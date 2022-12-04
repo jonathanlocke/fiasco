@@ -1,1 +1,15 @@
 /.idea/
+*.class
+*.jar
+*.war
+*.ear
+*~
+target/
+nbproject/
+nb-configuration.xml
+nbactions.xml
+*.iml
+.idea/*
+.classpath
+*.orig
+.DS_Store
