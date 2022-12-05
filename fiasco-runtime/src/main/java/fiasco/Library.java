@@ -7,7 +7,6 @@
 
 package fiasco;
 
-import com.telenav.kivakit.core.string.CaseFormat;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.comparison.Filter;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
@@ -15,6 +14,7 @@ import fiasco.dependency.DependencyList;
 import fiasco.repository.artifact.Artifact;
 
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
+import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
 import static fiasco.repository.artifact.Artifact.parseArtifact;
 
 @SuppressWarnings("unused")
@@ -27,20 +27,15 @@ public class Library implements Dependency<Library>
 
     private Artifact artifact;
 
-    private Filter<Library> exclusions = Filter.acceptAll();
+    private Filter<Library> exclusions = acceptAll();
 
     private final DependencyList<Library> dependencies = new DependencyList<>();
 
     private Version version;
 
-    public Library(Artifact artifact)
+    protected Library(Artifact artifact)
     {
         this.artifact = artifact;
-    }
-
-    protected Library()
-    {
-        artifact = parseArtifact(getClass().getPackageName() + ":" + CaseFormat.camelCaseToHyphenated(getClass().getSimpleName()));
     }
 
     protected Library(Library that)

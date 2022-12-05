@@ -1,6 +1,5 @@
-package fiasco.tools;
+package fiasco;
 
-import fiasco.BaseBuildSource;
 import fiasco.tools.archiver.Archiver;
 import fiasco.tools.builder.Builder;
 import fiasco.tools.compiler.Compiler;
@@ -9,11 +8,13 @@ import fiasco.tools.librarian.Librarian;
 import fiasco.tools.shader.Shader;
 import fiasco.tools.tester.Tester;
 
+import static com.telenav.kivakit.core.version.Version.version;
+
 /**
  * @author jonathan
  */
 @SuppressWarnings("unused")
-public interface Tools extends BaseBuildSource
+public interface ToolFactory extends BuildAttached
 {
     default Archiver archiver()
     {
@@ -27,7 +28,10 @@ public interface Tools extends BaseBuildSource
 
     default Compiler compiler()
     {
-        return new Compiler(baseBuild());
+        return new Compiler(baseBuild())
+                .sources(baseBuild().javaSources())
+                .sourceVersion(version("17"))
+                .targetVersion(version("17"));
     }
 
     default Copier copier()

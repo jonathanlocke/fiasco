@@ -81,7 +81,12 @@ public interface Structure extends Glob
      */
     default Folder outputFolder()
     {
-        return folder("output");
+        return rootFolder().folder("output");
+    }
+
+    default Folder rootFolder()
+    {
+        return folder("root");
     }
 
     /**
@@ -89,7 +94,7 @@ public interface Structure extends Glob
      */
     default Folder sourceFolder()
     {
-        return folder("src");
+        return rootFolder().folder("src");
     }
 
     /**

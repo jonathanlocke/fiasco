@@ -14,4 +14,8 @@ import com.telenav.kivakit.core.messaging.Repeater;
  */
 public interface Tool extends Repeater, Runnable
 {
+    /**
+     * Returns the build that this tool was created by
+     */
+    BaseBuild build();
 }

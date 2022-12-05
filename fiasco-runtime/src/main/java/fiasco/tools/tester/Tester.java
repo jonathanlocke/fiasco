@@ -8,7 +8,6 @@
 package fiasco.tools.tester;
 
 import fiasco.BaseBuild;
-import fiasco.tools.Tools;
 import fiasco.tools.BaseTool;
 
 /**

@@ -5,6 +5,8 @@ import fiasco.BaseBuild;
 import fiasco.Tool;
 
 /**
+ * Base class for {@link Tool}s.
+ *
  * @author jonathan
  */
 public abstract class BaseTool extends BaseRepeater implements Tool
@@ -16,6 +18,7 @@ public abstract class BaseTool extends BaseRepeater implements Tool
         this.build = build;
     }
 
+    @Override
     public BaseBuild build()
     {
         return build;

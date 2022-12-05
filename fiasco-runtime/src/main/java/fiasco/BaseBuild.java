@@ -27,18 +27,18 @@ import fiasco.glob.Glob;
 import fiasco.metadata.Metadata;
 import fiasco.repository.artifact.Artifact;
 import fiasco.structure.StructureMixin;
-import fiasco.tools.Tools;
 import fiasco.tools.builder.BuildListener;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+import static fiasco.repository.artifact.Artifact.parseArtifact;
 
 @SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused" })
 public abstract class BaseBuild extends BaseComponent implements
-        Tools,
+        ToolFactory,
         Glob,
         EnvironmentTrait,
         StructureMixin,
-        BaseBuildSource
+        BuildAttached
 {
     private Metadata metadata;
 
@@ -98,7 +98,7 @@ public abstract class BaseBuild extends BaseComponent implements
         return metadata;
     }
 
-    public Tools requires(Library library)
+    public ToolFactory requires(Library library)
     {
         libraries.add(library);
         return this;
@@ -106,7 +106,7 @@ public abstract class BaseBuild extends BaseComponent implements
 
     protected void artifact(String descriptor)
     {
-        artifact(Artifact.parseArtifact(descriptor));
+        artifact(parseArtifact(descriptor));
     }
 
     protected void artifact(Artifact artifact)
