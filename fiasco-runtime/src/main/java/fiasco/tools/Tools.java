@@ -17,7 +17,7 @@ public interface Tools extends BaseBuildSource
 {
     default Archiver archiver()
     {
-        return new Archiver(this);
+        return new Archiver(baseBuild());
     }
 
     default Builder builder()

@@ -106,7 +106,7 @@ public abstract class BaseBuild extends BaseComponent implements
 
     protected void artifact(String descriptor)
     {
-        artifact(Artifact.parse(descriptor));
+        artifact(Artifact.parseArtifact(descriptor));
     }
 
     protected void artifact(Artifact artifact)

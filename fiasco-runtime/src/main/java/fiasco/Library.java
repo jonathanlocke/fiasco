@@ -15,14 +15,14 @@ import fiasco.dependency.DependencyList;
 import fiasco.repository.artifact.Artifact;
 
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
+import static fiasco.repository.artifact.Artifact.parseArtifact;
 
 @SuppressWarnings("unused")
 public class Library implements Dependency<Library>
 {
-    @SuppressWarnings("ConstantConditions")
-    public static Library parse(String descriptor)
+    public static Library library(String artifact)
     {
-        return new Library((Library) null);
+        return new Library(parseArtifact(artifact));
     }
 
     private Artifact artifact;
@@ -33,11 +33,6 @@ public class Library implements Dependency<Library>
 
     private Version version;
 
-    public static Library library(String specifier)
-    {
-        return null;
-    }
-
     public Library(Artifact artifact)
     {
         this.artifact = artifact;
@@ -45,7 +40,7 @@ public class Library implements Dependency<Library>
 
     protected Library()
     {
-        artifact = Artifact.parse(getClass().getPackageName() + ":" + CaseFormat.camelCaseToHyphenated(getClass().getSimpleName()));
+        artifact = parseArtifact(getClass().getPackageName() + ":" + CaseFormat.camelCaseToHyphenated(getClass().getSimpleName()));
     }
 
     protected Library(Library that)

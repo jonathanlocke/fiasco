@@ -1,13 +1,13 @@
 package fiasco.tools.archiver;
 
-import fiasco.tools.Tools;
+import fiasco.BaseBuild;
 import fiasco.tools.BaseTool;
 
 public class Archiver extends BaseTool
 {
-    public Archiver(final Tools module)
+    public Archiver(BaseBuild build)
     {
-        super(module);
+        super(build);
     }
 
     @Override

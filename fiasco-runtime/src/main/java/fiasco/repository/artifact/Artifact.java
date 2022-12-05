@@ -19,7 +19,7 @@ public class Artifact implements Named
             + "(?<version>[\\d.]+(-(snapshot|alpha|beta|rc|final)))"
             + ")?");
 
-    public static Artifact parse(final String descriptor)
+    public static Artifact parseArtifact(final String descriptor)
     {
         final var matcher = pattern.matcher(descriptor);
         if (matcher.matches())
