@@ -29,6 +29,8 @@ import fiasco.repository.artifact.Artifact;
 import fiasco.structure.StructureMixin;
 import fiasco.tools.builder.BuildListener;
 
+import java.util.function.Consumer;
+
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static fiasco.repository.artifact.Artifact.parseArtifact;
 
@@ -47,6 +49,11 @@ public abstract class BaseBuild extends BaseComponent implements
     private final DependencyList<Library> libraries = new DependencyList<>();
 
     private Artifact artifact;
+
+    public void addListener(BuildListener listener)
+    {
+        buildListeners.add(listener);
+    }
 
     public Artifact artifact()
     {
@@ -78,11 +85,6 @@ public abstract class BaseBuild extends BaseComponent implements
         return issues.count(Problem.class).isZero();
     }
 
-    public ObjectList<BuildListener> buildListeners()
-    {
-        return buildListeners;
-    }
-
     public DependencyList<Library> libraries()
     {
         return libraries;
@@ -96,6 +98,11 @@ public abstract class BaseBuild extends BaseComponent implements
     public Metadata metadata()
     {
         return metadata;
+    }
+
+    public void notify(Consumer<BuildListener> consumer)
+    {
+        buildListeners.forEach(consumer);
     }
 
     public ToolFactory requires(Library library)

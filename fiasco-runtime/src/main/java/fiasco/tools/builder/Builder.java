@@ -18,40 +18,35 @@ public class Builder extends BaseTool
 
     public void archive()
     {
-        build().buildListeners().forEach(BuildListener::onArchiving);
+        build().notify(BuildListener::onArchiving);
         build().archiver().run();
-        build().buildListeners().forEach(BuildListener::onArchived);
+        build().notify(BuildListener::onArchived);
     }
 
     public void compile()
     {
-        build().buildListeners().forEach(BuildListener::onCompiling);
+        build().notify(BuildListener::onCompiling);
         build().compiler().run();
-        build().buildListeners().forEach(BuildListener::onCompiled);
+        build().notify(BuildListener::onCompiled);
     }
 
     public void deploy()
     {
-        build().buildListeners().forEach(BuildListener::onDeploying);
+        build().notify(BuildListener::onDeploying);
         build().librarian().deploy(null).run();
-        build().buildListeners().forEach(BuildListener::onDeployed);
+        build().notify(BuildListener::onDeployed);
     }
 
     public void install()
     {
-        build().buildListeners().forEach(BuildListener::onInstalling);
+        build().notify(BuildListener::onInstalling);
         build().librarian().install(null);
-        build().buildListeners().forEach(BuildListener::onInstalled);
-    }
-
-    public void listenTo(BuildListener listener)
-    {
-        build().buildListeners().add(listener);
+        build().notify(BuildListener::onInstalled);
     }
 
     public void onCompiled(Runnable code)
     {
-        listenTo(new BuildListener()
+        build().addListener(new BuildListener()
         {
             @Override
             public void onCompiled()
@@ -63,7 +58,7 @@ public class Builder extends BaseTool
 
     public void onCompiling(Runnable code)
     {
-        listenTo(new BuildListener()
+        build().addListener(new BuildListener()
         {
             @Override
             public void onCompiling()
@@ -76,16 +71,16 @@ public class Builder extends BaseTool
     @Override
     public void onRun()
     {
-        build().buildListeners().forEach(BuildListener::onBuilding);
+        build().notify(BuildListener::onBuilding);
         onBuild();
-        build().buildListeners().forEach(BuildListener::onBuilt);
+        build().notify(BuildListener::onBuilt);
     }
 
     public void test()
     {
-        build().buildListeners().forEach(BuildListener::onTesting);
+        build().notify(BuildListener::onTesting);
         build().tester().run();
-        build().buildListeners().forEach(BuildListener::onTested);
+        build().notify(BuildListener::onTested);
     }
 
     protected void onBuild()
