@@ -2,7 +2,6 @@ package fiasco;
 
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.core.object.Lazy;
-import com.telenav.kivakit.core.os.OperatingSystem;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.FileList;
 import com.telenav.kivakit.filesystem.Folder;
@@ -32,7 +31,7 @@ public class Module extends BaseRepeater implements Dependency<Module>
     private final DependencyList<Library> libraries = new DependencyList<>();
 
     /** The project that this module belongs to */
-    private Project project;
+    private FiascoBuild project;
 
     private Artifact artifact;
 
@@ -53,12 +52,12 @@ public class Module extends BaseRepeater implements Dependency<Module>
 
     private final Lazy<Tester> tester = lazy(() -> new Tester(this));
 
-    public Module(final Project project, final String relativePath)
+    public Module(final FiascoBuild project, final String relativePath)
     {
         this(project, Folder.parseFolder(relativePath));
     }
 
-    public Module(final Project project, final Folder relativeFolder)
+    public Module(final FiascoBuild project, final Folder relativeFolder)
     {
         this.project = project;
 
@@ -127,7 +126,7 @@ public class Module extends BaseRepeater implements Dependency<Module>
         return folder("output");
     }
 
-    public Project project()
+    public FiascoBuild project()
     {
         return project;
     }
@@ -208,7 +207,7 @@ public class Module extends BaseRepeater implements Dependency<Module>
         return operatingSystem().isWindows();
     }
 
-    protected void project(final Project project)
+    protected void project(final FiascoBuild project)
     {
         this.project = project;
     }

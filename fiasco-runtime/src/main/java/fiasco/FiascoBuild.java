@@ -21,20 +21,24 @@ import com.telenav.kivakit.core.messaging.messages.status.Warning;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.code.Callback;
-import fiasco.metadata.Contributor;
-import fiasco.metadata.Organization;
 
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 
 @SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused" })
-public abstract class Project extends Module
+public abstract class FiascoBuild extends Module
 {
-    private ProjectMetadata metadata = new ProjectMetadata();
+    private final BuildMetadata metadata;
 
-    public Project(Folder root)
+    public FiascoBuild(BuildMetadata metadata)
     {
-        super(null, root);
+        super((FiascoBuild) null, (String) null);
+        this.metadata = metadata;
         project(this);
+    }
+
+    public boolean build()
+    {
+        return build(Count._12);
     }
 
     /**
@@ -52,19 +56,14 @@ public abstract class Project extends Module
         return issues.count(Problem.class).isZero();
     }
 
-    public ProjectMetadata metadata()
-    {
-        return metadata;
-    }
-
-    public Project module(String path)
+    public FiascoBuild module(String path)
     {
         return module(path, module ->
         {
         });
     }
 
-    public Project module(String path, Callback<Module> configure)
+    public FiascoBuild module(String path, Callback<Module> configure)
     {
         var folder = Folder.parseFolder(path);
         ensure(folder.path().isRelative());
@@ -72,20 +71,5 @@ public abstract class Project extends Module
         configure.call(module);
         requires(module);
         return this;
-    }
-
-    protected void contributor(Contributor contributor)
-    {
-        metadata = metadata.withContributor(contributor);
-    }
-
-    protected void copyright(String copyright)
-    {
-        metadata = metadata.withCopyright(copyright);
-    }
-
-    protected void organization(Organization organization)
-    {
-        metadata = metadata.withOrganization(organization);
     }
 }

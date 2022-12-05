@@ -5,7 +5,7 @@ import com.telenav.kivakit.commandline.SwitchParser;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.filesystem.Folder;
-import fiasco.Project;
+import fiasco.FiascoBuild;
 
 import java.lang.reflect.Constructor;
 import java.net.URL;
@@ -92,7 +92,7 @@ public class Fiasco extends Application
                 Constructor<?> constructor = type.getConstructor(Folder.class);
 
                 // create the project object
-                var project = (Project) constructor.newInstance(folder);
+                var project = (FiascoBuild) constructor.newInstance(folder);
 
                 // and ask it to build the project
                 project.build(commandLine().get(THREADS));

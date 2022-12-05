@@ -1,17 +1,37 @@
 package fiasco.metadata;
 
-import com.telenav.kivakit.core.value.name.Name;
+import com.telenav.kivakit.core.collections.list.StringList;
+import com.telenav.kivakit.interfaces.naming.Named;
 
 @SuppressWarnings("unused")
-public class Contributor extends Name
+public class Contributor implements Named
 {
+    public static Contributor contributor(String name)
+    {
+        return new Contributor(name);
+    }
+
+    private String name;
+
     private String email;
 
-    private String role;
+    private StringList roles;
 
-    public Contributor(String name)
+    private Contributor(String name)
     {
-        super(name);
+        this.name = name;
+    }
+
+    private Contributor(Contributor that)
+    {
+        this.email = that.email;
+        this.name = that.name;
+        this.roles = that.roles.copy();
+    }
+
+    public Contributor copy()
+    {
+        return new Contributor(this);
     }
 
     public String email()
@@ -19,20 +39,35 @@ public class Contributor extends Name
         return email;
     }
 
-    public String role()
+    @Override
+    public String name()
     {
-        return role;
+        return name;
+    }
+
+    public StringList role()
+    {
+        return roles;
     }
 
     public Contributor withEmail(String email)
     {
-        this.email = email;
-        return this;
+        var copy = copy();
+        copy.email = email;
+        return copy;
+    }
+
+    public Contributor withName(String name)
+    {
+        var copy = copy();
+        copy.name = name;
+        return copy;
     }
 
     public Contributor withRole(String role)
     {
-        this.role = role;
-        return this;
+        var copy = copy();
+        copy.roles.add(role);
+        return copy;
     }
 }

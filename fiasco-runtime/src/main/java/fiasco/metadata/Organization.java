@@ -1,6 +1,6 @@
 package fiasco.metadata;
 
-import com.telenav.kivakit.core.value.name.Name;
+import com.telenav.kivakit.interfaces.naming.Named;
 
 import java.net.MalformedURLException;
 import java.net.URL;
@@ -8,13 +8,31 @@ import java.net.URL;
 import static com.telenav.kivakit.core.ensure.Ensure.fail;
 
 @SuppressWarnings("unused")
-public class Organization extends Name
+public class Organization implements Named
 {
+    public static Organization organization(String name)
+    {
+        return new Organization(name);
+    }
+
+    private final String name;
+
     private URL url;
 
-    public Organization(String name)
+    private Organization(String name)
     {
-        super(name);
+        this.name = name;
+    }
+
+    private Organization(Organization that)
+    {
+        this.name = that.name;
+        this.url = that.url;
+    }
+
+    public Organization copy()
+    {
+        return new Organization(this);
     }
 
     public URL url()
@@ -24,8 +42,9 @@ public class Organization extends Name
 
     public Organization withUrl(URL url)
     {
-        this.url = url;
-        return this;
+        var copy = copy();
+        copy.url = url;
+        return copy;
     }
 
     public Organization withUrl(String url)

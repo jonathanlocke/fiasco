@@ -33,6 +33,11 @@ public class Library implements Dependency<Library>
 
     private Version version;
 
+    public static Library library(String specifier)
+    {
+        return null;
+    }
+
     public Library(Artifact artifact)
     {
         this.artifact = artifact;

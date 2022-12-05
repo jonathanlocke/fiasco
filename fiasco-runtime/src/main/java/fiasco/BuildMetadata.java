@@ -14,23 +14,28 @@ import java.util.List;
  * @author jonathanl (shibo)
  */
 @SuppressWarnings("unused")
-public class ProjectMetadata implements Named
+public class BuildMetadata implements Named
 {
+    public static BuildMetadata metadata(String artifact)
+    {
+        return new BuildMetadata(artifact);
+    }
+
     private List<Contributor> contributors;
 
     private Copyright copyright;
 
     private Organization organization;
 
-    public ProjectMetadata()
-    {
-    }
-
-    protected ProjectMetadata(final ProjectMetadata that)
+    protected BuildMetadata(BuildMetadata that)
     {
         copyright = that.copyright;
         contributors = new ArrayList<>(that.contributors);
         organization = that.organization;
+    }
+
+    private BuildMetadata(String artifact)
+    {
     }
 
     public List<Contributor> contributors()
@@ -48,23 +53,23 @@ public class ProjectMetadata implements Named
         return organization;
     }
 
-    public ProjectMetadata withContributor(final Contributor contributor)
+    public BuildMetadata withContributor(Contributor contributor)
     {
-        final var copy = new ProjectMetadata(this);
+        var copy = new BuildMetadata(this);
         copy.contributors.add(contributor);
         return copy;
     }
 
-    public ProjectMetadata withCopyright(final String copyright)
+    public BuildMetadata withCopyright(String copyright)
     {
-        final var copy = new ProjectMetadata(this);
+        var copy = new BuildMetadata(this);
         copy.copyright = new Copyright(copyright);
         return copy;
     }
 
-    public ProjectMetadata withOrganization(final Organization organization)
+    public BuildMetadata withOrganization(Organization organization)
     {
-        final var copy = new ProjectMetadata(this);
+        var copy = new BuildMetadata(this);
         copy.organization = organization;
         return copy;
     }

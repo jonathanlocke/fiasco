@@ -67,7 +67,11 @@
 
         <!-- Framework -->
 
-        <kivakit.version>1.8.8</kivakit.version>
+        <kivakit.version>1.8.9</kivakit.version>
+
+        <!-- Fiasco -->
+
+        <fiasco.downloads.folder>${env.HOME}/.fiasco/downloads</fiasco.downloads.folder>
 
         <!-- Plugins -->
 
