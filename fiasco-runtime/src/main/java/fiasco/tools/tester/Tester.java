@@ -5,19 +5,19 @@
 // terms of the license agreement you entered into with Telenav.                                             /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package fiasco.plugins.tester;
+package fiasco.tools.tester;
 
-import fiasco.Module;
-import fiasco.plugins.Plugin;
+import fiasco.tools.Tools;
+import fiasco.tools.BaseTool;
 
 /**
  * Runs unit tests
  *
  * @author shibo
  */
-public class Tester extends Plugin
+public class Tester extends BaseTool
 {
-    public Tester(final Module module)
+    public Tester(final Tools module)
     {
         super(module);
     }

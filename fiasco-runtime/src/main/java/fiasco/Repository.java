@@ -6,7 +6,7 @@ import com.telenav.kivakit.core.messaging.Repeater;
 /**
  * Interface to a repository that stores libraries
  *
- * @author jonathanl (shibo)
+ * @author jonathan
  */
 @SuppressWarnings("unused")
 public interface Repository extends Repeater

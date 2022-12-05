@@ -21,7 +21,7 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
 /**
  * Fiasco is a pure-Java build tool.
  *
- * @author jonathanl (shibo)
+ * @author jonathan
  */
 public class Fiasco extends Application
 {

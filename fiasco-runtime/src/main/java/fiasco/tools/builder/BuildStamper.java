@@ -1,14 +1,14 @@
-package fiasco.plugins.builder;
+package fiasco.tools.builder;
 
-import fiasco.Module;
-import fiasco.plugins.Plugin;
+import fiasco.tools.Tools;
+import fiasco.tools.BaseTool;
 
 /**
- * @author jonathanl (shibo)
+ * @author jonathan
  */
-public class BuildStamper extends Plugin
+public class BuildStamper extends BaseTool
 {
-    public BuildStamper(final Module module)
+    public BuildStamper(final Tools module)
     {
         super(module);
     }

@@ -5,13 +5,13 @@
 // terms of the license agreement you entered into with Telenav.                                             /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package fiasco.plugins.librarian;
+package fiasco.tools.librarian;
 
 import com.telenav.kivakit.interfaces.comparison.Filter;
 import fiasco.Library;
-import fiasco.Module;
+import fiasco.tools.Tools;
 import fiasco.Repository;
-import fiasco.plugins.Plugin;
+import fiasco.tools.BaseTool;
 import fiasco.repository.LibraryResolver;
 import fiasco.repository.RemoteMavenRepository;
 
@@ -27,13 +27,13 @@ import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
  * @author shibo
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class Librarian extends Plugin implements LibraryResolver
+public class Librarian extends BaseTool implements LibraryResolver
 {
     private final List<Repository> repositories = new ArrayList<>();
 
     private Repository deploymentRepository;
 
-    public Librarian(Module module)
+    public Librarian(Tools module)
     {
         super(module);
     }

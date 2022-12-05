@@ -1,14 +1,15 @@
 import fiasco.FiascoBuild;
+import fiasco.metadata.Contributor;
+import fiasco.metadata.Copyright;
+import fiasco.metadata.Metadata;
+import fiasco.metadata.Organization;
 
-import static fiasco.BuildMetadata.metadata;
-import static fiasco.metadata.Contributor.contributor;
-import static fiasco.metadata.Organization.organization;
 import static fiasco.repository.RemoteMavenRepository.mavenCentral;
 
 /**
  * Example Fiasco build.
  *
- * @author jonathanl (shibo)
+ * @author jonathan
  */
 @SuppressWarnings({ "InnerClassMayBeStatic", "unused" })
 public class Build extends FiascoBuild implements
@@ -22,11 +23,11 @@ public class Build extends FiascoBuild implements
 
     public Build()
     {
-        super(metadata("fiasco:fiasco-example:1.0")
-                .withOrganization(organization("State of the Art")
+        metadata(new Metadata("fiasco:fiasco-example:1.0")
+                .withOrganization(new Organization("State of the Art")
                         .withUrl("https://www.state-of-the-art.org"))
-                .withCopyright("Copyright 2020-2022, Jonathan Locke. All Rights Reserved.")
-                .withContributor(contributor("Jonathan Locke")
+                .withCopyright(new Copyright("Copyright 2020-2022, Jonathan Locke. All Rights Reserved."))
+                .withContributor(new Contributor("Jonathan Locke")
                         .withRole("FiascoBuild Lead")
                         .withEmail("jon@thanlocke.com")));
 

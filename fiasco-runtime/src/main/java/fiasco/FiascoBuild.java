@@ -14,6 +14,7 @@
 
 package fiasco;
 
+import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.messaging.listeners.MessageList;
 import com.telenav.kivakit.core.messaging.messages.status.Problem;
 import com.telenav.kivakit.core.messaging.messages.status.Quibble;
@@ -21,24 +22,37 @@ import com.telenav.kivakit.core.messaging.messages.status.Warning;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.code.Callback;
+import fiasco.dependency.DependencyList;
+import fiasco.environment.EnvironmentTrait;
+import fiasco.glob.Glob;
+import fiasco.metadata.Metadata;
+import fiasco.repository.artifact.Artifact;
+import fiasco.structure.StructureMixin;
+import fiasco.tools.Tools;
 
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 
 @SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused" })
-public abstract class FiascoBuild extends Module
+public abstract class FiascoBuild extends BaseComponent implements
+        Tools,
+        Glob,
+        EnvironmentTrait,
+        StructureMixin
 {
-    private final BuildMetadata metadata;
+    private Metadata metadata;
 
-    public FiascoBuild(BuildMetadata metadata)
+    private final DependencyList<Library> libraries = new DependencyList<>();
+
+    private Artifact artifact;
+
+    public Artifact artifact()
     {
-        super((FiascoBuild) null, (String) null);
-        this.metadata = metadata;
-        project(this);
+        return artifact;
     }
 
     public boolean build()
     {
-        return build(Count._12);
+        return build(processors());
     }
 
     /**
@@ -50,10 +64,30 @@ public abstract class FiascoBuild extends Module
     public boolean build(Count threads)
     {
         var issues = new MessageList(message -> !message.status().succeeded());
-        dependencies().process(this, threads, module -> module.builder().run());
+        libraries().process(this, threads, module -> module.builder().run());
         var statistics = issues.statistics(Problem.class, Warning.class, Quibble.class);
         information(statistics.titledBox("Build Results"));
         return issues.count(Problem.class).isZero();
+    }
+
+    public Folder classesFolder()
+    {
+        return outputFolder().folder("classes");
+    }
+
+    public DependencyList<Library> libraries()
+    {
+        return libraries;
+    }
+
+    public void metadata(Metadata metadata)
+    {
+        this.metadata = metadata;
+    }
+
+    public Metadata metadata()
+    {
+        return metadata;
     }
 
     public FiascoBuild module(String path)
@@ -63,13 +97,29 @@ public abstract class FiascoBuild extends Module
         });
     }
 
-    public FiascoBuild module(String path, Callback<Module> configure)
+    public FiascoBuild module(String path, Callback<Tools> configure)
     {
         var folder = Folder.parseFolder(path);
         ensure(folder.path().isRelative());
-        var module = new Module(this, folder);
+        var module = new Tools(this, folder);
         configure.call(module);
         requires(module);
         return this;
+    }
+
+    public Tools requires(Library library)
+    {
+        libraries.add(library);
+        return this;
+    }
+
+    protected void artifact(String descriptor)
+    {
+        artifact(Artifact.parse(descriptor));
+    }
+
+    protected void artifact(Artifact artifact)
+    {
+        this.artifact = artifact;
     }
 }

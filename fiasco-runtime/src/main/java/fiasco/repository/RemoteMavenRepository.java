@@ -4,7 +4,7 @@ import com.telenav.kivakit.core.collections.list.ObjectList;
 import fiasco.Library;
 
 /**
- * @author jonathanl (shibo)
+ * @author jonathan
  */
 public class RemoteMavenRepository extends BaseRepository
 {

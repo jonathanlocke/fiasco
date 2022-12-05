@@ -3,7 +3,7 @@ package fiasco.repository.artifact;
 import com.telenav.kivakit.core.value.name.Name;
 
 /**
- * @author jonathanl (shibo)
+ * @author jonathan
  */
 @SuppressWarnings("unused")
 public class Group extends Name

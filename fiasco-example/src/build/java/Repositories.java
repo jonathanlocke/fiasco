@@ -2,7 +2,7 @@ import fiasco.Repository;
 import fiasco.repository.RemoteMavenRepository;
 
 /**
- * @author jonathanl (shibo)
+ * @author jonathan
  */
 public interface Repositories
 {

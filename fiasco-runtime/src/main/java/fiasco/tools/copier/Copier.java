@@ -5,15 +5,15 @@
 // terms of the license agreement you entered into with Telenav.                                             /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package fiasco.plugins.copier;
+package fiasco.tools.copier;
 
 import com.telenav.kivakit.core.progress.ProgressReporter;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import com.telenav.kivakit.resource.CopyMode;
 import com.telenav.kivakit.resource.ResourcePathed;
-import fiasco.Module;
-import fiasco.plugins.Plugin;
+import fiasco.tools.Tools;
+import fiasco.tools.BaseTool;
 
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
 
@@ -23,7 +23,7 @@ import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressRe
  * @author shibo
  */
 @SuppressWarnings("unused")
-public class Copier extends Plugin
+public class Copier extends BaseTool
 {
     /** The folder to copy to */
     private Folder to;
@@ -37,7 +37,7 @@ public class Copier extends Plugin
     /** Progress in copying files */
     private final ProgressReporter progress = progressReporter(this, "files");
 
-    public Copier(Module module)
+    public Copier(Tools module)
     {
         super(module);
     }

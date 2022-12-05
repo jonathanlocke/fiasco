@@ -4,7 +4,7 @@ import com.telenav.kivakit.interfaces.comparison.Matcher;
 import fiasco.Library;
 
 /**
- * @author jonathanl (shibo)
+ * @author jonathan
  */
 public class LibraryPattern implements Matcher<Library>
 {

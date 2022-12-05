@@ -7,7 +7,7 @@ import com.telenav.kivakit.interfaces.naming.Named;
 import java.util.regex.Pattern;
 
 /**
- * @author jonathanl (shibo)
+ * @author jonathan
  */
 @SuppressWarnings("unused")
 public class Artifact implements Named

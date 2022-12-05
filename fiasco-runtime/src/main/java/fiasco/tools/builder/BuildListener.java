@@ -1,9 +1,9 @@
-package fiasco.plugins.builder;
+package fiasco.tools.builder;
 
 /**
  * A build performs a set of actions on a collection of projects and other builds to produce a set of artifacts.
  *
- * @author jonathanl (shibo)
+ * @author jonathan
  */
 public interface BuildListener
 {

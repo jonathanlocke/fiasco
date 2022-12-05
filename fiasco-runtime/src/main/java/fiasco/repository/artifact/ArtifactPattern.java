@@ -3,7 +3,7 @@ package fiasco.repository.artifact;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 
 /**
- * @author jonathanl (shibo)
+ * @author jonathan
  */
 public class ArtifactPattern implements Matcher<Artifact>
 {

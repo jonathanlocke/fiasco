@@ -1,36 +1,20 @@
-package fiasco.plugins;
+package fiasco.tools;
 
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.filesystem.Folder;
-import fiasco.Module;
 import fiasco.Tool;
 
 /**
- * @author jonathanl (shibo)
+ * @author jonathan
  */
-public abstract class Plugin extends BaseRepeater implements Tool
+public abstract class BaseTool extends BaseRepeater implements Tool
 {
-    private final Module module;
-
-    /**
-     * @param module The module where this tool should be executed, if any
-     */
-    public Plugin(final Module module)
-    {
-        this.module = module;
-    }
-
     @Override
     public final void run()
     {
         onRunning();
         onRun();
         onRan();
-    }
-
-    protected Module module()
-    {
-        return module;
     }
 
     protected void onRan()
@@ -43,7 +27,7 @@ public abstract class Plugin extends BaseRepeater implements Tool
     {
     }
 
-    protected Folder resolveFolder(final Folder folder)
+    protected Folder resolveFolder(Folder folder)
     {
         if (folder.path().isRelative())
         {

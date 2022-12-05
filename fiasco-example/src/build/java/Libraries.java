@@ -3,7 +3,7 @@ import fiasco.Library;
 import static fiasco.Library.library;
 
 /**
- * @author jonathanl (shibo)
+ * @author jonathan
  */
 @SuppressWarnings({ "SpellCheckingInspection", "unused" })
 public interface Libraries

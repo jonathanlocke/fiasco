@@ -1,12 +1,12 @@
-package fiasco.plugins.compiler;
+package fiasco.tools.compiler;
 
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.FileList;
-import fiasco.Module;
-import fiasco.plugins.Plugin;
+import fiasco.tools.Tools;
+import fiasco.tools.BaseTool;
 
 @SuppressWarnings({ "FieldCanBeLocal", "unused" })
-public class Compiler extends Plugin
+public class Compiler extends BaseTool
 {
     private Version sourceVersion;
 
@@ -14,7 +14,7 @@ public class Compiler extends Plugin
 
     private FileList sources;
 
-    public Compiler(Module module)
+    public Compiler(Tools module)
     {
         super(module);
     }

@@ -1,7 +1,7 @@
-package fiasco.plugins.builder;
+package fiasco.tools.builder;
 
-import fiasco.Module;
-import fiasco.plugins.Plugin;
+import fiasco.tools.Tools;
+import fiasco.tools.BaseTool;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -9,13 +9,13 @@ import java.util.List;
 /**
  * A build performs a set of actions on a collection of projects and other builds to produce a set of artifacts.
  *
- * @author jonathanl (shibo)
+ * @author jonathan)
  */
-public class Builder extends Plugin
+public class Builder extends BaseTool
 {
     private final List<BuildListener> listeners = new ArrayList<>();
 
-    public Builder(final Module module)
+    public Builder(final Tools module)
     {
         super(module);
     }

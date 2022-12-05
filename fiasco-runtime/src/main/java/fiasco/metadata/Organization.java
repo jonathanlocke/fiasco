@@ -1,5 +1,7 @@
 package fiasco.metadata;
 
+import com.telenav.kivakit.core.string.FormatProperty;
+import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.interfaces.naming.Named;
 
 import java.net.MalformedURLException;
@@ -7,24 +9,31 @@ import java.net.URL;
 
 import static com.telenav.kivakit.core.ensure.Ensure.fail;
 
+/**
+ * Model for an organization managing a project
+ *
+ * @author jonathan
+ */
 @SuppressWarnings("unused")
 public class Organization implements Named
 {
-    public static Organization organization(String name)
-    {
-        return new Organization(name);
-    }
-
+    @FormatProperty
     private final String name;
 
+    @FormatProperty
     private URL url;
 
-    private Organization(String name)
+    /**
+     * Creates an {@link Organization} with the given name
+     *
+     * @param name The name of the organization
+     */
+    public Organization(String name)
     {
         this.name = name;
     }
 
-    private Organization(Organization that)
+    protected Organization(Organization that)
     {
         this.name = that.name;
         this.url = that.url;
@@ -33,6 +42,18 @@ public class Organization implements Named
     public Organization copy()
     {
         return new Organization(this);
+    }
+
+    @Override
+    public String name()
+    {
+        return name;
+    }
+
+    @Override
+    public String toString()
+    {
+        return new ObjectFormatter(this).toString();
     }
 
     public URL url()

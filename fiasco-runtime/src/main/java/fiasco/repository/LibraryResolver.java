@@ -6,7 +6,7 @@ import fiasco.Library;
 import java.util.List;
 
 /**
- * @author jonathanl (shibo)
+ * @author jonathan
  */
 @SuppressWarnings("unused")
 public interface LibraryResolver

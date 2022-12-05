@@ -21,7 +21,7 @@ import static com.telenav.kivakit.core.thread.Threads.shutdownAndAwaitTerminatio
  * {@link #process(Listener, Count, Callback)}, which calls the given callback with the number of threads requested and
  * reports issues to the given listener.
  *
- * @author jonathanl (shibo)
+ * @author jonathan
  */
 @SuppressWarnings("unused")
 public class DependencyList<T extends Dependency<T>> extends ObjectList<T>

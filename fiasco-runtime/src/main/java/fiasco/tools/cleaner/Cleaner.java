@@ -1,17 +1,17 @@
-package fiasco.plugins.cleaner;
+package fiasco.tools.cleaner;
 
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import com.telenav.kivakit.resource.ResourcePathed;
-import fiasco.Module;
-import fiasco.plugins.Plugin;
+import fiasco.tools.Tools;
+import fiasco.tools.BaseTool;
 
 @SuppressWarnings("unused")
-public class Cleaner extends Plugin
+public class Cleaner extends BaseTool
 {
     private final Matcher<ResourcePathed> matcher;
 
-    public Cleaner(Module module, Matcher<ResourcePathed> matcher)
+    public Cleaner(Tools module, Matcher<ResourcePathed> matcher)
     {
         super(module);
         this.matcher = matcher;

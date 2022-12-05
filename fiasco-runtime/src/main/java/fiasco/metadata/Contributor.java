@@ -1,28 +1,38 @@
 package fiasco.metadata;
 
 import com.telenav.kivakit.core.collections.list.StringList;
+import com.telenav.kivakit.core.string.FormatProperty;
+import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.interfaces.naming.Named;
 
+/**
+ * Model for a project contributor
+ *
+ * @author jonathan
+ */
 @SuppressWarnings("unused")
 public class Contributor implements Named
 {
-    public static Contributor contributor(String name)
-    {
-        return new Contributor(name);
-    }
-
+    @FormatProperty
     private String name;
 
+    @FormatProperty
     private String email;
 
+    @FormatProperty
     private StringList roles;
 
-    private Contributor(String name)
+    /**
+     * Creates a {@link Contributor} with the given name
+     *
+     * @param name The name of the contributor
+     */
+    public Contributor(String name)
     {
         this.name = name;
     }
 
-    private Contributor(Contributor that)
+    protected Contributor(Contributor that)
     {
         this.email = that.email;
         this.name = that.name;
@@ -48,6 +58,12 @@ public class Contributor implements Named
     public StringList role()
     {
         return roles;
+    }
+
+    @Override
+    public String toString()
+    {
+        return new ObjectFormatter(this).toString();
     }
 
     public Contributor withEmail(String email)

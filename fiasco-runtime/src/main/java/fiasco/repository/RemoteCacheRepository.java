@@ -14,7 +14,7 @@ import fiasco.Repository;
  * without accessing the network.
  * </p>
  *
- * @author jonathanl (shibo)
+ * @author jonathan
  */
 public class RemoteCacheRepository extends BaseRepository
 {
