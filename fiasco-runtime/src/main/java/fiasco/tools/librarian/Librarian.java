@@ -8,12 +8,12 @@
 package fiasco.tools.librarian;
 
 import com.telenav.kivakit.interfaces.comparison.Filter;
+import fiasco.BaseBuild;
 import fiasco.Library;
-import fiasco.tools.Tools;
 import fiasco.Repository;
-import fiasco.tools.BaseTool;
 import fiasco.repository.LibraryResolver;
 import fiasco.repository.RemoteMavenRepository;
+import fiasco.tools.BaseTool;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -33,9 +33,9 @@ public class Librarian extends BaseTool implements LibraryResolver
 
     private Repository deploymentRepository;
 
-    public Librarian(Tools module)
+    public Librarian(BaseBuild build)
     {
-        super(module);
+        super(build);
     }
 
     public Librarian deploy(Library library)

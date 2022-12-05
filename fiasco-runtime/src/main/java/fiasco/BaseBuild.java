@@ -15,13 +15,12 @@
 package fiasco;
 
 import com.telenav.kivakit.component.BaseComponent;
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.listeners.MessageList;
 import com.telenav.kivakit.core.messaging.messages.status.Problem;
 import com.telenav.kivakit.core.messaging.messages.status.Quibble;
 import com.telenav.kivakit.core.messaging.messages.status.Warning;
 import com.telenav.kivakit.core.value.count.Count;
-import com.telenav.kivakit.filesystem.Folder;
-import com.telenav.kivakit.interfaces.code.Callback;
 import fiasco.dependency.DependencyList;
 import fiasco.environment.EnvironmentTrait;
 import fiasco.glob.Glob;
@@ -29,17 +28,21 @@ import fiasco.metadata.Metadata;
 import fiasco.repository.artifact.Artifact;
 import fiasco.structure.StructureMixin;
 import fiasco.tools.Tools;
+import fiasco.tools.builder.BuildListener;
 
-import static com.telenav.kivakit.core.ensure.Ensure.ensure;
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 
 @SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused" })
-public abstract class FiascoBuild extends BaseComponent implements
+public abstract class BaseBuild extends BaseComponent implements
         Tools,
         Glob,
         EnvironmentTrait,
-        StructureMixin
+        StructureMixin,
+        BaseBuildSource
 {
     private Metadata metadata;
+
+    private final ObjectList<BuildListener> buildListeners = list();
 
     private final DependencyList<Library> libraries = new DependencyList<>();
 
@@ -48,6 +51,12 @@ public abstract class FiascoBuild extends BaseComponent implements
     public Artifact artifact()
     {
         return artifact;
+    }
+
+    @Override
+    public BaseBuild baseBuild()
+    {
+        return this;
     }
 
     public boolean build()
@@ -64,15 +73,14 @@ public abstract class FiascoBuild extends BaseComponent implements
     public boolean build(Count threads)
     {
         var issues = new MessageList(message -> !message.status().succeeded());
-        libraries().process(this, threads, module -> module.builder().run());
         var statistics = issues.statistics(Problem.class, Warning.class, Quibble.class);
         information(statistics.titledBox("Build Results"));
         return issues.count(Problem.class).isZero();
     }
 
-    public Folder classesFolder()
+    public ObjectList<BuildListener> buildListeners()
     {
-        return outputFolder().folder("classes");
+        return buildListeners;
     }
 
     public DependencyList<Library> libraries()
@@ -88,23 +96,6 @@ public abstract class FiascoBuild extends BaseComponent implements
     public Metadata metadata()
     {
         return metadata;
-    }
-
-    public FiascoBuild module(String path)
-    {
-        return module(path, module ->
-        {
-        });
-    }
-
-    public FiascoBuild module(String path, Callback<Tools> configure)
-    {
-        var folder = Folder.parseFolder(path);
-        ensure(folder.path().isRelative());
-        var module = new Tools(this, folder);
-        configure.call(module);
-        requires(module);
-        return this;
     }
 
     public Tools requires(Library library)

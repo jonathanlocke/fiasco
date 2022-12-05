@@ -1,5 +1,6 @@
 package fiasco.tools;
 
+import fiasco.BaseBuildSource;
 import fiasco.tools.archiver.Archiver;
 import fiasco.tools.builder.Builder;
 import fiasco.tools.compiler.Compiler;
@@ -12,7 +13,7 @@ import fiasco.tools.tester.Tester;
  * @author jonathan
  */
 @SuppressWarnings("unused")
-public interface Tools
+public interface Tools extends BaseBuildSource
 {
     default Archiver archiver()
     {
@@ -21,31 +22,31 @@ public interface Tools
 
     default Builder builder()
     {
-        return new Builder(this);
+        return new Builder(baseBuild());
     }
 
     default Compiler compiler()
     {
-        return new Compiler(this);
+        return new Compiler(baseBuild());
     }
 
     default Copier copier()
     {
-        return new Copier(this);
+        return new Copier(baseBuild());
     }
 
     default Librarian librarian()
     {
-        return new Librarian(this);
+        return new Librarian(baseBuild());
     }
 
     default Shader shader()
     {
-        return new Shader(this);
+        return new Shader(baseBuild());
     }
 
     default Tester tester()
     {
-        return new Tester(this);
+        return new Tester(baseBuild());
     }
 }

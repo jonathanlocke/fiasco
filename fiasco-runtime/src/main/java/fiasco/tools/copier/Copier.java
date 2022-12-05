@@ -12,7 +12,7 @@ import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import com.telenav.kivakit.resource.CopyMode;
 import com.telenav.kivakit.resource.ResourcePathed;
-import fiasco.tools.Tools;
+import fiasco.BaseBuild;
 import fiasco.tools.BaseTool;
 
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
@@ -37,14 +37,14 @@ public class Copier extends BaseTool
     /** Progress in copying files */
     private final ProgressReporter progress = progressReporter(this, "files");
 
-    public Copier(Tools module)
+    public Copier(BaseBuild build)
     {
-        super(module);
+        super(build);
     }
 
     public Copier from(Folder from)
     {
-        this.from = resolveFolder(from);
+        this.from = from;
         return this;
     }
 
@@ -66,7 +66,7 @@ public class Copier extends BaseTool
 
     public Copier to(Folder to)
     {
-        this.to = resolveFolder(to);
+        this.to = to;
         return this;
     }
 

@@ -4,9 +4,22 @@ import com.telenav.kivakit.filesystem.FileList;
 import com.telenav.kivakit.filesystem.Folder;
 import fiasco.glob.Glob;
 
+/**
+ * Information about the folder structure of the build.
+ *
+ * @author jonathan
+ */
 @SuppressWarnings("unused")
 public interface Structure extends Glob
 {
+    /**
+     * output/classes
+     */
+    default Folder classesFolder()
+    {
+        return outputFolder().folder("classes");
+    }
+
     /**
      * Returns the folder for the given key. For example "src" or "output".
      *

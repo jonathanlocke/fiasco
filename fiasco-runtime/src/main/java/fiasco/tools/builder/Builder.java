@@ -1,59 +1,55 @@
 package fiasco.tools.builder;
 
-import fiasco.tools.Tools;
+import fiasco.BaseBuild;
 import fiasco.tools.BaseTool;
-
-import java.util.ArrayList;
-import java.util.List;
 
 /**
  * A build performs a set of actions on a collection of projects and other builds to produce a set of artifacts.
  *
  * @author jonathan)
  */
+@SuppressWarnings("unused")
 public class Builder extends BaseTool
 {
-    private final List<BuildListener> listeners = new ArrayList<>();
-
-    public Builder(final Tools module)
+    public Builder(BaseBuild build)
     {
-        super(module);
+        super(build);
     }
 
     public void archive()
     {
-        listeners.forEach(BuildListener::onArchiving);
-        module().archiver().run();
-        listeners.forEach(BuildListener::onArchived);
+        build().buildListeners().forEach(BuildListener::onArchiving);
+        build().archiver().run();
+        build().buildListeners().forEach(BuildListener::onArchived);
     }
 
     public void compile()
     {
-        listeners.forEach(BuildListener::onCompiling);
-        module().compiler().run();
-        listeners.forEach(BuildListener::onCompiled);
+        build().buildListeners().forEach(BuildListener::onCompiling);
+        build().compiler().run();
+        build().buildListeners().forEach(BuildListener::onCompiled);
     }
 
     public void deploy()
     {
-        listeners.forEach(BuildListener::onDeploying);
-        module().librarian().deploy(null).run();
-        listeners.forEach(BuildListener::onDeployed);
+        build().buildListeners().forEach(BuildListener::onDeploying);
+        build().librarian().deploy(null).run();
+        build().buildListeners().forEach(BuildListener::onDeployed);
     }
 
     public void install()
     {
-        listeners.forEach(BuildListener::onInstalling);
-        module().librarian().install(null);
-        listeners.forEach(BuildListener::onInstalled);
+        build().buildListeners().forEach(BuildListener::onInstalling);
+        build().librarian().install(null);
+        build().buildListeners().forEach(BuildListener::onInstalled);
     }
 
-    public void listenTo(final BuildListener listener)
+    public void listenTo(BuildListener listener)
     {
-        listeners.add(listener);
+        build().buildListeners().add(listener);
     }
 
-    public void onCompiled(final Runnable code)
+    public void onCompiled(Runnable code)
     {
         listenTo(new BuildListener()
         {
@@ -65,7 +61,7 @@ public class Builder extends BaseTool
         });
     }
 
-    public void onCompiling(final Runnable code)
+    public void onCompiling(Runnable code)
     {
         listenTo(new BuildListener()
         {
@@ -80,16 +76,16 @@ public class Builder extends BaseTool
     @Override
     public void onRun()
     {
-        listeners.forEach(BuildListener::onBuilding);
+        build().buildListeners().forEach(BuildListener::onBuilding);
         onBuild();
-        listeners.forEach(BuildListener::onBuilt);
+        build().buildListeners().forEach(BuildListener::onBuilt);
     }
 
     public void test()
     {
-        listeners.forEach(BuildListener::onTesting);
-        module().tester().run();
-        listeners.forEach(BuildListener::onTested);
+        build().buildListeners().forEach(BuildListener::onTesting);
+        build().tester().run();
+        build().buildListeners().forEach(BuildListener::onTested);
     }
 
     protected void onBuild()

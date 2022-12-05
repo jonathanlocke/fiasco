@@ -1,7 +1,7 @@
 package fiasco.tools;
 
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
-import com.telenav.kivakit.filesystem.Folder;
+import fiasco.BaseBuild;
 import fiasco.Tool;
 
 /**
@@ -9,6 +9,18 @@ import fiasco.Tool;
  */
 public abstract class BaseTool extends BaseRepeater implements Tool
 {
+    private final BaseBuild build;
+
+    public BaseTool(BaseBuild build)
+    {
+        this.build = build;
+    }
+
+    public BaseBuild build()
+    {
+        return build;
+    }
+
     @Override
     public final void run()
     {
@@ -25,17 +37,5 @@ public abstract class BaseTool extends BaseRepeater implements Tool
 
     protected void onRunning()
     {
-    }
-
-    protected Folder resolveFolder(Folder folder)
-    {
-        if (folder.path().isRelative())
-        {
-            return module().folder().folder(folder);
-        }
-        else
-        {
-            return folder;
-        }
     }
 }

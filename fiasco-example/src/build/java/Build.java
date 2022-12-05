@@ -1,4 +1,4 @@
-import fiasco.FiascoBuild;
+import fiasco.BaseBuild;
 import fiasco.metadata.Contributor;
 import fiasco.metadata.Copyright;
 import fiasco.metadata.Metadata;
@@ -12,7 +12,7 @@ import static fiasco.repository.RemoteMavenRepository.mavenCentral;
  * @author jonathan
  */
 @SuppressWarnings({ "InnerClassMayBeStatic", "unused" })
-public class Build extends FiascoBuild implements
+public class Build extends BaseBuild implements
         Libraries,
         Repositories
 {
@@ -28,7 +28,7 @@ public class Build extends FiascoBuild implements
                         .withUrl("https://www.state-of-the-art.org"))
                 .withCopyright(new Copyright("Copyright 2020-2022, Jonathan Locke. All Rights Reserved."))
                 .withContributor(new Contributor("Jonathan Locke")
-                        .withRole("FiascoBuild Lead")
+                        .withRole("BaseBuild Lead")
                         .withEmail("jon@thanlocke.com")));
 
         librarian().lookIn(mavenCentral).lookIn(nexus);

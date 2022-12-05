@@ -7,6 +7,7 @@
 
 package fiasco.tools.tester;
 
+import fiasco.BaseBuild;
 import fiasco.tools.Tools;
 import fiasco.tools.BaseTool;
 
@@ -17,9 +18,9 @@ import fiasco.tools.BaseTool;
  */
 public class Tester extends BaseTool
 {
-    public Tester(final Tools module)
+    public Tester(BaseBuild build)
     {
-        super(module);
+        super(build);
     }
 
     @Override
