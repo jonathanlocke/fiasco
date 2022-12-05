@@ -33,4 +33,9 @@ public class Build extends BaseBuild implements
 
         librarian().lookIn(mavenCentral).lookIn(nexus);
     }
+
+    public void clean()
+    {
+        cleaner(outputFolder(), "**/*.class").run();
+    }
 }

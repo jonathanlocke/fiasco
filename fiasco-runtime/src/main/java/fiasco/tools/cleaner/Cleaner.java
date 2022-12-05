@@ -1,10 +1,13 @@
 package fiasco.tools.cleaner;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import com.telenav.kivakit.resource.ResourcePathed;
 import fiasco.BaseBuild;
 import fiasco.tools.BaseTool;
+
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 
 /**
  * Removes files matching the given pattern from the build output folder
@@ -14,19 +17,27 @@ import fiasco.tools.BaseTool;
 @SuppressWarnings("unused")
 public class Cleaner extends BaseTool
 {
-    private final Matcher<ResourcePathed> matcher;
+    private final ObjectList<Matcher<ResourcePathed>> matchers = list();
 
-    public Cleaner(BaseBuild build, Matcher<ResourcePathed> matcher)
+    public Cleaner(BaseBuild build)
     {
         super(build);
-        this.matcher = matcher;
+    }
+
+    public Cleaner matching(Matcher<ResourcePathed> matcher)
+    {
+        matchers.add(matcher);
+        return this;
     }
 
     @Override
     protected void onRun()
     {
-        build().outputFolder()
-                .nestedFiles(matcher)
-                .forEach(File::delete);
+        for (var matcher : matchers)
+        {
+            build().outputFolder()
+                    .nestedFiles(matcher)
+                    .forEach(File::delete);
+        }
     }
 }
