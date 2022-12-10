@@ -1,6 +1,6 @@
-import fiasco.Library;
+import digital.fiasco.runtime.build.tools.librarian.Library;
 
-import static fiasco.Library.library;
+import static digital.fiasco.runtime.build.tools.librarian.Library.library;
 
 /**
  * @author jonathan

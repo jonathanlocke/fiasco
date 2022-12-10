@@ -1,10 +1,10 @@
-import fiasco.BaseBuild;
-import fiasco.metadata.Contributor;
-import fiasco.metadata.Copyright;
-import fiasco.metadata.Metadata;
-import fiasco.metadata.Organization;
+import digital.fiasco.runtime.build.BaseBuild;
+import digital.fiasco.runtime.build.metadata.Contributor;
+import digital.fiasco.runtime.build.metadata.Copyright;
+import digital.fiasco.runtime.build.metadata.Metadata;
+import digital.fiasco.runtime.build.metadata.Organization;
 
-import static fiasco.repository.RemoteMavenRepository.mavenCentral;
+import static digital.fiasco.runtime.repository.RemoteMavenRepository.mavenCentral;
 
 /**
  * Example Fiasco build.

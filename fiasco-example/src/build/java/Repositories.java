@@ -1,5 +1,5 @@
-import fiasco.Repository;
-import fiasco.repository.RemoteMavenRepository;
+import digital.fiasco.runtime.repository.Repository;
+import digital.fiasco.runtime.repository.RemoteMavenRepository;
 
 /**
  * @author jonathan
