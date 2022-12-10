@@ -43,6 +43,7 @@ import digital.fiasco.runtime.build.phases.PhaseTest;
 import digital.fiasco.runtime.build.tools.ToolFactory;
 import digital.fiasco.runtime.build.tools.librarian.Library;
 import digital.fiasco.runtime.dependency.DependencyList;
+import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.artifact.Artifact;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
@@ -117,13 +118,17 @@ public abstract class Build extends Application implements
         BuildEnvironment,
         BuildStructure,
         BuildAttached,
-        BuildListener
+        BuildListener,
+        BuildRepositories
 {
     /** The primary artifact being built */
     private Artifact artifact;
 
     /** Metadata about the build */
     private Metadata metadata;
+
+    /** Repositories to look in */
+    private final ObjectList<Repository> repositories = list();
 
     /** Listeners to call as the build proceeds */
     private final ObjectList<BuildListener> buildListeners = list(this);
@@ -274,6 +279,11 @@ public abstract class Build extends Application implements
     public Phase phase(String name)
     {
         return ensureNotNull(nameToPhase.get(name), "Could not find phase: $", name);
+    }
+
+    public ObjectList<Repository> repositories()
+    {
+        return repositories;
     }
 
     public ToolFactory requires(Library library)

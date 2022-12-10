@@ -3,8 +3,7 @@ import digital.fiasco.runtime.build.metadata.Contributor;
 import digital.fiasco.runtime.build.metadata.Copyright;
 import digital.fiasco.runtime.build.metadata.Metadata;
 import digital.fiasco.runtime.build.metadata.Organization;
-
-import static digital.fiasco.runtime.repository.RemoteMavenRepository.mavenCentral;
+import digital.fiasco.runtime.build.BuildRepositories;
 
 /**
  * Example Fiasco build.
@@ -14,7 +13,7 @@ import static digital.fiasco.runtime.repository.RemoteMavenRepository.mavenCentr
 @SuppressWarnings({ "InnerClassMayBeStatic", "unused" })
 public class FiascoBuild extends Build implements
         Libraries,
-        Repositories
+        BuildRepositories
 {
     public static void main(String[] arguments)
     {
@@ -32,6 +31,6 @@ public class FiascoBuild extends Build implements
                         .withRole("BuildProject Lead")
                         .withEmail("jon@thanlocke.com")));
 
-        librarian().lookIn(mavenCentral).lookIn(nexus);
+        librarian().lookIn(mavenCentral);
     }
 }

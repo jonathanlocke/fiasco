@@ -10,9 +10,9 @@ package digital.fiasco.runtime.build.tools.librarian;
 import com.telenav.kivakit.interfaces.comparison.Filter;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
+import digital.fiasco.runtime.repository.LibraryResolver;
 import digital.fiasco.runtime.repository.RemoteMavenRepository;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.repository.LibraryResolver;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -26,15 +26,17 @@ import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
  * @author shibo
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class Librarian extends BaseTool implements LibraryResolver
+public class Librarian extends BaseTool implements
+        LibraryResolver
 {
-    private final List<Repository> repositories = new ArrayList<>();
-
     private Repository deploymentRepository;
+
+    private final List<Repository> repositories = new ArrayList<>();
 
     public Librarian(Build build)
     {
         super(build);
+        repositories.addAll(build.repositories());
     }
 
     public Librarian deploy(Library library)
