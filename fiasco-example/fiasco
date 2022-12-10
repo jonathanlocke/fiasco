@@ -1,6 +1,16 @@
 #!/bin/bash
 
+#
+# Bootstrap by using Maven to compile src/build/FiascoBuild.java
+#
+
 mvn -quiet clean compile || exit 1
 
-java -classpath ./target/fiasco:"$HOME"/.m2/repository/digital/fiasco/fiasco-runtime/0.9.0/fiasco-runtime-0.9.0.jar FiascoBuild "$@" || exit 1
+#
+# Run FiascoBuild using the runtime jar downloaded by Maven
+#
+
+FIASCO_RUNTIME="$HOME"/.m2/repository/digital/fiasco/fiasco-runtime/0.9.0/fiasco-runtime-0.9.0.jar
+
+java -classpath ./target/fiasco:"$FIASCO_RUNTIME" FiascoBuild "$@" || exit 1
 
