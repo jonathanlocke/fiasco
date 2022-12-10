@@ -13,3 +13,4 @@ nbactions.xml
 .classpath
 *.orig
 .DS_Store
+/fiasco-runtime/dependency-reduced-pom.xml
