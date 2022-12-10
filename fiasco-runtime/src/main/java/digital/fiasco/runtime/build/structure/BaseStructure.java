@@ -13,6 +13,7 @@ import java.util.Map;
 @SuppressWarnings("unused")
 public class BaseStructure implements Structure
 {
+    /** Map from logical name to folder */
     private final Map<String, Folder> folders = new HashMap<>();
 
     /**

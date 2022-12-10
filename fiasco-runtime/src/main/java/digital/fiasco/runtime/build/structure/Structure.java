@@ -2,7 +2,6 @@ package digital.fiasco.runtime.build.structure;
 
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.resource.ResourceList;
-import digital.fiasco.runtime.build.resources.ResourceGlobbing;
 
 /**
  * Information about the folder structure of the build.
@@ -10,7 +9,7 @@ import digital.fiasco.runtime.build.resources.ResourceGlobbing;
  * @author jonathan
  */
 @SuppressWarnings("unused")
-public interface Structure extends ResourceGlobbing
+public interface Structure
 {
     /**
      * output/classes
@@ -84,6 +83,9 @@ public interface Structure extends ResourceGlobbing
         return rootFolder().folder("output");
     }
 
+    /**
+     * root
+     */
     default Folder rootFolder()
     {
         return folder("root");
