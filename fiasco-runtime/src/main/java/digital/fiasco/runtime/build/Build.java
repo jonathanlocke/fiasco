@@ -17,6 +17,7 @@ package digital.fiasco.runtime.build;
 import com.telenav.kivakit.application.Application;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
+import com.telenav.kivakit.core.logging.logs.BaseLog;
 import com.telenav.kivakit.core.messaging.listeners.MessageList;
 import com.telenav.kivakit.core.messaging.messages.status.Problem;
 import com.telenav.kivakit.core.messaging.messages.status.Quibble;
@@ -43,8 +44,56 @@ import digital.fiasco.runtime.repository.artifact.Artifact;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
+import static com.telenav.kivakit.core.os.Console.console;
 import static digital.fiasco.runtime.repository.artifact.Artifact.parseArtifact;
 
+/**
+ * Base {@link Application} for Fiasco command-line builds.
+ *
+ * <p><b>Build Phases</b></p>
+ *
+ * <p>
+ * Build phases are executed in a pre-defined order, as below. Each phase is defined by a class that extends
+ * {@link Phase}. Additional phases can be inserted with {@link #addPhaseAfter(String, Phase)} and
+ * {@link #addPhaseBefore(String, Phase)}.
+ * </p>
+ *
+ * <p>
+ * Phases are enabled and disabled with {@link #enable(Phase)} and {@link #disable(Phase)}. The {@link #onRun()} method
+ * of the application enables and disables any phase names that were passed from the command line. The phase name itself
+ * enables the phase and any dependent phases (for example, "compile" enables the "build-start", "prepare" and "compile"
+ * phases). If the phase name is preceded by a dash (for example, -test), the phase is disabled (but not its dependent
+ * phases).
+ * </p>
+ *
+ * <ol>
+ *     <li>build-start</li>
+ *     <li>clean</li>
+ *     <li>prepare</li>
+ *     <li>compile</li>
+ *     <li>test</li>
+ *     <li>document</li>
+ *     <li>package</li>
+ *     <li>integration-test</li>
+ *     <li>install</li>
+ *     <li>deploy-packages</li>
+ *     <li>deploy-documentation</li>
+ *     <li>build-end</li>
+ * </ol>
+ *
+ * <p><b>Examples</b></p>
+ *
+ * <pre>
+ * fiasco                 show help
+ * fiasco clean           clean targets
+ * fiasco compile         prepare sources and compile
+ * fiasco clean compile   clean targets and compile
+ * fiasco package         compile, test, document and build packages
+ * fiasco package -test   build packages but don't run tests
+ * </pre>
+ *
+ * @author jonathan
+ */
 @SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused" })
 public abstract class Build extends Application implements
         ToolFactory,
@@ -98,7 +147,6 @@ public abstract class Build extends Application implements
     {
         nameToPhase.put(phase.name(), phase);
         orderedPhases.add(phase);
-        enable(phase);
     }
 
     /**
@@ -112,7 +160,6 @@ public abstract class Build extends Application implements
         var at = orderedPhases.indexOf(phase(name));
         orderedPhases.add(at + 1, phase);
         nameToPhase.put(phase.name(), phase);
-        enable(phase);
     }
 
     /**
@@ -126,7 +173,6 @@ public abstract class Build extends Application implements
         var at = orderedPhases.indexOf(phase(name));
         orderedPhases.add(at, phase);
         nameToPhase.put(phase.name(), phase);
-        enable(phase);
     }
 
     public Artifact artifact()
@@ -152,10 +198,6 @@ public abstract class Build extends Application implements
      */
     public void disable(Phase phase)
     {
-        for (var at : phase.requiredPhases())
-        {
-            phaseEnabled.put(at, false);
-        }
         phaseEnabled.put(phase, false);
     }
 
@@ -277,20 +319,46 @@ public abstract class Build extends Application implements
     @Override
     protected void onRun()
     {
-        for (var argument : argumentList())
+        if (argumentList().isEmpty())
         {
-            var value = argument.value();
-            if (value.startsWith("-"))
-            {
-                disable(phase(value));
-            }
-            else
-            {
-                enable(phase(value));
-            }
+            BaseLog.logs().forEach(BaseLog::flush);
+            console().println("""
+            
+            fiasco (-?[phase])+
+            
+            Phase arguments will be enabled, those preceded by a dash will be disabled.
+            
+              phase                 purpose
+              -----------           ---------------------------------------------
+              clean                 cleans targets
+              prepare               prepares resources and sources
+              compile               builds sources
+              test                  runs tests
+              document              builds documentation
+              package               creates packages
+              integration-test      runs integration tests
+              install               installs packages
+              deploy-packages       deploys packages
+              deploy-documentation  deploys documentation
+            """);
         }
+        else
+        {
+            for (var argument : argumentList())
+            {
+                var value = argument.value();
+                if (value.startsWith("-"))
+                {
+                    disable(phase(value));
+                }
+                else
+                {
+                    enable(phase(value));
+                }
+            }
 
-        runBuild();
+            runBuild();
+        }
     }
 
     private boolean enabled(Phase phase)
