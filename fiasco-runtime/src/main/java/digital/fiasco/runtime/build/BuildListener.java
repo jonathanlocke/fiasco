@@ -11,7 +11,7 @@ import digital.fiasco.runtime.build.tools.ToolFactory;
 public interface BuildListener extends
         ToolFactory,
         BuildStructure,
-        BuildAttached
+        BuildAssociated
 {
     default void onBuildStart()
     {
@@ -27,7 +27,7 @@ public interface BuildListener extends
 
     default void onClean()
     {
-        cleaner(outputFolder(), "**/*.class").run();
+        cleaner(targetFolder(), "**/*").run();
     }
 
     default void onCleaned()
@@ -41,6 +41,7 @@ public interface BuildListener extends
     default void onCompile()
     {
         compiler().sources(javaSources()).run();
+        buildStamper().run();
     }
 
     default void onCompiled()
@@ -133,6 +134,15 @@ public interface BuildListener extends
 
     default void onPrepareResources()
     {
+        copier().withFrom(mainResourceFolder())
+                .withTo(classesFolder())
+                .withMatcher("**/*")
+                .run();
+
+        copier().withFrom(testResourceFolder())
+                .withTo(testClassesFolder())
+                .withMatcher("**/*")
+                .run();
     }
 
     default void onPrepareSources()

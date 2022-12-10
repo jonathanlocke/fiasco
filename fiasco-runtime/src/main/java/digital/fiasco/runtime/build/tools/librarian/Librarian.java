@@ -83,6 +83,12 @@ public class Librarian extends BaseTool implements
     }
 
     @Override
+    protected String description()
+    {
+        return null;
+    }
+
+    @Override
     protected void onRun()
     {
         unsupported();

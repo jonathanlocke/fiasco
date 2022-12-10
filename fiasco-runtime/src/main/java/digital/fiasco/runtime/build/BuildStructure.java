@@ -12,14 +12,14 @@ import static com.telenav.kivakit.resource.ResourceGlob.glob;
  * @author jonathan
  */
 @SuppressWarnings("unused")
-public interface BuildStructure extends BuildAttached
+public interface BuildStructure extends BuildAssociated
 {
     /**
      * output/classes
      */
     default Folder classesFolder()
     {
-        return outputFolder().folder("classes");
+        return targetFolder().folder("classes");
     }
 
     /**
@@ -63,19 +63,27 @@ public interface BuildStructure extends BuildAttached
     }
 
     /**
-     * output
-     */
-    default Folder outputFolder()
-    {
-        return attachedToBuild().rootFolder().folder("output");
-    }
-
-    /**
      * src
      */
     default Folder sourceFolder()
     {
-        return attachedToBuild().rootFolder().folder("src");
+        return associatedBuild().rootFolder().folder("src");
+    }
+
+    /**
+     * output
+     */
+    default Folder targetFolder()
+    {
+        return associatedBuild().rootFolder().folder("output");
+    }
+
+    /**
+     * output/classes
+     */
+    default Folder testClassesFolder()
+    {
+        return targetFolder().folder("test-classes");
     }
 
     /**

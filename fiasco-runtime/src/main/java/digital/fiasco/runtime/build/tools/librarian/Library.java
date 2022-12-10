@@ -7,6 +7,7 @@
 
 package digital.fiasco.runtime.build.tools.librarian;
 
+import com.telenav.kivakit.core.messaging.Listener;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.comparison.Filter;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
@@ -20,9 +21,9 @@ import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
 @SuppressWarnings("unused")
 public class Library implements Dependency<Library>
 {
-    public static Library library(String artifact)
+    public static Library library(Listener listener, String artifact)
     {
-        return new Library(Artifact.parseArtifact(artifact));
+        return new Library(Artifact.parseArtifact(listener, artifact));
     }
 
     private Artifact artifact;

@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.repository.artifact;
 
+import com.telenav.kivakit.core.messaging.Listener;
 import com.telenav.kivakit.core.value.identifier.StringIdentifier;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.naming.Named;
@@ -16,25 +17,26 @@ public class Artifact implements Named
             + ":"
             + "(?<identifier>[A-Za-z-.]+)"
             + "(:"
-            + "(?<version>[\\d.]+(-(snapshot|alpha|beta|rc|final)))"
+            + "(?<version>\\d+\\.\\d+(\\.\\d+)?(-(snapshot|alpha|beta|rc|final))?)"
             + ")?");
 
-    public static Artifact parseArtifact(final String descriptor)
+    public static Artifact parseArtifact(Listener listener, String descriptor)
     {
-        final var matcher = pattern.matcher(descriptor);
+        var matcher = pattern.matcher(descriptor);
         if (matcher.matches())
         {
-            final var group = new Group(matcher.group("group"));
-            final var identifier = new Identifier(matcher.group("identifier"));
-            final var version = Version.parseVersion(matcher.group("version"));
+            var group = new Group(matcher.group("group"));
+            var identifier = new Identifier(matcher.group("identifier"));
+            var version = Version.parseVersion(matcher.group("version"));
             return new Artifact(group, identifier, version);
         }
+        listener.problem("Unable to parse artifact descriptor: $", descriptor);
         return null;
     }
 
     public static class Identifier extends StringIdentifier
     {
-        public Identifier(final String identifier)
+        public Identifier(String identifier)
         {
             super(identifier);
         }
@@ -46,21 +48,21 @@ public class Artifact implements Named
 
     private Version version;
 
-    public Artifact(final Group group, final Identifier identifier)
+    public Artifact(Group group, Identifier identifier)
     {
         this.group = group;
         this.identifier = identifier;
         version = null;
     }
 
-    public Artifact(final Group group, final Identifier identifier, final Version version)
+    public Artifact(Group group, Identifier identifier, Version version)
     {
         this.group = group;
         this.identifier = identifier;
         this.version = version;
     }
 
-    public Artifact(final Artifact that)
+    public Artifact(Artifact that)
     {
         group = that.group;
         identifier = that.identifier;
@@ -94,23 +96,23 @@ public class Artifact implements Named
         return version;
     }
 
-    public Artifact withGroup(final Group group)
+    public Artifact withGroup(Group group)
     {
-        final var copy = new Artifact(this);
+        var copy = new Artifact(this);
         copy.group = group;
         return copy;
     }
 
-    public Artifact withIdentifier(final Identifier group)
+    public Artifact withIdentifier(Identifier group)
     {
-        final var copy = new Artifact(this);
+        var copy = new Artifact(this);
         copy.identifier = identifier;
         return copy;
     }
 
-    public Artifact withVersion(final Version version)
+    public Artifact withVersion(Version version)
     {
-        final var copy = new Artifact(this);
+        var copy = new Artifact(this);
         copy.version = version;
         return copy;
     }

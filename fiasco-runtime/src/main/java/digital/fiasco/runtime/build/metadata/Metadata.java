@@ -24,12 +24,7 @@ public class Metadata implements Named
     @FormatProperty
     private Organization organization;
 
-    /**
-     * Creates a {@link Metadata} object for the given artifact specifier
-     *
-     * @param artifact The artifact specifier in group:artifact:version format
-     */
-    public Metadata(String artifact)
+    public Metadata()
     {
     }
 

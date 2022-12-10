@@ -7,14 +7,14 @@
 
 package digital.fiasco.runtime.build.tools.git;
 
-import com.telenav.kivakit.component.BaseComponent;
-import com.telenav.kivakit.conversion.core.time.TimeConverter;
-import com.telenav.kivakit.core.time.Time;
+import com.telenav.kivakit.core.collections.list.StringList;
 import com.telenav.kivakit.filesystem.Folder;
-import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.BuildAssociated;
+import digital.fiasco.runtime.build.tools.BaseTool;
 
+import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.os.OperatingSystem.operatingSystem;
-import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
+import static com.telenav.kivakit.core.string.Formatter.format;
 
 /**
  * Runs git
@@ -22,29 +22,80 @@ import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
  * @author shibo
  */
 @SuppressWarnings("unused")
-public class Git extends BaseComponent
+public class Git extends BaseTool
 {
-    private final Build build;
+    /** The folder where git should be run */
+    Folder folder;
 
-    public Git(Build build)
+    /** The arguments to pass to git */
+    StringList arguments = stringList();
+
+    private String output;
+
+    public Git(BuildAssociated build)
     {
-        this.build = build;
+        super(build.associatedBuild());
+        folder = build.associatedBuild().rootFolder();
     }
 
-    public String commitHash()
+    public Git(Git that)
     {
-        return run(build.rootFolder(), "git", "rev-parse", "HEAD").trim();
+        super(that.associatedBuild());
+        this.folder = that.folder;
+        this.arguments = that.arguments.copy();
+        this.output = that.output;
     }
 
-    public Time commitTime()
+    public Git commitHash()
+    {
+        return withArguments("git", "rev-parse", "HEAD");
+    }
+
+    public Git commitTime()
     {
         // Mon Dec 5 03:49:27 2022 -0700
-        var time = run(build.rootFolder(), "git", "log", "-1", "--format=%cd");
-        return new TimeConverter(this, ISO_ZONED_DATE_TIME).convert(time);
+        return withArguments("git", "log", "-1", "--format=%cd");
     }
 
-    private String run(Folder folder, String... arguments)
+    public Git copy()
     {
-        return operatingSystem().execute(this, folder.asJavaFile(), arguments);
+        return new Git(this);
+    }
+
+    public String output()
+    {
+        return output;
+    }
+
+    public Git withArguments(String... arguments)
+    {
+        var copy = copy();
+        copy.arguments = stringList(arguments);
+        return copy;
+    }
+
+    public Git withFolder(Folder folder)
+    {
+        var copy = copy();
+        copy.folder = folder;
+        return copy;
+    }
+
+    @Override
+    protected String description()
+    {
+        return format("""
+                Git
+                  folder: $
+                  arguments: $
+                """, folder, stringList(arguments).join(" "));
+    }
+
+    @Override
+    protected void onRun()
+    {
+        information(description());
+        output = operatingSystem().execute(this,
+                folder.asJavaFile(), arguments.asStringArray());
     }
 }

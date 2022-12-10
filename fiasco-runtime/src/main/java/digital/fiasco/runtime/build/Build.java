@@ -46,8 +46,10 @@ import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.artifact.Artifact;
 
+import static com.telenav.kivakit.commandline.ArgumentParser.argumentParser;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
+import static digital.fiasco.runtime.build.tools.librarian.Library.library;
 import static digital.fiasco.runtime.repository.artifact.Artifact.parseArtifact;
 
 /**
@@ -112,12 +114,12 @@ import static digital.fiasco.runtime.repository.artifact.Artifact.parseArtifact;
  *
  * @author jonathan
  */
-@SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused" })
+@SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused", "SwitchStatementWithTooFewBranches" })
 public abstract class Build extends Application implements
         ToolFactory,
         BuildEnvironment,
         BuildStructure,
-        BuildAttached,
+        BuildAssociated,
         BuildListener,
         BuildRepositories
 {
@@ -147,10 +149,23 @@ public abstract class Build extends Application implements
     /** The root folder for this build */
     private final Folder rootFolder = Folders.currentFolder();
 
+    /** If true, describe the build rather than executing it */
+    private boolean describe = false;
+
     protected Build()
     {
         // Install default build phases
         onInstallPhases();
+    }
+
+    /**
+     * Adds the given library to the list of libraries for this build
+     *
+     * @param library The library to add
+     */
+    public void addLibrary(String library)
+    {
+        libraries().add(library(this, library));
     }
 
     /**
@@ -206,7 +221,7 @@ public abstract class Build extends Application implements
     }
 
     @Override
-    public Build attachedToBuild()
+    public Build associatedBuild()
     {
         return this;
     }
@@ -216,10 +231,21 @@ public abstract class Build extends Application implements
         return buildListeners;
     }
 
+    public boolean describe()
+    {
+        return describe;
+    }
+
     @Override
     public String description()
     {
         return """
+                Commands
+                                
+                  command               purpose
+                  -----------           ---------------------------------------------
+                  describe              describe the build rather than running it
+                                
                 Phase arguments will be enabled, those preceded by a dash will be disabled.
                             
                   phase                 purpose
@@ -349,10 +375,10 @@ public abstract class Build extends Application implements
     @Override
     protected ObjectList<ArgumentParser<?>> argumentParsers()
     {
-        return list(ArgumentParser.argumentParser(String.class)
+        return list(argumentParser(String.class)
                 .oneOrMore()
                 .converter(new IdentityConverter(this))
-                .description("Phase to enable, or disable if preceded by a minus sign")
+                .description("Commands and phases")
                 .build());
     }
 
@@ -363,7 +389,7 @@ public abstract class Build extends Application implements
 
     protected void artifact(String descriptor)
     {
-        artifact(parseArtifact(descriptor));
+        artifact(parseArtifact(this, descriptor));
     }
 
     protected final void onInstallPhases()
@@ -391,13 +417,22 @@ public abstract class Build extends Application implements
             for (var argument : argumentList())
             {
                 var value = argument.value();
-                if (value.startsWith("-"))
+
+                switch (value)
                 {
-                    disable(phase(value));
-                }
-                else
-                {
-                    enable(phase(value));
+                    case "describe" -> describe = true;
+
+                    default ->
+                    {
+                        if (value.startsWith("-"))
+                        {
+                            disable(phase(value));
+                        }
+                        else
+                        {
+                            enable(phase(value));
+                        }
+                    }
                 }
             }
 

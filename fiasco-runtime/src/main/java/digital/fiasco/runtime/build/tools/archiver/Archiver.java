@@ -11,6 +11,12 @@ public class Archiver extends BaseTool
     }
 
     @Override
+    protected String description()
+    {
+        return null;
+    }
+
+    @Override
     protected void onRun()
     {
 

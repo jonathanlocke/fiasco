@@ -7,8 +7,8 @@
 
 package digital.fiasco.runtime.build.tools.tester;
 
-import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.tools.BaseTool;
 
 /**
  * Runs unit tests
@@ -20,6 +20,12 @@ public class Tester extends BaseTool
     public Tester(Build build)
     {
         super(build);
+    }
+
+    @Override
+    protected String description()
+    {
+        return null;
     }
 
     @Override

@@ -14,15 +14,18 @@ import com.telenav.kivakit.resource.CopyMode;
 import com.telenav.kivakit.resource.ResourcePathed;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
+import digital.fiasco.runtime.build.tools.Matchers;
 
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
+import static com.telenav.kivakit.core.string.Formatter.format;
+import static com.telenav.kivakit.resource.ResourceGlob.glob;
 
 /**
  * Copies selected files from one folder to another.
  *
  * @author shibo
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "UnusedReturnValue" })
 public class Copier extends BaseTool
 {
     /** The folder to copy to */
@@ -32,7 +35,7 @@ public class Copier extends BaseTool
     private Folder from;
 
     /** The files to copy */
-    private Matcher<ResourcePathed> matcher = Matcher.matchAll();
+    private Matchers matchers = new Matchers();
 
     /** Progress in copying files */
     private final ProgressReporter progress = progressReporter(this, "files");
@@ -42,44 +45,65 @@ public class Copier extends BaseTool
         super(build);
     }
 
-    public Copier from(Folder from)
+    public Copier(Copier that)
     {
-        this.from = from;
-        return this;
+        super(that.associatedBuild());
+        this.to = that.to;
+        this.from = that.from;
+        this.matchers = that.matchers.copy();
     }
 
-    public Folder from()
+    public Copier copy()
     {
-        return from;
+        return new Copier(this);
     }
 
-    public Matcher<ResourcePathed> matching()
+    public Copier withFrom(Folder from)
     {
-        return matcher;
+        var copy = copy();
+        copy.from = from;
+        return copy;
     }
 
-    public Copier matching(Matcher<ResourcePathed> matcher)
+    public Copier withMatcher(Matcher<ResourcePathed> matcher)
     {
-        this.matcher = matcher;
-        return this;
+        var copy = copy();
+        copy.matchers.add(matcher);
+        return copy;
     }
 
-    public Copier to(Folder to)
+    public Copier withMatcher(String glob)
     {
-        this.to = to;
-        return this;
+        var copy = copy();
+        copy.matchers.add(glob(glob));
+        return copy;
     }
 
-    public Folder to()
+    public Copier withTo(Folder to)
     {
-        return to;
+        var copy = copy();
+        copy.to = to;
+        return copy;
+    }
+
+    @Override
+    protected String description()
+    {
+        return format("""
+                Copier
+                  from: $
+                  to: $
+                  matchers: $
+                """, from, to, matchers.toString().replaceAll("\\$", "."));
     }
 
     @Override
     protected void onRun()
     {
-        // For each source file in the from folder that matches,
-        var files = from.nestedFiles(matcher);
+        information("Copying from $ to $", from, to);
+
+        // For each source file in the 'from' folder that matches,
+        var files = from.nestedFiles(matchers);
         progress.steps(files.count());
         progress.start("Copying " + files.size() + " files");
         for (var source : files)

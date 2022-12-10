@@ -1,14 +1,21 @@
 package digital.fiasco.runtime.build.tools.stamper;
 
 import com.telenav.cactus.metadata.BuildName;
+import com.telenav.kivakit.conversion.core.time.TimeConverter;
+import com.telenav.kivakit.core.collections.list.StringList;
+import com.telenav.kivakit.core.string.Formatter;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.BuildStructure;
 import digital.fiasco.runtime.build.tools.BaseTool;
-import digital.fiasco.runtime.build.tools.git.Git;
+import digital.fiasco.runtime.build.tools.ToolFactory;
+import digital.fiasco.runtime.repository.artifact.Artifact;
 
 import java.time.LocalDate;
 
+import static com.telenav.kivakit.core.collections.list.StringList.stringList;
+import static com.telenav.kivakit.core.time.Time.START_OF_UNIX_TIME;
 import static com.telenav.kivakit.core.time.Time.now;
+import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
 
 /**
  * Creates a build.txt file in the root of the classes folder containing information about the build.
@@ -17,7 +24,8 @@ import static com.telenav.kivakit.core.time.Time.now;
  */
 @SuppressWarnings("unused")
 public class BuildStamper extends BaseTool implements
-        BuildStructure
+        BuildStructure,
+        ToolFactory
 {
     public BuildStamper(Build build)
     {
@@ -25,33 +33,63 @@ public class BuildStamper extends BaseTool implements
     }
 
     @Override
-    public Build attachedToBuild()
+    protected String description()
     {
-        return build();
+        return Formatter.format("""
+                        BuildStamper:
+                          project properties:
+                        $
+                          build properties:
+                        $
+                        """,
+                projectProperties().indented(4),
+                buildProperties().indented(4));
     }
 
     @Override
     protected void onRun()
     {
-        var artifact = build().artifact();
+        information("Stamping build");
 
-        try (var out = classesFolder().file(artifact.name() + ".properties").printWriter())
-        {
-            out.println("artifact.group = " + artifact.group());
-            out.println("artifact.name = " + artifact.name());
-            out.println("artifact.version = " + artifact.version());
-            out.println("artifact = " + artifact);
-        }
+        classesFolder()
+                .file(artifact().name() + "-project.properties")
+                .saveText(projectProperties().join("\n"));
 
-        var git = new Git(build());
+        classesFolder()
+                .file(artifact().name() + "-build.properties")
+                .saveText(buildProperties().join("\n"));
+    }
 
-        try (var out = classesFolder().file("build.properties").printWriter())
-        {
-            out.println("build.time = " + now().asString());
-            out.println("build.number = " + BuildName.name(LocalDate.now()));
-            out.println("build.name = " + BuildName.toBuildNumber(LocalDate.now()));
-            out.println("build.commit.hash = " + git.commitHash());
-            out.println("build.commit.time = " + git.commitTime());
-        }
+    private Artifact artifact()
+    {
+        return associatedBuild().artifact();
+    }
+
+    private StringList buildProperties()
+    {
+        var git = git();
+
+        git.commitHash().run();
+        var commitHash = git.output() != null
+                ? git.output()
+                : "[unknown]";
+
+        git.commitTime().run();
+        var commitTime = new TimeConverter(this, ISO_ZONED_DATE_TIME)
+                .convertOrDefault(git.output(), START_OF_UNIX_TIME);
+
+        return stringList("build.time = " + now().asString(),
+                "build.number = " + BuildName.name(LocalDate.now()),
+                "build.name = " + BuildName.toBuildNumber(LocalDate.now()),
+                "build.commit.hash = " + commitHash,
+                "build.commit.time = " + commitTime);
+    }
+
+    private StringList projectProperties()
+    {
+        return stringList("artifact.group = " + artifact().group(),
+                "artifact.name = " + artifact().name(),
+                "artifact.version = " + artifact().version(),
+                "artifact = " + artifact());
     }
 }

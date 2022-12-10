@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.build.tools.compiler;
 
+import com.telenav.kivakit.core.string.Formatter;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.FileList;
 import digital.fiasco.runtime.build.Build;
@@ -77,16 +78,29 @@ public class Compiler extends BaseTool
     }
 
     @Override
+    protected String description()
+    {
+        return Formatter.format("""
+                Compiler
+                  sources: $
+                  source version: $
+                  target version: $
+                  charset: $
+                """, sources, sourceVersion, targetVersion, charset);
+    }
+
+    @Override
     protected void onRun()
     {
-        compile(build().javaSources());
+        compile(associatedBuild().javaSources());
     }
 
     private boolean compile(FileList sources)
     {
+        information("Compiling");
+
         var compiler = getSystemJavaCompiler();
-        var fileManager = compiler.getStandardFileManager(
-                new ProblemListener(), locale, charset);
+        var fileManager = compiler.getStandardFileManager(new ProblemListener(), locale, charset);
         var files = fileManager.getJavaFileObjectsFromFiles(sources.asJavaFiles());
         return compiler.getTask(null, fileManager, new ProblemListener(), null, null, files).call();
     }

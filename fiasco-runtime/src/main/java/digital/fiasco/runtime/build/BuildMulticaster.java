@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.build;
 
+import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import digital.fiasco.runtime.build.phases.Phase;
 
@@ -8,7 +9,7 @@ import digital.fiasco.runtime.build.phases.Phase;
  *
  * @author jonathan
  */
-public class BuildMulticaster implements
+public class BuildMulticaster extends BaseComponent implements
         BuildListener,
         BuildStructure
 {
@@ -20,7 +21,7 @@ public class BuildMulticaster implements
     }
 
     @Override
-    public Build attachedToBuild()
+    public Build associatedBuild()
     {
         return build;
     }

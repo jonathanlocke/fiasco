@@ -8,6 +8,7 @@ import digital.fiasco.runtime.build.Build;
  *
  * @author jonathan
  */
+@SuppressWarnings("unused")
 public abstract class BaseTool extends BaseRepeater implements Tool
 {
     private final Build build;
@@ -15,10 +16,11 @@ public abstract class BaseTool extends BaseRepeater implements Tool
     public BaseTool(Build build)
     {
         this.build = build;
+        addListener(build);
     }
 
     @Override
-    public Build build()
+    public Build associatedBuild()
     {
         return build;
     }
@@ -26,9 +28,28 @@ public abstract class BaseTool extends BaseRepeater implements Tool
     @Override
     public final void run()
     {
-        onRunning();
-        onRun();
-        onRan();
+        if (describe())
+        {
+            onDescribe();
+        }
+        else
+        {
+            onRunning();
+            onRun();
+            onRan();
+        }
+    }
+
+    protected boolean describe()
+    {
+        return build.describe();
+    }
+
+    protected abstract String description();
+
+    protected void onDescribe()
+    {
+        announce(description());
     }
 
     protected void onRan()
