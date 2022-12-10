@@ -15,14 +15,17 @@
 package digital.fiasco.runtime.build;
 
 import com.telenav.kivakit.application.Application;
+import com.telenav.kivakit.commandline.ArgumentParser;
+import com.telenav.kivakit.conversion.core.language.IdentityConverter;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
-import com.telenav.kivakit.core.logging.logs.BaseLog;
 import com.telenav.kivakit.core.messaging.listeners.MessageList;
 import com.telenav.kivakit.core.messaging.messages.status.Problem;
 import com.telenav.kivakit.core.messaging.messages.status.Quibble;
 import com.telenav.kivakit.core.messaging.messages.status.Warning;
 import com.telenav.kivakit.core.value.count.Count;
+import com.telenav.kivakit.filesystem.Folder;
+import com.telenav.kivakit.filesystem.Folders;
 import digital.fiasco.runtime.build.metadata.Metadata;
 import digital.fiasco.runtime.build.phases.Phase;
 import digital.fiasco.runtime.build.phases.PhaseBuildEnd;
@@ -44,7 +47,6 @@ import digital.fiasco.runtime.repository.artifact.Artifact;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
-import static com.telenav.kivakit.core.os.Console.console;
 import static digital.fiasco.runtime.repository.artifact.Artifact.parseArtifact;
 
 /**
@@ -83,14 +85,29 @@ import static digital.fiasco.runtime.repository.artifact.Artifact.parseArtifact;
  *
  * <p><b>Examples</b></p>
  *
- * <pre>
- * fiasco                 show help
- * fiasco clean           clean targets
- * fiasco compile         prepare sources and compile
- * fiasco clean compile   clean targets and compile
- * fiasco package         compile, test, document and build packages
- * fiasco package -test   build packages but don't run tests
- * </pre>
+ * <table>
+ *     <tr>
+ *         <td>fiasco</td> <td>&nbsp;&nbsp;</td> </td><td>show help</td>
+ *     </tr>
+ *     <tr>
+ *         <td>fiasco clean</td> <td>&nbsp;&nbsp;</td> <td>clean targets</td>
+ *     </tr>
+ *     <tr>
+ *         <td>fiasco compile</td> <td>&nbsp;&nbsp;</td> <td>prepare sources and compile</td>
+ *     </tr>
+ *     <tr>
+ *         <td>fiasco clean compile</td> <td>&nbsp;&nbsp;</td> <td>clean targets and compile</td>
+ *     </tr>
+ *     <tr>
+ *         <td>fiasco package</td> <td>&nbsp;&nbsp;</td> <td>compile, test, document and build packages</td>
+ *     </tr>
+ *     <tr>
+ *         <td>fiasco package -test</td> <td>&nbsp;&nbsp;</td> <td>build packages but don't run tests</td>
+ *     </tr>
+ *     <tr>
+ *         <td>fiasco install -test -document</td> <td>&nbsp;&nbsp;</td> <td>install packages but don't run tests or document</td>
+ *     </tr>
+ * </table>
  *
  * @author jonathan
  */
@@ -121,6 +138,9 @@ public abstract class Build extends Application implements
 
     /** Enable state of each phase */
     private final ObjectMap<Phase, Boolean> phaseEnabled = new ObjectMap<>();
+
+    /** The root folder for this build */
+    private final Folder rootFolder = Folders.currentFolder();
 
     protected Build()
     {
@@ -191,6 +211,27 @@ public abstract class Build extends Application implements
         return buildListeners;
     }
 
+    @Override
+    public String description()
+    {
+        return """
+                Phase arguments will be enabled, those preceded by a dash will be disabled.
+                            
+                  phase                 purpose
+                  -----------           ---------------------------------------------
+                  clean                 cleans targets
+                  prepare               prepares resources and sources
+                  compile               builds sources
+                  test                  runs tests
+                  document              builds documentation
+                  package               creates packages
+                  integration-test      runs integration tests
+                  install               installs packages
+                  deploy-packages       deploys packages
+                  deploy-documentation  deploys documentation
+                """;
+    }
+
     /**
      * Disables the given phase from execution during a build
      *
@@ -239,6 +280,11 @@ public abstract class Build extends Application implements
     {
         libraries.add(library);
         return this;
+    }
+
+    public Folder rootFolder()
+    {
+        return rootFolder;
     }
 
     /**
@@ -290,14 +336,24 @@ public abstract class Build extends Application implements
         return issues.countWorseThanOrEqualTo(Problem.class).isZero();
     }
 
-    protected void artifact(String descriptor)
+    @Override
+    protected ObjectList<ArgumentParser<?>> argumentParsers()
     {
-        artifact(parseArtifact(descriptor));
+        return list(ArgumentParser.argumentParser(String.class)
+                .oneOrMore()
+                .converter(new IdentityConverter(this))
+                .description("Phase to enable, or disable if preceded by a minus sign")
+                .build());
     }
 
     protected void artifact(Artifact artifact)
     {
         this.artifact = artifact;
+    }
+
+    protected void artifact(String descriptor)
+    {
+        artifact(parseArtifact(descriptor));
     }
 
     protected final void onInstallPhases()
@@ -319,31 +375,9 @@ public abstract class Build extends Application implements
     @Override
     protected void onRun()
     {
-        if (argumentList().isEmpty())
+        if (!argumentList().isEmpty())
         {
-            BaseLog.logs().forEach(BaseLog::flush);
-            console().println("""
-            
-            fiasco (-?[phase])+
-            
-            Phase arguments will be enabled, those preceded by a dash will be disabled.
-            
-              phase                 purpose
-              -----------           ---------------------------------------------
-              clean                 cleans targets
-              prepare               prepares resources and sources
-              compile               builds sources
-              test                  runs tests
-              document              builds documentation
-              package               creates packages
-              integration-test      runs integration tests
-              install               installs packages
-              deploy-packages       deploys packages
-              deploy-documentation  deploys documentation
-            """);
-        }
-        else
-        {
+            announce("Building $", rootFolder().name());
             for (var argument : argumentList())
             {
                 var value = argument.value();
@@ -363,6 +397,6 @@ public abstract class Build extends Application implements
 
     private boolean enabled(Phase phase)
     {
-        return phaseEnabled.get(phase);
+        return phaseEnabled.getOrDefault(phase, false);
     }
 }

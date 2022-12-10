@@ -25,6 +25,12 @@ public class BuildStamper extends BaseTool implements
     }
 
     @Override
+    public Build attachedToBuild()
+    {
+        return build();
+    }
+
+    @Override
     protected void onRun()
     {
         var artifact = build().artifact();

@@ -25,6 +25,7 @@
 
         <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
         <maven.resources.plugin.version>3.3.0</maven.resources.plugin.version>
+        <utilities.cactus.metadata.version>1.0.3</utilities.cactus.metadata.version>
 
     </properties>
 
@@ -68,6 +69,29 @@
         </testResources>
 
         <plugins>
+
+            <!-- Generate build.properties and project.properties files -->
+
+            <plugin>
+                <groupId>com.telenav.cactus.metadata</groupId>
+                <artifactId>cactus-metadata-maven-plugin</artifactId>
+                <version>${utilities.cactus.metadata.version}</version>
+                <executions>
+                    <execution>
+                        <id>project-metadata</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>project-information</goal>
+                            <goal>build-metadata</goal>
+                        </goals>
+                        <configuration>
+                            <buildPropertiesDestination>target/fiasco/FiascoBuild-build.properties</buildPropertiesDestination>
+                            <projectPropertiesDestination>target/fiasco/FiascoBuild-project.properties</projectPropertiesDestination>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-compiler-plugin</artifactId>

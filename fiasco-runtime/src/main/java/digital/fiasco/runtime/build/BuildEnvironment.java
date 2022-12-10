@@ -11,7 +11,7 @@ import static com.telenav.kivakit.core.vm.JavaVirtualMachine.javaVirtualMachine;
 import static com.telenav.kivakit.filesystem.Folder.parseFolder;
 
 /**
- * Operating system and hardware information
+ * Build environment information, such as operating system and hardware information
  *
  * @author jonathanl (shibo)
  */

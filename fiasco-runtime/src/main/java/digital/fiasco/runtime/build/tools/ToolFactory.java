@@ -12,6 +12,7 @@ import digital.fiasco.runtime.build.tools.shader.Shader;
 import digital.fiasco.runtime.build.tools.tester.Tester;
 
 import static com.telenav.kivakit.core.version.Version.version;
+import static com.telenav.kivakit.resource.ResourceGlob.glob;
 
 /**
  * @author jonathan
@@ -27,7 +28,7 @@ public interface ToolFactory extends BuildAttached
     default Cleaner cleaner(Folder folder, String glob)
     {
         return new Cleaner(attachedToBuild()).matching(at ->
-                folder.nestedResources(glob).contains((Resource) at));
+                folder.nestedResources(glob(glob)).contains((Resource) at));
     }
 
     default Compiler compiler()

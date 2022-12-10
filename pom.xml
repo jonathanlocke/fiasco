@@ -65,7 +65,7 @@
 
         <!-- Framework -->
 
-        <kivakit.version>1.8.9</kivakit.version>
+        <kivakit.version>1.9.0</kivakit.version>
 
         <!-- Fiasco -->
 
@@ -115,7 +115,7 @@
         <utilities.guava.version>31.1-jre</utilities.guava.version>
         <utilities.classgraph.version>4.8.151</utilities.classgraph.version>
         <utilities.log4j.version>2.19.0</utilities.log4j.version>
-        <utilities.cactus.metadata.version>1.0.2</utilities.cactus.metadata.version>
+        <utilities.cactus.metadata.version>1.0.3</utilities.cactus.metadata.version>
         <utilities.classgraph.version>4.8.149</utilities.classgraph.version>
 
         <!-- Testing -->
@@ -249,24 +249,6 @@
                         </configuration>
                         <goals>
                             <goal>enforce</goal>
-                        </goals>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <!-- Generate build.properties and project.properties files -->
-
-            <plugin>
-                <groupId>com.telenav.cactus.metadata</groupId>
-                <artifactId>cactus-metadata-maven-plugin</artifactId>
-                <version>${utilities.cactus.metadata.version}</version>
-                <executions>
-                    <execution>
-                        <id>project-metadata</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>project-information</goal>
-                            <goal>build-metadata</goal>
                         </goals>
                     </execution>
                 </executions>

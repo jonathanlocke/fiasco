@@ -4,16 +4,15 @@ import com.telenav.kivakit.filesystem.FileList;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.resource.ResourceList;
 
-import static com.telenav.kivakit.filesystem.Folder.parseFolder;
 import static com.telenav.kivakit.resource.ResourceGlob.glob;
 
 /**
- * Information about the folder structure of the build.
+ * Information about the folder structure of a build.
  *
  * @author jonathan
  */
 @SuppressWarnings("unused")
-public interface BuildStructure
+public interface BuildStructure extends BuildAttached
 {
     /**
      * output/classes
@@ -68,15 +67,7 @@ public interface BuildStructure
      */
     default Folder outputFolder()
     {
-        return rootFolder().folder("output");
-    }
-
-    /**
-     * root
-     */
-    default Folder rootFolder()
-    {
-        return parseFolder("root");
+        return attachedToBuild().rootFolder().folder("output");
     }
 
     /**
@@ -84,7 +75,7 @@ public interface BuildStructure
      */
     default Folder sourceFolder()
     {
-        return rootFolder().folder("src");
+        return attachedToBuild().rootFolder().folder("src");
     }
 
     /**
@@ -92,7 +83,7 @@ public interface BuildStructure
      */
     default ResourceList testJavaSources()
     {
-        return javaTestSourceFolder().nestedResources("**/*.java");
+        return javaTestSourceFolder().nestedResources(glob("**/*.java"));
     }
 
     /**
