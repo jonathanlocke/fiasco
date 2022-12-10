@@ -2,7 +2,7 @@ package digital.fiasco.runtime.build.tools.stamper;
 
 import com.telenav.cactus.metadata.BuildName;
 import digital.fiasco.runtime.build.Build;
-import digital.fiasco.runtime.build.structure.BuildStructureMixin;
+import digital.fiasco.runtime.build.BuildStructure;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.build.tools.git.Git;
 
@@ -17,7 +17,7 @@ import static com.telenav.kivakit.core.time.Time.now;
  */
 @SuppressWarnings("unused")
 public class BuildStamper extends BaseTool implements
-        BuildStructureMixin
+        BuildStructure
 {
     public BuildStamper(Build build)
     {

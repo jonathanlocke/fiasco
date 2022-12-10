@@ -1,7 +1,6 @@
 package digital.fiasco.runtime.build;
 
 import digital.fiasco.runtime.build.phases.Phase;
-import digital.fiasco.runtime.build.structure.BuildStructure;
 import digital.fiasco.runtime.build.tools.ToolFactory;
 
 /**

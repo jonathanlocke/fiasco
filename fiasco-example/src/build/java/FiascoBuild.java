@@ -12,13 +12,13 @@ import static digital.fiasco.runtime.repository.RemoteMavenRepository.mavenCentr
  * @author jonathan
  */
 @SuppressWarnings({ "InnerClassMayBeStatic", "unused" })
-public class ExampleBuild extends Build implements
+public class FiascoBuild extends Build implements
         Libraries,
         Repositories
 {
-    public static void main(String[] args)
+    public static void main(String[] arguments)
     {
-        new ExampleBuild().build();
+        new FiascoBuild().run(arguments);
     }
 
     @Override

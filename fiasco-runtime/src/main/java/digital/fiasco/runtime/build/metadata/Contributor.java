@@ -5,6 +5,8 @@ import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.interfaces.naming.Named;
 
+import static com.telenav.kivakit.core.collections.list.StringList.stringList;
+
 /**
  * Model for a project contributor
  *
@@ -20,7 +22,7 @@ public class Contributor implements Named
     private String email;
 
     @FormatProperty
-    private StringList roles;
+    private StringList roles = stringList();
 
     /**
      * Creates a {@link Contributor} with the given name

@@ -1,9 +1,10 @@
-package digital.fiasco.runtime.build.structure;
+package digital.fiasco.runtime.build;
 
 import com.telenav.kivakit.filesystem.FileList;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.resource.ResourceList;
 
+import static com.telenav.kivakit.filesystem.Folder.parseFolder;
 import static com.telenav.kivakit.resource.ResourceGlob.glob;
 
 /**
@@ -21,22 +22,6 @@ public interface BuildStructure
     {
         return outputFolder().folder("classes");
     }
-
-    /**
-     * Returns the folder for the given key. For example "src" or "output".
-     *
-     * @param key The key
-     * @return The folder
-     */
-    Folder folder(String key);
-
-    /**
-     * Sets the folder for the given key. For example "src" or "output".
-     *
-     * @param key The key
-     * @param folder The folder
-     */
-    void folder(String key, Folder folder);
 
     /**
      * src/main/java
@@ -91,7 +76,7 @@ public interface BuildStructure
      */
     default Folder rootFolder()
     {
-        return folder("root");
+        return parseFolder("root");
     }
 
     /**

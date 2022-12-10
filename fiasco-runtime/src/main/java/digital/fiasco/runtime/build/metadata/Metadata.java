@@ -16,7 +16,7 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 public class Metadata implements Named
 {
     @FormatProperty
-    private ObjectList<Contributor> contributors;
+    private ObjectList<Contributor> contributors = list();
 
     @FormatProperty
     private Copyright copyright;

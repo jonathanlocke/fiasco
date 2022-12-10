@@ -1,0 +1,6 @@
+#!/bin/bash
+
+mvn -quiet clean compile || exit 1
+
+java -classpath ./target/fiasco:"$HOME"/.m2/repository/digital/fiasco/fiasco-runtime/0.9.0/fiasco-runtime-0.9.0.jar FiascoBuild "$@" || exit 1
+

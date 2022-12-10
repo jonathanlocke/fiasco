@@ -16,7 +16,7 @@
     <modelVersion>4.0.0</modelVersion>
 
     <parent>
-        <groupId>fiasco</groupId>
+        <groupId>digital.fiasco</groupId>
         <artifactId>fiasco</artifactId>
         <version>0.9.0</version>
     </parent>
@@ -35,4 +35,48 @@
 
     </dependencies>
 
+    <build>
+
+        <plugins>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven.shade.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+
+                        <configuration>
+                            <finalName>${project.artifactId}-${project.parent.version}</finalName>
+                            <minimizeJar>true</minimizeJar>
+                            <artifactSet>
+                                <includes>
+                                    <include>*:*</include>
+                                </includes>
+                            </artifactSet>
+                            <transformers>
+                                <transformer implementation = "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <manifestEntries>
+
+                                        <!-- MANIFEST -->
+
+                                        <Implementation-Vendor>Digital Fiasco</Implementation-Vendor>
+                                        <Implementation-Title>${project.artifactId}</Implementation-Title>
+                                        <Release-Version>${project.version}</Release-Version>
+                                        <Built-By>${user.name}</Built-By>
+
+                                    </manifestEntries>
+                                </transformer>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
 </project>

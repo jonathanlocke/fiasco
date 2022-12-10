@@ -22,7 +22,6 @@ import com.telenav.kivakit.core.messaging.messages.status.Problem;
 import com.telenav.kivakit.core.messaging.messages.status.Quibble;
 import com.telenav.kivakit.core.messaging.messages.status.Warning;
 import com.telenav.kivakit.core.value.count.Count;
-import digital.fiasco.runtime.build.environment.EnvironmentTrait;
 import digital.fiasco.runtime.build.metadata.Metadata;
 import digital.fiasco.runtime.build.phases.Phase;
 import digital.fiasco.runtime.build.phases.PhaseBuildEnd;
@@ -37,7 +36,6 @@ import digital.fiasco.runtime.build.phases.PhaseIntegrationTest;
 import digital.fiasco.runtime.build.phases.PhasePackage;
 import digital.fiasco.runtime.build.phases.PhasePrepare;
 import digital.fiasco.runtime.build.phases.PhaseTest;
-import digital.fiasco.runtime.build.structure.BuildStructureMixin;
 import digital.fiasco.runtime.build.tools.ToolFactory;
 import digital.fiasco.runtime.build.tools.librarian.Library;
 import digital.fiasco.runtime.dependency.DependencyList;
@@ -45,14 +43,13 @@ import digital.fiasco.runtime.repository.artifact.Artifact;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
-import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static digital.fiasco.runtime.repository.artifact.Artifact.parseArtifact;
 
 @SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused" })
 public abstract class Build extends Application implements
         ToolFactory,
-        EnvironmentTrait,
-        BuildStructureMixin,
+        BuildEnvironment,
+        BuildStructure,
         BuildAttached,
         BuildListener
 {
@@ -78,15 +75,6 @@ public abstract class Build extends Application implements
 
     protected Build()
     {
-        // Do not allow subclass constructors
-        for (Class<?> at = getClass(); at != Build.class; at = at.getSuperclass())
-        {
-            if (at.getConstructors().length > 0)
-            {
-                illegalState("BuildBuild subclasses cannot declare constructors");
-            }
-        }
-
         // Install default build phases
         onInstallPhases();
     }
@@ -110,6 +98,7 @@ public abstract class Build extends Application implements
     {
         nameToPhase.put(phase.name(), phase);
         orderedPhases.add(phase);
+        enable(phase);
     }
 
     /**
@@ -123,6 +112,7 @@ public abstract class Build extends Application implements
         var at = orderedPhases.indexOf(phase(name));
         orderedPhases.add(at + 1, phase);
         nameToPhase.put(phase.name(), phase);
+        enable(phase);
     }
 
     /**
@@ -136,6 +126,7 @@ public abstract class Build extends Application implements
         var at = orderedPhases.indexOf(phase(name));
         orderedPhases.add(at, phase);
         nameToPhase.put(phase.name(), phase);
+        enable(phase);
     }
 
     public Artifact artifact()
@@ -143,15 +134,15 @@ public abstract class Build extends Application implements
         return artifact;
     }
 
-    public ObjectList<BuildListener> buildListeners()
-    {
-        return buildListeners;
-    }
-
     @Override
     public Build attachedToBuild()
     {
         return this;
+    }
+
+    public ObjectList<BuildListener> buildListeners()
+    {
+        return buildListeners;
     }
 
     /**
@@ -182,54 +173,6 @@ public abstract class Build extends Application implements
         phaseEnabled.put(phase, true);
     }
 
-    /**
-     * Builds with one thread for each processor
-     *
-     * @return True if the build succeeded without any problems
-     */
-    public final boolean execute()
-    {
-        return execute(processors());
-    }
-
-    /**
-     * Builds with the given number of worker threads
-     *
-     * @return True if the build succeeded without any problems
-     */
-    @SuppressWarnings("unchecked")
-    public final boolean execute(Count threads)
-    {
-        // Listen to any problems broadcast by the build,
-        var issues = new MessageList(message -> !message.status().succeeded());
-        issues.listenTo(this);
-
-        // go through each phase in order,
-        for (var phase : orderedPhases)
-        {
-            // and if the phase is enabled,
-            if (enabled(phase))
-            {
-                // notify that the phase has started,
-                var multicaster = new BuildMulticaster(buildListeners);
-                multicaster.onPhaseStart(phase);
-
-                // run the phase calling all listeners,
-                phase.run(multicaster);
-
-                // notify that the phase has ended,
-                multicaster.onPhaseEnd(phase);
-            }
-        }
-
-        // then collect statistics and display them,
-        var statistics = issues.statistics(Problem.class, Warning.class, Quibble.class);
-        information(statistics.titledBox("Build Results"));
-
-        // and return true if there are no problems (or worse).
-        return issues.countWorseThanOrEqualTo(Problem.class).isZero();
-    }
-
     public DependencyList<Library> libraries()
     {
         return libraries;
@@ -254,6 +197,55 @@ public abstract class Build extends Application implements
     {
         libraries.add(library);
         return this;
+    }
+
+    /**
+     * Builds with one thread for each processor
+     *
+     * @return True if the build succeeded without any problems
+     */
+    public final boolean runBuild()
+    {
+        return runBuild(processors());
+    }
+
+    /**
+     * Builds with the given number of worker threads
+     *
+     * @return True if the build succeeded without any problems
+     */
+    @SuppressWarnings("unchecked")
+    public final boolean runBuild(Count threads)
+    {
+        // Listen to any problems broadcast by the build,
+        var issues = new MessageList(message -> !message.status().succeeded());
+        issues.listenTo(this);
+
+        // go through each phase in order,
+        for (var phase : orderedPhases)
+        {
+            // and if the phase is enabled,
+            if (enabled(phase))
+            {
+                // notify that the phase has started,
+                var multicaster = new BuildMulticaster(this);
+                multicaster.onPhaseStart(phase);
+
+                // run the phase calling all listeners,
+                announce("Phase $", phase.name());
+                phase.run(multicaster);
+
+                // notify that the phase has ended,
+                multicaster.onPhaseEnd(phase);
+            }
+        }
+
+        // then collect statistics and display them,
+        var statistics = issues.statistics(Problem.class, Warning.class, Quibble.class);
+        information(statistics.titledBox("Build Results"));
+
+        // and return true if there are no problems (or worse).
+        return issues.countWorseThanOrEqualTo(Problem.class).isZero();
     }
 
     protected void artifact(String descriptor)
@@ -297,6 +289,8 @@ public abstract class Build extends Application implements
                 enable(phase(value));
             }
         }
+
+        runBuild();
     }
 
     private boolean enabled(Phase phase)

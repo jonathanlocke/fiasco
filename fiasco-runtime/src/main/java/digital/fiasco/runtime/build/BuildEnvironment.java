@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.build.environment;
+package digital.fiasco.runtime.build;
 
 import com.telenav.kivakit.core.collections.map.VariableMap;
 import com.telenav.kivakit.core.os.OperatingSystem.OperatingSystemType;
@@ -16,7 +16,7 @@ import static com.telenav.kivakit.filesystem.Folder.parseFolder;
  * @author jonathanl (shibo)
  */
 @SuppressWarnings("unused")
-public interface EnvironmentTrait
+public interface BuildEnvironment
 {
     default VariableMap<String> environmentVariables()
     {

@@ -2,7 +2,6 @@ package digital.fiasco.runtime.build;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import digital.fiasco.runtime.build.phases.Phase;
-import digital.fiasco.runtime.build.structure.BuildStructureMixin;
 
 /**
  * A {@link BuildListener} that calls a list of {@link BuildListener}s
@@ -11,7 +10,7 @@ import digital.fiasco.runtime.build.structure.BuildStructureMixin;
  */
 public class BuildMulticaster implements
         BuildListener,
-        BuildStructureMixin
+        BuildStructure
 {
     private final Build build;
 
