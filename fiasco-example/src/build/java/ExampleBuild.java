@@ -12,16 +12,17 @@ import static digital.fiasco.runtime.repository.RemoteMavenRepository.mavenCentr
  * @author jonathan
  */
 @SuppressWarnings({ "InnerClassMayBeStatic", "unused" })
-public class BuildExample extends Build implements
+public class ExampleBuild extends Build implements
         Libraries,
         Repositories
 {
     public static void main(String[] args)
     {
-        new BuildExample().build();
+        new ExampleBuild().build();
     }
 
-    public BuildExample()
+    @Override
+    public void onBuildStart()
     {
         metadata(new Metadata("fiasco:fiasco-example:1.0")
                 .withOrganization(new Organization("State of the Art")
@@ -32,10 +33,5 @@ public class BuildExample extends Build implements
                         .withEmail("jon@thanlocke.com")));
 
         librarian().lookIn(mavenCentral).lookIn(nexus);
-    }
-
-    public void clean()
-    {
-        cleaner(outputFolder(), "**/*.class").run();
     }
 }

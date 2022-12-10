@@ -37,7 +37,7 @@ import digital.fiasco.runtime.build.phases.PhaseIntegrationTest;
 import digital.fiasco.runtime.build.phases.PhasePackage;
 import digital.fiasco.runtime.build.phases.PhasePrepare;
 import digital.fiasco.runtime.build.phases.PhaseTest;
-import digital.fiasco.runtime.build.structure.StructureMixin;
+import digital.fiasco.runtime.build.structure.BuildStructureMixin;
 import digital.fiasco.runtime.build.tools.ToolFactory;
 import digital.fiasco.runtime.build.tools.librarian.Library;
 import digital.fiasco.runtime.dependency.DependencyList;
@@ -52,8 +52,8 @@ import static digital.fiasco.runtime.repository.artifact.Artifact.parseArtifact;
 public abstract class Build extends Application implements
         ToolFactory,
         EnvironmentTrait,
-        StructureMixin,
-        Built,
+        BuildStructureMixin,
+        BuildAttached,
         BuildListener
 {
     /** The primary artifact being built */
@@ -149,7 +149,7 @@ public abstract class Build extends Application implements
     }
 
     @Override
-    public Build buildable()
+    public Build attachedToBuild()
     {
         return this;
     }

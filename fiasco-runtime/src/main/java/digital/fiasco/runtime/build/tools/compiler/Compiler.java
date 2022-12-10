@@ -1,22 +1,61 @@
 package digital.fiasco.runtime.build.tools.compiler;
 
 import com.telenav.kivakit.core.version.Version;
-import com.telenav.kivakit.resource.ResourceList;
-import digital.fiasco.runtime.build.tools.BaseTool;
+import com.telenav.kivakit.filesystem.FileList;
 import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.tools.BaseTool;
 
-@SuppressWarnings({ "FieldCanBeLocal", "unused" })
+import javax.tools.Diagnostic;
+import javax.tools.DiagnosticListener;
+import javax.tools.JavaFileObject;
+import java.nio.charset.Charset;
+import java.util.Locale;
+
+import static java.nio.charset.StandardCharsets.UTF_8;
+import static javax.tools.ToolProvider.getSystemJavaCompiler;
+
+@SuppressWarnings({ "FieldCanBeLocal", "unused", "UnusedReturnValue" })
 public class Compiler extends BaseTool
 {
+    private class ProblemListener implements DiagnosticListener<JavaFileObject>
+    {
+        @Override
+        public void report(Diagnostic<? extends JavaFileObject> diagnostic)
+        {
+            problem("$ $ ($:$): $",
+                    diagnostic.getKind(),
+                    diagnostic.getCode(),
+                    diagnostic.getSource().getName(),
+                    diagnostic.getLineNumber(),
+                    diagnostic.getMessage(Locale.getDefault()));
+        }
+    }
+
     private Version sourceVersion;
 
     private Version targetVersion;
 
-    private ResourceList sources;
+    private FileList sources;
+
+    private Charset charset = UTF_8;
+
+    private Locale locale = Locale.getDefault();
 
     public Compiler(Build build)
     {
         super(build);
+    }
+
+    public Compiler charSet(Charset charset)
+    {
+        this.charset = charset;
+        return this;
+    }
+
+    public Compiler locale(Locale locale)
+    {
+        this.locale = locale;
+        return this;
     }
 
     public Compiler sourceVersion(Version version)
@@ -25,7 +64,7 @@ public class Compiler extends BaseTool
         return this;
     }
 
-    public Compiler sources(ResourceList sources)
+    public Compiler sources(FileList sources)
     {
         this.sources = sources;
         return this;
@@ -40,5 +79,15 @@ public class Compiler extends BaseTool
     @Override
     protected void onRun()
     {
+        compile(build().javaSources());
+    }
+
+    private boolean compile(FileList sources)
+    {
+        var compiler = getSystemJavaCompiler();
+        var fileManager = compiler.getStandardFileManager(
+                new ProblemListener(), locale, charset);
+        var files = fileManager.getJavaFileObjectsFromFiles(sources.asJavaFiles());
+        return compiler.getTask(null, fileManager, new ProblemListener(), null, null, files).call();
     }
 }

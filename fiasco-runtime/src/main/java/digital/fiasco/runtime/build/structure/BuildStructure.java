@@ -1,7 +1,10 @@
 package digital.fiasco.runtime.build.structure;
 
+import com.telenav.kivakit.filesystem.FileList;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.resource.ResourceList;
+
+import static com.telenav.kivakit.resource.ResourceGlob.glob;
 
 /**
  * Information about the folder structure of the build.
@@ -9,7 +12,7 @@ import com.telenav.kivakit.resource.ResourceList;
  * @author jonathan
  */
 @SuppressWarnings("unused")
-public interface Structure
+public interface BuildStructure
 {
     /**
      * output/classes
@@ -46,9 +49,9 @@ public interface Structure
     /**
      * src/main/java/**&#47;*.java
      */
-    default ResourceList javaSources()
+    default FileList javaSources()
     {
-        return javaSourceFolder().nestedResources("**/*.java");
+        return javaSourceFolder().nestedFiles(glob("**/*.java"));
     }
 
     /**

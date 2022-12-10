@@ -1,13 +1,18 @@
 package digital.fiasco.runtime.build;
 
 import digital.fiasco.runtime.build.phases.Phase;
+import digital.fiasco.runtime.build.structure.BuildStructure;
+import digital.fiasco.runtime.build.tools.ToolFactory;
 
 /**
  * A listener that is called as the build proceeds
  *
  * @author jonathan
  */
-public interface BuildListener
+public interface BuildListener extends
+        ToolFactory,
+        BuildStructure,
+        BuildAttached
 {
     default void onBuildStart()
     {
@@ -23,6 +28,7 @@ public interface BuildListener
 
     default void onClean()
     {
+        cleaner(outputFolder(), "**/*.class").run();
     }
 
     default void onCleaned()
@@ -35,6 +41,7 @@ public interface BuildListener
 
     default void onCompile()
     {
+        compiler().sources(javaSources()).run();
     }
 
     default void onCompiled()

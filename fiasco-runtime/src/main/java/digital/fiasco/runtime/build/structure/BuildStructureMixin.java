@@ -4,8 +4,8 @@ import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.mixins.Mixin;
 
 @SuppressWarnings("unused")
-public interface StructureMixin extends
-        Structure,
+public interface BuildStructureMixin extends
+        BuildStructure,
         Mixin
 {
     @Override
@@ -20,8 +20,8 @@ public interface StructureMixin extends
         structure().folder(key, folder);
     }
 
-    default BaseStructure structure()
+    default BaseBuildStructure structure()
     {
-        return mixin(StructureMixin.class, BaseStructure::new);
+        return mixin(BuildStructureMixin.class, BaseBuildStructure::new);
     }
 }

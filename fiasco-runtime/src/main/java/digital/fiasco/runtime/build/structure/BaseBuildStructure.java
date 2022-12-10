@@ -11,7 +11,7 @@ import java.util.Map;
  * @author jonathan
  */
 @SuppressWarnings("unused")
-public class BaseStructure implements Structure
+public class BaseBuildStructure implements BuildStructure
 {
     /** Map from logical name to folder */
     private final Map<String, Folder> folders = new HashMap<>();
