@@ -5,7 +5,7 @@ package digital.fiasco.runtime.build;
  *
  * @author jonathan
  */
-public interface Buildable
+public interface Built
 {
-    BaseBuild baseBuild();
+    Build buildable();
 }

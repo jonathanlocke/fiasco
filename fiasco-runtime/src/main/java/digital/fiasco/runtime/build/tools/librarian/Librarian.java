@@ -11,7 +11,7 @@ import com.telenav.kivakit.interfaces.comparison.Filter;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.repository.RemoteMavenRepository;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.build.BaseBuild;
+import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.repository.LibraryResolver;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class Librarian extends BaseTool implements LibraryResolver
 
     private Repository deploymentRepository;
 
-    public Librarian(BaseBuild build)
+    public Librarian(Build build)
     {
         super(build);
     }

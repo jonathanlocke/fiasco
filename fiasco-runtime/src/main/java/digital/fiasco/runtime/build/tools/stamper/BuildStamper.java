@@ -1,10 +1,10 @@
 package digital.fiasco.runtime.build.tools.stamper;
 
 import com.telenav.cactus.metadata.BuildName;
+import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.structure.StructureMixin;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.build.tools.git.Git;
-import digital.fiasco.runtime.build.BaseBuild;
 
 import java.time.LocalDate;
 
@@ -19,7 +19,7 @@ import static com.telenav.kivakit.core.time.Time.now;
 public class BuildStamper extends BaseTool implements
         StructureMixin
 {
-    public BuildStamper(BaseBuild build)
+    public BuildStamper(Build build)
     {
         super(build);
     }

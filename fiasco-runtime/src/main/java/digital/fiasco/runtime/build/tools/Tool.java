@@ -8,7 +8,7 @@
 package digital.fiasco.runtime.build.tools;
 
 import com.telenav.kivakit.core.messaging.Repeater;
-import digital.fiasco.runtime.build.BaseBuild;
+import digital.fiasco.runtime.build.Build;
 
 /**
  * Interface for executable tools.
@@ -18,5 +18,5 @@ public interface Tool extends Repeater, Runnable
     /**
      * Returns the build that this tool was created by
      */
-    BaseBuild build();
+    Build build();
 }

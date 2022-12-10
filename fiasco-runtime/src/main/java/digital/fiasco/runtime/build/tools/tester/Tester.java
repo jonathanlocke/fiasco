@@ -8,7 +8,7 @@
 package digital.fiasco.runtime.build.tools.tester;
 
 import digital.fiasco.runtime.build.tools.BaseTool;
-import digital.fiasco.runtime.build.BaseBuild;
+import digital.fiasco.runtime.build.Build;
 
 /**
  * Runs unit tests
@@ -17,7 +17,7 @@ import digital.fiasco.runtime.build.BaseBuild;
  */
 public class Tester extends BaseTool
 {
-    public Tester(BaseBuild build)
+    public Tester(Build build)
     {
         super(build);
     }

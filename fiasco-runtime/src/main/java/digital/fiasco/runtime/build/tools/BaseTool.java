@@ -1,7 +1,7 @@
 package digital.fiasco.runtime.build.tools;
 
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
-import digital.fiasco.runtime.build.BaseBuild;
+import digital.fiasco.runtime.build.Build;
 
 /**
  * Base class for {@link Tool}s.
@@ -10,15 +10,15 @@ import digital.fiasco.runtime.build.BaseBuild;
  */
 public abstract class BaseTool extends BaseRepeater implements Tool
 {
-    private final BaseBuild build;
+    private final Build build;
 
-    public BaseTool(BaseBuild build)
+    public BaseTool(Build build)
     {
         this.build = build;
     }
 
     @Override
-    public BaseBuild build()
+    public Build build()
     {
         return build;
     }

@@ -3,7 +3,7 @@ package digital.fiasco.runtime.build.tools.compiler;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.resource.ResourceList;
 import digital.fiasco.runtime.build.tools.BaseTool;
-import digital.fiasco.runtime.build.BaseBuild;
+import digital.fiasco.runtime.build.Build;
 
 @SuppressWarnings({ "FieldCanBeLocal", "unused" })
 public class Compiler extends BaseTool
@@ -14,7 +14,7 @@ public class Compiler extends BaseTool
 
     private ResourceList sources;
 
-    public Compiler(BaseBuild build)
+    public Compiler(Build build)
     {
         super(build);
     }

@@ -12,8 +12,8 @@ import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import com.telenav.kivakit.resource.CopyMode;
 import com.telenav.kivakit.resource.ResourcePathed;
+import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
-import digital.fiasco.runtime.build.BaseBuild;
 
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
 
@@ -37,7 +37,7 @@ public class Copier extends BaseTool
     /** Progress in copying files */
     private final ProgressReporter progress = progressReporter(this, "files");
 
-    public Copier(BaseBuild build)
+    public Copier(Build build)
     {
         super(build);
     }

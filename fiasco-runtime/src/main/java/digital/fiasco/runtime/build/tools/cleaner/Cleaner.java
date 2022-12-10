@@ -4,7 +4,7 @@ import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import com.telenav.kivakit.resource.ResourcePathed;
-import digital.fiasco.runtime.build.BaseBuild;
+import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
@@ -20,7 +20,7 @@ public class Cleaner extends BaseTool
     /** The matchers that match files to be removed */
     private final ObjectList<Matcher<ResourcePathed>> matchers = list();
 
-    public Cleaner(BaseBuild build)
+    public Cleaner(Build build)
     {
         super(build);
     }

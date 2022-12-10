@@ -49,11 +49,11 @@ import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static digital.fiasco.runtime.repository.artifact.Artifact.parseArtifact;
 
 @SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused" })
-public abstract class BaseBuild extends Application implements
+public abstract class Build extends Application implements
         ToolFactory,
         EnvironmentTrait,
         StructureMixin,
-        Buildable,
+        Built,
         BuildListener
 {
     /** The primary artifact being built */
@@ -76,14 +76,14 @@ public abstract class BaseBuild extends Application implements
     /** Enable state of each phase */
     private final ObjectMap<Phase, Boolean> phaseEnabled = new ObjectMap<>();
 
-    protected BaseBuild()
+    protected Build()
     {
         // Do not allow subclass constructors
-        for (Class<?> at = getClass(); at != BaseBuild.class; at = at.getSuperclass())
+        for (Class<?> at = getClass(); at != Build.class; at = at.getSuperclass())
         {
             if (at.getConstructors().length > 0)
             {
-                illegalState("BaseBuild subclasses cannot declare constructors");
+                illegalState("BuildBuild subclasses cannot declare constructors");
             }
         }
 
@@ -143,15 +143,15 @@ public abstract class BaseBuild extends Application implements
         return artifact;
     }
 
-    @Override
-    public BaseBuild baseBuild()
-    {
-        return this;
-    }
-
     public ObjectList<BuildListener> buildListeners()
     {
         return buildListeners;
+    }
+
+    @Override
+    public Build buildable()
+    {
+        return this;
     }
 
     /**

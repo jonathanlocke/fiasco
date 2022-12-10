@@ -11,7 +11,7 @@ import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.conversion.core.time.TimeConverter;
 import com.telenav.kivakit.core.time.Time;
 import com.telenav.kivakit.filesystem.Folder;
-import digital.fiasco.runtime.build.BaseBuild;
+import digital.fiasco.runtime.build.Build;
 
 import static com.telenav.kivakit.core.os.OperatingSystem.operatingSystem;
 import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
@@ -24,9 +24,9 @@ import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
 @SuppressWarnings("unused")
 public class Git extends BaseComponent
 {
-    private final BaseBuild build;
+    private final Build build;
 
-    public Git(BaseBuild build)
+    public Git(Build build)
     {
         this.build = build;
     }
