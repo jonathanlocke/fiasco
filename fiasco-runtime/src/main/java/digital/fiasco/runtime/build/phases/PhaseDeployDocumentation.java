@@ -21,8 +21,7 @@ public class PhaseDeployDocumentation extends Phase
     @Override
     public ObjectList<Phase> requiredPhases()
     {
-        return list(new PhaseBuildStart(),
-                new PhaseDocument());
+        return list(new PhaseDocument());
     }
 
     @Override

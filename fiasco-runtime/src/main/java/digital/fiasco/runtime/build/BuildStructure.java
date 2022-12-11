@@ -75,7 +75,7 @@ public interface BuildStructure extends BuildAssociated
      */
     default Folder targetFolder()
     {
-        return associatedBuild().rootFolder().folder("output");
+        return associatedBuild().rootFolder().folder("target");
     }
 
     /**

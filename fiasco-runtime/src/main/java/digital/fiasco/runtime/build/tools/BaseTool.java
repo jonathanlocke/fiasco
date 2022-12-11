@@ -49,7 +49,7 @@ public abstract class BaseTool extends BaseRepeater implements Tool
 
     protected void onDescribe()
     {
-        announce(description());
+        announce(" \n" + description());
     }
 
     protected void onRan()

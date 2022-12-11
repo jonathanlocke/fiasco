@@ -1,3 +1,5 @@
+package fiasco;
+
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.metadata.Contributor;
 import digital.fiasco.runtime.build.metadata.Copyright;
@@ -14,7 +16,7 @@ public class FiascoBuild extends Build
 {
     public static void main(String[] arguments)
     {
-        new FiascoBuild().run(arguments);
+        run(FiascoBuild.class, arguments);
     }
 
     @Override

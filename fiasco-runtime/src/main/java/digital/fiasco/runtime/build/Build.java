@@ -14,6 +14,7 @@
 
 package digital.fiasco.runtime.build;
 
+import com.google.common.base.Strings;
 import com.telenav.kivakit.application.Application;
 import com.telenav.kivakit.commandline.ArgumentParser;
 import com.telenav.kivakit.conversion.core.language.IdentityConverter;
@@ -28,24 +29,26 @@ import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.filesystem.Folders;
 import digital.fiasco.runtime.build.metadata.Metadata;
 import digital.fiasco.runtime.build.phases.Phase;
-import digital.fiasco.runtime.build.phases.PhaseBuildEnd;
-import digital.fiasco.runtime.build.phases.PhaseBuildStart;
 import digital.fiasco.runtime.build.phases.PhaseClean;
 import digital.fiasco.runtime.build.phases.PhaseCompile;
 import digital.fiasco.runtime.build.phases.PhaseDeployDocumentation;
 import digital.fiasco.runtime.build.phases.PhaseDeployPackages;
 import digital.fiasco.runtime.build.phases.PhaseDocument;
+import digital.fiasco.runtime.build.phases.PhaseEnd;
 import digital.fiasco.runtime.build.phases.PhaseInstall;
 import digital.fiasco.runtime.build.phases.PhaseIntegrationTest;
 import digital.fiasco.runtime.build.phases.PhasePackage;
 import digital.fiasco.runtime.build.phases.PhasePrepare;
+import digital.fiasco.runtime.build.phases.PhaseStart;
 import digital.fiasco.runtime.build.phases.PhaseTest;
 import digital.fiasco.runtime.build.tools.ToolFactory;
 import digital.fiasco.runtime.build.tools.librarian.Library;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.artifact.Artifact;
+import org.jetbrains.annotations.NotNull;
 
+import static com.google.common.base.Strings.repeat;
 import static com.telenav.kivakit.commandline.ArgumentParser.argumentParser;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
@@ -135,6 +138,7 @@ public abstract class Build extends Application implements
     /** Listeners to call as the build proceeds */
     private final ObjectList<BuildListener> buildListeners = list(this);
 
+    /** Libraries to compile with */
     private final DependencyList<Library> libraries = new DependencyList<>();
 
     /** Maps from the name of a phase to the {@link Phase} object */
@@ -356,7 +360,14 @@ public abstract class Build extends Application implements
                 multicaster.onPhaseStart(phase);
 
                 // run the phase calling all listeners,
-                announce("Phase $", phase.name());
+                if (describe)
+                {
+                    announce(" \n$ $ $", bar("="), phase.name(), bar("="));
+                }
+                else
+                {
+                    announce("$ $ $", bar("="), phase.name(), bar("="));
+                }
                 phase.run(multicaster);
 
                 // notify that the phase has ended,
@@ -394,7 +405,7 @@ public abstract class Build extends Application implements
 
     protected final void onInstallPhases()
     {
-        addPhase(new PhaseBuildStart());
+        addPhase(new PhaseStart());
         addPhase(new PhaseClean());
         addPhase(new PhasePrepare());
         addPhase(new PhaseCompile());
@@ -405,7 +416,10 @@ public abstract class Build extends Application implements
         addPhase(new PhaseInstall());
         addPhase(new PhaseDeployPackages());
         addPhase(new PhaseDeployDocumentation());
-        addPhase(new PhaseBuildEnd());
+        addPhase(new PhaseEnd());
+
+        enable(phase("start"));
+        enable(phase("end"));
     }
 
     @Override
@@ -438,6 +452,12 @@ public abstract class Build extends Application implements
 
             runBuild();
         }
+    }
+
+    @NotNull
+    private static String bar(String text)
+    {
+        return repeat(text, 8);
     }
 
     private boolean enabled(Phase phase)

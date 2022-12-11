@@ -21,7 +21,7 @@ public class PhaseClean extends Phase
     @Override
     public ObjectList<Phase> requiredPhases()
     {
-        return list(new PhaseBuildStart());
+        return list();
     }
 
     @Override

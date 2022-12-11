@@ -21,8 +21,7 @@ public class PhaseCompile extends Phase
     @Override
     public ObjectList<Phase> requiredPhases()
     {
-        return list(new PhaseBuildStart(),
-                new PhasePrepare());
+        return list(new PhasePrepare());
     }
 
     @Override

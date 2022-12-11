@@ -5,17 +5,17 @@ import digital.fiasco.runtime.build.BuildListener;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 
-public class PhaseBuildStart extends Phase
+public class PhaseEnd extends Phase
 {
-    public PhaseBuildStart()
+    public PhaseEnd()
     {
-        super("build-start");
+        super("end");
     }
 
     @Override
     public String description()
     {
-        return "Starts the build";
+        return "Ends the build";
     }
 
     @Override

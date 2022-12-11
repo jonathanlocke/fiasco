@@ -21,7 +21,7 @@ public class PhaseDocument extends Phase
     @Override
     public ObjectList<Phase> requiredPhases()
     {
-        return list(new PhaseBuildStart());
+        return list();
     }
 
     @Override

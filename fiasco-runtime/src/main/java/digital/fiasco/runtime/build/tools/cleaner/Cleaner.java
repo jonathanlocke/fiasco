@@ -8,6 +8,7 @@ import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.build.tools.Matchers;
 
+import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.string.Formatter.format;
 
 /**
@@ -59,17 +60,25 @@ public class Cleaner extends BaseTool
     @Override
     protected String description()
     {
+        var files = folder.nestedFiles(matchers);
+        var paths = stringList();
+        for (var file : files)
+        {
+            paths.add(file.relativeTo(folder).path().asString());
+        }
         return format("""
                 Cleaner
-                  files: $
+                  folder: $
                   matchers: $
-                """ , folder, matchers);
+                  files:
+                $
+                """, folder, matchers, paths.indented(4).join("\n"));
     }
 
     @Override
     protected void onRun()
     {
-        information("Cleaning");
+        information("Cleaning $", folder.name());
 
         folder.nestedFiles(matchers)
                 .forEach(File::delete);

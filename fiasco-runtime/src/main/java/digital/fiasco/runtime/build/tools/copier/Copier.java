@@ -94,7 +94,7 @@ public class Copier extends BaseTool
                   from: $
                   to: $
                   matchers: $
-                """, from, to, matchers.toString().replaceAll("\\$", "."));
+                """, from, to, matchers);
     }
 
     @Override

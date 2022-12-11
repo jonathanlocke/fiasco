@@ -12,5 +12,5 @@ mvn -quiet clean compile || exit 1
 
 FIASCO_RUNTIME="$HOME"/.m2/repository/digital/fiasco/fiasco-runtime/0.9.0/fiasco-runtime-0.9.0.jar
 
-java -classpath ./target/fiasco:"$FIASCO_RUNTIME" FiascoBuild "$@" || exit 1
+java -classpath ./target/classes:"$FIASCO_RUNTIME" fiasco.FiascoBuild "$@" || exit 1
 

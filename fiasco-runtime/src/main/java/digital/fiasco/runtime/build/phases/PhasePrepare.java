@@ -21,7 +21,7 @@ public class PhasePrepare extends Phase
     @Override
     public ObjectList<Phase> requiredPhases()
     {
-        return list(new PhaseBuildStart());
+        return list();
     }
 
     @Override

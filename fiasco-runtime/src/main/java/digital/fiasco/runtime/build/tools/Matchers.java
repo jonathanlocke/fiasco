@@ -3,6 +3,9 @@ package digital.fiasco.runtime.build.tools;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import com.telenav.kivakit.resource.ResourcePathed;
+import org.jetbrains.annotations.NotNull;
+
+import java.util.regex.Pattern;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.interfaces.comparison.Matcher.matchAll;
@@ -46,6 +49,20 @@ public class Matchers implements Matcher<ResourcePathed>
     @Override
     public String toString()
     {
-        return matchers.join();
+        return matchers.map(this::toString)
+                .join()
+                .replaceAll("\\$", ".");
+    }
+
+    @NotNull
+    private String toString(Matcher<ResourcePathed> at)
+    {
+        var text = at.toString();
+        var matcher = Pattern.compile("([A-Za-z0-9_]+)\\$\\$").matcher(text);
+        if (matcher.find())
+        {
+            text = "(" + matcher.group(1) + " lambda)";
+        }
+        return text;
     }
 }

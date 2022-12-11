@@ -21,8 +21,7 @@ public class PhaseDeployPackages extends Phase
     @Override
     public ObjectList<Phase> requiredPhases()
     {
-        return list(new PhaseBuildStart(),
-                new PhasePrepare(),
+        return list(new PhasePrepare(),
                 new PhaseCompile(),
                 new PhaseTest(),
                 new PhaseDocument(),
