@@ -32,6 +32,11 @@
             <artifactId>kivakit-application</artifactId>
             <version>${kivakit.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.telenav.kivakit</groupId>
+            <artifactId>kivakit-serialization-gson</artifactId>
+            <version>${kivakit.version}</version>
+        </dependency>
 
     </dependencies>
 

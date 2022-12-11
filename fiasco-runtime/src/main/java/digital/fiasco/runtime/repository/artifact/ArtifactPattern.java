@@ -5,10 +5,11 @@ import com.telenav.kivakit.interfaces.comparison.Matcher;
 /**
  * @author jonathan
  */
-public class ArtifactPattern implements Matcher<Artifact>
+@SuppressWarnings("unused")
+public class ArtifactPattern implements Matcher<ArtifactDescriptor>
 {
     @Override
-    public boolean matches(final Artifact artifact)
+    public boolean matches(ArtifactDescriptor artifact)
     {
         return false;
     }

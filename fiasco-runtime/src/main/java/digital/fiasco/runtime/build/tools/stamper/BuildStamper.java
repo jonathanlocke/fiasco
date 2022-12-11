@@ -8,7 +8,7 @@ import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.BuildStructure;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.build.tools.ToolFactory;
-import digital.fiasco.runtime.repository.artifact.Artifact;
+import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
 
 import java.time.LocalDate;
 
@@ -59,7 +59,7 @@ public class BuildStamper extends BaseTool implements
                 .saveText(buildProperties().join("\n"));
     }
 
-    private Artifact artifact()
+    private ArtifactDescriptor artifact()
     {
         return associatedBuild().artifact();
     }

@@ -2,7 +2,6 @@ package digital.fiasco.runtime.repository;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.Repeater;
-import digital.fiasco.runtime.build.tools.librarian.Library;
 
 /**
  * Interface to a repository that stores libraries

@@ -5,7 +5,7 @@
 // terms of the license agreement you entered into with Telenav.                                             /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package digital.fiasco.runtime.build.tools.librarian;
+package digital.fiasco.runtime.repository;
 
 import com.telenav.kivakit.core.messaging.Listener;
 import com.telenav.kivakit.core.version.Version;
@@ -13,7 +13,7 @@ import com.telenav.kivakit.interfaces.comparison.Filter;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.DependencyList;
-import digital.fiasco.runtime.repository.artifact.Artifact;
+import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
 
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
@@ -23,10 +23,10 @@ public class Library implements Dependency<Library>
 {
     public static Library library(Listener listener, String artifact)
     {
-        return new Library(Artifact.parseArtifact(listener, artifact));
+        return new Library(ArtifactDescriptor.parseArtifactDescriptor(listener, artifact));
     }
 
-    private Artifact artifact;
+    private ArtifactDescriptor artifact;
 
     private Filter<Library> exclusions = acceptAll();
 
@@ -34,7 +34,7 @@ public class Library implements Dependency<Library>
 
     private Version version;
 
-    protected Library(Artifact artifact)
+    protected Library(ArtifactDescriptor artifact)
     {
         this.artifact = artifact;
     }
@@ -46,7 +46,7 @@ public class Library implements Dependency<Library>
         exclusions = that.exclusions;
     }
 
-    public Artifact artifact()
+    public ArtifactDescriptor artifact()
     {
         return artifact;
     }

@@ -1,7 +1,6 @@
 package digital.fiasco.runtime.repository;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
-import digital.fiasco.runtime.build.tools.librarian.Library;
 
 public class LocalRepository extends BaseRepository
 {

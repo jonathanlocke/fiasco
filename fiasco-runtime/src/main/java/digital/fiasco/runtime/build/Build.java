@@ -14,7 +14,6 @@
 
 package digital.fiasco.runtime.build;
 
-import com.google.common.base.Strings;
 import com.telenav.kivakit.application.Application;
 import com.telenav.kivakit.commandline.ArgumentParser;
 import com.telenav.kivakit.conversion.core.language.IdentityConverter;
@@ -24,9 +23,11 @@ import com.telenav.kivakit.core.messaging.listeners.MessageList;
 import com.telenav.kivakit.core.messaging.messages.status.Problem;
 import com.telenav.kivakit.core.messaging.messages.status.Quibble;
 import com.telenav.kivakit.core.messaging.messages.status.Warning;
+import com.telenav.kivakit.core.project.Project;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.filesystem.Folders;
+import com.telenav.kivakit.serialization.gson.GsonSerializationProject;
 import digital.fiasco.runtime.build.metadata.Metadata;
 import digital.fiasco.runtime.build.phases.Phase;
 import digital.fiasco.runtime.build.phases.PhaseClean;
@@ -42,18 +43,21 @@ import digital.fiasco.runtime.build.phases.PhasePrepare;
 import digital.fiasco.runtime.build.phases.PhaseStart;
 import digital.fiasco.runtime.build.phases.PhaseTest;
 import digital.fiasco.runtime.build.tools.ToolFactory;
-import digital.fiasco.runtime.build.tools.librarian.Library;
 import digital.fiasco.runtime.dependency.DependencyList;
+import digital.fiasco.runtime.repository.Library;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.repository.artifact.Artifact;
+import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.Set;
 
 import static com.google.common.base.Strings.repeat;
 import static com.telenav.kivakit.commandline.ArgumentParser.argumentParser;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
-import static digital.fiasco.runtime.build.tools.librarian.Library.library;
-import static digital.fiasco.runtime.repository.artifact.Artifact.parseArtifact;
+import static digital.fiasco.runtime.repository.Library.library;
+import static digital.fiasco.runtime.repository.artifact.ArtifactDescriptor.parseArtifactDescriptor;
 
 /**
  * Base {@link Application} for Fiasco command-line builds.
@@ -127,7 +131,7 @@ public abstract class Build extends Application implements
         BuildRepositories
 {
     /** The primary artifact being built */
-    private Artifact artifact;
+    private ArtifactDescriptor artifact;
 
     /** Metadata about the build */
     private Metadata metadata;
@@ -219,7 +223,7 @@ public abstract class Build extends Application implements
         nameToPhase.put(phase.name(), phase);
     }
 
-    public Artifact artifact()
+    public ArtifactDescriptor artifact()
     {
         return artifact;
     }
@@ -311,6 +315,12 @@ public abstract class Build extends Application implements
         return ensureNotNull(nameToPhase.get(name), "Could not find phase: $", name);
     }
 
+    @Override
+    public Set<Project> projects()
+    {
+        return set(new GsonSerializationProject());
+    }
+
     public ObjectList<Repository> repositories()
     {
         return repositories;
@@ -393,14 +403,14 @@ public abstract class Build extends Application implements
                 .build());
     }
 
-    protected void artifact(Artifact artifact)
+    protected void artifact(ArtifactDescriptor artifact)
     {
         this.artifact = artifact;
     }
 
     protected void artifact(String descriptor)
     {
-        artifact(parseArtifact(this, descriptor));
+        artifact(parseArtifactDescriptor(this, descriptor));
     }
 
     protected final void onInstallPhases()
