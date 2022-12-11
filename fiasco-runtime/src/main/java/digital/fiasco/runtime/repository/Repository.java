@@ -1,18 +1,34 @@
 package digital.fiasco.runtime.repository;
 
 import com.telenav.kivakit.core.messaging.Repeater;
+import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.resource.Resource;
+import digital.fiasco.runtime.repository.artifact.ArtifactContentMetadata;
 import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.repository.artifact.ArtifactMetadata;
-import digital.fiasco.runtime.repository.artifact.ArtifactContentMetadata;
 
 /**
  * Interface to a repository that stores libraries
  *
+ * <p><b>Retrieving</b></p>
+ *
+ * <ul>
+ *     <li>{@link #metadata(ArtifactDescriptor)} - Gets the {@link ArtifactMetadata} for the given descriptor</li>
+ *     <li>{@link #content(ArtifactMetadata, ArtifactContentMetadata, String)} - Gets the cached resource for the given artifact and content metadata</li>
+ * </ul>
+ *
+ * <p><b>Adding and Removing</b></p>
+ *
+ * <ul>
+ *     <li>{@link #clear()} - Removes all data from this repository</li>
+ *     <li>{@link #metadata(ArtifactDescriptor)} - Gets the {@link ArtifactMetadata} for the given descriptor</li>
+ *     <li>{@link #content(ArtifactMetadata, ArtifactContentMetadata, String)} - Gets the cached resource for the given content metadata</li>
+ * </ul>
+ *
  * @author jonathan
  */
 @SuppressWarnings("unused")
-public interface Repository extends Repeater
+public interface Repository extends Repeater, Named
 {
     /**
      * Adds the given content {@link Resource}s to content.bin, and the {@link ArtifactMetadata} metadata to
@@ -33,10 +49,12 @@ public interface Repository extends Repeater
     /**
      * Returns the section of the binary resources file containing the given artifact
      *
-     * @param artifact The artifact metadata, including its offset and size
+     * @param metadata The artifact metadata
+     * @param content The content metadata, including its offset and size
+     * @param suffix A suffix to add to the resource path
      * @return The resource section for the artifact
      */
-    Resource content(ArtifactContentMetadata artifact);
+    Resource content(ArtifactMetadata metadata, ArtifactContentMetadata content, String suffix);
 
     /**
      * Gets the cache entry for the given artifact descriptor

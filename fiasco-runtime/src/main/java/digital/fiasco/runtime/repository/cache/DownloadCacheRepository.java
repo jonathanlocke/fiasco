@@ -19,12 +19,19 @@ import static java.nio.file.StandardOpenOption.APPEND;
  * wipes out their repository, causing it to repopulate. Instead of repopulating from Maven Central or another remote
  * repository, the artifacts in this cache can be used.
  *
- * <p><b>Key Methods</b></p>
+ * <p><b>Retrieving</b></p>
  *
  * <ul>
- *     <li>{@link #add(ArtifactMetadata, Resource, Resource, Resource)} - Adds an artifact to this cache, including its metadata, and its jar, javadoc and source attachments</li>
  *     <li>{@link #metadata(ArtifactDescriptor)} - Gets the {@link ArtifactMetadata} for the given descriptor</li>
- *     <li>{@link #content(ArtifactContentMetadata)} - Gets the cached resource for the given content metadata</li>
+ *     <li>{@link digital.fiasco.runtime.repository.Repository#content(ArtifactMetadata, ArtifactContentMetadata, String)} - Gets the cached resource for the given artifact and content metadata</li>
+ * </ul>
+ *
+ * <p><b>Adding and Removing</b></p>
+ *
+ * <ul>
+ *     <li>{@link #clear()} - Removes all data from this repository</li>
+ *     <li>{@link #metadata(ArtifactDescriptor)} - Gets the {@link ArtifactMetadata} for the given descriptor</li>
+ *     <li>{@link digital.fiasco.runtime.repository.Repository#content(ArtifactMetadata, ArtifactContentMetadata, String)} - Gets the cached resource for the given content metadata</li>
  * </ul>
  *
  * @author jonathan
@@ -36,7 +43,7 @@ public class DownloadCacheRepository extends BaseRepository
     private boolean loaded;
 
     /** The file for storing metadata in JSON format */
-    private final File metadataFile = cacheFile("artifact-metadata.txt");
+    private final File metadataFile = cacheFile("metadata.txt");
 
     /** The binary file containing artifacts, laid out end-to-end */
     private final File contentFile = cacheFile("content.bin");
@@ -103,7 +110,9 @@ public class DownloadCacheRepository extends BaseRepository
      * @return The resource section for the artifact
      */
     @Override
-    public synchronized Resource content(ArtifactContentMetadata artifact)
+    public synchronized Resource content(ArtifactMetadata metadata,
+                                         ArtifactContentMetadata artifact,
+                                         String suffix)
     {
         var start = artifact.offset();
         var end = start + artifact.size().asBytes();
@@ -172,7 +181,7 @@ public class DownloadCacheRepository extends BaseRepository
     private File cacheFile(String name)
     {
         return userHome()
-                .folder(".fiasco/downloaded-artifacts")
+                .folder(".fiasco/download-cache")
                 .file(name);
     }
 

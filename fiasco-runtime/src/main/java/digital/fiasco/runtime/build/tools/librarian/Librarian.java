@@ -12,7 +12,6 @@ import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.repository.Library;
 import digital.fiasco.runtime.repository.LibraryResolver;
-import digital.fiasco.runtime.repository.RemoteMavenRepository;
 import digital.fiasco.runtime.repository.Repository;
 
 import java.util.ArrayList;
@@ -42,13 +41,13 @@ public class Librarian extends BaseTool implements
 
     public Librarian deploy(Library library)
     {
-        deploymentRepository.install(library);
+        // deploymentRepository.add(library);
         return this;
     }
 
     public Librarian install(Library library)
     {
-        RemoteMavenRepository.local().install(library);
+        //RemoteMavenRepository.local().install(library);
         return this;
     }
 
@@ -68,11 +67,7 @@ public class Librarian extends BaseTool implements
     {
         for (var repository : repositories)
         {
-            var libraries = repository.dependencies(library);
-            if (libraries != null)
-            {
-                return libraries;
-            }
+
         }
         return Collections.emptyList();
     }

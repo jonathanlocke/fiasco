@@ -2,18 +2,39 @@ package digital.fiasco.runtime.repository.maven;
 
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
+import com.telenav.kivakit.resource.FileName;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.ResourceFolder;
+import com.telenav.kivakit.resource.ResourcePath;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.artifact.ArtifactContentMetadata;
 import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.repository.artifact.ArtifactMetadata;
 
+import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
+import static com.telenav.kivakit.network.http.HttpNetworkLocation.parseHttpNetworkLocation;
 import static com.telenav.kivakit.resource.CopyMode.OVERWRITE;
+import static com.telenav.kivakit.resource.FileName.parseFileName;
+import static com.telenav.kivakit.resource.ResourcePath.parseResourcePath;
 
 /**
  * A basic Maven repository, either on the local machine or some remote resource folder. If the given root folder is a
  * local folder the repository is writable, otherwise it is read-only.
+ *
+ * <p><b>Retrieving</b></p>
+ *
+ * <ul>
+ *     <li>{@link #metadata(ArtifactDescriptor)} - Gets the {@link ArtifactMetadata} for the given descriptor</li>
+ *     <li>{@link digital.fiasco.runtime.repository.Repository#content(ArtifactMetadata, ArtifactContentMetadata, String)} - Gets the cached resource for the given artifact and content metadata</li>
+ * </ul>
+ *
+ * <p><b>Adding and Removing</b></p>
+ *
+ * <ul>
+ *     <li>{@link #clear()} - Removes all data from this repository</li>
+ *     <li>{@link #metadata(ArtifactDescriptor)} - Gets the {@link ArtifactMetadata} for the given descriptor</li>
+ *     <li>{@link digital.fiasco.runtime.repository.Repository#content(ArtifactMetadata, ArtifactContentMetadata, String)} - Gets the cached resource for the given content metadata</li>
+ * </ul>
  *
  * @author jonathan
  */
@@ -23,12 +44,16 @@ public class MavenRepository extends BaseRepository
     /** The root folder for this repository */
     private final ResourceFolder<?> root;
 
+    /** The name of this repository */
+    private final String name;
+
     /**
      * @param root The root folder of this repository
      */
-    public MavenRepository(ResourceFolder<?> root)
+    public MavenRepository(String name, String root)
     {
-        this.root = listenTo(root);
+        this.name = name;
+        this.root = parseHttpNetworkLocation(this, root).resource().parent();
     }
 
     /**
@@ -57,9 +82,11 @@ public class MavenRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public Resource content(ArtifactContentMetadata artifact)
+    public Resource content(ArtifactMetadata metadata, ArtifactContentMetadata content, String suffix)
     {
-        return null;
+        var descriptor = metadata.descriptor();
+        return mavenFolder(root, descriptor)
+                .resource(mavenFileName(descriptor, suffix));
     }
 
     /**
@@ -71,6 +98,11 @@ public class MavenRepository extends BaseRepository
         return null;
     }
 
+    public String name()
+    {
+        return name;
+    }
+
     /**
      * Returns a file under the root of this repository
      *
@@ -80,9 +112,44 @@ public class MavenRepository extends BaseRepository
      */
     private File mavenFile(Folder target, ArtifactDescriptor descriptor, String suffix)
     {
-        var folder = target.folder(descriptor.asMavenPath().join("/"));
-        var fileName = descriptor.asFileName(suffix);
-        return folder.file(fileName);
+        var folder = (Folder) mavenFolder(target, descriptor);
+        return folder.file(mavenFileName(descriptor, suffix));
+    }
+
+    /**
+     * Returns this descriptor as a filename with the given suffix.
+     *
+     * @param suffix The suffix to add to the filename
+     * @return The filename
+     */
+    private FileName mavenFileName(ArtifactDescriptor descriptor, String suffix)
+    {
+        return parseFileName(throwingListener(), descriptor.group() + "-" + descriptor.version() + suffix);
+    }
+
+    /**
+     * Returns the subfolder within the given folder for the given descriptor
+     *
+     * @param root The root folder
+     * @param descriptor The descriptor
+     * @return The folder within the root folder for the descriptor
+     */
+    private ResourceFolder<?> mavenFolder(ResourceFolder<?> root, ArtifactDescriptor descriptor)
+    {
+        return root.folder(mavenPath(descriptor).join("/"));
+    }
+
+    /**
+     * Returns this artifact descriptor as a Maven path (relative to some repository root) such as:
+     * <pre>
+     * com/telenav/kivakit/kivakit-application/1.9.0</pre>
+     *
+     * @return The resource path
+     */
+    private ResourcePath mavenPath(ArtifactDescriptor descriptor)
+    {
+        var groupPath = descriptor.group().name().replaceAll("\\.", "/");
+        return parseResourcePath(throwingListener(), groupPath + "/" + descriptor.identifier() + "/" + descriptor.version());
     }
 
     /**
@@ -117,6 +184,7 @@ public class MavenRepository extends BaseRepository
             // get the file to write to
             var file = mavenFile(target, metadata.descriptor(), ".pom");
             file.saveText(metadata.asMavenPom());
+            // TODO return saveText boolean
             return true;
         }
         else
@@ -149,7 +217,7 @@ public class MavenRepository extends BaseRepository
         if (root instanceof Folder targetFolder)
         {
             // get the target sub-folder,
-            targetFolder = targetFolder.folder(descriptor.asMavenPath().join("/"));
+            targetFolder = (Folder) mavenFolder(targetFolder, descriptor);
 
             // and the target file in that folder,
             var targetFile = mavenFile(targetFolder, descriptor, ".jar");
