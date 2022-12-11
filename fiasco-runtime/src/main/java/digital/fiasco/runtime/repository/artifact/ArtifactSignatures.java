@@ -6,7 +6,7 @@ package digital.fiasco.runtime.repository.artifact;
  * @author jonathanl (shibo)
  */
 @SuppressWarnings("unused")
-public record ArtifactSignature
+public record ArtifactSignatures
         (
                 String pgp, // PGP signature text
                 String md5, // MD5 hash

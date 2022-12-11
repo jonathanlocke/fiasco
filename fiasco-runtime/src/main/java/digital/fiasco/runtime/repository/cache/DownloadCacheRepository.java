@@ -1,11 +1,13 @@
 package digital.fiasco.runtime.repository.cache;
 
-import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.ResourceSection;
+import digital.fiasco.runtime.repository.BaseRepository;
+import digital.fiasco.runtime.repository.artifact.ArtifactContentMetadata;
 import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.repository.artifact.ArtifactMetadata;
 
 import java.nio.file.Files;
 
@@ -22,13 +24,13 @@ import static java.nio.file.StandardOpenOption.APPEND;
  * <ul>
  *     <li>{@link #add(ArtifactMetadata, Resource, Resource, Resource)} - Adds an artifact to this cache, including its metadata, and its jar, javadoc and source attachments</li>
  *     <li>{@link #metadata(ArtifactDescriptor)} - Gets the {@link ArtifactMetadata} for the given descriptor</li>
- *     <li>{@link #content(ContentMetadata)} - Gets the cached resource for the given content metadata</li>
+ *     <li>{@link #content(ArtifactContentMetadata)} - Gets the cached resource for the given content metadata</li>
  * </ul>
  *
  * @author jonathan
  */
 @SuppressWarnings("unused")
-public class Cache extends BaseComponent
+public class DownloadCacheRepository extends BaseRepository
 {
     /** True if this cache has been loaded */
     private boolean loaded;
@@ -49,20 +51,21 @@ public class Cache extends BaseComponent
      * Adds the given content {@link Resource}s to content.bin, and the {@link ArtifactMetadata} metadata to
      * metadata.txt in JSON format.
      *
-     * @param entry The cache entry metadata to append to metadata.txt in JSON format
+     * @param metadata The cache entry metadata to append to metadata.txt in JSON format
      * @param jar The jar resource to add to content.bin
      * @param javadoc The javadoc resource to add to content.bin
      * @param source The source resource to add to content.bin
      */
-    public synchronized void add(ArtifactMetadata entry, Resource jar, Resource javadoc, Resource source)
+    @Override
+    public synchronized boolean add(ArtifactMetadata metadata, Resource jar, Resource javadoc, Resource source)
     {
         try
         {
             // Save resources to artifactsFile and attach cached artifacts to the cache entry.
-            entry = entry
-                    .withJar(appendArtifactContent(entry.jar(), jar))
-                    .withJavadoc(appendArtifactContent(entry.javadoc(), javadoc))
-                    .withSource(appendArtifactContent(entry.source(), source));
+            metadata = metadata
+                    .withJar(appendArtifactContent(metadata.jar(), jar))
+                    .withJavadoc(appendArtifactContent(metadata.javadoc(), javadoc))
+                    .withSource(appendArtifactContent(metadata.source(), source));
 
             // If the metadata file is missing or empty,
             var path = metadataFile.asJavaPath();
@@ -73,12 +76,24 @@ public class Cache extends BaseComponent
             }
 
             // then append the cache entry in JSON to the end of the file.
-            Files.writeString(path, entry.toJson(), APPEND);
+            Files.writeString(path, metadata.toJson(), APPEND);
+            return true;
         }
         catch (Exception e)
         {
-            problem(e, "Unable to add cache entry: $", entry);
+            problem(e, "Unable to add cache entry: $", metadata);
+            return false;
         }
+    }
+
+    /**
+     * Removes all data from this repository
+     */
+    @Override
+    public synchronized void clear()
+    {
+        metadataFile.delete();
+        contentFile.delete();
     }
 
     /**
@@ -87,7 +102,8 @@ public class Cache extends BaseComponent
      * @param artifact The artifact metadata, including its offset and size
      * @return The resource section for the artifact
      */
-    public synchronized Resource content(ContentMetadata artifact)
+    @Override
+    public synchronized Resource content(ArtifactContentMetadata artifact)
     {
         var start = artifact.offset();
         var end = start + artifact.size().asBytes();
@@ -100,6 +116,7 @@ public class Cache extends BaseComponent
      * @param descriptor The artifact descriptor
      * @return The cache entry for the descriptor
      */
+    @Override
     public synchronized ArtifactMetadata metadata(ArtifactDescriptor descriptor)
     {
         load();
@@ -107,14 +124,14 @@ public class Cache extends BaseComponent
     }
 
     /**
-     * Saves the given content into the content file, returning the given {@link ContentMetadata} with the offset, size,
-     * and last modified time populated.
+     * Saves the given content into the content file, returning the given {@link ArtifactContentMetadata} with the
+     * offset, size, and last modified time populated.
      *
      * @param artifact The artifact to save
      * @param content The artifact content to write to the resources file
      * @return The updated artifact metadata
      */
-    private ContentMetadata appendArtifactContent(ContentMetadata artifact, Resource content)
+    private ArtifactContentMetadata appendArtifactContent(ArtifactContentMetadata artifact, Resource content)
     {
         try
         {

@@ -1,7 +1,10 @@
 package digital.fiasco.runtime.repository;
 
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.Repeater;
+import com.telenav.kivakit.resource.Resource;
+import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.repository.artifact.ArtifactMetadata;
+import digital.fiasco.runtime.repository.artifact.ArtifactContentMetadata;
 
 /**
  * Interface to a repository that stores libraries
@@ -12,31 +15,34 @@ import com.telenav.kivakit.core.messaging.Repeater;
 public interface Repository extends Repeater
 {
     /**
-     * Resolves the dependencies for a library
+     * Adds the given content {@link Resource}s to content.bin, and the {@link ArtifactMetadata} metadata to
+     * metadata.txt in JSON format.
      *
-     * @return The library dependencies
+     * @param metadata The cache entry metadata to append to metadata.txt in JSON format
+     * @param jar The jar resource to add to content.bin
+     * @param javadoc The javadoc resource to add to content.bin
+     * @param source The source resource to add to content.bin
      */
-    ObjectList<Library> dependencies(Library library);
+    boolean add(ArtifactMetadata metadata, Resource jar, Resource javadoc, Resource source);
 
     /**
-     * Installs the given library into this repository
-     *
-     * @param library The library to install
+     * Removes all data from this repository
      */
-    void install(Library library);
+    void clear();
 
     /**
-     * Removes the given library from this repository
+     * Returns the section of the binary resources file containing the given artifact
      *
-     * @param library The library to remove
-     * @return True if the library was removed
+     * @param artifact The artifact metadata, including its offset and size
+     * @return The resource section for the artifact
      */
-    boolean remove(Library library);
+    Resource content(ArtifactContentMetadata artifact);
 
     /**
-     * Removes all libraries from this repository
+     * Gets the cache entry for the given artifact descriptor
      *
-     * @return True if the repository is empty
+     * @param descriptor The artifact descriptor
+     * @return The cache entry for the descriptor
      */
-    boolean removeAll();
+    ArtifactMetadata metadata(ArtifactDescriptor descriptor);
 }
