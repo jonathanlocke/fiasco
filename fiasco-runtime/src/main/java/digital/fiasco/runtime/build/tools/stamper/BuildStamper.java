@@ -13,7 +13,6 @@ import digital.fiasco.runtime.repository.artifact.Artifact;
 import java.time.LocalDate;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
-import static com.telenav.kivakit.core.time.Time.START_OF_UNIX_TIME;
 import static com.telenav.kivakit.core.time.Time.now;
 import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
 
@@ -76,7 +75,7 @@ public class BuildStamper extends BaseTool implements
 
         git.commitTime().run();
         var commitTime = new TimeConverter(this, ISO_ZONED_DATE_TIME)
-                .convertOrDefault(git.output(), START_OF_UNIX_TIME);
+                .convert(git.output());
 
         return stringList("build.time = " + now().asString(),
                 "build.number = " + BuildName.name(LocalDate.now()),
