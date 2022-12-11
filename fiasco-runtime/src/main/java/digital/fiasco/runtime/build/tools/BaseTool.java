@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.build.tools;
 
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
+import com.telenav.kivakit.filesystem.Folder;
 import digital.fiasco.runtime.build.Build;
 
 /**
@@ -60,5 +61,10 @@ public abstract class BaseTool extends BaseRepeater implements Tool
 
     protected void onRunning()
     {
+    }
+
+    protected Folder rootFolder()
+    {
+        return build.rootFolder();
     }
 }

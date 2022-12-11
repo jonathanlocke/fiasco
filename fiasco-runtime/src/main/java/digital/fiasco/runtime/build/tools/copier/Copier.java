@@ -100,7 +100,9 @@ public class Copier extends BaseTool
     @Override
     protected void onRun()
     {
-        information("Copying from $ to $", from, to);
+        information("Copying from $ to $",
+                from.relativeTo(rootFolder()),
+                to.relativeTo(rootFolder()));
 
         // For each source file in the 'from' folder that matches,
         var files = from.nestedFiles(matchers);

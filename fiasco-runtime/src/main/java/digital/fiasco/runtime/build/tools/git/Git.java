@@ -35,7 +35,7 @@ public class Git extends BaseTool
     public Git(BuildAssociated build)
     {
         super(build.associatedBuild());
-        folder = build.associatedBuild().rootFolder();
+        folder = rootFolder();
     }
 
     public Git(Git that)

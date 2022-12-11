@@ -1,6 +1,5 @@
 package digital.fiasco.runtime.build.tools.cleaner;
 
-import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import com.telenav.kivakit.resource.ResourcePathed;
@@ -81,6 +80,14 @@ public class Cleaner extends BaseTool
         information("Cleaning $", folder.name());
 
         folder.nestedFiles(matchers)
-                .forEach(File::delete);
+                .forEach(file ->
+                {
+                    file.delete();
+                    var parent = file.parent();
+                    if (parent.isEmpty())
+                    {
+                        parent.delete();
+                    }
+                });
     }
 }
