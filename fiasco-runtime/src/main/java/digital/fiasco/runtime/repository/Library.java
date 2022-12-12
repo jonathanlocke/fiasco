@@ -8,70 +8,88 @@
 package digital.fiasco.runtime.repository;
 
 import com.telenav.kivakit.core.messaging.Listener;
+import com.telenav.kivakit.core.registry.RegistryTrait;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.comparison.Filter;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
+import digital.fiasco.runtime.build.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.DependencyList;
+import digital.fiasco.runtime.repository.artifact.Artifact;
 import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
 
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
+import static digital.fiasco.runtime.repository.artifact.ArtifactDescriptor.parseArtifactDescriptor;
 
+/**
+ * A library is an artifact with zero or more excluded artifacts
+ *
+ * @author jonathan
+ */
 @SuppressWarnings("unused")
-public class Library implements Dependency<Library>
+public class Library implements
+        Dependency<Library>,
+        RegistryTrait
 {
-    public static Library library(Listener listener, String artifact)
+    public static Library library(Artifact artifact)
     {
-        return new Library(ArtifactDescriptor.parseArtifactDescriptor(listener, artifact));
+        return new Library(artifact.descriptor());
     }
 
-    private ArtifactDescriptor artifact;
-
-    private Filter<Library> exclusions = acceptAll();
-
-    private final DependencyList<Library> dependencies = new DependencyList<>();
-
-    private Version version;
-
-    protected Library(ArtifactDescriptor artifact)
+    public static Library library(Listener listener, String artifact)
     {
-        this.artifact = artifact;
+        return new Library(parseArtifactDescriptor(listener, artifact));
+    }
+
+    /** This library's artifact */
+    private ArtifactDescriptor artifactDescriptor;
+
+    /** Dependency exclusions for this artifact */
+    private Filter<ArtifactDescriptor> exclusions = acceptAll();
+
+    protected Library(ArtifactDescriptor artifactDescriptor)
+    {
+        this.artifactDescriptor = artifactDescriptor;
     }
 
     protected Library(Library that)
     {
-        artifact = that.artifact;
-        version = that.version;
+        artifactDescriptor = that.artifactDescriptor;
         exclusions = that.exclusions;
     }
 
-    public ArtifactDescriptor artifact()
+    public ArtifactDescriptor artifactDescriptor()
     {
-        return artifact;
+        return artifactDescriptor;
     }
 
     @Override
     public DependencyList<Library> dependencies()
     {
-        return dependencies.copy().without(exclusions);
+        return require(Librarian.class).dependencies(this);
     }
 
-    public Library excluding(Matcher<Library> pattern)
+    public boolean excludes(ArtifactDescriptor descriptor)
+    {
+        return exclusions.accepts(descriptor);
+    }
+
+    public Library excluding(ArtifactDescriptor... exclude)
+    {
+        return excluding(library -> arrayContains(exclude, library));
+    }
+
+    public Library excluding(Matcher<ArtifactDescriptor> pattern)
     {
         exclusions = exclusions.exclude(pattern);
         return this;
     }
 
-    public Library excluding(Library... libraries)
-    {
-        return excluding(library -> arrayContains(libraries, library));
-    }
-
     @SuppressWarnings("unchecked")
     public <T extends Library> T version(Version version)
     {
-        artifact = artifact.withVersion(version);
+        artifactDescriptor = artifactDescriptor.withVersion(version);
         return (T) this;
     }
 

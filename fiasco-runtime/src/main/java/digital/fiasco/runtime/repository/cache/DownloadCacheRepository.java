@@ -5,13 +5,17 @@ import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.ResourceSection;
 import digital.fiasco.runtime.repository.BaseRepository;
-import digital.fiasco.runtime.repository.artifact.ArtifactContentMetadata;
+import digital.fiasco.runtime.repository.artifact.Artifact;
+import digital.fiasco.runtime.repository.artifact.ArtifactContent;
 import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.repository.artifact.ArtifactMetadata;
+import digital.fiasco.runtime.repository.artifact.ArtifactResources;
 
 import java.nio.file.Files;
 
 import static com.telenav.kivakit.filesystem.Folders.userHome;
+import static digital.fiasco.runtime.repository.artifact.ArtifactResources.JAR_SUFFIX;
+import static digital.fiasco.runtime.repository.artifact.ArtifactResources.JAVADOC_JAR_SUFFIX;
+import static digital.fiasco.runtime.repository.artifact.ArtifactResources.SOURCES_JAR_SUFFIX;
 import static java.nio.file.StandardOpenOption.APPEND;
 
 /**
@@ -19,19 +23,18 @@ import static java.nio.file.StandardOpenOption.APPEND;
  * wipes out their repository, causing it to repopulate. Instead of repopulating from Maven Central or another remote
  * repository, the artifacts in this cache can be used.
  *
- * <p><b>Retrieving</b></p>
+ * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #metadata(ArtifactDescriptor)} - Gets the {@link ArtifactMetadata} for the given descriptor</li>
- *     <li>{@link digital.fiasco.runtime.repository.Repository#content(ArtifactMetadata, ArtifactContentMetadata, String)} - Gets the cached resource for the given artifact and content metadata</li>
+ *     <li>{@link #resolve(ArtifactDescriptor)} - Gets the {@link Artifact} for the given descriptor</li>
+ *     <li>{@link #content(Artifact, ArtifactContent, String)} - Gets the cached resource for the given artifact and content metadata</li>
  * </ul>
  *
- * <p><b>Adding and Removing</b></p>
+ * <p><b>Adding and Removing Artifacts</b></p>
  *
  * <ul>
+ *     <li>{@link #add(Artifact, ArtifactResources)} - Adds the given artifact with the given attached resources</li>
  *     <li>{@link #clear()} - Removes all data from this repository</li>
- *     <li>{@link #metadata(ArtifactDescriptor)} - Gets the {@link ArtifactMetadata} for the given descriptor</li>
- *     <li>{@link digital.fiasco.runtime.repository.Repository#content(ArtifactMetadata, ArtifactContentMetadata, String)} - Gets the cached resource for the given content metadata</li>
  * </ul>
  *
  * @author jonathan
@@ -42,53 +45,51 @@ public class DownloadCacheRepository extends BaseRepository
     /** True if this cache has been loaded */
     private boolean loaded;
 
-    /** The file for storing metadata in JSON format */
-    private final File metadataFile = cacheFile("metadata.txt");
+    /** The file for storing artifact metadata in JSON format */
+    private final File artifactsFile = cacheFile("artifacts.txt");
 
     /** The binary file containing artifacts, laid out end-to-end */
     private final File contentFile = cacheFile("content.bin");
 
     /** The cached artifact entries */
-    private final ObjectMap<ArtifactDescriptor, ArtifactMetadata> artifacts = new ObjectMap<>();
+    private final ObjectMap<ArtifactDescriptor, Artifact> artifacts = new ObjectMap<>();
 
-    /** Separator to use between metadata entries in the metadata.txt file */
-    private final String SEPARATOR = "\n========\n";
+    /** Separator to use between artifact entries in the artifacts.txt file */
+    private final String ARTIFACT_SEPARATOR = "\n========\n";
 
     /**
-     * Adds the given content {@link Resource}s to content.bin, and the {@link ArtifactMetadata} metadata to
-     * metadata.txt in JSON format.
+     * Adds the given content {@link Resource}s to content.bin, and the {@link Artifact} artifact to artifacts.txt in
+     * JSON format.
      *
-     * @param metadata The cache entry metadata to append to metadata.txt in JSON format
-     * @param jar The jar resource to add to content.bin
-     * @param javadoc The javadoc resource to add to content.bin
-     * @param source The source resource to add to content.bin
+     * @param artifact The artifact to append to artifacts.txt in JSON format
+     * @param resources The resources to add to content.bin
      */
     @Override
-    public synchronized boolean add(ArtifactMetadata metadata, Resource jar, Resource javadoc, Resource source)
+    public synchronized boolean add(Artifact artifact, ArtifactResources resources)
     {
         try
         {
             // Save resources to artifactsFile and attach cached artifacts to the cache entry.
-            metadata = metadata
-                    .withJar(appendArtifactContent(metadata.jar(), jar))
-                    .withJavadoc(appendArtifactContent(metadata.javadoc(), javadoc))
-                    .withSource(appendArtifactContent(metadata.source(), source));
+            artifact = artifact
+                    .withJar(appendArtifactContent(artifact.jar(), resources.get(JAR_SUFFIX)))
+                    .withJavadoc(appendArtifactContent(artifact.javadoc(), resources.get(JAVADOC_JAR_SUFFIX)))
+                    .withSource(appendArtifactContent(artifact.source(), resources.get(SOURCES_JAR_SUFFIX)));
 
-            // If the metadata file is missing or empty,
-            var path = metadataFile.asJavaPath();
+            // If the artifact file is missing or empty,
+            var path = artifactsFile.asJavaPath();
             if (!Files.exists(path) || Files.size(path) > 0)
             {
                 // write out a separator to make the file easy to read,
-                Files.writeString(path, SEPARATOR);
+                Files.writeString(path, ARTIFACT_SEPARATOR);
             }
 
             // then append the cache entry in JSON to the end of the file.
-            Files.writeString(path, metadata.toJson(), APPEND);
+            Files.writeString(path, artifact.toJson(), APPEND);
             return true;
         }
         catch (Exception e)
         {
-            problem(e, "Unable to add cache entry: $", metadata);
+            problem(e, "Unable to add cache entry: $", artifact);
             return false;
         }
     }
@@ -99,23 +100,24 @@ public class DownloadCacheRepository extends BaseRepository
     @Override
     public synchronized void clear()
     {
-        metadataFile.delete();
+        artifactsFile.delete();
         contentFile.delete();
     }
 
     /**
      * Returns the section of the binary resources file containing the given artifact
      *
-     * @param artifact The artifact metadata, including its offset and size
-     * @return The resource section for the artifact
+     * @param artifact The artifact, including its offset and size
+     * @param content The artifact content to retrieve
+     * @return The resource section for the artifact's content in content.bin
      */
     @Override
-    public synchronized Resource content(ArtifactMetadata metadata,
-                                         ArtifactContentMetadata artifact,
+    public synchronized Resource content(Artifact artifact,
+                                         ArtifactContent content,
                                          String suffix)
     {
-        var start = artifact.offset();
-        var end = start + artifact.size().asBytes();
+        var start = content.offset();
+        var end = start + content.size().asBytes();
         return new ResourceSection(contentFile, start, end);
     }
 
@@ -126,21 +128,21 @@ public class DownloadCacheRepository extends BaseRepository
      * @return The cache entry for the descriptor
      */
     @Override
-    public synchronized ArtifactMetadata metadata(ArtifactDescriptor descriptor)
+    public synchronized Artifact resolve(ArtifactDescriptor descriptor)
     {
         load();
         return artifacts.get(descriptor);
     }
 
     /**
-     * Saves the given content into the content file, returning the given {@link ArtifactContentMetadata} with the
-     * offset, size, and last modified time populated.
+     * Saves the given content into the content file, returning the given {@link ArtifactContent} with the offset, size,
+     * and last modified time populated.
      *
      * @param artifact The artifact to save
      * @param content The artifact content to write to the resources file
-     * @return The updated artifact metadata
+     * @return The updated artifact content
      */
-    private ArtifactContentMetadata appendArtifactContent(ArtifactContentMetadata artifact, Resource content)
+    private ArtifactContent appendArtifactContent(ArtifactContent artifact, Resource content)
     {
         try
         {
@@ -186,20 +188,20 @@ public class DownloadCacheRepository extends BaseRepository
     }
 
     /**
-     * Loads metadata.txt into the cache entries map
+     * Loads artifacts.txt into the artifacts map
      */
     private synchronized void load()
     {
         if (!loaded)
         {
             // Read the file,
-            var text = metadataFile.reader().readText();
+            var text = artifactsFile.reader().readText();
 
             // split it into chunks,
-            for (var at : text.split(SEPARATOR))
+            for (var at : text.split(ARTIFACT_SEPARATOR))
             {
                 // convert the chunk to a cache entry,
-                var entry = ArtifactMetadata.fromJson(at);
+                var entry = Artifact.fromJson(at);
 
                 // and put the entry into the entries map.
                 artifacts.put(entry.descriptor(), entry);

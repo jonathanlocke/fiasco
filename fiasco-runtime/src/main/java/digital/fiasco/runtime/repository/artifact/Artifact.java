@@ -5,7 +5,6 @@ import com.telenav.kivakit.resource.resources.StringOutputResource;
 import com.telenav.kivakit.resource.resources.StringResource;
 import com.telenav.kivakit.resource.serialization.SerializableObject;
 import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
-import digital.fiasco.runtime.repository.Library;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
@@ -21,17 +20,17 @@ import static com.telenav.kivakit.core.string.Formatter.format;
  * @param source The attached source jar
  */
 @SuppressWarnings("unused")
-public record ArtifactMetadata(ArtifactDescriptor descriptor,
-                               ObjectList<Library> dependencies,
-                               ArtifactContentMetadata jar,
-                               ArtifactContentMetadata javadoc,
-                               ArtifactContentMetadata source)
+public record Artifact(ArtifactDescriptor descriptor,
+                       ObjectList<Artifact> dependencies,
+                       ArtifactContent jar,
+                       ArtifactContent javadoc,
+                       ArtifactContent source)
 {
-    public static ArtifactMetadata fromJson(String json)
+    public static Artifact fromJson(String json)
     {
         var serialized = new StringResource(json);
         var serializer = new GsonObjectSerializer();
-        return serializer.readObject(serialized, ArtifactMetadata.class).object();
+        return serializer.readObject(serialized, Artifact.class).object();
     }
 
     /**
@@ -42,9 +41,9 @@ public record ArtifactMetadata(ArtifactDescriptor descriptor,
     public String asMavenPom()
     {
         var dependencies = stringList();
-        for (var dependency : dependencies())
+        for (var at : dependencies())
         {
-            var descriptor = dependency.artifact();
+            var descriptor = at.descriptor();
             dependencies.add("""
                             <dependency>
                               <groupId>$</groupId>
@@ -87,18 +86,18 @@ public record ArtifactMetadata(ArtifactDescriptor descriptor,
         return serialized.string();
     }
 
-    public ArtifactMetadata withJar(ArtifactContentMetadata jar)
+    public Artifact withJar(ArtifactContent jar)
     {
-        return new ArtifactMetadata(descriptor, dependencies, ensureNotNull(jar), javadoc, source);
+        return new Artifact(descriptor, dependencies, ensureNotNull(jar), javadoc, source);
     }
 
-    public ArtifactMetadata withJavadoc(ArtifactContentMetadata javadoc)
+    public Artifact withJavadoc(ArtifactContent javadoc)
     {
-        return new ArtifactMetadata(descriptor, dependencies, jar, ensureNotNull(javadoc), source);
+        return new Artifact(descriptor, dependencies, jar, ensureNotNull(javadoc), source);
     }
 
-    public ArtifactMetadata withSource(ArtifactContentMetadata source)
+    public Artifact withSource(ArtifactContent source)
     {
-        return new ArtifactMetadata(descriptor, dependencies, jar, javadoc, ensureNotNull(source));
+        return new Artifact(descriptor, dependencies, jar, javadoc, ensureNotNull(source));
     }
 }

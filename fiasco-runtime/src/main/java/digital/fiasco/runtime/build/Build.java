@@ -43,6 +43,7 @@ import digital.fiasco.runtime.build.phases.PhasePrepare;
 import digital.fiasco.runtime.build.phases.PhaseStart;
 import digital.fiasco.runtime.build.phases.PhaseTest;
 import digital.fiasco.runtime.build.tools.ToolFactory;
+import digital.fiasco.runtime.build.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.repository.Library;
 import digital.fiasco.runtime.repository.Repository;
@@ -79,7 +80,7 @@ import static digital.fiasco.runtime.repository.artifact.ArtifactDescriptor.pars
  * </p>
  *
  * <ol>
- *     <li>build-start</li>
+ *     <li>start</li>
  *     <li>clean</li>
  *     <li>prepare</li>
  *     <li>compile</li>
@@ -90,7 +91,7 @@ import static digital.fiasco.runtime.repository.artifact.ArtifactDescriptor.pars
  *     <li>install</li>
  *     <li>deploy-packages</li>
  *     <li>deploy-documentation</li>
- *     <li>build-end</li>
+ *     <li>end</li>
  * </ol>
  *
  * <p><b>Examples</b></p>
@@ -144,6 +145,9 @@ public abstract class Build extends Application implements
 
     /** Libraries to compile with */
     private final DependencyList<Library> libraries = new DependencyList<>();
+
+    /** The librarian to manage libraries */
+    private final Librarian librarian = listenTo(new Librarian(this));
 
     /** Maps from the name of a phase to the {@link Phase} object */
     private final ObjectMap<String, Phase> nameToPhase = new ObjectMap<>();
@@ -295,6 +299,21 @@ public abstract class Build extends Application implements
         phaseEnabled.put(phase, true);
     }
 
+    /**
+     * The librarian for this build
+     *
+     * @return The librarian
+     */
+    public Librarian librarian()
+    {
+        return librarian;
+    }
+
+    /**
+     * The libraries required by this build
+     *
+     * @return The libraries to compile against
+     */
     public DependencyList<Library> libraries()
     {
         return libraries;

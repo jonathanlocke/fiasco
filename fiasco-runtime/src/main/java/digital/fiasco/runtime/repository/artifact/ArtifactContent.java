@@ -12,7 +12,7 @@ import com.telenav.kivakit.core.value.count.Bytes;
  * @param size The size of the resource
  */
 @SuppressWarnings("unused")
-public record ArtifactContentMetadata
+public record ArtifactContent
         (
                 ArtifactSignatures signatures,
                 long offset,
@@ -20,18 +20,18 @@ public record ArtifactContentMetadata
                 Bytes size
         )
 {
-    public ArtifactContentMetadata withLastModified(Time lastModified)
+    public ArtifactContent withLastModified(Time lastModified)
     {
-        return new ArtifactContentMetadata(signatures, offset, lastModified, size);
+        return new ArtifactContent(signatures, offset, lastModified, size);
     }
 
-    public ArtifactContentMetadata withOffset(long offset)
+    public ArtifactContent withOffset(long offset)
     {
-        return new ArtifactContentMetadata(signatures, offset, lastModified, size);
+        return new ArtifactContent(signatures, offset, lastModified, size);
     }
 
-    public ArtifactContentMetadata withSize(long offset)
+    public ArtifactContent withSize(long offset)
     {
-        return new ArtifactContentMetadata(signatures, offset, lastModified, size);
+        return new ArtifactContent(signatures, offset, lastModified, size);
     }
 }

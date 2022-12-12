@@ -3,26 +3,26 @@ package digital.fiasco.runtime.repository;
 import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.resource.Resource;
-import digital.fiasco.runtime.repository.artifact.ArtifactContentMetadata;
+import digital.fiasco.runtime.repository.artifact.Artifact;
+import digital.fiasco.runtime.repository.artifact.ArtifactContent;
 import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.repository.artifact.ArtifactMetadata;
+import digital.fiasco.runtime.repository.artifact.ArtifactResources;
 
 /**
  * Interface to a repository that stores libraries
  *
- * <p><b>Retrieving</b></p>
+ * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #metadata(ArtifactDescriptor)} - Gets the {@link ArtifactMetadata} for the given descriptor</li>
- *     <li>{@link #content(ArtifactMetadata, ArtifactContentMetadata, String)} - Gets the cached resource for the given artifact and content metadata</li>
+ *     <li>{@link #resolve(ArtifactDescriptor)} - Gets the {@link Artifact} for the given descriptor</li>
+ *     <li>{@link #content(Artifact, ArtifactContent, String)} - Gets the cached resource for the given artifact and content metadata</li>
  * </ul>
  *
- * <p><b>Adding and Removing</b></p>
+ * <p><b>Adding and Removing Artifacts</b></p>
  *
  * <ul>
+ *     <li>{@link #add(Artifact, ArtifactResources)} - Adds the given artifact with the given attached resources</li>
  *     <li>{@link #clear()} - Removes all data from this repository</li>
- *     <li>{@link #metadata(ArtifactDescriptor)} - Gets the {@link ArtifactMetadata} for the given descriptor</li>
- *     <li>{@link #content(ArtifactMetadata, ArtifactContentMetadata, String)} - Gets the cached resource for the given content metadata</li>
  * </ul>
  *
  * @author jonathan
@@ -31,15 +31,13 @@ import digital.fiasco.runtime.repository.artifact.ArtifactMetadata;
 public interface Repository extends Repeater, Named
 {
     /**
-     * Adds the given content {@link Resource}s to content.bin, and the {@link ArtifactMetadata} metadata to
-     * metadata.txt in JSON format.
+     * Adds the given content {@link Resource}s to content.bin, and the {@link Artifact} metadata to metadata.txt in
+     * JSON format.
      *
      * @param metadata The cache entry metadata to append to metadata.txt in JSON format
-     * @param jar The jar resource to add to content.bin
-     * @param javadoc The javadoc resource to add to content.bin
-     * @param source The source resource to add to content.bin
+     * @param resources The resources to add to content.bin
      */
-    boolean add(ArtifactMetadata metadata, Resource jar, Resource javadoc, Resource source);
+    boolean add(Artifact metadata, ArtifactResources resources);
 
     /**
      * Removes all data from this repository
@@ -54,7 +52,7 @@ public interface Repository extends Repeater, Named
      * @param suffix A suffix to add to the resource path
      * @return The resource section for the artifact
      */
-    Resource content(ArtifactMetadata metadata, ArtifactContentMetadata content, String suffix);
+    Resource content(Artifact metadata, ArtifactContent content, String suffix);
 
     /**
      * Gets the cache entry for the given artifact descriptor
@@ -62,5 +60,5 @@ public interface Repository extends Repeater, Named
      * @param descriptor The artifact descriptor
      * @return The cache entry for the descriptor
      */
-    ArtifactMetadata metadata(ArtifactDescriptor descriptor);
+    Artifact resolve(ArtifactDescriptor descriptor);
 }

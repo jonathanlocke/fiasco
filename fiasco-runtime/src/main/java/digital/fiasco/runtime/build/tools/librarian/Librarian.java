@@ -7,31 +7,43 @@
 
 package digital.fiasco.runtime.build.tools.librarian;
 
-import com.telenav.kivakit.interfaces.comparison.Filter;
+import com.telenav.kivakit.core.collections.list.ObjectList;
+import com.telenav.kivakit.core.collections.map.ObjectMap;
+import com.telenav.kivakit.core.version.Version;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
+import digital.fiasco.runtime.dependency.DependencyList;
+import digital.fiasco.runtime.dependency.DependencyResolver;
 import digital.fiasco.runtime.repository.Library;
-import digital.fiasco.runtime.repository.LibraryResolver;
 import digital.fiasco.runtime.repository.Repository;
+import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.repository.artifact.ArtifactResources;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.List;
-
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+import static com.telenav.kivakit.core.ensure.Ensure.ensure;
+import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
+import static com.telenav.kivakit.core.string.Formatter.format;
+import static digital.fiasco.runtime.repository.Library.library;
 
 /**
- * Copies selected files from one folder to another.
+ * Manages {@link Library} artifacts and their dependencies.
+ *
+ * <p><b>Dependencies</b></p>
+ *
+ * <ul>
+ *     <li>{@link #dependencies(Library)} - Returns the dependencies for the given library. Dependent libraries are resolved in depth-first order.</li>
+ * </ul>
  *
  * @author shibo
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class Librarian extends BaseTool implements
-        LibraryResolver
+public class Librarian extends BaseTool implements DependencyResolver
 {
-    private Repository deploymentRepository;
+    private final ObjectList<Repository> repositories = list();
 
-    private final List<Repository> repositories = new ArrayList<>();
+    /** A map from group:artifact-id to version */
+    private final ObjectMap<ArtifactDescriptor, Version> pinnedVersions = new ObjectMap<>();
 
     public Librarian(Build build)
     {
@@ -39,54 +51,164 @@ public class Librarian extends BaseTool implements
         repositories.addAll(build.repositories());
     }
 
-    public Librarian deploy(Library library)
-    {
-        // deploymentRepository.add(library);
-        return this;
-    }
-
-    public Librarian install(Library library)
+    public Librarian add(Repository repository, Library library)
     {
         //RemoteMavenRepository.local().install(library);
         return this;
     }
 
+    /**
+     * Resolves the given library in the repositories managed by this librarian. Resolution of dependent artifacts
+     * occurs in depth-first order.
+     *
+     * @param library The library to resolve
+     * @return The library and all of its dependencies
+     */
+    @Override
+    public DependencyList<Library> dependencies(Library library)
+    {
+        var dependencies = new DependencyList<Library>();
+
+        // Go through the library's dependencies,
+        for (var dependency : library.dependencies())
+        {
+            // resolve each dependency,
+            for (var resolved : dependencies(dependency))
+            {
+                // and if it is not excluded by the library,
+                if (resolved != null && library.excludes(resolved.artifactDescriptor()))
+                {
+                    // add it to the dependencies list.
+                    dependencies.add(resolved);
+                }
+            }
+        }
+
+        // For each repository,
+        var found = false;
+        for (var repository : repositories)
+        {
+            // resolve the library's descriptor to an artifact,
+            var descriptor = resolveArtifactVersion(library.artifactDescriptor());
+            var artifact = repository.resolve(descriptor);
+            if (artifact != null)
+            {
+                // and if it isn't excluded,
+                if (library.excludes(artifact.descriptor()))
+                {
+                    // add it to the dependencies.
+                    dependencies.add(library(artifact));
+                    found = true;
+                }
+            }
+        }
+
+        if (!found)
+        {
+            illegalState("Could not resolve: $", library);
+        }
+
+        return dependencies;
+    }
+
+    /**
+     * Installs the given library in the target repository
+     *
+     * @param target The repository to deploy to
+     * @param library The library to install
+     * @param resources The resource jar attachments
+     */
+    public Librarian install(Repository target, Library library, ArtifactResources resources)
+    {
+        var resolved = target.resolve(library.artifactDescriptor());
+        target.add(resolved, resources);
+        return this;
+    }
+
+    /**
+     * Adds a repository to the search path of the librarian
+     *
+     * @param repository The repository to search
+     * @return This librarian for chaining
+     */
     public Librarian lookIn(Repository repository)
     {
         repositories.add(repository);
         return this;
     }
 
-    public List<Repository> repositories()
+    /**
+     * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
+     * descriptor will be assigned the version.
+     *
+     * @param descriptor The group and artifact identifier (but without a version)
+     * @param version The version to enforce for the descriptor
+     */
+    public void pinArtifactVersion(ArtifactDescriptor descriptor, Version version)
     {
-        return Collections.unmodifiableList(repositories);
+        ensure(descriptor.version() == null);
+        pinnedVersions.put(descriptor, version);
     }
 
-    @Override
-    public List<Library> resolve(Library library, Filter<Library> exclusions)
+    /**
+     * Returns a copy of the repository list for this librarian
+     */
+    public ObjectList<Repository> repositories()
     {
-        for (var repository : repositories)
+        return repositories.copy();
+    }
+
+    /**
+     * Resolves the given artifact descriptor to a library
+     *
+     * @param descriptor The descriptor
+     * @return The library
+     */
+    public Library resolve(ArtifactDescriptor descriptor)
+    {
+        for (var at : repositories())
         {
-
+            var resolved = at.resolve(resolveArtifactVersion(descriptor));
+            if (resolved != null)
+            {
+                return library(resolved);
+            }
         }
-        return Collections.emptyList();
+        return null;
     }
 
-    public Librarian withDeploymentRepository(Repository deploymentRepository)
-    {
-        this.deploymentRepository = deploymentRepository;
-        return this;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String description()
     {
-        return null;
+        return format("""
+                Librarian
+                  repositories: $
+                  pinned versions: $
+                """, repositories, pinnedVersions);
     }
 
     @Override
     protected void onRun()
     {
-        unsupported();
+        unsupported("Librarian does not need to be started");
+    }
+
+    /**
+     * Resolves the artifact descriptor's version using any pinned versions added by
+     * {@link #pinArtifactVersion(ArtifactDescriptor, Version)}
+     *
+     * @param descriptor The descriptor to resolve
+     * @return The descriptor with the correct version resolved
+     */
+    private ArtifactDescriptor resolveArtifactVersion(ArtifactDescriptor descriptor)
+    {
+        var version = pinnedVersions.get(descriptor);
+
+        return version == null
+                ? descriptor
+                : descriptor.withVersion(version);
     }
 }

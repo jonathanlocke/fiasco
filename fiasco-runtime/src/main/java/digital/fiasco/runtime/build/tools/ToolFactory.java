@@ -65,11 +65,6 @@ public interface ToolFactory extends
         return new Git(associatedBuild());
     }
 
-    default Librarian librarian()
-    {
-        return new Librarian(associatedBuild());
-    }
-
     default Shader shader()
     {
         return new Shader(associatedBuild());
