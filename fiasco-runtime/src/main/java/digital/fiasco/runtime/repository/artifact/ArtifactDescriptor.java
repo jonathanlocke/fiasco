@@ -6,6 +6,8 @@ import com.telenav.kivakit.interfaces.naming.Named;
 
 import java.util.regex.Pattern;
 
+import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
+
 /**
  * An identifier that uniquely identifies an artifact, including its group, artifact identifier and version.
  *
@@ -26,6 +28,11 @@ public record ArtifactDescriptor
             + "(:"
             + "(?<version>\\d+\\.\\d+(\\.\\d+)?(-(snapshot|alpha|beta|rc|final))?)"
             + ")?");
+
+    public static ArtifactDescriptor parseArtifactDescriptor(String descriptor)
+    {
+        return parseArtifactDescriptor(throwingListener(), descriptor);
+    }
 
     public static ArtifactDescriptor parseArtifactDescriptor(Listener listener, String descriptor)
     {
@@ -69,6 +76,11 @@ public record ArtifactDescriptor
     public ArtifactDescriptor withIdentifier(ArtifactIdentifier identifier)
     {
         return new ArtifactDescriptor(group, identifier, version);
+    }
+
+    public ArtifactDescriptor withIdentifier(String identifier)
+    {
+        return withIdentifier(new ArtifactIdentifier(identifier));
     }
 
     public ArtifactDescriptor withVersion(Version version)

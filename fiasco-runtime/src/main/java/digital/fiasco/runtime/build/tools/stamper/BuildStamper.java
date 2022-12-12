@@ -61,7 +61,7 @@ public class BuildStamper extends BaseTool implements
 
     private ArtifactDescriptor artifact()
     {
-        return associatedBuild().artifact();
+        return associatedBuild().artifactDescriptor();
     }
 
     private StringList buildProperties()

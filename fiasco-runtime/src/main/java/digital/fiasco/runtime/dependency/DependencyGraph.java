@@ -16,7 +16,7 @@ public class DependencyGraph<T extends Dependency<T>>
     /**
      * @return The dependency graph formed by traversing dependencies starting at the given root
      */
-    public static <T extends Dependency<T>> DependencyGraph<T> of(final T root)
+    public static <T extends Dependency<T>> DependencyGraph<T> dependencyGraph(T root)
     {
         return new DependencyGraph<>(root);
     }
@@ -27,7 +27,7 @@ public class DependencyGraph<T extends Dependency<T>>
     /** The dependencies of this graph in depth-first-order */
     private final DependencyList<T> depthFirst;
 
-    private DependencyGraph(final T root)
+    private DependencyGraph(T root)
     {
         this.root = root;
         depthFirst = depthFirst(root);
@@ -52,15 +52,15 @@ public class DependencyGraph<T extends Dependency<T>>
     /**
      * @return List of dependencies in depth-first order
      */
-    private DependencyList<T> depthFirst(final T root)
+    private DependencyList<T> depthFirst(T root)
     {
-        final DependencyList<T> explored = new DependencyList<>();
+        DependencyList<T> explored = new DependencyList<>();
 
         // Go through each child of the root
-        for (final T child : root.dependencies())
+        for (T child : root.dependencies())
         {
             // and explore it (in a depth-first traversal)
-            final var descendants = depthFirst(child);
+            var descendants = depthFirst(child);
 
             // and if none of the explored values has already been explored
             if (Collections.disjoint(explored, descendants))

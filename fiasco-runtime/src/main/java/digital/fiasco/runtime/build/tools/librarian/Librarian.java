@@ -24,15 +24,27 @@ import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.string.Formatter.format;
+import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.repository.Library.library;
 
 /**
- * Manages {@link Library} artifacts and their dependencies.
+ * Manages {@link Library} artifacts and their dependencies. Searches a list of repositories added with
+ * {@link #lookIn(Repository)} to resolve libraries and their dependencies.
  *
- * <p><b>Dependencies</b></p>
+ * <p><b>Finding Libraries</b></p>
  *
  * <ul>
+ *     <li>{@link #resolve(ArtifactDescriptor)} - Resolves the library specified by the given descriptor</li>
  *     <li>{@link #dependencies(Library)} - Returns the dependencies for the given library. Dependent libraries are resolved in depth-first order.</li>
+ *     <li>{@link #lookIn(Repository)} - Adds a repository to look in when resolving libraries</li>
+ *     <li>{@link #repositories()} - The list of repositories to search</li>
+ *     <li>{@link #pinArtifactVersion(ArtifactDescriptor, Version)} - Pins the given artifact to the specified version</li>
+ * </ul>
+ *
+ * <p><b>Adding Libraries</b></p>
+ *
+ * <ul>
+ *     <li>{@link #add(Repository, Library, ArtifactResources)} - Adds the given library and its attached content to the given repository</li>
  * </ul>
  *
  * @author shibo
@@ -51,9 +63,17 @@ public class Librarian extends BaseTool implements DependencyResolver
         repositories.addAll(build.repositories());
     }
 
-    public Librarian add(Repository repository, Library library)
+    /**
+     * Installs the given library in the target repository
+     *
+     * @param target The repository to deploy to
+     * @param library The library to install
+     * @param resources The resource jar attachments
+     */
+    public Librarian add(Repository target, Library library, ArtifactResources resources)
     {
-        //RemoteMavenRepository.local().install(library);
+        var resolved = target.resolve(library.artifactDescriptor());
+        target.add(resolved, resources);
         return this;
     }
 
@@ -67,7 +87,7 @@ public class Librarian extends BaseTool implements DependencyResolver
     @Override
     public DependencyList<Library> dependencies(Library library)
     {
-        var dependencies = new DependencyList<Library>();
+        DependencyList<Library> dependencies = dependencyList();
 
         // Go through the library's dependencies,
         for (var dependency : library.dependencies())
@@ -109,20 +129,6 @@ public class Librarian extends BaseTool implements DependencyResolver
         }
 
         return dependencies;
-    }
-
-    /**
-     * Installs the given library in the target repository
-     *
-     * @param target The repository to deploy to
-     * @param library The library to install
-     * @param resources The resource jar attachments
-     */
-    public Librarian install(Repository target, Library library, ArtifactResources resources)
-    {
-        var resolved = target.resolve(library.artifactDescriptor());
-        target.add(resolved, resources);
-        return this;
     }
 
     /**

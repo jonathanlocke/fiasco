@@ -1,38 +1,50 @@
 package fiasco;
 
-import digital.fiasco.runtime.build.Build;
-import digital.fiasco.runtime.build.metadata.Contributor;
-import digital.fiasco.runtime.build.metadata.Copyright;
-import digital.fiasco.runtime.build.metadata.Metadata;
-import digital.fiasco.runtime.build.metadata.Organization;
+import digital.fiasco.runtime.build.MultiBuild;
+import digital.fiasco.runtime.repository.CommonLibraries;
+
+import static com.telenav.kivakit.core.version.Version.parseVersion;
+import static digital.fiasco.runtime.repository.artifact.ArtifactDescriptor.parseArtifactDescriptor;
 
 /**
  * Example Fiasco build.
  *
  * @author jonathan
  */
-@SuppressWarnings({ "InnerClassMayBeStatic", "unused", "SpellCheckingInspection" })
-public class FiascoBuild extends Build
+public class FiascoBuild extends MultiBuild implements CommonLibraries
 {
     public static void main(String[] arguments)
     {
-        run(FiascoBuild.class, arguments);
+        new FiascoBuild().arguments(arguments).run(arguments);
     }
 
+    String version_apache_commons_logging = "1.0";
+
+    String version_kivakit = "1.9.0";
+
+    String version_kryo = "4.3.1";
+
     @Override
-    public void onInitialize()
+    protected void onInitialize()
     {
-        artifact("digital.fiasco:fiasco-example:1.0");
+        var build = new ProjectBuild();
 
-        metadata(new Metadata()
-                .withOrganization(new Organization("Fiasco")
-                        .withUrl("https://www.fiasco.digital"))
-                .withCopyright(new Copyright("Copyright 2020-2022, Jonathan Locke. All Rights Reserved."))
-                .withContributor(new Contributor("Jonathan Locke")
-                        .withRole("Project Lead")
-                        .withEmail("jon@thanlocke.com")));
+        build.librarian().pinArtifactVersion(
+                parseArtifactDescriptor("org.apache.commons:logging"),
+                parseVersion("1.0.3"));
 
-        addLibrary("org.apache.commons:logging:1.0");
-        addLibrary("com.esotericsoftware:kryo:4.3.1");
+        addBuild(build
+                .project("example1")
+                .withDependencies(
+                        logging.apache_commons_logging.version(version_apache_commons_logging),
+                        serialization.kryo.version(version_kryo)
+                ));
+
+        addBuild(build
+                .project("example2")
+                .withDependencies(
+                        framework.kivakit_application.version(version_kivakit),
+                        network.kivakit_network_core.version(version_kivakit)
+                ));
     }
 }

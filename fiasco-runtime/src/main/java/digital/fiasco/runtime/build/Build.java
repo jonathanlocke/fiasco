@@ -24,11 +24,10 @@ import com.telenav.kivakit.core.messaging.messages.status.Problem;
 import com.telenav.kivakit.core.messaging.messages.status.Quibble;
 import com.telenav.kivakit.core.messaging.messages.status.Warning;
 import com.telenav.kivakit.core.project.Project;
+import com.telenav.kivakit.core.string.Paths;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.filesystem.Folder;
-import com.telenav.kivakit.filesystem.Folders;
 import com.telenav.kivakit.serialization.gson.GsonSerializationProject;
-import digital.fiasco.runtime.build.metadata.Metadata;
 import digital.fiasco.runtime.build.phases.Phase;
 import digital.fiasco.runtime.build.phases.PhaseClean;
 import digital.fiasco.runtime.build.phases.PhaseCompile;
@@ -46,7 +45,6 @@ import digital.fiasco.runtime.build.tools.ToolFactory;
 import digital.fiasco.runtime.build.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.repository.Library;
-import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
 import org.jetbrains.annotations.NotNull;
 
@@ -57,6 +55,9 @@ import static com.telenav.kivakit.commandline.ArgumentParser.argumentParser;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
+import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
+import static com.telenav.kivakit.filesystem.Folders.currentFolder;
+import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.repository.Library.library;
 import static digital.fiasco.runtime.repository.artifact.ArtifactDescriptor.parseArtifactDescriptor;
 
@@ -132,34 +133,31 @@ public abstract class Build extends Application implements
         BuildRepositories
 {
     /** The primary artifact being built */
-    private ArtifactDescriptor artifact;
+    private ArtifactDescriptor artifactDescriptor;
 
     /** Metadata about the build */
-    private Metadata metadata;
-
-    /** Repositories to look in */
-    private final ObjectList<Repository> repositories = list();
+    private BuildMetadata metadata;
 
     /** Listeners to call as the build proceeds */
-    private final ObjectList<BuildListener> buildListeners = list(this);
+    private ObjectList<BuildListener> buildListeners = list(this);
 
     /** Libraries to compile with */
-    private final DependencyList<Library> libraries = new DependencyList<>();
+    private DependencyList<Library> dependencies = dependencyList();
 
     /** The librarian to manage libraries */
     private final Librarian librarian = listenTo(new Librarian(this));
 
     /** Maps from the name of a phase to the {@link Phase} object */
-    private final ObjectMap<String, Phase> nameToPhase = new ObjectMap<>();
+    private ObjectMap<String, Phase> nameToPhase = new ObjectMap<>();
 
     /** Phases in order of execution */
-    private final ObjectList<Phase> orderedPhases = list();
+    private ObjectList<Phase> orderedPhases = list();
 
     /** Enable state of each phase */
-    private final ObjectMap<Phase, Boolean> phaseEnabled = new ObjectMap<>();
+    private ObjectMap<Phase, Boolean> phaseEnabled = new ObjectMap<>();
 
     /** The root folder for this build */
-    private final Folder rootFolder = Folders.currentFolder();
+    private Folder rootFolder = currentFolder();
 
     /** If true, describe the build rather than executing it */
     private boolean describe = false;
@@ -170,6 +168,11 @@ public abstract class Build extends Application implements
         onInstallPhases();
     }
 
+    protected Build(Build that)
+    {
+        copy(that);
+    }
+
     /**
      * Adds the given library to the list of libraries for this build
      *
@@ -177,7 +180,7 @@ public abstract class Build extends Application implements
      */
     public void addLibrary(String library)
     {
-        libraries().add(library(this, library));
+        libraries().add(library(library));
     }
 
     /**
@@ -227,9 +230,9 @@ public abstract class Build extends Application implements
         nameToPhase.put(phase.name(), phase);
     }
 
-    public ArtifactDescriptor artifact()
+    public ArtifactDescriptor artifactDescriptor()
     {
-        return artifact;
+        return artifactDescriptor;
     }
 
     @Override
@@ -241,6 +244,26 @@ public abstract class Build extends Application implements
     public ObjectList<BuildListener> buildListeners()
     {
         return buildListeners;
+    }
+
+    public void copy(Build that)
+    {
+        this.artifactDescriptor = that.artifactDescriptor;
+        this.metadata = that.metadata.copy();
+        this.buildListeners = that.buildListeners.copy();
+        this.dependencies = that.dependencies.copy();
+        this.nameToPhase = that.nameToPhase.copy();
+        this.orderedPhases = that.orderedPhases.copy();
+        this.phaseEnabled = that.phaseEnabled.copy();
+        this.rootFolder = that.rootFolder;
+        this.describe = that.describe;
+    }
+
+    public Build copy()
+    {
+        var copy = typeForClass(getClass()).newInstance();
+        copy.copy(this);
+        return copy;
     }
 
     public boolean describe()
@@ -316,15 +339,15 @@ public abstract class Build extends Application implements
      */
     public DependencyList<Library> libraries()
     {
-        return libraries;
+        return dependencies;
     }
 
-    public void metadata(Metadata metadata)
+    public void metadata(BuildMetadata metadata)
     {
         this.metadata = metadata;
     }
 
-    public Metadata metadata()
+    public BuildMetadata metadata()
     {
         return metadata;
     }
@@ -334,20 +357,21 @@ public abstract class Build extends Application implements
         return ensureNotNull(nameToPhase.get(name), "Could not find phase: $", name);
     }
 
+    public Build project(String path)
+    {
+        return withChildFolder(path)
+                .withArtifactIdentifier(Paths.pathTail(path, '/'));
+    }
+
     @Override
     public Set<Project> projects()
     {
         return set(new GsonSerializationProject());
     }
 
-    public ObjectList<Repository> repositories()
-    {
-        return repositories;
-    }
-
     public ToolFactory requires(Library library)
     {
-        libraries.add(library);
+        dependencies.add(library);
         return this;
     }
 
@@ -412,6 +436,62 @@ public abstract class Build extends Application implements
         return issues.countWorseThanOrEqualTo(Problem.class).isZero();
     }
 
+    public Build withArtifactDescriptor(ArtifactDescriptor descriptor)
+    {
+        var copy = copy();
+        copy.artifactDescriptor = descriptor;
+        return copy;
+    }
+
+    public Build withArtifactDescriptor(String descriptor)
+    {
+        var copy = copy();
+        copy.artifactDescriptor(descriptor);
+        return copy;
+    }
+
+    public Build withArtifactIdentifier(String identifier)
+    {
+        var copy = copy();
+        copy.artifactDescriptor = artifactDescriptor.withIdentifier(identifier);
+        return copy;
+    }
+
+    public Build withChildFolder(String child)
+    {
+        var copy = copy();
+        copy.rootFolder = rootFolder.folder(child);
+        return copy;
+    }
+
+    public Build withDependencies(DependencyList<Library> dependencies)
+    {
+        var copy = copy();
+        copy.dependencies = dependencies;
+        return copy;
+    }
+
+    public Build withDependencies(Library... dependencies)
+    {
+        var copy = copy();
+        copy.dependencies = dependencyList(dependencies);
+        return copy;
+    }
+
+    public Build withMetadata(BuildMetadata metadata)
+    {
+        var copy = copy();
+        copy.metadata = metadata;
+        return copy;
+    }
+
+    public Build withRootFolder(Folder root)
+    {
+        var copy = copy();
+        copy.rootFolder = root;
+        return copy;
+    }
+
     @Override
     protected ObjectList<ArgumentParser<?>> argumentParsers()
     {
@@ -422,14 +502,14 @@ public abstract class Build extends Application implements
                 .build());
     }
 
-    protected void artifact(ArtifactDescriptor artifact)
+    protected void artifactDescriptor(ArtifactDescriptor artifact)
     {
-        this.artifact = artifact;
+        this.artifactDescriptor = artifact;
     }
 
-    protected void artifact(String descriptor)
+    protected void artifactDescriptor(String descriptor)
     {
-        artifact(parseArtifactDescriptor(this, descriptor));
+        artifactDescriptor = parseArtifactDescriptor(this, descriptor);
     }
 
     protected final void onInstallPhases()

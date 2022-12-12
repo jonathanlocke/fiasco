@@ -1,9 +1,13 @@
-package digital.fiasco.runtime.build.metadata;
+package digital.fiasco.runtime.build;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.interfaces.naming.Named;
+import digital.fiasco.runtime.build.metadata.Contributor;
+import digital.fiasco.runtime.build.metadata.Copyright;
+import digital.fiasco.runtime.build.metadata.Organization;
+import org.jetbrains.annotations.NotNull;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 
@@ -13,7 +17,7 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  * @author jonathan
  */
 @SuppressWarnings("unused")
-public class Metadata implements Named
+public class BuildMetadata implements Named
 {
     @FormatProperty
     private ObjectList<Contributor> contributors = list();
@@ -24,11 +28,11 @@ public class Metadata implements Named
     @FormatProperty
     private Organization organization;
 
-    public Metadata()
+    public BuildMetadata()
     {
     }
 
-    protected Metadata(Metadata that)
+    protected BuildMetadata(BuildMetadata that)
     {
         copyright = that.copyright;
         contributors = list(that.contributors);
@@ -56,24 +60,30 @@ public class Metadata implements Named
         return new ObjectFormatter(this).toString();
     }
 
-    public Metadata withContributor(Contributor contributor)
+    public BuildMetadata withContributor(Contributor contributor)
     {
-        var copy = new Metadata(this);
+        var copy = copy();
         copy.contributors.add(contributor);
         return copy;
     }
 
-    public Metadata withCopyright(Copyright copyright)
+    public BuildMetadata withCopyright(Copyright copyright)
     {
-        var copy = new Metadata(this);
+        var copy = copy();
         copy.copyright = copyright;
         return copy;
     }
 
-    public Metadata withOrganization(Organization organization)
+    public BuildMetadata withOrganization(Organization organization)
     {
-        var copy = new Metadata(this);
+        var copy = copy();
         copy.organization = organization;
         return copy;
+    }
+
+    @NotNull
+    public BuildMetadata copy()
+    {
+        return new BuildMetadata(this);
     }
 }

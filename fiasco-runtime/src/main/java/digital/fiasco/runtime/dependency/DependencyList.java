@@ -26,16 +26,21 @@ import static com.telenav.kivakit.core.thread.Threads.shutdownAndAwaitTerminatio
 public class DependencyList<T extends Dependency<T>> extends ObjectList<T>
 {
     @SafeVarargs
-    public static <T extends Dependency<T>> DependencyList<T> of(T... dependencies)
+    public static <T extends Dependency<T>> DependencyList<T> dependencyList(T... dependencies)
     {
-        return new DependencyList<>(List.of(dependencies));
+        return new DependencyList<>(list(dependencies));
     }
 
-    public DependencyList()
+    public static <T extends Dependency<T>> DependencyList<T> dependencyList(List<T> dependencies)
+    {
+        return new DependencyList<>(dependencies);
+    }
+
+    protected DependencyList()
     {
     }
 
-    public DependencyList(List<T> dependencies)
+    protected DependencyList(List<T> dependencies)
     {
         addAll(dependencies);
     }

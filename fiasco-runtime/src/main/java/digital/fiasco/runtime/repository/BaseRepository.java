@@ -1,10 +1,10 @@
 package digital.fiasco.runtime.repository;
 
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
-import com.telenav.kivakit.resource.Resource;
 import digital.fiasco.runtime.repository.artifact.Artifact;
 import digital.fiasco.runtime.repository.artifact.ArtifactContent;
 import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.repository.artifact.ArtifactResources;
 
 /**
  * Base implementation of a {@link Repository}
@@ -19,7 +19,7 @@ import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
  * <p><b>Adding and Removing Artifacts</b></p>
  *
  * <ul>
- *     <li>{@link #add(Artifact, Resource, Resource, Resource)} - Adds the given artifact with the given attached resources</li>
+ *     <li>{@link #add(Artifact, ArtifactResources)} - Adds the given artifact with the given attached resources</li>
  *     <li>{@link #clear()} - Removes all data from this repository</li>
  * </ul>
  *

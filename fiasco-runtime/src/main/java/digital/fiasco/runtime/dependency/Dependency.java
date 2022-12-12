@@ -24,6 +24,6 @@ public interface Dependency<T extends Dependency<T>> extends Named
     @SuppressWarnings("unchecked")
     default DependencyGraph<T> graph()
     {
-        return DependencyGraph.of((T) this);
+        return DependencyGraph.dependencyGraph((T) this);
     }
 }

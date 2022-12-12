@@ -15,6 +15,7 @@ public class ArtifactResources
     /** Suffix for sources attachment */
     public static final String SOURCES_JAR_SUFFIX = "-sources.jar";
 
+    /** The resources by suffix */
     private final ObjectMap<String, Resource> resources = new ObjectMap<>();
 
     public void add(String suffix, Resource resource)

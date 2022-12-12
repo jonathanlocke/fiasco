@@ -7,7 +7,6 @@
 
 package digital.fiasco.runtime.repository;
 
-import com.telenav.kivakit.core.messaging.Listener;
 import com.telenav.kivakit.core.registry.RegistryTrait;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.comparison.Filter;
@@ -18,8 +17,12 @@ import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.repository.artifact.Artifact;
 import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
 
+import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
+import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
+import static com.telenav.kivakit.core.version.Version.parseVersion;
 import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
+import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.repository.artifact.ArtifactDescriptor.parseArtifactDescriptor;
 
 /**
@@ -32,14 +35,24 @@ public class Library implements
         Dependency<Library>,
         RegistryTrait
 {
+    public static DependencyList<Library> libraries(String... descriptors)
+    {
+        return dependencyList(stringList(descriptors).map(Library::library));
+    }
+
+    public static DependencyList<Library> libraries(Library... libraries)
+    {
+        return dependencyList(libraries);
+    }
+
+    public static Library library(String artifact)
+    {
+        return new Library(parseArtifactDescriptor(throwingListener(), artifact));
+    }
+
     public static Library library(Artifact artifact)
     {
         return new Library(artifact.descriptor());
-    }
-
-    public static Library library(Listener listener, String artifact)
-    {
-        return new Library(parseArtifactDescriptor(listener, artifact));
     }
 
     /** This library's artifact */
@@ -64,6 +77,11 @@ public class Library implements
         return artifactDescriptor;
     }
 
+    public Library copy()
+    {
+        return new Library(this);
+    }
+
     @Override
     public DependencyList<Library> dependencies()
     {
@@ -86,15 +104,22 @@ public class Library implements
         return this;
     }
 
-    @SuppressWarnings("unchecked")
-    public <T extends Library> T version(Version version)
+    public Library version(Version version)
     {
-        artifactDescriptor = artifactDescriptor.withVersion(version);
-        return (T) this;
+        var copy = copy();
+        copy.artifactDescriptor = artifactDescriptor.withVersion(version);
+        return copy;
     }
 
-    public <T extends Library> T version(String version)
+    public Library version(String version)
     {
-        return version(Version.parseVersion(version));
+        return version(parseVersion(version));
+    }
+
+    public Library withIdentifier(String identifier)
+    {
+        var copy = copy();
+        copy.artifactDescriptor = artifactDescriptor.withIdentifier(identifier);
+        return copy;
     }
 }
