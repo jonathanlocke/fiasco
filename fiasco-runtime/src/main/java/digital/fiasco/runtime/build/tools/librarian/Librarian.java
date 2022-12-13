@@ -52,6 +52,7 @@ import static digital.fiasco.runtime.repository.Library.library;
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
 public class Librarian extends BaseTool implements DependencyResolver
 {
+    /** The repositories that this librarian searches */
     private final ObjectList<Repository> repositories = list();
 
     /** A map from group:artifact-id to version */
