@@ -217,18 +217,16 @@ public class MavenRepository extends BaseRepository
             var targetFile = (File) mavenResource(targetFolder, descriptor, suffix);
 
             // and copy the content to that file.
-            artifactContentResource.safeCopyTo(targetFile, OVERWRITE);
+            if (artifactContentResource.safeCopyTo(targetFile, OVERWRITE))
+            {
+                // Get the signatures for the content,
+                var signature = artifactContent.signatures();
 
-            // Get the signatures for the content,
-            var signature = artifactContent.signatures();
-
-            // and write them to the folder.
-            ((File) mavenResource(targetFolder, descriptor, suffix + ".asc")).saveText(signature.pgp());
-            ((File) mavenResource(targetFolder, descriptor, suffix + ".md5")).saveText(signature.md5());
-            ((File) mavenResource(targetFolder, descriptor, suffix + ".sha1")).saveText(signature.sha1());
-
-            // TODO return saveText stati using KivaKit 1.9.1
-            return true;
+                // and write them to the folder.
+                return ((File) mavenResource(targetFolder, descriptor, suffix + ".asc")).saveText(signature.pgp())
+                        && ((File) mavenResource(targetFolder, descriptor, suffix + ".md5")).saveText(signature.md5())
+                        && ((File) mavenResource(targetFolder, descriptor, suffix + ".sha1")).saveText(signature.sha1());
+            }
         }
         return false;
     }
@@ -264,9 +262,7 @@ public class MavenRepository extends BaseRepository
         {
             // get the file to write to
             var file = (File) mavenResource(target, artifact.descriptor(), ".pom");
-            file.saveText(artifact.asMavenPom());
-            // TODO return saveText boolean
-            return true;
+            return file.saveText(artifact.asMavenPom());
         }
         else
         {
