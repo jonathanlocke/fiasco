@@ -9,15 +9,16 @@ package digital.fiasco.runtime.build.tools.copier;
 
 import com.telenav.kivakit.core.progress.ProgressReporter;
 import com.telenav.kivakit.filesystem.Folder;
+import com.telenav.kivakit.filesystem.Folder.Traversal;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
-import com.telenav.kivakit.resource.CopyMode;
 import com.telenav.kivakit.resource.ResourcePathed;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
-import digital.fiasco.runtime.build.tools.Matchers;
 
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
 import static com.telenav.kivakit.core.string.Formatter.format;
+import static com.telenav.kivakit.interfaces.comparison.Matcher.matchAll;
+import static com.telenav.kivakit.resource.CopyMode.OVERWRITE;
 import static com.telenav.kivakit.resource.ResourceGlob.glob;
 
 /**
@@ -35,7 +36,7 @@ public class Copier extends BaseTool
     private Folder from;
 
     /** The files to copy */
-    private Matchers matchers = new Matchers();
+    private Matcher<ResourcePathed> matcher = matchAll();
 
     /** Progress in copying files */
     private final ProgressReporter progress = progressReporter(this, "files");
@@ -50,7 +51,8 @@ public class Copier extends BaseTool
         super(that.associatedBuild());
         this.to = that.to;
         this.from = that.from;
-        this.matchers = that.matchers.copy();
+        this.matcher = that.matcher;
+        this.traversal = that.traversal;
     }
 
     public Copier copy()
@@ -68,14 +70,14 @@ public class Copier extends BaseTool
     public Copier withMatcher(Matcher<ResourcePathed> matcher)
     {
         var copy = copy();
-        copy.matchers.add(matcher);
+        copy.matcher = matcher;
         return copy;
     }
 
     public Copier withMatcher(String glob)
     {
         var copy = copy();
-        copy.matchers.add(glob(glob));
+        copy.matcher = glob(glob);
         return copy;
     }
 
@@ -83,6 +85,13 @@ public class Copier extends BaseTool
     {
         var copy = copy();
         copy.to = to;
+        return copy;
+    }
+
+    public Copier withTraversal(Traversal traversal)
+    {
+        var copy = copy();
+        copy.traversal = traversal;
         return copy;
     }
 
@@ -94,8 +103,10 @@ public class Copier extends BaseTool
                   from: $
                   to: $
                   matchers: $
-                """, from, to, matchers);
+                """, from, to, matcher);
     }
+
+    private Traversal traversal;
 
     @Override
     protected void onRun()
@@ -105,7 +116,7 @@ public class Copier extends BaseTool
                 to.relativeTo(rootFolder()));
 
         // For each source file in the 'from' folder that matches,
-        var files = from.nestedFiles(matchers);
+        var files = from.files(matcher, traversal);
         progress.steps(files.count());
         progress.start("Copying " + files.size() + " files");
         for (var source : files)
@@ -120,7 +131,7 @@ public class Copier extends BaseTool
             destination.parent().mkdirs();
 
             // and copy the source file to the destination location
-            source.safeCopyTo(destination, CopyMode.OVERWRITE, progress);
+            source.safeCopyTo(destination, OVERWRITE, progress);
             progress.next();
         }
         progress.end(files.size() + " files copied");

@@ -9,7 +9,7 @@ package digital.fiasco.runtime.build.tools.git;
 
 import com.telenav.kivakit.core.collections.list.StringList;
 import com.telenav.kivakit.filesystem.Folder;
-import digital.fiasco.runtime.build.BuildAssociated;
+import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
@@ -32,9 +32,9 @@ public class Git extends BaseTool
 
     private String output;
 
-    public Git(BuildAssociated build)
+    public Git(Build build)
     {
-        super(build.associatedBuild());
+        super(build);
         folder = rootFolder();
     }
 

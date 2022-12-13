@@ -1,11 +1,9 @@
 package digital.fiasco.runtime.build.tools.cleaner;
 
-import com.telenav.kivakit.filesystem.Folder;
-import com.telenav.kivakit.interfaces.comparison.Matcher;
-import com.telenav.kivakit.resource.ResourcePathed;
+import com.telenav.kivakit.filesystem.File;
+import com.telenav.kivakit.filesystem.FileList;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
-import digital.fiasco.runtime.build.tools.Matchers;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.string.Formatter.format;
@@ -18,69 +16,50 @@ import static com.telenav.kivakit.core.string.Formatter.format;
 @SuppressWarnings("unused")
 public class Cleaner extends BaseTool
 {
-    /** The matchers that match files to be removed */
-    private Matchers matchers = new Matchers();
-
-    /** The root folder to clean */
-    private Folder folder;
+    /** The files to be removed */
+    private final FileList files = new FileList();
 
     public Cleaner(Build build)
     {
         super(build);
-        folder = build.targetFolder();
     }
 
-    public Cleaner(Cleaner that)
+    public Cleaner include(Iterable<File> files)
     {
-        super(that.associatedBuild());
-        matchers = that.matchers.copy();
-        folder = that.folder;
-    }
-
-    public Cleaner copy()
-    {
-        return new Cleaner(this);
-    }
-
-    public Cleaner withFolder(Folder that)
-    {
-        var copy = copy();
-        copy.folder = folder;
+        this.files.addAll(files);
         return this;
     }
 
-    public Cleaner withMatcher(Matcher<ResourcePathed> matcher)
+    public Cleaner exclude(Iterable<File> files)
     {
-        var copy = copy();
-        matchers.add(matcher);
+        for (var file : files)
+        {
+            this.files.remove(file);
+        }
         return this;
     }
 
     @Override
     protected String description()
     {
-        var files = folder.nestedFiles(matchers);
         var paths = stringList();
         for (var file : files)
         {
-            paths.add(file.relativeTo(folder).path().asString());
+            paths.add(file.path().asString());
         }
         return format("""
                 Cleaner
-                  folder: $
-                  matchers: $
                   files:
                 $
-                """, folder, matchers, paths.indented(4).join("\n"));
+                """, paths.indented(4).join("\n"));
     }
 
     @Override
     protected void onRun()
     {
-        information("Cleaning $", folder.name());
+        information("Cleaning $ files", files.count());
 
-        folder.nestedFiles(matchers)
-                .forEach(file ->
+        files.forEach(file ->
                 {
                     file.delete();
                     var parent = file.parent();

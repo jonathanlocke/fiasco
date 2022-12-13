@@ -22,6 +22,8 @@ public class ProjectBuild extends Build
     @Override
     public void onInitialize()
     {
+        librarian().lookIn(mavenCentral);
+
         artifactDescriptor("digital.fiasco:fiasco-example:1.0");
 
         metadata(new BuildMetadata()

@@ -60,7 +60,6 @@ public class Librarian extends BaseTool implements DependencyResolver
     public Librarian(Build build)
     {
         super(build);
-        repositories.addAll(build.repositories());
     }
 
     /**
