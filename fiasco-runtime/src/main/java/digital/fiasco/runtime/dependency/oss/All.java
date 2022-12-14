@@ -21,10 +21,10 @@ public interface All extends
         Maven,
         Networking,
         Parsing,
+        Search,
         Serialization,
         Testing,
         Utilities,
         Web
 {
-
 }
