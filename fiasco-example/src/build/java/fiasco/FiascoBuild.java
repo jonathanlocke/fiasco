@@ -1,7 +1,7 @@
 package fiasco;
 
 import digital.fiasco.runtime.build.MultiBuild;
-import digital.fiasco.runtime.repository.CommonLibraries;
+import digital.fiasco.runtime.dependency.oss.OpenSource;
 
 import static com.telenav.kivakit.core.version.Version.parseVersion;
 import static digital.fiasco.runtime.repository.artifact.ArtifactDescriptor.parseArtifactDescriptor;
@@ -11,7 +11,7 @@ import static digital.fiasco.runtime.repository.artifact.ArtifactDescriptor.pars
  *
  * @author jonathan
  */
-public class FiascoBuild extends MultiBuild implements CommonLibraries
+public class FiascoBuild extends MultiBuild implements OpenSource
 {
     public static void main(String[] arguments)
     {
@@ -36,15 +36,15 @@ public class FiascoBuild extends MultiBuild implements CommonLibraries
         addBuild(build
                 .project("example1")
                 .withDependencies(
-                        logging.apache_commons_logging.version(version_apache_commons_logging),
-                        serialization.kryo.version(version_kryo)
+                        apache_commons_logging.version(version_apache_commons_logging),
+                        kryo.version(version_kryo)
                 ));
 
         addBuild(build
                 .project("example2")
                 .withDependencies(
-                        framework.kivakit_application.version(version_kivakit),
-                        network.kivakit_network_core.version(version_kivakit)
+                        kivakit_application.version(version_kivakit),
+                        kivakit_network_core.version(version_kivakit)
                 ));
     }
 }
