@@ -2,6 +2,7 @@ package digital.fiasco.runtime.build.metadata;
 
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
+import com.telenav.kivakit.core.time.Year;
 
 /**
  * Copyright text
@@ -9,26 +10,10 @@ import com.telenav.kivakit.core.string.ObjectFormatter;
  * @author jonathan
  */
 @SuppressWarnings({ "unused", "ClassCanBeRecord" })
-public class Copyright
+public record Copyright(@FormatProperty String text,
+                        @FormatProperty Year from,
+                        @FormatProperty Year to)
 {
-    @FormatProperty
-    private final String text;
-
-    /**
-     * Creates a copyright with the given text
-     *
-     * @param text The copyright text
-     */
-    public Copyright(String text)
-    {
-        this.text = text;
-    }
-
-    public String text()
-    {
-        return text;
-    }
-
     @Override
     public String toString()
     {

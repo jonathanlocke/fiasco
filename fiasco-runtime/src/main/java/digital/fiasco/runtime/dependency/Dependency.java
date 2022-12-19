@@ -2,6 +2,8 @@ package digital.fiasco.runtime.dependency;
 
 import com.telenav.kivakit.interfaces.naming.Named;
 
+import static digital.fiasco.runtime.dependency.DependencyGraph.dependencyGraph;
+
 /**
  * A dependency has a list of {@link #dependencies()}, which must be resolved for it to function. A graph of
  * dependencies in depth-first order, where the leaves first and the root is last, can be created with {@link #graph()}.
@@ -11,19 +13,19 @@ import com.telenav.kivakit.interfaces.naming.Named;
  * @author shibo
  */
 @SuppressWarnings("unused")
-public interface Dependency<T extends Dependency<T>> extends Named
+public interface Dependency<D extends Dependency<D>> extends Named
 {
     /**
      * @return The objects that this depends on
      */
-    DependencyList<T> dependencies();
+    DependencyList<D> dependencies();
 
     /**
      * @return A dependency graph with this dependency at the root
      */
     @SuppressWarnings("unchecked")
-    default DependencyGraph<T> graph()
+    default DependencyGraph<D> graph()
     {
-        return DependencyGraph.dependencyGraph((T) this);
+        return dependencyGraph((D) this);
     }
 }

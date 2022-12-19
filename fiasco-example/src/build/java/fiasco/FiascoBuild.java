@@ -1,7 +1,7 @@
 package fiasco;
 
 import digital.fiasco.runtime.build.MultiBuild;
-import digital.fiasco.runtime.dependency.oss.OpenSource;
+import digital.fiasco.runtime.library.oss.OpenSource;
 
 import static com.telenav.kivakit.core.version.Version.parseVersion;
 import static digital.fiasco.runtime.repository.artifact.ArtifactDescriptor.parseArtifactDescriptor;

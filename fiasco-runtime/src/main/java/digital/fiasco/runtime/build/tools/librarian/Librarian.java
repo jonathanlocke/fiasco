@@ -13,8 +13,7 @@ import com.telenav.kivakit.core.version.Version;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.dependency.DependencyList;
-import digital.fiasco.runtime.dependency.DependencyResolver;
-import digital.fiasco.runtime.repository.Library;
+import digital.fiasco.runtime.library.Library;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.repository.artifact.ArtifactResources;
@@ -25,7 +24,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-import static digital.fiasco.runtime.repository.Library.library;
+import static digital.fiasco.runtime.library.Library.library;
 
 /**
  * Manages {@link Library} artifacts and their dependencies. Searches a list of repositories added with
@@ -50,7 +49,7 @@ import static digital.fiasco.runtime.repository.Library.library;
  * @author shibo
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class Librarian extends BaseTool implements DependencyResolver
+public class Librarian extends BaseTool
 {
     /** The repositories that this librarian searches */
     private final ObjectList<Repository> repositories = list();
@@ -84,7 +83,6 @@ public class Librarian extends BaseTool implements DependencyResolver
      * @param library The library to resolve
      * @return The library and all of its dependencies
      */
-    @Override
     public DependencyList<Library> dependencies(Library library)
     {
         DependencyList<Library> dependencies = dependencyList();
@@ -99,7 +97,7 @@ public class Librarian extends BaseTool implements DependencyResolver
                 if (resolved != null && library.excludes(resolved.artifactDescriptor()))
                 {
                     // add it to the dependencies list.
-                    dependencies.add(resolved);
+                    dependencies = dependencies.with(resolved);
                 }
             }
         }
@@ -117,7 +115,7 @@ public class Librarian extends BaseTool implements DependencyResolver
                 if (library.excludes(artifact.descriptor()))
                 {
                     // add it to the dependencies.
-                    dependencies.add(library(artifact));
+                    dependencies = dependencies.with(library(artifact));
                     found = true;
                 }
             }

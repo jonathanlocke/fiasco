@@ -44,7 +44,7 @@ import digital.fiasco.runtime.build.phases.PhaseTest;
 import digital.fiasco.runtime.build.tools.ToolFactory;
 import digital.fiasco.runtime.build.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.DependencyList;
-import digital.fiasco.runtime.repository.Library;
+import digital.fiasco.runtime.library.Library;
 import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
 import org.jetbrains.annotations.NotNull;
 
@@ -58,7 +58,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-import static digital.fiasco.runtime.repository.Library.library;
+import static digital.fiasco.runtime.library.Library.library;
 import static digital.fiasco.runtime.repository.artifact.ArtifactDescriptor.parseArtifactDescriptor;
 
 /**
@@ -142,7 +142,7 @@ public abstract class Build extends Application implements
     private ObjectList<BuildListener> buildListeners = list(this);
 
     /** Libraries to compile with */
-    private DependencyList<Library> dependencies = dependencyList();
+    private DependencyList<Library> libraries = dependencyList();
 
     /** The librarian to manage libraries */
     private final Librarian librarian = listenTo(new Librarian(this));
@@ -180,7 +180,7 @@ public abstract class Build extends Application implements
      */
     public void addLibrary(String library)
     {
-        libraries().add(library(library));
+        libraries = libraries.with(library(library));
     }
 
     /**
@@ -249,9 +249,9 @@ public abstract class Build extends Application implements
     public void copy(Build that)
     {
         this.artifactDescriptor = that.artifactDescriptor;
-        this.metadata = that.metadata.copy();
+        this.metadata = that.metadata;
         this.buildListeners = that.buildListeners.copy();
-        this.dependencies = that.dependencies.copy();
+        this.libraries = that.libraries.copy();
         this.nameToPhase = that.nameToPhase.copy();
         this.orderedPhases = that.orderedPhases.copy();
         this.phaseEnabled = that.phaseEnabled.copy();
@@ -339,7 +339,7 @@ public abstract class Build extends Application implements
      */
     public DependencyList<Library> libraries()
     {
-        return dependencies;
+        return libraries;
     }
 
     public void metadata(BuildMetadata metadata)
@@ -371,7 +371,7 @@ public abstract class Build extends Application implements
 
     public ToolFactory requires(Library library)
     {
-        dependencies.add(library);
+        libraries = libraries.with(library);
         return this;
     }
 
@@ -467,14 +467,14 @@ public abstract class Build extends Application implements
     public Build withDependencies(DependencyList<Library> dependencies)
     {
         var copy = copy();
-        copy.dependencies = dependencies;
+        copy.libraries = dependencies;
         return copy;
     }
 
     public Build withDependencies(Library... dependencies)
     {
         var copy = copy();
-        copy.dependencies = dependencyList(dependencies);
+        copy.libraries = dependencyList(dependencies);
         return copy;
     }
 

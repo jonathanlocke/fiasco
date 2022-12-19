@@ -1,12 +1,16 @@
 package digital.fiasco.runtime.build.tools.cleaner;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.filesystem.File;
-import com.telenav.kivakit.filesystem.FileList;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
 
+import java.util.List;
+
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.string.Formatter.format;
+import static com.telenav.kivakit.filesystem.FileList.fileList;
 
 /**
  * Removes files matching the given pattern from the build output folder
@@ -17,25 +21,30 @@ import static com.telenav.kivakit.core.string.Formatter.format;
 public class Cleaner extends BaseTool
 {
     /** The files to be removed */
-    private final FileList files = new FileList();
+    private ObjectList<File> files = list();
 
     public Cleaner(Build build)
     {
         super(build);
     }
 
-    public Cleaner include(Iterable<File> files)
+    public Cleaner copy()
     {
-        this.files.addAll(files);
-        return this;
+        var copy = new Cleaner(associatedBuild());
+        copy.files = files.copy();
+        return copy;
     }
 
-    public Cleaner exclude(Iterable<File> files)
+    /**
+     * Records the list of files to remove
+     *
+     * @param files The files to remove
+     * @return This for chaining
+     */
+    public Cleaner withFiles(List<File> files)
     {
-        for (var file : files)
-        {
-            this.files.remove(file);
-        }
+        var copy = copy();
+        this.files = fileList(this.files.with(files));
         return this;
     }
 
@@ -60,13 +69,13 @@ public class Cleaner extends BaseTool
         information("Cleaning $ files", files.count());
 
         files.forEach(file ->
-                {
-                    file.delete();
-                    var parent = file.parent();
-                    if (parent.isEmpty())
-                    {
-                        parent.delete();
-                    }
-                });
+        {
+            file.delete();
+            var parent = file.parent();
+            if (parent.isEmpty())
+            {
+                parent.delete();
+            }
+        });
     }
 }

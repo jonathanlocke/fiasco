@@ -14,13 +14,9 @@ import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
  * @author jonathan
  */
 @SuppressWarnings("unused")
-public record ArtifactDescriptor
-        (
-                ArtifactGroup group,
-                ArtifactIdentifier identifier,
-                Version version
-        )
-        implements Named
+public record ArtifactDescriptor(ArtifactGroup group,
+                                 ArtifactIdentifier identifier,
+                                 Version version) implements Named
 {
     private static final Pattern pattern = Pattern.compile("(?<group>[A-Za-z.]+)"
             + ":"
@@ -48,11 +44,19 @@ public record ArtifactDescriptor
         return null;
     }
 
+    /**
+     * Returns true if this descriptor is complete, having a group, identifier and version.
+     *
+     * @return True if this descriptor is valid
+     */
     public boolean isValid()
     {
         return group != null && identifier != null && version != null;
     }
 
+    /**
+     * Returns the name of this descriptor as [group]:[identifier]:[version]
+     */
     @Override
     public String name()
     {
@@ -68,21 +72,45 @@ public record ArtifactDescriptor
         return name();
     }
 
+    /**
+     * Returns a copy of this descriptor with the given group
+     *
+     * @param group The group
+     * @return The copy
+     */
     public ArtifactDescriptor withGroup(ArtifactGroup group)
     {
         return new ArtifactDescriptor(group, identifier, version);
     }
 
+    /**
+     * Returns a copy of this descriptor with the given identifier
+     *
+     * @param identifier The identifier
+     * @return The copy
+     */
     public ArtifactDescriptor withIdentifier(ArtifactIdentifier identifier)
     {
         return new ArtifactDescriptor(group, identifier, version);
     }
 
+    /**
+     * Returns a copy of this descriptor with the given identifier
+     *
+     * @param identifier The identifier
+     * @return The copy
+     */
     public ArtifactDescriptor withIdentifier(String identifier)
     {
         return withIdentifier(new ArtifactIdentifier(identifier));
     }
 
+    /**
+     * Returns a copy of this descriptor with the given version
+     *
+     * @param version The version
+     * @return The descriptor
+     */
     public ArtifactDescriptor withVersion(Version version)
     {
         return new ArtifactDescriptor(group, identifier, version);

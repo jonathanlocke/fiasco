@@ -11,7 +11,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.fail;
  * @author shibo
  */
 @SuppressWarnings("unused")
-public class DependencyGraph<T extends Dependency<T>>
+public class DependencyGraph<D extends Dependency<D>>
 {
     /**
      * @return The dependency graph formed by traversing dependencies starting at the given root
@@ -22,12 +22,12 @@ public class DependencyGraph<T extends Dependency<T>>
     }
 
     /** The root of this dependency graph */
-    private final Dependency<T> root;
+    private final Dependency<D> root;
 
     /** The dependencies of this graph in depth-first-order */
-    private final DependencyList<T> depthFirst;
+    private final DependencyList<D> depthFirst;
 
-    private DependencyGraph(T root)
+    private DependencyGraph(D root)
     {
         this.root = root;
         depthFirst = depthFirst(root);
@@ -36,7 +36,7 @@ public class DependencyGraph<T extends Dependency<T>>
     /**
      * @return The dependencies in this graph in depth-first order
      */
-    public DependencyList<T> depthFirst()
+    public DependencyList<D> depthFirst()
     {
         return depthFirst;
     }
@@ -44,7 +44,7 @@ public class DependencyGraph<T extends Dependency<T>>
     /**
      * @return The root node of this dependency graph
      */
-    public Dependency<T> root()
+    public Dependency<D> root()
     {
         return root;
     }
@@ -52,21 +52,21 @@ public class DependencyGraph<T extends Dependency<T>>
     /**
      * @return List of dependencies in depth-first order
      */
-    private DependencyList<T> depthFirst(T root)
+    private DependencyList<D> depthFirst(D root)
     {
-        DependencyList<T> explored = new DependencyList<>();
+        DependencyList<D> explored = new DependencyList<>();
 
         // Go through each child of the root
-        for (T child : root.dependencies())
+        for (D child : root.dependencies())
         {
             // and explore it (in a depth-first traversal)
             var descendants = depthFirst(child);
 
             // and if none of the explored values has already been explored
-            if (Collections.disjoint(explored, descendants))
+            if (Collections.disjoint(explored.asSet(), descendants.asSet()))
             {
                 // then add the explored descendants to the list of dependencies
-                explored.addAll(descendants);
+                explored = explored.with(descendants);
             }
             else
             {
@@ -75,9 +75,7 @@ public class DependencyGraph<T extends Dependency<T>>
             }
         }
 
-        // Finally, add the root to the list
-        explored.add(root);
-
-        return explored;
+        // Finally, return the explored children with the root.
+        return explored.with(root);
     }
 }

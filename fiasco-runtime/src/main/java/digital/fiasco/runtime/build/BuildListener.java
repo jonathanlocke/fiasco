@@ -3,6 +3,8 @@ package digital.fiasco.runtime.build;
 import digital.fiasco.runtime.build.phases.Phase;
 import digital.fiasco.runtime.build.tools.ToolFactory;
 
+import static com.telenav.kivakit.interfaces.comparison.Matcher.matchAll;
+
 /**
  * A listener that is called as the build proceeds
  *
@@ -27,7 +29,7 @@ public interface BuildListener extends
 
     default void onClean()
     {
-        cleaner(targetFolder(), "**/*").run();
+        cleaner().withFiles(targetFolder().nestedFiles(matchAll())).run();
     }
 
     default void onCleaned()
@@ -136,12 +138,12 @@ public interface BuildListener extends
     {
         copier().withFrom(mainResourceFolder())
                 .withTo(classesFolder())
-                .withMatcher("**/*")
+                .including("**/*")
                 .run();
 
         copier().withFrom(testResourceFolder())
                 .withTo(testClassesFolder())
-                .withMatcher("**/*")
+                .including("**/*")
                 .run();
     }
 

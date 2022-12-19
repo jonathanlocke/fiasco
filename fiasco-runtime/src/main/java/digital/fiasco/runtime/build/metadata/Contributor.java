@@ -5,7 +5,7 @@ import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.interfaces.naming.Named;
 
-import static com.telenav.kivakit.core.collections.list.StringList.stringList;
+import java.time.ZoneId;
 
 /**
  * Model for a project contributor
@@ -13,55 +13,12 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
  * @author jonathan
  */
 @SuppressWarnings("unused")
-public class Contributor implements Named
+public record Contributor(@FormatProperty String name,
+                          @FormatProperty String email,
+                          @FormatProperty Organization organization,
+                          @FormatProperty ZoneId timeZone,
+                          @FormatProperty StringList roles) implements Named
 {
-    @FormatProperty
-    private String name;
-
-    @FormatProperty
-    private String email;
-
-    @FormatProperty
-    private StringList roles = stringList();
-
-    /**
-     * Creates a {@link Contributor} with the given name
-     *
-     * @param name The name of the contributor
-     */
-    public Contributor(String name)
-    {
-        this.name = name;
-    }
-
-    protected Contributor(Contributor that)
-    {
-        this.email = that.email;
-        this.name = that.name;
-        this.roles = that.roles.copy();
-    }
-
-    public Contributor copy()
-    {
-        return new Contributor(this);
-    }
-
-    public String email()
-    {
-        return email;
-    }
-
-    @Override
-    public String name()
-    {
-        return name;
-    }
-
-    public StringList role()
-    {
-        return roles;
-    }
-
     @Override
     public String toString()
     {
@@ -70,22 +27,33 @@ public class Contributor implements Named
 
     public Contributor withEmail(String email)
     {
-        var copy = copy();
-        copy.email = email;
-        return copy;
+        return new Contributor(name, email, organization, timeZone, roles.copy());
     }
 
     public Contributor withName(String name)
     {
-        var copy = copy();
-        copy.name = name;
-        return copy;
+        return new Contributor(name, email, organization, timeZone, roles.copy());
+    }
+
+    public Contributor withOrganization(Organization organization)
+    {
+        return new Contributor(name, email, organization, timeZone, roles.copy());
     }
 
     public Contributor withRole(String role)
     {
-        var copy = copy();
+        var copy = new Contributor(name, email, organization, timeZone, roles.copy());
         copy.roles.add(role);
         return copy;
+    }
+
+    public Contributor withTimeZone(ZoneId timeZone)
+    {
+        return new Contributor(name, email, organization, timeZone, roles.copy());
+    }
+
+    public Contributor withTimeZone(String timeZone)
+    {
+        return new Contributor(name, email, organization, ZoneId.of(timeZone), roles.copy());
     }
 }
