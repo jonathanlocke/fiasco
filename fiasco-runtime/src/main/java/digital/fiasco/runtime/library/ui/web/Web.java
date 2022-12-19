@@ -1,6 +1,4 @@
-package digital.fiasco.runtime.library.web;
-
-import static digital.fiasco.runtime.library.Library.library;
+package digital.fiasco.runtime.library.ui.web;
 
 @SuppressWarnings({ "unused" })
 public interface Web extends

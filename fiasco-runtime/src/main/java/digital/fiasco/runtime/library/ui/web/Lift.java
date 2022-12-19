@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.library.web;
+package digital.fiasco.runtime.library.ui.web;
 
 import digital.fiasco.runtime.library.Library;
 

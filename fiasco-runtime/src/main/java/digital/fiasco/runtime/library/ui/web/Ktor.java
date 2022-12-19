@@ -1,11 +1,11 @@
-package digital.fiasco.runtime.library.web;
+package digital.fiasco.runtime.library.ui.web;
 
 import digital.fiasco.runtime.library.Library;
 
 import static digital.fiasco.runtime.library.Library.library;
 
 @SuppressWarnings("unused")
-public interface ApacheClick
+public interface Ktor
 {
-    Library apache_click = library("org.apache.click:click");
+    Library ktor_client_core = library("io.ktor:ktor-client-core");
 }

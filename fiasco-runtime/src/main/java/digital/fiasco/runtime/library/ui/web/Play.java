@@ -1,11 +1,11 @@
-package digital.fiasco.runtime.library.web;
+package digital.fiasco.runtime.library.ui.web;
 
 import digital.fiasco.runtime.library.Library;
 
 import static digital.fiasco.runtime.library.Library.library;
 
 @SuppressWarnings("unused")
-public interface GoogleGwt
+public interface Play
 {
-    Library gwt_user = library("com.google.gwt:gwt-user");
+    Library play = library("com.typesafe.play:play");
 }

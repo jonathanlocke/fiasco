@@ -1,5 +1,12 @@
 package digital.fiasco.runtime.library.ui;
 
-public interface Ui extends ApacheFlex
+import digital.fiasco.runtime.library.ui.desktop.Desktop;
+import digital.fiasco.runtime.library.ui.mobile.Mobile;
+import digital.fiasco.runtime.library.ui.web.Web;
+
+public interface Ui extends
+        Desktop,
+        Mobile,
+        Web
 {
 }
