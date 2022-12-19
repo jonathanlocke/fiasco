@@ -8,10 +8,20 @@ import java.net.URL;
 
 import static com.telenav.kivakit.core.ensure.Ensure.illegalArgument;
 
+@SuppressWarnings("unused")
 public record License(@FormatProperty String name,
                       @FormatProperty URL url,
                       @FormatProperty String description)
 {
+    public static License APACHE_LICENSE = new License("Apache License 2.0")
+            .withDescription("Licensed under Apache License, Version 2.0")
+            .withUrl("https://www.apache.org/licenses/LICENSE-2.0");
+
+    public License(String name)
+    {
+        this(name, null, null);
+    }
+
     @Override
     public String toString()
     {
@@ -19,11 +29,6 @@ public record License(@FormatProperty String name,
     }
 
     public License withDescription(String description)
-    {
-        return new License(name, url, description);
-    }
-
-    public License withName(String name)
     {
         return new License(name, url, description);
     }

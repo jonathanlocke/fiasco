@@ -1,7 +1,7 @@
 package fiasco;
 
 import digital.fiasco.runtime.build.MultiBuild;
-import digital.fiasco.runtime.library.oss.OpenSource;
+import digital.fiasco.runtime.library.Libraries;
 
 import static com.telenav.kivakit.core.version.Version.parseVersion;
 import static digital.fiasco.runtime.repository.artifact.ArtifactDescriptor.parseArtifactDescriptor;
@@ -11,7 +11,7 @@ import static digital.fiasco.runtime.repository.artifact.ArtifactDescriptor.pars
  *
  * @author jonathan
  */
-public class FiascoBuild extends MultiBuild implements OpenSource
+public class FiascoBuild extends MultiBuild implements Libraries
 {
     public static void main(String[] arguments)
     {

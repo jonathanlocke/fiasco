@@ -1,10 +1,11 @@
 package digital.fiasco.runtime.repository.artifact;
 
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.resource.resources.StringOutputResource;
 import com.telenav.kivakit.resource.resources.StringResource;
 import com.telenav.kivakit.resource.serialization.SerializableObject;
 import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
+import digital.fiasco.runtime.dependency.Dependency;
+import digital.fiasco.runtime.dependency.DependencyList;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
@@ -21,10 +22,11 @@ import static com.telenav.kivakit.core.string.Formatter.format;
  */
 @SuppressWarnings("unused")
 public record Artifact(ArtifactDescriptor descriptor,
-                       ObjectList<Artifact> dependencies,
+                       ArtifactType type,
+                       DependencyList<Artifact> dependencies,
                        ArtifactContent jar,
                        ArtifactContent javadoc,
-                       ArtifactContent source)
+                       ArtifactContent source) implements Dependency<Artifact>
 {
     public static Artifact fromJson(String json)
     {
@@ -86,18 +88,38 @@ public record Artifact(ArtifactDescriptor descriptor,
         return serialized.string();
     }
 
+    public Artifact withDependencies(DependencyList<Artifact> dependencies)
+    {
+        return new Artifact(descriptor, type, dependencies, jar, javadoc, source);
+    }
+
+    public Artifact withDescriptor(ArtifactDescriptor descriptor)
+    {
+        return new Artifact(descriptor, type, dependencies, jar, javadoc, source);
+    }
+
     public Artifact withJar(ArtifactContent jar)
     {
-        return new Artifact(descriptor, dependencies, ensureNotNull(jar), javadoc, source);
+        return new Artifact(descriptor, type, dependencies, ensureNotNull(jar), javadoc, source);
+    }
+
+    public Artifact withJar(ArtifactType type)
+    {
+        return new Artifact(descriptor, type, dependencies, jar, javadoc, source);
     }
 
     public Artifact withJavadoc(ArtifactContent javadoc)
     {
-        return new Artifact(descriptor, dependencies, jar, ensureNotNull(javadoc), source);
+        return new Artifact(descriptor, type, dependencies, jar, ensureNotNull(javadoc), source);
     }
 
     public Artifact withSource(ArtifactContent source)
     {
-        return new Artifact(descriptor, dependencies, jar, javadoc, ensureNotNull(source));
+        return new Artifact(descriptor, type, dependencies, jar, javadoc, ensureNotNull(source));
+    }
+
+    public Artifact withType(ArtifactType type)
+    {
+        return new Artifact(descriptor, type, dependencies, jar, javadoc, source);
     }
 }

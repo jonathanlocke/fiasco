@@ -19,6 +19,11 @@ public record Contributor(@FormatProperty String name,
                           @FormatProperty ZoneId timeZone,
                           @FormatProperty StringList roles) implements Named
 {
+    public Contributor(String name)
+    {
+        this(name, null, null, null, null);
+    }
+
     @Override
     public String toString()
     {

@@ -15,6 +15,11 @@ import java.net.URL;
 public record Organization(@FormatProperty String name,
                            @FormatProperty URL url) implements Named
 {
+    public Organization(String name)
+    {
+        this(name, null);
+    }
+
     @Override
     public String name()
     {
@@ -25,5 +30,10 @@ public record Organization(@FormatProperty String name,
     public String toString()
     {
         return new ObjectFormatter(this).toString();
+    }
+
+    public Organization withUrl(URL url)
+    {
+        return new Organization(name, url);
     }
 }
