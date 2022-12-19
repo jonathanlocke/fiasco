@@ -349,6 +349,10 @@ public abstract class Build extends Application implements
 
     public BuildMetadata metadata()
     {
+        if (metadata == null)
+        {
+            metadata = new BuildMetadata();
+        }
         return metadata;
     }
 

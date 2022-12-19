@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.library.database;
+package digital.fiasco.runtime.library.data.database;
 
 import digital.fiasco.runtime.library.Library;
 

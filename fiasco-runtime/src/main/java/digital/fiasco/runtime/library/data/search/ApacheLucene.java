@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.library.search;
+package digital.fiasco.runtime.library.data.search;
 
 import digital.fiasco.runtime.library.Library;
 

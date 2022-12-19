@@ -1,7 +1,6 @@
 package fiasco;
 
 import digital.fiasco.runtime.build.Build;
-import digital.fiasco.runtime.build.BuildMetadata;
 import digital.fiasco.runtime.build.metadata.Contributor;
 import digital.fiasco.runtime.build.metadata.Copyright;
 import digital.fiasco.runtime.build.metadata.Organization;
@@ -11,6 +10,9 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.time.Year.year;
 import static com.telenav.kivakit.resource.Urls.url;
 import static digital.fiasco.runtime.build.metadata.License.APACHE_LICENSE;
+import static digital.fiasco.runtime.build.metadata.Role.ARCHITECT;
+import static digital.fiasco.runtime.build.metadata.Role.LEAD_DEVELOPER;
+import static digital.fiasco.runtime.build.metadata.Role.ORIGINATOR;
 
 /**
  * Example Fiasco build.
@@ -28,11 +30,10 @@ public class ProjectBuild extends Build
     @Override
     public void onInitialize()
     {
-        librarian().lookIn(mavenCentral);
+        var jonathanLocke = new Organization("Jonathan Locke")
+                .withUrl(url("https://state-of-the-art.org"));
 
-        var jonathanLocke = new Organization("Jonathan Locke");
-
-        metadata(new BuildMetadata()
+        metadata(metadata()
                 .withArtifactDescriptor("digital.fiasco:fiasco-example:1.0")
                 .withLicense(APACHE_LICENSE)
                 .withOrganization(jonathanLocke)
@@ -45,8 +46,9 @@ public class ProjectBuild extends Build
                         new Contributor("Jonathan Locke")
                                 .withOrganization(jonathanLocke)
                                 .withTimeZone("America/Denver")
-                                .withRole("Originator")
-                                .withRole("Project Lead")
+                                .withRoles(ORIGINATOR, ARCHITECT, LEAD_DEVELOPER)
                                 .withEmail("jon@thanlocke.com"))));
+
+        librarian().lookIn(mavenCentral);
     }
 }
