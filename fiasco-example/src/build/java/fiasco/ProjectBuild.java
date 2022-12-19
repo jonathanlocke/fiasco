@@ -19,7 +19,7 @@ import static digital.fiasco.runtime.build.metadata.Role.ORIGINATOR;
  *
  * @author jonathan
  */
-@SuppressWarnings({ "InnerClassMayBeStatic", "unused" })
+@SuppressWarnings({ "unused" })
 public class ProjectBuild extends Build
 {
     public static void main(String[] arguments)

@@ -13,10 +13,10 @@ import com.telenav.kivakit.core.version.Version;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.dependency.DependencyList;
-import digital.fiasco.runtime.library.Library;
+import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactResources;
+import digital.fiasco.runtime.dependency.library.Library;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.repository.artifact.ArtifactResources;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
@@ -24,7 +24,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-import static digital.fiasco.runtime.library.Library.library;
+import static digital.fiasco.runtime.dependency.library.Library.library;
 
 /**
  * Manages {@link Library} artifacts and their dependencies. Searches a list of repositories added with
@@ -71,7 +71,7 @@ public class Librarian extends BaseTool
      */
     public Librarian add(Repository target, Library library, ArtifactResources resources)
     {
-        var resolved = target.resolve(library.artifactDescriptor());
+        var resolved = target.resolve(library.descriptor());
         target.add(resolved, resources);
         return this;
     }
@@ -94,7 +94,7 @@ public class Librarian extends BaseTool
             for (var resolved : dependencies(dependency))
             {
                 // and if it is not excluded by the library,
-                if (resolved != null && library.excludes(resolved.artifactDescriptor()))
+                if (resolved != null && library.excludes(resolved.descriptor()))
                 {
                     // add it to the dependencies list.
                     dependencies = dependencies.with(resolved);
@@ -107,7 +107,7 @@ public class Librarian extends BaseTool
         for (var repository : repositories)
         {
             // resolve the library's descriptor to an artifact,
-            var descriptor = resolveArtifactVersion(library.artifactDescriptor());
+            var descriptor = resolveArtifactVersion(library.descriptor());
             var artifact = repository.resolve(descriptor);
             if (artifact != null)
             {

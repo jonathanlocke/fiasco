@@ -7,11 +7,11 @@ import digital.fiasco.runtime.build.metadata.Copyright;
 import digital.fiasco.runtime.build.metadata.License;
 import digital.fiasco.runtime.build.metadata.Organization;
 import digital.fiasco.runtime.build.metadata.Resources;
-import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.repository.artifact.ArtifactType;
+import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactType;
 
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
-import static digital.fiasco.runtime.repository.artifact.ArtifactDescriptor.parseArtifactDescriptor;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.parseArtifactDescriptor;
 
 public record BuildMetadata(@FormatProperty ArtifactDescriptor artifactDescriptor,
                             @FormatProperty ArtifactType artifactType,

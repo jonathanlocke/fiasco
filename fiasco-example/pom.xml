@@ -40,6 +40,11 @@
             <artifactId>fiasco-runtime</artifactId>
             <version>${fiasco.version}</version>
         </dependency>
+        <dependency>
+            <groupId>digital.fiasco</groupId>
+            <artifactId>fiasco-libraries</artifactId>
+            <version>${fiasco.version}</version>
+        </dependency>
 
     </dependencies>
 

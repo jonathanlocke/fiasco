@@ -13,7 +13,7 @@ public record License(@FormatProperty String name,
                       @FormatProperty URL url,
                       @FormatProperty String description)
 {
-    public static License APACHE_LICENSE = new License("Apache License 2.0")
+    public static final License APACHE_LICENSE = new License("Apache License 2.0")
             .withDescription("Licensed under Apache License, Version 2.0")
             .withUrl("https://www.apache.org/licenses/LICENSE-2.0");
 

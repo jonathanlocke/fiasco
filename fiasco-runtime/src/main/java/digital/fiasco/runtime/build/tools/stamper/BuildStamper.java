@@ -8,7 +8,7 @@ import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.BuildStructure;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.build.tools.ToolFactory;
-import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 
 import java.time.LocalDate;
 

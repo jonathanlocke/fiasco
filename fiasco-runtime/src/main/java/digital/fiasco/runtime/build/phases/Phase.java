@@ -28,8 +28,6 @@ public abstract class Phase implements Named
         return false;
     }
 
-    public abstract ObjectList<Phase> requiredPhases();
-
     @Override
     public int hashCode()
     {
@@ -44,6 +42,8 @@ public abstract class Phase implements Named
     {
         return name;
     }
+
+    public abstract ObjectList<Phase> requiredPhases();
 
     public abstract void run(BuildListener listener);
 }

@@ -4,18 +4,18 @@ import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.ResourceSection;
+import digital.fiasco.runtime.dependency.artifact.Artifact;
+import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactResources;
 import digital.fiasco.runtime.repository.BaseRepository;
-import digital.fiasco.runtime.repository.artifact.Artifact;
-import digital.fiasco.runtime.repository.artifact.ArtifactContent;
-import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.repository.artifact.ArtifactResources;
 
 import java.nio.file.Files;
 
 import static com.telenav.kivakit.filesystem.Folders.userHome;
-import static digital.fiasco.runtime.repository.artifact.ArtifactResources.JAR_SUFFIX;
-import static digital.fiasco.runtime.repository.artifact.ArtifactResources.JAVADOC_JAR_SUFFIX;
-import static digital.fiasco.runtime.repository.artifact.ArtifactResources.SOURCES_JAR_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactResources.JAR_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactResources.JAVADOC_JAR_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactResources.SOURCES_JAR_SUFFIX;
 import static java.nio.file.StandardOpenOption.APPEND;
 
 /**

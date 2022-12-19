@@ -6,22 +6,24 @@ import com.telenav.kivakit.resource.FileName;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.ResourceFolder;
 import com.telenav.kivakit.resource.ResourcePath;
+import digital.fiasco.runtime.dependency.DependencyList;
+import digital.fiasco.runtime.dependency.artifact.Artifact;
+import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactResources;
+import digital.fiasco.runtime.dependency.artifact.ArtifactSignatures;
 import digital.fiasco.runtime.repository.BaseRepository;
-import digital.fiasco.runtime.repository.artifact.Artifact;
-import digital.fiasco.runtime.repository.artifact.ArtifactContent;
-import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.repository.artifact.ArtifactResources;
-import digital.fiasco.runtime.repository.artifact.ArtifactSignatures;
 
-import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static com.telenav.kivakit.network.http.HttpNetworkLocation.parseHttpNetworkLocation;
 import static com.telenav.kivakit.resource.CopyMode.OVERWRITE;
 import static com.telenav.kivakit.resource.FileName.parseFileName;
 import static com.telenav.kivakit.resource.ResourcePath.parseResourcePath;
-import static digital.fiasco.runtime.repository.artifact.ArtifactResources.JAR_SUFFIX;
-import static digital.fiasco.runtime.repository.artifact.ArtifactResources.JAVADOC_JAR_SUFFIX;
-import static digital.fiasco.runtime.repository.artifact.ArtifactResources.SOURCES_JAR_SUFFIX;
+import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactResources.JAR_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactResources.JAVADOC_JAR_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactResources.SOURCES_JAR_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactType.LIBRARY;
 
 /**
  * A basic Maven repository, either on the local machine or some remote resource folder. If the given root folder is a
@@ -115,10 +117,10 @@ public class MavenRepository extends BaseRepository
         var source = readContent(descriptor, SOURCES_JAR_SUFFIX);
 
         // TODO read metadata with Maven libraries
-        var dependencies = list((Artifact) null);
+        DependencyList<Artifact> dependencies = dependencyList();
 
         // Return the artifact, with descriptor, dependencies, and jar attachments.
-        return new Artifact(descriptor, dependencies, jar, javadoc, source);
+        return new Artifact(descriptor, LIBRARY, dependencies, jar, javadoc, source);
     }
 
     /**
@@ -133,7 +135,7 @@ public class MavenRepository extends BaseRepository
     }
 
     /**
-     * Returns the subfolder within the given folder for the given descriptor
+     * Returns the sub-folder within the given folder for the given descriptor
      *
      * @param root The root folder
      * @param descriptor The descriptor

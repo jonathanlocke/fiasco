@@ -44,8 +44,8 @@ import digital.fiasco.runtime.build.phases.PhaseTest;
 import digital.fiasco.runtime.build.tools.ToolFactory;
 import digital.fiasco.runtime.build.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.DependencyList;
-import digital.fiasco.runtime.library.Library;
-import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.library.Library;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -58,8 +58,8 @@ import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-import static digital.fiasco.runtime.library.Library.library;
-import static digital.fiasco.runtime.repository.artifact.ArtifactDescriptor.parseArtifactDescriptor;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.parseArtifactDescriptor;
+import static digital.fiasco.runtime.dependency.library.Library.library;
 
 /**
  * Base {@link Application} for Fiasco command-line builds.

@@ -9,7 +9,7 @@ import com.telenav.kivakit.core.time.Year;
  *
  * @author jonathan
  */
-@SuppressWarnings({ "unused", "ClassCanBeRecord" })
+@SuppressWarnings({ "unused" })
 public record Copyright(@FormatProperty String text,
                         @FormatProperty Year from,
                         @FormatProperty Year to)

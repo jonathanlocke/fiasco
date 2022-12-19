@@ -15,7 +15,7 @@ import java.util.Locale;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
-@SuppressWarnings({ "FieldCanBeLocal", "unused", "UnusedReturnValue" })
+@SuppressWarnings({ "unused", "UnusedReturnValue" })
 public class Compiler extends BaseTool
 {
     private class ProblemListener implements DiagnosticListener<JavaFileObject>

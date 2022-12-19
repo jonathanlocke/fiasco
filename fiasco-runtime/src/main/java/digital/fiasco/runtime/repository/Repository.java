@@ -3,10 +3,10 @@ package digital.fiasco.runtime.repository;
 import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.resource.Resource;
-import digital.fiasco.runtime.repository.artifact.Artifact;
-import digital.fiasco.runtime.repository.artifact.ArtifactContent;
-import digital.fiasco.runtime.repository.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.repository.artifact.ArtifactResources;
+import digital.fiasco.runtime.dependency.artifact.Artifact;
+import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactResources;
 
 /**
  * Interface to a repository that stores libraries
