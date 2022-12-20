@@ -2,9 +2,6 @@ package fiasco;
 
 import digital.fiasco.libraries.Libraries;
 import digital.fiasco.runtime.build.MultiBuild;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-
-import static com.telenav.kivakit.core.version.Version.parseVersion;
 
 /**
  * Example Fiasco build.
@@ -18,8 +15,6 @@ public class FiascoBuild extends MultiBuild implements Libraries
         new FiascoBuild().arguments(arguments).run(arguments);
     }
 
-    final String version_apache_commons_logging = "1.0";
-
     final String version_kivakit = "1.9.0";
 
     final String version_kryo = "4.3.1";
@@ -29,14 +24,12 @@ public class FiascoBuild extends MultiBuild implements Libraries
     {
         var build = new ProjectBuild();
 
-        build.librarian().pinArtifactVersion(
-                ArtifactDescriptor.artifactDescriptor("org.apache.commons:logging"),
-                parseVersion("1.0.3"));
+        build.librarian().pinVersion("org.apache.commons:logging", "1.0.3");
 
         addBuild(build
                 .project("example1")
                 .withDependencies(
-                        apache_commons_logging.version(version_apache_commons_logging),
+                        apache_commons_logging,
                         kryo.version(version_kryo)
                 ));
 

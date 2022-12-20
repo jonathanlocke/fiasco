@@ -23,7 +23,9 @@ import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.string.Formatter.format;
+import static com.telenav.kivakit.core.version.Version.parseVersion;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
 import static digital.fiasco.runtime.dependency.library.Library.library;
 
 /**
@@ -37,7 +39,7 @@ import static digital.fiasco.runtime.dependency.library.Library.library;
  *     <li>{@link #dependencies(Library)} - Returns the dependencies for the given library. Dependent libraries are resolved in depth-first order.</li>
  *     <li>{@link #lookIn(Repository)} - Adds a repository to look in when resolving libraries</li>
  *     <li>{@link #repositories()} - The list of repositories to search</li>
- *     <li>{@link #pinArtifactVersion(ArtifactDescriptor, Version)} - Pins the given artifact to the specified version</li>
+ *     <li>{@link #pinVersion(ArtifactDescriptor, Version)} - Pins the given artifact to the specified version</li>
  * </ul>
  *
  * <p><b>Adding Libraries</b></p>
@@ -148,10 +150,23 @@ public class Librarian extends BaseTool
      * @param descriptor The group and artifact identifier (but without a version)
      * @param version The version to enforce for the descriptor
      */
-    public void pinArtifactVersion(ArtifactDescriptor descriptor, Version version)
+    public void pinVersion(ArtifactDescriptor descriptor, Version version)
     {
         ensure(descriptor.version() == null);
         pinnedVersions.put(descriptor, version);
+    }
+
+
+    /**
+     * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
+     * descriptor will be assigned the version.
+     *
+     * @param descriptor The group and artifact identifier (but without a version)
+     * @param version The version to enforce for the descriptor
+     */
+    public void pinVersion(String descriptor, String version)
+    {
+        pinVersion(artifactDescriptor(descriptor), parseVersion(version));
     }
 
     /**
@@ -202,7 +217,7 @@ public class Librarian extends BaseTool
 
     /**
      * Resolves the artifact descriptor's version using any pinned versions added by
-     * {@link #pinArtifactVersion(ArtifactDescriptor, Version)}
+     * {@link #pinVersion(ArtifactDescriptor, Version)}
      *
      * @param descriptor The descriptor to resolve
      * @return The descriptor with the correct version resolved
