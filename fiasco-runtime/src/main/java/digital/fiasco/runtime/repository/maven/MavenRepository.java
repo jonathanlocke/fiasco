@@ -10,7 +10,7 @@ import com.telenav.kivakit.resource.ResourcePath;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachments;
-import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.ArtifactContentMetadata;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactSignatures;
 import digital.fiasco.runtime.dependency.artifact.Library;
@@ -19,7 +19,6 @@ import digital.fiasco.runtime.repository.maven.resolver.MavenDependency;
 import digital.fiasco.runtime.repository.maven.resolver.MavenResolver;
 
 import java.net.URI;
-import java.util.Objects;
 
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static com.telenav.kivakit.resource.CopyMode.OVERWRITE;
@@ -40,14 +39,14 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
  *
  * <ul>
  *     <li>{@link #name()} - The human readable name of this repository</li>
- *     <li>{@link #uri} - The location of this repository</li>
+ *     <li>{@link #uri()} - The location of this repository</li>
  * </ul>
  *
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
  *     <li>{@link #resolve(ArtifactDescriptor)} - Gets the {@link Artifact} for the given descriptor</li>
- *     <li>{@link #content(Artifact, ArtifactContent, String)} - Gets the cached resource for the given artifact and content metadata</li>
+ *     <li>{@link #content(Artifact, ArtifactContentMetadata, String)} - Gets the cached resource for the given artifact and content metadata</li>
  * </ul>
  *
  * <p><b>Adding and Removing Artifacts</b></p>
@@ -69,19 +68,12 @@ public class MavenRepository extends BaseRepository
     /** The root folder for this repository */
     private final ResourceFolder<?> root;
 
-    /** The location of this repository */
-    private final URI uri;
-
-    /** The name of this repository */
-    private final String name;
-
     /**
      * Creates a maven repository
      */
     public MavenRepository(String name, URI uri)
     {
-        this.name = name;
-        this.uri = uri;
+        super(name, uri);
         this.root = new HttpResourceFolder(uri);
 
         mavenResolver = mavenResolver.withRepository(this);
@@ -100,27 +92,11 @@ public class MavenRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public Resource content(Artifact<?> artifact, ArtifactContent content, String suffix)
+    public Resource content(Artifact<?> artifact, ArtifactContentMetadata content, String suffix)
     {
         var descriptor = artifact.descriptor();
         return mavenFolder(root, descriptor)
                 .resource(mavenFileName(descriptor, suffix));
-    }
-
-    @Override
-    public boolean equals(final Object object)
-    {
-        if (object instanceof MavenRepository that)
-        {
-            return this.name.equals(that.name);
-        }
-        return false;
-    }
-
-    @Override
-    public int hashCode()
-    {
-        return Objects.hash(name);
     }
 
     /**
@@ -141,15 +117,6 @@ public class MavenRepository extends BaseRepository
             return true;
         }
         return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public String name()
-    {
-        return name;
     }
 
     /**
@@ -191,15 +158,6 @@ public class MavenRepository extends BaseRepository
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public URI uri()
-    {
-        return uri;
-    }
-
-    /**
      * Returns this descriptor as a filename with the given suffix.
      *
      * @param suffix The suffix to add to the filename
@@ -236,13 +194,13 @@ public class MavenRepository extends BaseRepository
     }
 
     /**
-     * Reads the signature files that go with an artifact, returning an {@link ArtifactContent}.
+     * Reads the signature files that go with an artifact, returning an {@link ArtifactContentMetadata}.
      *
      * @param descriptor The artifact descriptor
      * @param suffix The file suffix
      * @return The artifact content
      */
-    private ArtifactContent mavenReadContent(ArtifactDescriptor descriptor, String suffix)
+    private ArtifactContentMetadata mavenReadContent(ArtifactDescriptor descriptor, String suffix)
     {
         var artifact = mavenResource(root, descriptor, suffix);
         if (artifact.exists())
@@ -251,7 +209,7 @@ public class MavenRepository extends BaseRepository
             var md5 = mavenResource(root, descriptor, suffix + "md5").reader().readText();
             var sha1 = mavenResource(root, descriptor, suffix + "sha1").reader().readText();
             var signatures = new ArtifactSignatures(pgp, md5, sha1);
-            return new ArtifactContent(signatures, -1, artifact.lastModified(), artifact.sizeInBytes());
+            return new ArtifactContentMetadata(signatures, -1, artifact.lastModified(), artifact.sizeInBytes());
         }
         return null;
     }
@@ -285,7 +243,7 @@ public class MavenRepository extends BaseRepository
      * @param suffix The resource suffix to use
      */
     private boolean mavenWriteContent(ArtifactDescriptor descriptor,
-                                      ArtifactContent artifactContent,
+                                      ArtifactContentMetadata artifactContent,
                                       Resource artifactContentResource,
                                       String suffix)
     {

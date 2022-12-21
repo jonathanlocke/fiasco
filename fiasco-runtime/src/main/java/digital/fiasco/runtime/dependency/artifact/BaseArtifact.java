@@ -45,7 +45,7 @@ import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
  *     <li>{@link #withDependencies(DependencyList)} - Returns this artifact with the given dependencies</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
  *     <li>{@link #withIdentifier(String)} - Returns this artifact with the given identifier</li>
- *     <li>{@link #withJar(ArtifactContent)} - Returns this artifact with the given JAR content</li>
+ *     <li>{@link #withJar(ArtifactContentMetadata)} - Returns this artifact with the given JAR content</li>
  *     <li>{@link #withType(ArtifactType)} - Returns this artifact with the given type</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #withoutDependencies(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
@@ -70,7 +70,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     protected DependencyList dependencies;
 
     /** The artifact JAR */
-    protected ArtifactContent jar;
+    protected ArtifactContentMetadata jar;
 
     /** Dependency exclusions for this artifact */
     private ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptAll());
@@ -152,7 +152,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
      * {@inheritDoc}
      */
     @Override
-    public final ArtifactContent jar()
+    public final ArtifactContentMetadata jar()
     {
         return jar;
     }
@@ -285,7 +285,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
      * @param jar The new jar
      * @return The new artifact
      */
-    public A withJar(ArtifactContent jar)
+    public A withJar(ArtifactContentMetadata jar)
     {
         var copy = copy();
         copy.jar = jar;

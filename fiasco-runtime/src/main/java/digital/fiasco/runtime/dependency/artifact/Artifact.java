@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.dependency.artifact;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.resource.resources.StringOutputResource;
 import com.telenav.kivakit.resource.resources.StringResource;
 import com.telenav.kivakit.resource.serialization.SerializableObject;
@@ -23,6 +24,11 @@ public interface Artifact<A extends Artifact<A>> extends Dependency<A>
         var serializer = new GsonObjectSerializer();
         return (A) serializer.readObject(serialized, BaseArtifact.class).object();
     }
+
+    /**
+     * Returns the metadata for all attached jars
+     */
+    ObjectList<ArtifactContentMetadata> attachments();
 
     /**
      * Returns the list of dependencies for this artifact
@@ -52,7 +58,7 @@ public interface Artifact<A extends Artifact<A>> extends Dependency<A>
      *
      * @return The artifact content JAR
      */
-    ArtifactContent jar();
+    ArtifactContentMetadata jar();
 
     /**
      * Returns a skeletal Maven POM for this artifact

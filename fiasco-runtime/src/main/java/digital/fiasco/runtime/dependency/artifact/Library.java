@@ -34,8 +34,8 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactType.LIBRARY;
  * <ul>
  *     <li>{@link #javadoc()} - The Javadoc attachment for this library</li>
  *     <li>{@link #source()} - The source attachment for this library</li>
- *     <li>{@link #withJavadoc(ArtifactContent)} - Returns a copy of this library with the given Javadoc content attached</li>
- *     <li>{@link #withSource(ArtifactContent)} - Returns a copy of this library with the given Javadoc source content attached</li>
+ *     <li>{@link #withJavadoc(ArtifactContentMetadata)} - Returns a copy of this library with the given Javadoc content attached</li>
+ *     <li>{@link #withSource(ArtifactContentMetadata)} - Returns a copy of this library with the given Javadoc source content attached</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -102,10 +102,10 @@ public class Library extends BaseArtifact<Library> implements
     }
 
     /** The Javadoc content for this library */
-    private ArtifactContent javadoc;
+    private ArtifactContentMetadata javadoc;
 
     /** The source code for this library */
-    private ArtifactContent source;
+    private ArtifactContentMetadata source;
 
     protected Library(ArtifactDescriptor descriptor)
     {
@@ -133,7 +133,7 @@ public class Library extends BaseArtifact<Library> implements
      *
      * @return The Javadoc content
      */
-    public ArtifactContent javadoc()
+    public ArtifactContentMetadata javadoc()
     {
         return javadoc;
     }
@@ -143,7 +143,7 @@ public class Library extends BaseArtifact<Library> implements
      *
      * @return The source code JAR
      */
-    public ArtifactContent source()
+    public ArtifactContentMetadata source()
     {
         return source;
     }
@@ -154,7 +154,7 @@ public class Library extends BaseArtifact<Library> implements
      * @param javadoc The Javadoc content
      * @return The new library
      */
-    public Library withJavadoc(ArtifactContent javadoc)
+    public Library withJavadoc(ArtifactContentMetadata javadoc)
     {
         var copy = copy();
         copy.javadoc = javadoc;
@@ -167,7 +167,7 @@ public class Library extends BaseArtifact<Library> implements
      * @param source The source code JAR attachment
      * @return The new library
      */
-    public Library withSource(ArtifactContent source)
+    public Library withSource(ArtifactContentMetadata source)
     {
         var copy = copy();
         copy.source = source;

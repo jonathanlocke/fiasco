@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.download;
+package digital.fiasco.runtime.repository.fiasco;
 
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.filesystem.File;
@@ -7,7 +7,7 @@ import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.ResourceSection;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachments;
-import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.ArtifactContentMetadata;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.Asset;
 import digital.fiasco.runtime.dependency.artifact.Library;
@@ -25,11 +25,24 @@ import static java.nio.file.Files.writeString;
 import static java.nio.file.StandardOpenOption.APPEND;
 
 /**
- * A fast cache of downloaded artifacts and their metadata. This cache helps to avoid unnecessary downloads when a user
- * wipes out their repository, causing it to repopulate. Instead of repopulating from Maven Central or another remote
- * repository, the artifacts in this cache can be used. Because downloaded artifacts are not mutable in Maven Central
- * (and should not be mutable in any other repository), it should rarely be necessary to remove the download
- * repository.
+ * A high performance repository of artifacts and their metadata.
+ *
+ * <p><b>User Repositories</b></p>
+ *
+ * <p>
+ * This repository is used to store artifacts and metadata for Fiasco users. The repository metadata is in a
+ * human-readable text file called <i>artifacts.txt</i>. The metadata can be searched with grep or viewed in a text
+ * editor.
+ * </p>
+ *
+ * <p><b>Maven Download Cache</b></p>
+ *
+ * <p>
+ * An instance of this repository is used as a download cache to avoid unnecessary downloads when a user wipes out their
+ * repository, causing it to repopulate. Instead of repopulating from Maven Central or another remote repository, the
+ * artifacts in this cache can be used. Because downloaded artifacts are not mutable in Maven Central (and should not be
+ * mutable in any other repository), it should rarely be necessary to remove the download repository.
+ * </p>
  *
  * <p><b>Artifact Storage</b></p>
  *
@@ -51,7 +64,7 @@ import static java.nio.file.StandardOpenOption.APPEND;
  *
  * <ul>
  *     <li>{@link #resolve(ArtifactDescriptor)} - Gets the {@link Artifact} for the given descriptor</li>
- *     <li>{@link #content(Artifact, ArtifactContent, String)} - Gets the cached resource for the given artifact and content metadata</li>
+ *     <li>{@link #content(Artifact, ArtifactContentMetadata, String)} - Gets the cached resource for the given artifact and content metadata</li>
  * </ul>
  *
  * <p><b>Adding and Removing Artifacts</b></p>
@@ -64,23 +77,31 @@ import static java.nio.file.StandardOpenOption.APPEND;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class DownloadRepository extends BaseRepository
+public class FiascoRepository extends BaseRepository
 {
-    /** The file for storing artifact metadata in JSON format */
-    private final File metadataFile = cacheFile("artifacts.txt");
-
-    /** The binary file containing artifacts, laid out end-to-end */
-    private final File attachmentsFile = cacheFile("attachments.binary");
-
     /** The cached artifact entries */
     private final ObjectMap<ArtifactDescriptor, Artifact<?>> artifacts = new ObjectMap<>();
 
     /** Separator to use between artifact entries in the artifacts.txt file */
     private final String ARTIFACT_SEPARATOR = "\n========\n";
 
-    public DownloadRepository()
+    private Folder rootFolder;
+
+    /** The file for storing artifact metadata in JSON format */
+    private final File metadataFile = cacheFile("artifacts.txt");
+
+    /** The binary file containing artifacts, laid out end-to-end */
+    private final File attachmentsFile = cacheFile("attachments.binary");
+
+    public FiascoRepository(String name, Folder rootFolder)
     {
+        super(name, rootFolder.uri());
         loadMetadata();
+    }
+
+    public FiascoRepository(String name)
+    {
+        this(name, fiascoCacheFolder().folder(name));
     }
 
     /**
@@ -103,7 +124,7 @@ public class DownloadRepository extends BaseRepository
      */
     @Override
     public synchronized Resource content(Artifact<?> ignored1,
-                                         ArtifactContent content,
+                                         ArtifactContentMetadata content,
                                          String ignored2)
     {
         var start = content.offset();
@@ -181,28 +202,18 @@ public class DownloadRepository extends BaseRepository
     @Override
     public URI uri()
     {
-        return downloadCacheFolder().uri();
+        return rootFolder.uri();
     }
 
     /**
-     * Returns the download cache folder
-     *
-     * @return The folder
-     */
-    private static Folder downloadCacheFolder()
-    {
-        return fiascoCacheFolder().folder("download-cache");
-    }
-
-    /**
-     * Saves the given content into the content file, returning the given {@link ArtifactContent} with the offset, size,
-     * and last modified time populated.
+     * Saves the given content into the content file, returning the given {@link ArtifactContentMetadata} with the
+     * offset, size, and last modified time populated.
      *
      * @param artifact The artifact to save
      * @param content The artifact content to write to the resources file
      * @return The updated artifact content
      */
-    private ArtifactContent appendArtifactContent(ArtifactContent artifact, Resource content)
+    private ArtifactContentMetadata appendArtifactContent(ArtifactContentMetadata artifact, Resource content)
     {
         try
         {
@@ -242,8 +253,7 @@ public class DownloadRepository extends BaseRepository
      */
     private File cacheFile(String name)
     {
-        return downloadCacheFolder()
-                .file(name);
+        return rootFolder.file(name);
     }
 
     /**

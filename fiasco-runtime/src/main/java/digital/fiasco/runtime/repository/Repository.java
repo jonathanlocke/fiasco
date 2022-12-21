@@ -5,7 +5,7 @@ import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.resource.Resource;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachments;
-import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.ArtifactContentMetadata;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 
 import java.net.URI;
@@ -17,7 +17,7 @@ import java.net.URI;
  *
  * <ul>
  *     <li>{@link #resolve(ArtifactDescriptor)} - Gets the {@link Artifact} for the given descriptor</li>
- *     <li>{@link #content(Artifact, ArtifactContent, String)} - Gets the cached resource for the given artifact and content metadata</li>
+ *     <li>{@link #content(Artifact, ArtifactContentMetadata, String)} - Gets the cached resource for the given artifact and content metadata</li>
  * </ul>
  *
  * <p><b>Adding and Removing Artifacts</b></p>
@@ -45,7 +45,7 @@ public interface Repository extends Repeater, Named
      * @param suffix A suffix to add to the resource path
      * @return The resource section for the artifact
      */
-    Resource content(Artifact<?> metadata, ArtifactContent content, String suffix);
+    Resource content(Artifact<?> metadata, ArtifactContentMetadata content, String suffix);
 
     /**
      * Adds the given content {@link Resource}s to content.bin, and the {@link Artifact} metadata to metadata.txt in

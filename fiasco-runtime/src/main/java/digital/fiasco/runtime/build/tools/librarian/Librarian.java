@@ -14,11 +14,11 @@ import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachments;
+import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.repository.download.DownloadRepository;
+import digital.fiasco.runtime.repository.fiasco.FiascoRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
@@ -68,7 +68,8 @@ public class Librarian extends BaseTool
     {
         super(build);
 
-        lookIn(new DownloadRepository());
+        lookIn(new FiascoRepository("user-repository"));
+        lookIn(new FiascoRepository("download-repository"));
         lookIn(new MavenRepository("maven-central", uri("https://repo1.maven.org/maven2/")));
     }
 
