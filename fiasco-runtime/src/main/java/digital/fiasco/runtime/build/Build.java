@@ -24,7 +24,6 @@ import com.telenav.kivakit.core.messaging.messages.status.Problem;
 import com.telenav.kivakit.core.messaging.messages.status.Quibble;
 import com.telenav.kivakit.core.messaging.messages.status.Warning;
 import com.telenav.kivakit.core.project.Project;
-import com.telenav.kivakit.core.string.Paths;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.serialization.gson.GsonSerializationProject;
@@ -45,6 +44,7 @@ import digital.fiasco.runtime.build.phases.PhaseTest;
 import digital.fiasco.runtime.build.tools.ToolFactory;
 import digital.fiasco.runtime.build.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.DependencyList;
+import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
@@ -55,9 +55,9 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
 import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
+import static com.telenav.kivakit.core.string.Paths.pathTail;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.parseArtifactDescriptor;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
 /**
@@ -143,7 +143,7 @@ public abstract class Build extends Application implements
     private ObjectList<BuildListener> buildListeners = list(this);
 
     /** Libraries to compile with */
-    private DependencyList libraries = dependencyList();
+    private DependencyList dependencies = dependencyList();
 
     /** The librarian to manage libraries */
     private final Librarian librarian = listenTo(new Librarian(this));
@@ -160,12 +160,19 @@ public abstract class Build extends Application implements
     /** If true, describe the build rather than executing it */
     private boolean dryRun = false;
 
+    /**
+     * Creates a build
+     */
     protected Build()
     {
-        // Install default build phases
-        onInstallPhases();
+        installDefaultPhases();
     }
 
+    /**
+     * Creates a copy of the given build
+     *
+     * @param that The build to copy
+     */
     protected Build(Build that)
     {
         copyFrom(that);
@@ -178,7 +185,7 @@ public abstract class Build extends Application implements
      */
     public void addLibrary(String library)
     {
-        libraries = libraries.with(library(library));
+        dependencies = dependencies.with(library(library));
     }
 
     /**
@@ -191,22 +198,45 @@ public abstract class Build extends Application implements
         buildListeners.add(listener);
     }
 
+    /**
+     * Returns the primary artifact descriptor for this build
+     */
     public ArtifactDescriptor artifactDescriptor()
     {
         return artifactDescriptor;
     }
 
+    /**
+     * Returns this build
+     */
     @Override
     public Build associatedBuild()
     {
         return this;
     }
 
+    /**
+     * Returns the list of listeners to this build
+     */
     public ObjectList<BuildListener> buildListeners()
     {
         return buildListeners;
     }
 
+    /**
+     * Returns the child build at the given path
+     *
+     * @param path The path to the child build
+     */
+    public Build childBuild(String path)
+    {
+        return withChildFolder(path)
+                .withArtifactIdentifier(pathTail(path, '/'));
+    }
+
+    /**
+     * Returns a copy of this build
+     */
     public Build copy()
     {
         var copy = typeForClass(getClass()).newInstance();
@@ -214,12 +244,17 @@ public abstract class Build extends Application implements
         return copy;
     }
 
+    /**
+     * Copies the values of the given build into this build
+     *
+     * @param that The build to copy
+     */
     public void copyFrom(Build that)
     {
         this.artifactDescriptor = that.artifactDescriptor;
         this.metadata = that.metadata;
         this.buildListeners = that.buildListeners.copy();
-        this.libraries = that.libraries.copy();
+        this.dependencies = that.dependencies.copy();
         this.phaseEnabled = that.phaseEnabled.copy();
         this.rootFolder = that.rootFolder;
         this.dryRun = that.dryRun;
@@ -301,7 +336,7 @@ public abstract class Build extends Application implements
      */
     public DependencyList libraries()
     {
-        return libraries;
+        return dependencies;
     }
 
     /**
@@ -324,29 +359,37 @@ public abstract class Build extends Application implements
         return metadata;
     }
 
+    /**
+     * Returns the list of phases in execution order for this build
+     */
     public PhaseList phases()
     {
         return phases;
     }
 
-    public Build project(String path)
-    {
-        return withChildFolder(path)
-                .withArtifactIdentifier(Paths.pathTail(path, '/'));
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Set<Project> projects()
     {
         return set(new GsonSerializationProject());
     }
 
-    public ToolFactory requires(Library library)
+    /**
+     * Adds the given artifact to this build's dependencies
+     *
+     * @param artifact The artifact to add
+     */
+    public Build requires(Artifact<?> artifact)
     {
-        libraries = libraries.with(library);
+        dependencies = dependencies.with(artifact);
         return this;
     }
 
+    /**
+     * Returns the root folder of this build
+     */
     public Folder rootFolder()
     {
         return rootFolder;
@@ -418,7 +461,7 @@ public abstract class Build extends Application implements
     public Build withArtifactDescriptor(String descriptor)
     {
         var copy = copy();
-        copy.artifactDescriptor(descriptor);
+        copy.artifactDescriptor = ArtifactDescriptor.artifactDescriptor(descriptor);
         return copy;
     }
 
@@ -439,14 +482,14 @@ public abstract class Build extends Application implements
     public Build withDependencies(DependencyList dependencies)
     {
         var copy = copy();
-        copy.libraries = dependencies;
+        copy.dependencies = dependencies;
         return copy;
     }
 
     public Build withDependencies(Library... dependencies)
     {
         var copy = copy();
-        copy.libraries = dependencyList(dependencies);
+        copy.dependencies = dependencyList(dependencies);
         return copy;
     }
 
@@ -464,6 +507,9 @@ public abstract class Build extends Application implements
         return copy;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected ObjectList<ArgumentParser<?>> argumentParsers()
     {
@@ -474,35 +520,9 @@ public abstract class Build extends Application implements
                 .build());
     }
 
-    protected void artifactDescriptor(ArtifactDescriptor artifact)
-    {
-        this.artifactDescriptor = artifact;
-    }
-
-    protected void artifactDescriptor(String descriptor)
-    {
-        artifactDescriptor = parseArtifactDescriptor(this, descriptor);
-    }
-
-    protected final void onInstallPhases()
-    {
-        phases.add(new PhaseStart());
-        phases.add(new PhaseClean());
-        phases.add(new PhasePrepare());
-        phases.add(new PhaseCompile());
-        phases.add(new PhaseTest());
-        phases.add(new PhaseDocument());
-        phases.add(new PhasePackage());
-        phases.add(new PhaseIntegrationTest());
-        phases.add(new PhaseInstall());
-        phases.add(new PhaseDeployPackages());
-        phases.add(new PhaseDeployDocumentation());
-        phases.add(new PhaseEnd());
-
-        enable(phase("start"));
-        enable(phase("end"));
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onRun()
     {
@@ -535,13 +555,47 @@ public abstract class Build extends Application implements
         }
     }
 
+    /**
+     * Returns true if the given phase is enabled
+     *
+     * @param phase The phase
+     * @return True if the phase is enabled
+     */
     private boolean enabled(Phase phase)
     {
         return phaseEnabled.getOrDefault(phase, false);
     }
 
-    private Phase phase(final String value)
+    /**
+     * Installs the default phases
+     */
+    private void installDefaultPhases()
     {
-        return phases.phase(value);
+        phases.add(new PhaseStart());
+        phases.add(new PhaseClean());
+        phases.add(new PhasePrepare());
+        phases.add(new PhaseCompile());
+        phases.add(new PhaseTest());
+        phases.add(new PhaseDocument());
+        phases.add(new PhasePackage());
+        phases.add(new PhaseIntegrationTest());
+        phases.add(new PhaseInstall());
+        phases.add(new PhaseDeployPackages());
+        phases.add(new PhaseDeployDocumentation());
+        phases.add(new PhaseEnd());
+
+        enable(phase("start"));
+        enable(phase("end"));
+    }
+
+    /**
+     * Returns the phase with the given name
+     *
+     * @param name The phase name to look up
+     * @return The phase, or null if no phase can be found with the given name
+     */
+    private Phase phase(String name)
+    {
+        return phases.phase(name);
     }
 }

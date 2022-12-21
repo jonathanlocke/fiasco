@@ -27,14 +27,14 @@ public class FiascoBuild extends MultiBuild implements Libraries
         build.librarian().pinVersion("org.apache.commons:logging", "1.0.3");
 
         addBuild(build
-                .project("example1")
+                .childBuild("example1")
                 .withDependencies(
                         apache_commons_logging,
                         kryo.version(version_kryo)
                 ));
 
         addBuild(build
-                .project("example2")
+                .childBuild("example2")
                 .withDependencies(
                         kivakit_application.version(version_kivakit),
                         kivakit_network_core.version(version_kivakit)
