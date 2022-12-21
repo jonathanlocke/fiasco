@@ -24,4 +24,14 @@ public class MavenUtilities
     {
         return event.getRepository().getId();
     }
+
+    public static String repositoryAndArtifact(RepositoryEvent event)
+    {
+        return repository(event) + "/" + artifact(event);
+    }
+
+    public static String repositoryAndMetadata(RepositoryEvent event)
+    {
+        return metadata(event) + "/" + artifact(event);
+    }
 }

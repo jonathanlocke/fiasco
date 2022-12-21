@@ -6,8 +6,8 @@ import org.eclipse.aether.RepositoryEvent;
 
 import static digital.fiasco.runtime.repository.maven.resolver.MavenUtilities.artifact;
 import static digital.fiasco.runtime.repository.maven.resolver.MavenUtilities.metadata;
-import static digital.fiasco.runtime.repository.maven.resolver.MavenUtilities.repository;
-import static java.util.Objects.requireNonNull;
+import static digital.fiasco.runtime.repository.maven.resolver.MavenUtilities.repositoryAndArtifact;
+import static digital.fiasco.runtime.repository.maven.resolver.MavenUtilities.repositoryAndMetadata;
 
 /**
  * A simplistic repository listener that logs events to the console.
@@ -17,119 +17,102 @@ public class MavenRepositoryListener extends AbstractRepositoryListener implemen
     @Override
     public void artifactDeployed(RepositoryEvent event)
     {
-        requireNonNull(event);
-        trace("Deployed " + artifact(event) + " to " + repository(event));
+        trace("Deployed " + repositoryAndArtifact(event));
     }
 
     @Override
     public void artifactDeploying(RepositoryEvent event)
     {
-        requireNonNull(event);
-        trace("Deploying " + artifact(event) + " to " + repository(event));
+        trace("Deploying " + repositoryAndArtifact(event));
     }
 
     @Override
     public void artifactDescriptorInvalid(RepositoryEvent event)
     {
-        requireNonNull(event);
-        problem("Invalid artifact descriptor for " + artifact(event) + ": " + event.getException().getMessage());
+        problem("Invalid descriptor for " + artifact(event) + ": " + event.getException().getMessage());
     }
 
     @Override
     public void artifactDescriptorMissing(RepositoryEvent event)
     {
-        requireNonNull(event);
-        problem("Missing artifact descriptor for " + artifact(event));
+        problem("Missing descriptor for " + artifact(event));
     }
 
     @Override
     public void artifactDownloaded(RepositoryEvent event)
     {
-        requireNonNull(event);
-        trace("Downloaded artifact " + artifact(event) + " from " + repository(event));
+        trace("Downloaded " + repositoryAndArtifact(event));
     }
 
     @Override
     public void artifactDownloading(RepositoryEvent event)
     {
-        requireNonNull(event);
-        trace("Downloading artifact " + artifact(event) + " from " + repository(event));
+        information("Downloading " + repositoryAndArtifact(event));
     }
 
     @Override
     public void artifactInstalled(RepositoryEvent event)
     {
-        requireNonNull(event);
-        trace("Installed " + artifact(event) + " to " + event.getFile());
+        trace("Installed " + artifact(event) + " => " + event.getFile());
     }
 
     @Override
     public void artifactInstalling(RepositoryEvent event)
     {
-        requireNonNull(event);
-        trace("Installing " + artifact(event) + " to " + event.getFile());
+        trace("Installing " + artifact(event) + " => " + event.getFile());
     }
 
     @Override
     public void artifactResolved(RepositoryEvent event)
     {
-        requireNonNull(event);
-        trace("Resolved artifact " + artifact(event) + " from " + repository(event));
+        trace("Resolved " + repositoryAndArtifact(event));
     }
 
     @Override
     public void artifactResolving(RepositoryEvent event)
     {
-        requireNonNull(event);
-        trace("Resolving artifact " + artifact(event));
+        trace("Resolving " + artifact(event));
     }
 
     @Override
     public void metadataDeployed(RepositoryEvent event)
     {
-        requireNonNull(event);
-        trace("Deployed " + metadata(event) + " to " + repository(event));
+        trace("Deployed " + repositoryAndMetadata(event));
     }
 
     @Override
     public void metadataDeploying(RepositoryEvent event)
     {
-        requireNonNull(event);
-        trace("Deploying " + metadata(event) + " to " + repository(event));
+        trace("Deploying " + repositoryAndMetadata(event));
     }
 
     @Override
     public void metadataInstalled(RepositoryEvent event)
     {
-        requireNonNull(event);
-        trace("Installed " + metadata(event) + " to " + event.getFile());
+        trace("Installed " + metadata(event) + " => " + event.getFile());
     }
 
     @Override
     public void metadataInstalling(RepositoryEvent event)
     {
-        requireNonNull(event);
-        trace("Installing " + metadata(event) + " to " + event.getFile());
+        trace("Installing " + metadata(event) + " => " + event.getFile());
     }
 
     @Override
     public void metadataInvalid(RepositoryEvent event)
     {
-        requireNonNull(event);
         problem("Invalid metadata " + metadata(event));
     }
 
     @Override
     public void metadataResolved(RepositoryEvent event)
     {
-        requireNonNull(event);
-        trace("Resolved metadata " + metadata(event) + " from " + repository(event));
+        trace("Resolved metadata " + repositoryAndMetadata(event));
     }
 
     @Override
     public void metadataResolving(RepositoryEvent event)
     {
-        requireNonNull(event);
-        trace("Resolving metadata " + metadata(event) + " from " + repository(event));
+        trace("Resolving metadata " + repositoryAndMetadata(event));
     }
 }
