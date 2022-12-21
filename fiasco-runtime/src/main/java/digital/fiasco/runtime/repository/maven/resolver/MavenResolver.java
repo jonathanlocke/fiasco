@@ -1,7 +1,11 @@
 package digital.fiasco.runtime.repository.maven.resolver;
 
 import com.google.inject.Guice;
-import com.telenav.kivakit.core.language.trait.TryCatchTrait;
+import com.telenav.kivakit.component.BaseComponent;
+import com.telenav.kivakit.core.collections.list.ObjectList;
+import com.telenav.kivakit.core.language.trait.TryTrait;
+import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.repository.maven.MavenRepository;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
@@ -12,72 +16,180 @@ import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
-import org.eclipse.aether.util.artifact.JavaScopes;
-import org.eclipse.aether.util.filter.DependencyFilterUtils;
 
 import java.util.List;
 
-public class MavenResolver implements TryCatchTrait
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+import static com.telenav.kivakit.core.os.Console.console;
+import static com.telenav.kivakit.resource.Urls.url;
+import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.parseArtifactDescriptor;
+import static org.eclipse.aether.util.artifact.JavaScopes.COMPILE;
+import static org.eclipse.aether.util.filter.DependencyFilterUtils.classpathFilter;
+
+/**
+ * Resolves Maven dependencies
+ */
+public class MavenResolver extends BaseComponent implements TryTrait
 {
+    /** The per-thread {@link RepositorySystemSession} object, to maintain thread safety */
+    private static final ThreadLocal<RepositorySystemSession> session = new ThreadLocal<>();
+
     public static void main(String[] args)
     {
-        new MavenResolver().resolve();
+        console().println(new MavenResolver()
+                .resolveDependencies("com.telenav.kivakit:kivakit-application:1.9.0")
+                .asStringList()
+                .join("\n"));
     }
 
+    /** The Maven repository system for resolving artifacts */
     private final RepositorySystem system;
 
-    private final RepositorySystemSession session;
+    /** The list of maven repositories to consult */
+    private final ObjectList<RemoteRepository> repositories;
+
+    /** The local Maven repository, defaults to ~/.fiasco/maven-repository */
+    private LocalRepository localRepository = new LocalRepository(fiascoCacheFolder()
+            .folder("maven-repository")
+            .toString());
 
     public MavenResolver()
     {
-        system = Guice.createInjector(new MavenResolverGuiceModule()).getInstance(RepositorySystem.class);
-        session = newSession();
+        system = Guice
+                .createInjector(new MavenResolverGuiceModule())
+                .getInstance(RepositorySystem.class);
+
+        repositories = list();
+        repositories.add(newRepository("maven-central", "https://repo1.maven.org/maven2/"));
     }
 
-    public void resolve()
+    protected MavenResolver(MavenResolver that)
     {
-        tryCatch(() ->
-        {
-            var artifact = new DefaultArtifact("org.apache.maven.resolver:maven-resolver-impl:1.3.3");
+        this.system = that.system;
+        this.repositories = that.repositories.copy();
+        this.localRepository = that.localRepository;
+    }
 
-            var classpathFlter = DependencyFilterUtils.classpathFilter(JavaScopes.COMPILE);
+    /**
+     * Returns a copy of this resolver
+     *
+     * @return The copy
+     */
+    public MavenResolver copy()
+    {
+        return new MavenResolver(this);
+    }
+
+    /**
+     * Resolves the dependencies for the given artifact descripttor
+     *
+     * @param descriptor The descriptor
+     * @return The list of resolved dependencies
+     */
+    public ObjectList<MavenDependency> resolveDependencies(ArtifactDescriptor descriptor)
+    {
+        return tryCatch(() ->
+        {
+            var artifact = new DefaultArtifact(descriptor.name());
 
             var collectRequest = new CollectRequest();
-            collectRequest.setRoot(new Dependency(artifact, JavaScopes.COMPILE));
-            collectRequest.setRepositories(newRepositories());
+            collectRequest.setRoot(new Dependency(artifact, COMPILE));
+            collectRequest.setRepositories(repositories);
 
-            DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, classpathFlter);
+            DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, classpathFilter(COMPILE));
+            List<ArtifactResult> artifactResults = system
+                    .resolveDependencies(session(), dependencyRequest)
+                    .getArtifactResults();
 
-            List<ArtifactResult> artifactResults =
-                    system.resolveDependencies(session, dependencyRequest).getArtifactResults();
-
-            for (ArtifactResult artifactResult : artifactResults)
+            ObjectList<MavenDependency> dependencies = list();
+            for (var artifactResult : artifactResults)
             {
-                System.out.println(artifactResult.getArtifact() + " resolved to "
-                        + artifactResult.getArtifact().getFile());
+                var mavenArtifact = artifactResult.getArtifact();
+                var mavenArtifactDescriptor = mavenArtifact.getGroupId()
+                        + ":" + mavenArtifact.getArtifactId()
+                        + ":" + mavenArtifact.getVersion();
+                var mavenRepository = repository(artifactResult.getRepository().getId());
+                var fiascoDescriptor = parseArtifactDescriptor(this, mavenArtifactDescriptor);
+                if (mavenRepository != null && fiascoDescriptor != null)
+                {
+                    dependencies.add(new MavenDependency(mavenRepository, fiascoDescriptor));
+                }
             }
+            return dependencies;
+        }, "Could not resolve dependencies for: $", descriptor);
+    }
+
+    /**
+     * Resolves the dependencies for the given artifact descripttor
+     *
+     * @param descriptor The descriptor
+     * @return The list of resolved dependencies
+     */
+    public ObjectList<MavenDependency> resolveDependencies(String descriptor)
+    {
+        return resolveDependencies(artifactDescriptor(descriptor));
+    }
+
+    /**
+     * Returns a copy of this resolver with the given Maven local respository
+     *
+     * @param localRepository The local repository
+     * @return The new resolver
+     */
+    public MavenResolver withLocalRepository(LocalRepository localRepository)
+    {
+        var copy = copy();
+        copy.localRepository = localRepository;
+        return copy;
+    }
+
+    /**
+     * Returns a copy of this resolver with the given Maven local respository
+     *
+     * @param name The repository name
+     * @param uri The repository URI
+     * @return The new resolver
+     */
+    public MavenResolver withRepository(String name, String uri)
+    {
+        var copy = copy();
+        copy.repositories.add(newRepository(name, uri));
+        return copy;
+    }
+
+    private RemoteRepository newRepository(String id, String url)
+    {
+        return new RemoteRepository.Builder(id, "default", url).build();
+    }
+
+    private MavenRepository repository(String id)
+    {
+        return tryCatch(() ->
+        {
+            for (var at : repositories)
+            {
+                if (at.getId().equals(id))
+                {
+                    return new MavenRepository(at.getId(), url(at.getUrl()).toURI());
+                }
+            }
+            return null;
         });
     }
 
-    private static RemoteRepository newCentralRepository()
+    private RepositorySystemSession session()
     {
-        return new RemoteRepository.Builder("central", "default", "https://repo.maven.apache.org/maven2/").build();
-    }
-
-    private List<RemoteRepository> newRepositories()
-    {
-        return List.of(newCentralRepository());
-    }
-
-    private RepositorySystemSession newSession()
-    {
-        var session = MavenRepositorySystemUtils.newSession();
-
-        var localRepo = new LocalRepository("target/local-repo");
-        session.setLocalRepositoryManager(system.newLocalRepositoryManager(session, localRepo));
-
-        session.setTransferListener(new ConsoleTransferListener());
-        session.setRepositoryListener(new ConsoleRepositoryListener());
+        RepositorySystemSession session = MavenResolver.session.get();
+        if (session == null)
+        {
+            var newSession = MavenRepositorySystemUtils.newSession();
+            newSession.setLocalRepositoryManager(system.newLocalRepositoryManager(newSession, localRepository));
+            newSession.setTransferListener(new MavenArtifactTransferListener());
+            newSession.setRepositoryListener(new MavenRepositoryListener());
+            MavenResolver.session.set(session = newSession);
+        }
         return session;
     }
 }

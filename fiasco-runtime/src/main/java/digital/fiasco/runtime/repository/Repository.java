@@ -8,6 +8,8 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactResources;
 
+import java.net.URI;
+
 /**
  * Interface to a repository that stores libraries
  *
@@ -53,6 +55,13 @@ public interface Repository extends Repeater, Named
      * @return The resource section for the artifact
      */
     Resource content(Artifact metadata, ArtifactContent content, String suffix);
+
+    /**
+     * Returns the URI of this repository
+     *
+     * @return The repository URI
+     */
+    URI location();
 
     /**
      * Gets the cache entry for the given artifact descriptor

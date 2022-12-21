@@ -2,6 +2,7 @@ package digital.fiasco.runtime.repository.maven;
 
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
+import com.telenav.kivakit.network.http.HttpResourceFolder;
 import com.telenav.kivakit.resource.FileName;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.ResourceFolder;
@@ -14,8 +15,9 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactResources;
 import digital.fiasco.runtime.dependency.artifact.ArtifactSignatures;
 import digital.fiasco.runtime.repository.BaseRepository;
 
+import java.net.URI;
+
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
-import static com.telenav.kivakit.network.http.HttpNetworkLocation.parseHttpNetworkLocation;
 import static com.telenav.kivakit.resource.CopyMode.OVERWRITE;
 import static com.telenav.kivakit.resource.FileName.parseFileName;
 import static com.telenav.kivakit.resource.ResourcePath.parseResourcePath;
@@ -51,16 +53,20 @@ public class MavenRepository extends BaseRepository
     /** The root folder for this repository */
     private final ResourceFolder<?> root;
 
+    /** The location of this repository */
+    private final URI location;
+
     /** The name of this repository */
     private final String name;
 
     /**
-     * @param root The root folder of this repository
+     * Creates a maven repository
      */
-    public MavenRepository(String name, String root)
+    public MavenRepository(String name, URI location)
     {
         this.name = name;
-        this.root = parseHttpNetworkLocation(this, root).resource().parent();
+        this.location = location;
+        this.root = new HttpResourceFolder(location);
     }
 
     /**
@@ -94,6 +100,12 @@ public class MavenRepository extends BaseRepository
         var descriptor = artifact.descriptor();
         return mavenFolder(root, descriptor)
                 .resource(mavenFileName(descriptor, suffix));
+    }
+
+    @Override
+    public URI location()
+    {
+        return location;
     }
 
     /**

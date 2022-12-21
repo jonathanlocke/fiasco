@@ -3,6 +3,8 @@ package digital.fiasco.runtime.build;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
 
+import static com.telenav.kivakit.resource.Uris.uri;
+
 /**
  * @author jonathan
  */
@@ -11,9 +13,9 @@ public interface BuildRepositories
 {
     Repository mavenCentral = new MavenRepository(
             "Maven Central",
-            "https://repo1.maven.org/maven2");
+            uri("https://repo1.maven.org/maven2"));
 
     Repository mavenCentralStaging = new MavenRepository(
             "Maven Central Staging",
-            "https://s01.oss.sonatype.org/service/local/staging/deploy/maven2");
+            uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"));
 }

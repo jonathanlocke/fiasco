@@ -13,6 +13,11 @@ public record ArtifactGroup(String name) implements Named
         return new ArtifactDescriptor(this, identifier, null);
     }
 
+    public String toString()
+    {
+        return name;
+    }
+
     @Override
     public String name()
     {

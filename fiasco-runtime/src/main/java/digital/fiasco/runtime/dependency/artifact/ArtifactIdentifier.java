@@ -10,4 +10,10 @@ public record ArtifactIdentifier(String identifier)
     {
         return this.identifier.compareTo(that.identifier);
     }
+
+    @Override
+    public String toString()
+    {
+        return identifier;
+    }
 }

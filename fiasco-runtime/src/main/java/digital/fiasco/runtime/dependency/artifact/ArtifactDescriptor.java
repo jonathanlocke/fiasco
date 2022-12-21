@@ -7,6 +7,7 @@ import com.telenav.kivakit.interfaces.naming.Named;
 import java.util.regex.Pattern;
 
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
+import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
 
 /**
  * An identifier that uniquely identifies an artifact, including its group, artifact identifier and version.
@@ -18,11 +19,11 @@ public record ArtifactDescriptor(ArtifactGroup group,
                                  ArtifactIdentifier identifier,
                                  Version version) implements Named
 {
-    private static final Pattern pattern = Pattern.compile("(?<group>[A-Za-z.]+)"
+    private static final Pattern pattern = Pattern.compile("(?<group>[A-Za-z0-9._-]+)"
             + ":"
-            + "(?<identifier>[A-Za-z-.]+)"
+            + "(?<identifier>[A-Za-z0-9._-]+)"
             + "(:"
-            + "(?<version>\\d+\\.\\d+(\\.\\d+)?(-(snapshot|alpha|beta|rc|final))?)"
+            + "(?<version>[A-Za-z0-9._-]+)"
             + ")?");
 
     public static ArtifactDescriptor artifactDescriptor(String descriptor)
@@ -37,7 +38,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
         {
             var group = new ArtifactGroup(matcher.group("group"));
             var identifier = new ArtifactIdentifier(matcher.group("identifier"));
-            var version = Version.parseVersion(matcher.group("version"));
+            var version = Version.version(matcher.group("version"), LENIENT);
             return new ArtifactDescriptor(group, identifier, version);
         }
         listener.problem("Unable to parse artifact descriptor: $", descriptor);
@@ -61,7 +62,6 @@ public record ArtifactDescriptor(ArtifactGroup group,
     public String name()
     {
         return group
-                + ":"
                 + (identifier == null ? "" : ":" + identifier)
                 + (version == null ? "" : ":" + version);
     }

@@ -2,6 +2,7 @@ package digital.fiasco.runtime.repository.cache;
 
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.filesystem.File;
+import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.ResourceSection;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
@@ -10,9 +11,10 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactResources;
 import digital.fiasco.runtime.repository.BaseRepository;
 
+import java.net.URI;
 import java.nio.file.Files;
 
-import static com.telenav.kivakit.filesystem.Folders.userHome;
+import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactResources.JAR_SUFFIX;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactResources.JAVADOC_JAR_SUFFIX;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactResources.SOURCES_JAR_SUFFIX;
@@ -121,6 +123,12 @@ public class DownloadCacheRepository extends BaseRepository
         return new ResourceSection(contentFile, start, end);
     }
 
+    @Override
+    public URI location()
+    {
+        return downloadCacheFolder().uri();
+    }
+
     /**
      * Gets the cache entry for the given artifact descriptor
      *
@@ -132,6 +140,16 @@ public class DownloadCacheRepository extends BaseRepository
     {
         load();
         return artifacts.get(descriptor);
+    }
+
+    /**
+     * Returns the download cache folder
+     *
+     * @return The folder
+     */
+    private static Folder downloadCacheFolder()
+    {
+        return fiascoCacheFolder().folder("download-cache");
     }
 
     /**
@@ -182,8 +200,7 @@ public class DownloadCacheRepository extends BaseRepository
      */
     private File cacheFile(String name)
     {
-        return userHome()
-                .folder(".fiasco/download-cache")
+        return downloadCacheFolder()
                 .file(name);
     }
 
