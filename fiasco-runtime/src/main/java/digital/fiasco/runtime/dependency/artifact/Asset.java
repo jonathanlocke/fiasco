@@ -7,9 +7,11 @@
 
 package digital.fiasco.runtime.dependency.artifact;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.registry.RegistryTrait;
 import digital.fiasco.runtime.dependency.DependencyList;
 
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
@@ -97,6 +99,12 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
     protected Asset(Asset that)
     {
         super(that);
+    }
+
+    @Override
+    public ObjectList<ArtifactContentMetadata> attachments()
+    {
+        return list(jar());
     }
 
     /**
