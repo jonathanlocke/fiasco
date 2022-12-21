@@ -7,5 +7,8 @@ package digital.fiasco.runtime.build;
  */
 public interface BuildAssociated
 {
+    /**
+     * Returns the build associated with this object
+     */
     Build associatedBuild();
 }

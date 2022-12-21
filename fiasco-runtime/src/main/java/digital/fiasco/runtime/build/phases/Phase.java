@@ -30,6 +30,9 @@ public abstract class Phase implements Named
      */
     public abstract String description();
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public boolean equals(Object object)
     {
@@ -40,6 +43,9 @@ public abstract class Phase implements Named
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public int hashCode()
     {

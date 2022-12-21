@@ -12,6 +12,22 @@ import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 /**
  * Maintains a list of phases in execution order.
  *
+ * <p><b>Adding Phases</b></p>
+ *
+ * <ul>
+ *     <li>{@link #add(Phase)}</li>
+ *     <li>{@link #addPhaseAfter(String, Phase)}</li>
+ *     <li>{@link #addPhaseBefore(String, Phase)}</li>
+ * </ul>
+ *
+ * <p><b>Phase Access</b></p>
+ *
+ * <ul>
+ *     <li>{@link #iterator()}</li>
+ *     <li>{@link #phase(String)}</li>
+ *     <li>{@link #phases()}</li>
+ * </ul>
+ *
  * @author Jonathan Locke
  */
 public class PhaseList implements Iterable<Phase>

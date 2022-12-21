@@ -50,6 +50,6 @@ public class ProjectBuild extends Build
                                 .withRoles(ORIGINATOR, ARCHITECT, LEAD_DEVELOPER)
                                 .withEmail("jon@thanlocke.com"))));
 
-        librarian().lookIn(mavenCentral);
+        librarian().lookIn(MAVEN_CENTRAL);
     }
 }
