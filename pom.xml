@@ -48,7 +48,6 @@
 
         <module>fiasco-runtime</module>
         <module>fiasco-libraries</module>
-        <module>fiasco-server</module>
 
     </modules>
 

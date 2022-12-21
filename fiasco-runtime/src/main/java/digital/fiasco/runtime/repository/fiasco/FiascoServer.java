@@ -1,13 +1,12 @@
-package digital.fiasco.server;
+package digital.fiasco.runtime.repository.fiasco;
 
 import com.telenav.kivakit.application.Application;
 import com.telenav.kivakit.core.thread.KivaKitThread;
 import com.telenav.kivakit.network.socket.server.ConnectionListener;
 import com.telenav.kivakit.resource.resources.InputResource;
 import com.telenav.kivakit.resource.resources.OutputResource;
-import digital.fiasco.runtime.repository.fiasco.FiascoRepository;
-import digital.fiasco.server.protocol.FiascoRepositoryRequest;
-import digital.fiasco.server.protocol.FiascoRepositoryResponse;
+import digital.fiasco.runtime.repository.fiasco.protocol.FiascoRepositoryRequest;
+import digital.fiasco.runtime.repository.fiasco.protocol.FiascoRepositoryResponse;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.Socket;
@@ -17,7 +16,7 @@ import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressRep
 import static com.telenav.kivakit.core.value.count.Maximum._8;
 import static com.telenav.kivakit.resource.CloseMode.LEAVE_OPEN;
 import static com.telenav.kivakit.resource.CopyMode.STREAM;
-import static digital.fiasco.server.protocol.FiascoRepositoryRequest.requestFromJson;
+import static digital.fiasco.runtime.repository.fiasco.protocol.FiascoRepositoryRequest.requestFromJson;
 
 /**
  * A server application that accepts JSON {@link FiascoRepositoryRequest}s and produces
@@ -54,7 +53,7 @@ public class FiascoServer extends Application
                     {
                         // read the request,
                         var json = in.reader().readText();
-                        var request = requestFromJson(json);
+                        var request = FiascoRepositoryRequest.requestFromJson(json);
 
                         // compose a response,
                         var response = new FiascoRepositoryResponse();

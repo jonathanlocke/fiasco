@@ -85,6 +85,7 @@ public class FiascoRepository extends BaseRepository
     /** Separator to use between artifact entries in the artifacts.txt file */
     private final String ARTIFACT_SEPARATOR = "\n========\n";
 
+    /** The root folder of this repository */
     private Folder rootFolder;
 
     /** The file for storing artifact metadata in JSON format */

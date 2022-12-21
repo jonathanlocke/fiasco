@@ -51,6 +51,11 @@
             <artifactId>kivakit-serialization-gson</artifactId>
             <version>${kivakit.version}</version>
         </dependency>
+        <dependency>
+            <groupId>com.telenav.kivakit</groupId>
+            <artifactId>kivakit-network-socket</artifactId>
+            <version>${kivakit.version}</version>
+        </dependency>
 
         <!-- Maven -->
 
