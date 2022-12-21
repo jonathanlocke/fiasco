@@ -39,7 +39,7 @@ public class MavenArtifactTransferListener extends AbstractTransferListener impl
         requireNonNull(event);
         var message = event.getRequestType() == PUT ? "Uploading" : "Downloading";
 
-        information("$ $", message, event.getResource().getRepositoryUrl() + event.getResource().getResourceName());
+        trace("$ $", message, event.getResource().getRepositoryUrl() + event.getResource().getResourceName());
     }
 
     @Override
@@ -61,7 +61,7 @@ public class MavenArtifactTransferListener extends AbstractTransferListener impl
             {
                 String type = event.getRequestType() == PUT ? "Uploaded" : "Downloaded";
                 var rate = new Rate(contentLength, duration);
-                information(type + ": " + resource.getRepositoryUrl() + resource.getResourceName()
+                trace(type + ": " + resource.getRepositoryUrl() + resource.getResourceName()
                         + " (" + rate.perSecond() + ")");
             }
         }
