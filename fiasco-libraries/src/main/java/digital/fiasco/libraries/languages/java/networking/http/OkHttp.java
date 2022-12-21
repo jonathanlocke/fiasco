@@ -1,8 +1,8 @@
 package digital.fiasco.libraries.languages.java.networking.http;
 
-import digital.fiasco.runtime.dependency.library.Library;
+import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.library.Library.library;
+import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
 @SuppressWarnings({ "unused", "SpellCheckingInspection" })
 public interface OkHttp

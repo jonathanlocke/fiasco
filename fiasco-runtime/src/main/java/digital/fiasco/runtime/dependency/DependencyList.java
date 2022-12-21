@@ -8,11 +8,11 @@ import com.telenav.kivakit.core.thread.Monitor;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.interfaces.code.Callback;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
+import digital.fiasco.runtime.dependency.artifact.Artifact;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.LinkedBlockingDeque;
 
@@ -29,13 +29,13 @@ import static com.telenav.kivakit.core.thread.Threads.shutdownAndAwaitTerminatio
  *
  * <ul>
  *     <li>{@link #dependencyList(Dependency[])} - Variable arguments factory method</li>
- *     <li>{@link #dependencyList(List)} - List factory method</li>
+ *     <li>{@link #dependencyList(Collection)} - List factory method</li>
  * </ul>
  *
  * <p><b>Functional</b></p>
  *
  * <ul>
- *     <li>{@link #with(Dependency[])} - Returns a copy of this list with the given variable-argument dependencies</li>
+ *     <li>{@link #with(Dependency, Dependency[])} - Returns a copy of this list with the given variable-argument dependencies</li>
  *     <li>{@link #without(Matcher)} - Returns a copy of this list without the given dependencies</li>
  *     <li>{@link #without(Collection) - Returns a copy of this list without the given dependencies}</li>
  * </ul>
@@ -51,43 +51,47 @@ import static com.telenav.kivakit.core.thread.Threads.shutdownAndAwaitTerminatio
  * @author jonathan
  */
 @SuppressWarnings("unused")
-public class DependencyList<D extends Dependency<D>> implements Iterable<D>
+public class DependencyList implements Iterable<Dependency<?>>
 {
     /**
      * Creates a list of dependencies
      *
      * @param dependencies The dependencies to add
-     * @param <T> The type of dependency
      * @return The dependency list
      */
-    @SafeVarargs
-    public static <T extends Dependency<T>> DependencyList<T> dependencyList(T... dependencies)
+    public static DependencyList dependencyList(Dependency<?>... dependencies)
     {
-        return new DependencyList<>(list(dependencies));
+        return new DependencyList(list(dependencies));
     }
 
     /**
      * Creates a list of dependencies
      *
      * @param dependencies The dependencies to add
-     * @param <T> The type of dependency
      * @return The dependency list
      */
-    public static <T extends Dependency<T>> DependencyList<T> dependencyList(List<T> dependencies)
+    public static DependencyList dependencyList(Collection<Dependency<?>> dependencies)
     {
-        return new DependencyList<>(dependencies);
+        return new DependencyList(dependencies);
     }
 
     /** The underlying dependencies */
-    private final ObjectList<D> dependencies = list();
+    private final ObjectList<Dependency<?>> dependencies = list();
 
     protected DependencyList()
     {
     }
 
-    protected DependencyList(List<D> dependencies)
+    protected DependencyList(Collection<Dependency<?>> dependencies)
     {
         this.dependencies.addAll(dependencies);
+    }
+
+    public ObjectList<Artifact<?>> asArtifactList()
+    {
+        var artifacts = new ObjectList<Artifact<?>>();
+        dependencies.forEach(at -> artifacts.add((Artifact<?>) at));
+        return artifacts;
     }
 
     /**
@@ -95,7 +99,7 @@ public class DependencyList<D extends Dependency<D>> implements Iterable<D>
      *
      * @return The list
      */
-    public ObjectList<D> asList()
+    public ObjectList<Dependency<?>> asList()
     {
         return dependencies.copy();
     }
@@ -105,7 +109,7 @@ public class DependencyList<D extends Dependency<D>> implements Iterable<D>
      *
      * @return The list
      */
-    public ObjectSet<D> asSet()
+    public ObjectSet<Dependency<?>> asSet()
     {
         return set(dependencies.copy());
     }
@@ -115,9 +119,9 @@ public class DependencyList<D extends Dependency<D>> implements Iterable<D>
      *
      * @return The copy
      */
-    public DependencyList<D> copy()
+    public DependencyList copy()
     {
-        return new DependencyList<>(dependencies.copy());
+        return new DependencyList(dependencies.copy());
     }
 
     /**
@@ -125,7 +129,7 @@ public class DependencyList<D extends Dependency<D>> implements Iterable<D>
      */
     @NotNull
     @Override
-    public Iterator<D> iterator()
+    public Iterator<Dependency<?>> iterator()
     {
         return dependencies.iterator();
     }
@@ -136,7 +140,7 @@ public class DependencyList<D extends Dependency<D>> implements Iterable<D>
      * @param listener The listener to call with any messages from processing
      * @param callback The callback to process each dependency
      */
-    public void process(Listener listener, Callback<D> callback)
+    public void process(Listener listener, Callback<Dependency<?>> callback)
     {
         process(listener, Count._1, callback);
     }
@@ -149,8 +153,7 @@ public class DependencyList<D extends Dependency<D>> implements Iterable<D>
      * @param threads The number of threads to use
      * @param callback The callback to process each dependency
      */
-    @SuppressWarnings("unchecked")
-    public void process(Listener listener, Count threads, Callback<D> callback)
+    public void process(Listener listener, Count threads, Callback<Dependency<?>> callback)
     {
         // If there is only one thread requested,
         if (threads.equals(Count._1))
@@ -167,14 +170,14 @@ public class DependencyList<D extends Dependency<D>> implements Iterable<D>
             var queue = queue();
 
             // and submit jobs for each thread
-            var completed = new ConcurrentHashSet<Dependency<D>>();
+            var completed = new ConcurrentHashSet<Dependency<?>>();
             var monitor = new Monitor();
             threads.loop(() -> executor.submit(() ->
             {
                 // While the queue has dependencies to process,
                 while (!queue.isEmpty())
                 {
-                    Dependency<D> dependency = null;
+                    Dependency<?> dependency = null;
                     try
                     {
                         // take the next dependency from the queue
@@ -187,7 +190,7 @@ public class DependencyList<D extends Dependency<D>> implements Iterable<D>
                         }
 
                         // before processing it,
-                        callback.call((D) dependency);
+                        callback.call(dependency);
                         completed.add(dependency);
 
                         // and waking any threads waiting on this dependency.
@@ -213,7 +216,7 @@ public class DependencyList<D extends Dependency<D>> implements Iterable<D>
      *
      * @return A blocking queue of dependencies
      */
-    public LinkedBlockingDeque<Dependency<D>> queue()
+    public LinkedBlockingDeque<Dependency<?>> queue()
     {
         return new LinkedBlockingDeque<>(dependencies);
     }
@@ -224,10 +227,10 @@ public class DependencyList<D extends Dependency<D>> implements Iterable<D>
      * @param dependencies A variable-argument list of dependencies to include
      * @return A copy of this list with the given dependencies added
      */
-    @SafeVarargs
-    public final DependencyList<D> with(D... dependencies)
+    public final DependencyList with(Dependency<?> first, Dependency<?>... dependencies)
     {
         var copy = copy();
+        copy.dependencies.add(first);
         copy.dependencies.addAll(dependencies);
         return copy;
     }
@@ -237,7 +240,7 @@ public class DependencyList<D extends Dependency<D>> implements Iterable<D>
      *
      * @return A copy of this list with the given dependencies added
      */
-    public DependencyList<D> with(DependencyList<D> dependencies)
+    public DependencyList with(DependencyList dependencies)
     {
         var copy = copy();
         copy.dependencies.addAll(dependencies.dependencies);
@@ -250,7 +253,7 @@ public class DependencyList<D extends Dependency<D>> implements Iterable<D>
      * @param exclusions The dependencies to exclude
      * @return The dependency list
      */
-    public DependencyList<D> without(Collection<D> exclusions)
+    public DependencyList without(Collection<Dependency<?>> exclusions)
     {
         var copy = copy();
         copy.dependencies.removeAll(exclusions);
@@ -263,7 +266,7 @@ public class DependencyList<D extends Dependency<D>> implements Iterable<D>
      * @param pattern The pattern to match
      * @return A copy of this list without the specified dependencies
      */
-    public DependencyList<D> without(Matcher<D> pattern)
+    public DependencyList without(Matcher<Dependency<?>> pattern)
     {
         var copy = copy();
         copy.dependencies.removeIf(pattern::matches);

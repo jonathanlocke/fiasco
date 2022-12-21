@@ -5,9 +5,9 @@ import digital.fiasco.runtime.repository.maven.MavenRepository;
 import org.jetbrains.annotations.NotNull;
 
 public record MavenDependency(@NotNull MavenRepository repository,
-                              @NotNull ArtifactDescriptor descriptor
-)
+                              @NotNull ArtifactDescriptor descriptor)
 {
+    @Override
     public String toString()
     {
         return repository.name() + " => " + descriptor;

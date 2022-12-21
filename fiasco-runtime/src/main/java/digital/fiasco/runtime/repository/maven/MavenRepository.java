@@ -13,7 +13,10 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactResources;
 import digital.fiasco.runtime.dependency.artifact.ArtifactSignatures;
+import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.BaseRepository;
+import digital.fiasco.runtime.repository.maven.resolver.MavenDependency;
+import digital.fiasco.runtime.repository.maven.resolver.MavenResolver;
 
 import java.net.URI;
 
@@ -25,7 +28,8 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactResources.JAR_SUFFIX;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactResources.JAVADOC_JAR_SUFFIX;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactResources.SOURCES_JAR_SUFFIX;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactType.LIBRARY;
+import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
+import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
 /**
  * A basic Maven repository, either on the local machine or some remote resource folder. If the given root folder is a
@@ -41,7 +45,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactType.LIBRARY;
  * <p><b>Adding and Removing Artifacts</b></p>
  *
  * <ul>
- *     <li>{@link #add(Artifact, ArtifactResources)} - Adds the given artifact with the given attached resources</li>
+ *     <li>{@link #install(Artifact, ArtifactResources)} - Adds the given artifact with the given attached resources</li>
  *     <li>{@link #clear()} - Removes all data from this repository</li>
  * </ul>
  *
@@ -50,11 +54,14 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactType.LIBRARY;
 @SuppressWarnings({ "JavadocLinkAsPlainText", "unused" })
 public class MavenRepository extends BaseRepository
 {
+    /** Resolves artifacts from maven repositories */
+    private static MavenResolver mavenResolver = new MavenResolver();
+
     /** The root folder for this repository */
     private final ResourceFolder<?> root;
 
     /** The location of this repository */
-    private final URI location;
+    private final URI uri;
 
     /** The name of this repository */
     private final String name;
@@ -62,24 +69,13 @@ public class MavenRepository extends BaseRepository
     /**
      * Creates a maven repository
      */
-    public MavenRepository(String name, URI location)
+    public MavenRepository(String name, URI uri)
     {
         this.name = name;
-        this.location = location;
-        this.root = new HttpResourceFolder(location);
-    }
+        this.uri = uri;
+        this.root = new HttpResourceFolder(uri);
 
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean add(Artifact artifact, ArtifactResources resources)
-    {
-        var descriptor = artifact.descriptor();
-        return writeContent(descriptor, artifact.jar(), resources.get(JAR_SUFFIX), JAR_SUFFIX)
-                && writeContent(descriptor, artifact.javadoc(), resources.get(JAVADOC_JAR_SUFFIX), JAVADOC_JAR_SUFFIX)
-                && writeContent(descriptor, artifact.source(), resources.get(SOURCES_JAR_SUFFIX), SOURCES_JAR_SUFFIX)
-                && writePom(artifact);
+        mavenResolver = mavenResolver.withRepository(this);
     }
 
     /**
@@ -95,17 +91,31 @@ public class MavenRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public Resource content(Artifact artifact, ArtifactContent content, String suffix)
+    public Resource content(Artifact<?> artifact, ArtifactContent content, String suffix)
     {
         var descriptor = artifact.descriptor();
         return mavenFolder(root, descriptor)
                 .resource(mavenFileName(descriptor, suffix));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public URI location()
+    public boolean install(Artifact<?> artifact, ArtifactResources resources)
     {
-        return location;
+        var descriptor = artifact.descriptor();
+        if (writeContent(descriptor, artifact.jar(), resources.get(JAR_SUFFIX), JAR_SUFFIX))
+        {
+            if (artifact instanceof Library library)
+            {
+                return writeContent(descriptor, library.javadoc(), resources.get(JAVADOC_JAR_SUFFIX), JAVADOC_JAR_SUFFIX)
+                        && writeContent(descriptor, library.source(), resources.get(SOURCES_JAR_SUFFIX), SOURCES_JAR_SUFFIX)
+                        && writePom(artifact);
+            }
+            return true;
+        }
+        return false;
     }
 
     /**
@@ -121,18 +131,43 @@ public class MavenRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public Artifact resolve(ArtifactDescriptor descriptor)
+    public Artifact<?> resolve(ArtifactDescriptor descriptor)
     {
         // Read content information,
         var jar = readContent(descriptor, JAR_SUFFIX);
         var javadoc = readContent(descriptor, JAVADOC_JAR_SUFFIX);
         var source = readContent(descriptor, SOURCES_JAR_SUFFIX);
 
-        // TODO read metadata with Maven libraries
-        DependencyList<Artifact> dependencies = dependencyList();
+        var descriptors = mavenResolver.resolveDependencies(descriptor).map(MavenDependency::descriptor);
+        DependencyList dependencies = dependencyList();
+        for (var at : descriptors)
+        {
+            dependencies = dependencies.with(resolve(at));
+        }
 
-        // Return the artifact, with descriptor, dependencies, and jar attachments.
-        return new Artifact(descriptor, LIBRARY, dependencies, jar, javadoc, source);
+        // If the artifact has source code,
+        if (source != null)
+        {
+            // return it as a library,
+            return library(descriptor)
+                    .withDependencies(dependencies)
+                    .withJar(jar)
+                    .withJavadoc(javadoc)
+                    .withSource(source);
+        }
+        else
+        {
+            // otherwise, return it as an asset.
+            return asset(descriptor)
+                    .withDependencies(dependencies)
+                    .withJar(jar);
+        }
+    }
+
+    @Override
+    public URI uri()
+    {
+        return uri;
     }
 
     /**
@@ -195,11 +230,15 @@ public class MavenRepository extends BaseRepository
     private ArtifactContent readContent(ArtifactDescriptor descriptor, String suffix)
     {
         var artifact = mavenResource(root, descriptor, suffix);
-        var pgp = mavenResource(root, descriptor, suffix + "pgp").reader().readText();
-        var md5 = mavenResource(root, descriptor, suffix + "md5").reader().readText();
-        var sha1 = mavenResource(root, descriptor, suffix + "sha1").reader().readText();
-        var signatures = new ArtifactSignatures(pgp, md5, sha1);
-        return new ArtifactContent(signatures, -1, artifact.lastModified(), artifact.sizeInBytes());
+        if (artifact.exists())
+        {
+            var pgp = mavenResource(root, descriptor, suffix + "pgp").reader().readText();
+            var md5 = mavenResource(root, descriptor, suffix + "md5").reader().readText();
+            var sha1 = mavenResource(root, descriptor, suffix + "sha1").reader().readText();
+            var signatures = new ArtifactSignatures(pgp, md5, sha1);
+            return new ArtifactContent(signatures, -1, artifact.lastModified(), artifact.sizeInBytes());
+        }
+        return null;
     }
 
     /**
@@ -269,14 +308,14 @@ public class MavenRepository extends BaseRepository
      *
      * @param artifact The artifact metadata
      */
-    private boolean writePom(Artifact artifact)
+    private boolean writePom(Artifact<?> artifact)
     {
         // If we can write to the folder,
         if (root instanceof Folder target)
         {
             // get the file to write to
             var file = (File) mavenResource(target, artifact.descriptor(), ".pom");
-            return file.saveText(artifact.asMavenPom());
+            return file.saveText(artifact.mavenPom());
         }
         else
         {

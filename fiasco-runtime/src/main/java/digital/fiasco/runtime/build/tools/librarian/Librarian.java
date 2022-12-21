@@ -13,20 +13,25 @@ import com.telenav.kivakit.core.version.Version;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.dependency.DependencyList;
+import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactResources;
-import digital.fiasco.runtime.dependency.library.Library;
+import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.Repository;
+import digital.fiasco.runtime.repository.download.DownloadRepository;
+import digital.fiasco.runtime.repository.maven.MavenRepository;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
+import static com.telenav.kivakit.core.ensure.Ensure.illegalArgument;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.string.Formatter.format;
-import static com.telenav.kivakit.core.version.Version.parseVersion;
+import static com.telenav.kivakit.core.version.Version.version;
+import static com.telenav.kivakit.resource.Uris.uri;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
-import static digital.fiasco.runtime.dependency.library.Library.library;
+import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
 /**
  * Manages {@link Library} artifacts and their dependencies. Searches a list of repositories added with
@@ -36,7 +41,7 @@ import static digital.fiasco.runtime.dependency.library.Library.library;
  *
  * <ul>
  *     <li>{@link #resolve(ArtifactDescriptor)} - Resolves the library specified by the given descriptor</li>
- *     <li>{@link #dependencies(Library)} - Returns the dependencies for the given library. Dependent libraries are resolved in depth-first order.</li>
+ *     <li>{@link #dependencies(Artifact)} - Returns the dependencies for the given library. Dependent libraries are resolved in depth-first order.</li>
  *     <li>{@link #lookIn(Repository)} - Adds a repository to look in when resolving libraries</li>
  *     <li>{@link #repositories()} - The list of repositories to search</li>
  *     <li>{@link #pinVersion(ArtifactDescriptor, Version)} - Pins the given artifact to the specified version</li>
@@ -45,7 +50,7 @@ import static digital.fiasco.runtime.dependency.library.Library.library;
  * <p><b>Adding Libraries</b></p>
  *
  * <ul>
- *     <li>{@link #add(Repository, Library, ArtifactResources)} - Adds the given library and its attached content to the given repository</li>
+ *     <li>{@link #install(Repository, Library, ArtifactResources)} - Adds the given library and its attached content to the given repository</li>
  * </ul>
  *
  * @author shibo
@@ -62,41 +67,30 @@ public class Librarian extends BaseTool
     public Librarian(Build build)
     {
         super(build);
+
+        lookIn(new DownloadRepository());
+        lookIn(new MavenRepository("maven-central", uri("https://repo1.maven.org/maven2/")));
     }
 
     /**
-     * Installs the given library in the target repository
-     *
-     * @param target The repository to deploy to
-     * @param library The library to install
-     * @param resources The resource jar attachments
-     */
-    public Librarian add(Repository target, Library library, ArtifactResources resources)
-    {
-        var resolved = target.resolve(library.descriptor());
-        target.add(resolved, resources);
-        return this;
-    }
-
-    /**
-     * Resolves the given library in the repositories managed by this librarian. Resolution of dependent artifacts
+     * Resolves the given artiface in the repositories managed by this librarian. Resolution of dependent artifacts
      * occurs in depth-first order.
      *
-     * @param library The library to resolve
-     * @return The library and all of its dependencies
+     * @param artifact The artifact
+     * @return The artiface and all of its dependencies
      */
-    public DependencyList<Library> dependencies(Library library)
+    public DependencyList dependencies(Artifact<?> artifact)
     {
-        DependencyList<Library> dependencies = dependencyList();
+        DependencyList dependencies = dependencyList();
 
         // Go through the library's dependencies,
-        for (var dependency : library.dependencies())
+        for (var dependency : artifact.dependencies().asArtifactList())
         {
             // resolve each dependency,
-            for (var resolved : dependencies(dependency))
+            for (var resolved : dependencies(dependency).asArtifactList())
             {
                 // and if it is not excluded by the library,
-                if (resolved != null && library.excludes(resolved.descriptor()))
+                if (resolved != null && artifact.excludes(resolved.descriptor()))
                 {
                     // add it to the dependencies list.
                     dependencies = dependencies.with(resolved);
@@ -109,15 +103,15 @@ public class Librarian extends BaseTool
         for (var repository : repositories)
         {
             // resolve the library's descriptor to an artifact,
-            var descriptor = resolveArtifactVersion(library.descriptor());
-            var artifact = repository.resolve(descriptor);
-            if (artifact != null)
+            var descriptor = resolveArtifactVersion(artifact.descriptor());
+            var resolved = repository.resolve(descriptor);
+            if (resolved != null)
             {
                 // and if it isn't excluded,
-                if (library.excludes(artifact.descriptor()))
+                if (resolved.excludes(resolved.descriptor()))
                 {
                     // add it to the dependencies.
-                    dependencies = dependencies.with(library(artifact));
+                    dependencies = dependencies.with(library(resolved));
                     found = true;
                 }
             }
@@ -125,22 +119,34 @@ public class Librarian extends BaseTool
 
         if (!found)
         {
-            illegalState("Could not resolve: $", library);
+            illegalState("Could not resolve: $", artifact);
         }
 
         return dependencies;
     }
 
     /**
+     * Installs the given library in the target repository
+     *
+     * @param target The repository to deploy to
+     * @param library The library to install
+     * @param resources The resource jar attachments
+     */
+    public Librarian install(Repository target, Library library, ArtifactResources resources)
+    {
+        var resolved = target.resolve(library.descriptor());
+        target.install(resolved, resources);
+        return this;
+    }
+
+    /**
      * Adds a repository to the search path of the librarian
      *
      * @param repository The repository to search
-     * @return This librarian for chaining
      */
-    public Librarian lookIn(Repository repository)
+    public void lookIn(Repository repository)
     {
         repositories.add(repository);
-        return this;
     }
 
     /**
@@ -156,7 +162,6 @@ public class Librarian extends BaseTool
         pinnedVersions.put(descriptor, version);
     }
 
-
     /**
      * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
      * descriptor will be assigned the version.
@@ -166,7 +171,7 @@ public class Librarian extends BaseTool
      */
     public void pinVersion(String descriptor, String version)
     {
-        pinVersion(artifactDescriptor(descriptor), parseVersion(version));
+        pinVersion(artifactDescriptor(descriptor), version(version));
     }
 
     /**
@@ -185,15 +190,20 @@ public class Librarian extends BaseTool
      */
     public Library resolve(ArtifactDescriptor descriptor)
     {
+        // Go through each repository,
         for (var at : repositories())
         {
+            // and if we can resolve the artifact,
             var resolved = at.resolve(resolveArtifactVersion(descriptor));
             if (resolved != null)
             {
+                // return it as a library.
                 return library(resolved);
             }
         }
-        return null;
+
+        // Cannot resolve the descriptor
+        return illegalArgument("Cannot resolve: " + descriptor);
     }
 
     /**

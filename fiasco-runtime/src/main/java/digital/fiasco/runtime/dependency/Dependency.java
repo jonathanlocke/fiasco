@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.dependency;
 
 import com.telenav.kivakit.interfaces.naming.Named;
+import digital.fiasco.runtime.repository.Repository;
 
 import static digital.fiasco.runtime.dependency.DependencyGraph.dependencyGraph;
 
@@ -18,14 +19,21 @@ public interface Dependency<D extends Dependency<D>> extends Named
     /**
      * @return The objects that this depends on
      */
-    DependencyList<D> dependencies();
+    DependencyList dependencies();
 
     /**
      * @return A dependency graph with this dependency at the root
      */
     @SuppressWarnings("unchecked")
-    default DependencyGraph<D> graph()
+    default DependencyGraph graph()
     {
-        return dependencyGraph((D) this);
+        return dependencyGraph(this);
     }
+
+    /**
+     * Returns the repository where this dependency was found
+     *
+     * @return The hosting repository
+     */
+    Repository repository();
 }

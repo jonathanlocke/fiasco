@@ -3,6 +3,7 @@ package digital.fiasco.runtime.dependency;
 import java.util.Collections;
 
 import static com.telenav.kivakit.core.ensure.Ensure.fail;
+import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 
 /**
  * Graph of dependencies created by traversing dependencies from a root. If the dependency graph is cyclic, terminal
@@ -11,23 +12,23 @@ import static com.telenav.kivakit.core.ensure.Ensure.fail;
  * @author shibo
  */
 @SuppressWarnings("unused")
-public class DependencyGraph<D extends Dependency<D>>
+public class DependencyGraph
 {
     /**
      * @return The dependency graph formed by traversing dependencies starting at the given root
      */
-    public static <T extends Dependency<T>> DependencyGraph<T> dependencyGraph(T root)
+    public static DependencyGraph dependencyGraph(Dependency<?> root)
     {
-        return new DependencyGraph<>(root);
+        return new DependencyGraph(root);
     }
 
     /** The root of this dependency graph */
-    private final Dependency<D> root;
+    private final Dependency<?> root;
 
     /** The dependencies of this graph in depth-first-order */
-    private final DependencyList<D> depthFirst;
+    private final DependencyList depthFirst;
 
-    private DependencyGraph(D root)
+    private DependencyGraph(Dependency<?> root)
     {
         this.root = root;
         depthFirst = depthFirst(root);
@@ -36,7 +37,7 @@ public class DependencyGraph<D extends Dependency<D>>
     /**
      * @return The dependencies in this graph in depth-first order
      */
-    public DependencyList<D> depthFirst()
+    public DependencyList depthFirst()
     {
         return depthFirst;
     }
@@ -44,7 +45,7 @@ public class DependencyGraph<D extends Dependency<D>>
     /**
      * @return The root node of this dependency graph
      */
-    public Dependency<D> root()
+    public Dependency<?> root()
     {
         return root;
     }
@@ -52,12 +53,12 @@ public class DependencyGraph<D extends Dependency<D>>
     /**
      * @return List of dependencies in depth-first order
      */
-    private DependencyList<D> depthFirst(D root)
+    private DependencyList depthFirst(Dependency<?> root)
     {
-        DependencyList<D> explored = new DependencyList<>();
+        DependencyList explored = dependencyList();
 
         // Go through each child of the root
-        for (D child : root.dependencies())
+        for (var child : root.dependencies())
         {
             // and explore it (in a depth-first traversal)
             var descendants = depthFirst(child);

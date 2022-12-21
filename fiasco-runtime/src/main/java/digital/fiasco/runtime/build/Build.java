@@ -45,7 +45,7 @@ import digital.fiasco.runtime.build.tools.ToolFactory;
 import digital.fiasco.runtime.build.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.library.Library;
+import digital.fiasco.runtime.dependency.artifact.Library;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -59,7 +59,7 @@ import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.parseArtifactDescriptor;
-import static digital.fiasco.runtime.dependency.library.Library.library;
+import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
 /**
  * Base {@link Application} for Fiasco command-line builds.
@@ -142,7 +142,7 @@ public abstract class Build extends Application implements
     private ObjectList<BuildListener> buildListeners = list(this);
 
     /** Libraries to compile with */
-    private DependencyList<Library> libraries = dependencyList();
+    private DependencyList libraries = dependencyList();
 
     /** The librarian to manage libraries */
     private final Librarian librarian = listenTo(new Librarian(this));
@@ -337,7 +337,7 @@ public abstract class Build extends Application implements
      *
      * @return The libraries to compile against
      */
-    public DependencyList<Library> libraries()
+    public DependencyList libraries()
     {
         return libraries;
     }
@@ -468,7 +468,7 @@ public abstract class Build extends Application implements
         return copy;
     }
 
-    public Build withDependencies(DependencyList<Library> dependencies)
+    public Build withDependencies(DependencyList dependencies)
     {
         var copy = copy();
         copy.libraries = dependencies;

@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.cache;
+package digital.fiasco.runtime.repository.download;
 
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.filesystem.File;
@@ -9,6 +9,8 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactResources;
+import digital.fiasco.runtime.dependency.artifact.Asset;
+import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.BaseRepository;
 
 import java.net.URI;
@@ -35,14 +37,14 @@ import static java.nio.file.StandardOpenOption.APPEND;
  * <p><b>Adding and Removing Artifacts</b></p>
  *
  * <ul>
- *     <li>{@link #add(Artifact, ArtifactResources)} - Adds the given artifact with the given attached resources</li>
+ *     <li>{@link #install(Artifact, ArtifactResources)} - Adds the given artifact with the given attached resources</li>
  *     <li>{@link #clear()} - Removes all data from this repository</li>
  * </ul>
  *
  * @author jonathan
  */
 @SuppressWarnings("unused")
-public class DownloadCacheRepository extends BaseRepository
+public class DownloadRepository extends BaseRepository
 {
     /** True if this cache has been loaded */
     private boolean loaded;
@@ -54,10 +56,37 @@ public class DownloadCacheRepository extends BaseRepository
     private final File contentFile = cacheFile("content.bin");
 
     /** The cached artifact entries */
-    private final ObjectMap<ArtifactDescriptor, Artifact> artifacts = new ObjectMap<>();
+    private final ObjectMap<ArtifactDescriptor, Artifact<?>> artifacts = new ObjectMap<>();
 
     /** Separator to use between artifact entries in the artifacts.txt file */
     private final String ARTIFACT_SEPARATOR = "\n========\n";
+
+    /**
+     * Removes all data from this repository
+     */
+    @Override
+    public synchronized void clear()
+    {
+        artifactsFile.delete();
+        contentFile.delete();
+    }
+
+    /**
+     * Returns the section of the binary resources file containing the given artifact
+     *
+     * @param artifact The artifact, including its offset and size
+     * @param content The artifact content to retrieve
+     * @return The resource section for the artifact's content in content.bin
+     */
+    @Override
+    public synchronized Resource content(Artifact<?> artifact,
+                                         ArtifactContent content,
+                                         String suffix)
+    {
+        var start = content.offset();
+        var end = start + content.size().asBytes();
+        return new ResourceSection(contentFile, start, end);
+    }
 
     /**
      * Adds the given content {@link Resource}s to content.bin, and the {@link Artifact} artifact to artifacts.txt in
@@ -67,15 +96,23 @@ public class DownloadCacheRepository extends BaseRepository
      * @param resources The resources to add to content.bin
      */
     @Override
-    public synchronized boolean add(Artifact artifact, ArtifactResources resources)
+    public synchronized boolean install(Artifact<?> artifact, ArtifactResources resources)
     {
         try
         {
-            // Save resources to artifactsFile and attach cached artifacts to the cache entry.
-            artifact = artifact
-                    .withJar(appendArtifactContent(artifact.jar(), resources.get(JAR_SUFFIX)))
-                    .withJavadoc(appendArtifactContent(artifact.javadoc(), resources.get(JAVADOC_JAR_SUFFIX)))
-                    .withSource(appendArtifactContent(artifact.source(), resources.get(SOURCES_JAR_SUFFIX)));
+            if (artifact instanceof Library library)
+            {
+                // Save resources to artifactsFile and attach cached artifacts to the cache entry.
+                artifact = library
+                        .withJar(appendArtifactContent(library.jar(), resources.get(JAR_SUFFIX)))
+                        .withJavadoc(appendArtifactContent(library.javadoc(), resources.get(JAVADOC_JAR_SUFFIX)))
+                        .withSource(appendArtifactContent(library.source(), resources.get(SOURCES_JAR_SUFFIX)));
+            }
+
+            if (artifact instanceof Asset asset)
+            {
+                artifact = asset.withJar(appendArtifactContent(asset.jar(), resources.get(JAR_SUFFIX)));
+            }
 
             // If the artifact file is missing or empty,
             var path = artifactsFile.asJavaPath();
@@ -97,49 +134,22 @@ public class DownloadCacheRepository extends BaseRepository
     }
 
     /**
-     * Removes all data from this repository
-     */
-    @Override
-    public synchronized void clear()
-    {
-        artifactsFile.delete();
-        contentFile.delete();
-    }
-
-    /**
-     * Returns the section of the binary resources file containing the given artifact
-     *
-     * @param artifact The artifact, including its offset and size
-     * @param content The artifact content to retrieve
-     * @return The resource section for the artifact's content in content.bin
-     */
-    @Override
-    public synchronized Resource content(Artifact artifact,
-                                         ArtifactContent content,
-                                         String suffix)
-    {
-        var start = content.offset();
-        var end = start + content.size().asBytes();
-        return new ResourceSection(contentFile, start, end);
-    }
-
-    @Override
-    public URI location()
-    {
-        return downloadCacheFolder().uri();
-    }
-
-    /**
      * Gets the cache entry for the given artifact descriptor
      *
      * @param descriptor The artifact descriptor
      * @return The cache entry for the descriptor
      */
     @Override
-    public synchronized Artifact resolve(ArtifactDescriptor descriptor)
+    public synchronized Artifact<?> resolve(ArtifactDescriptor descriptor)
     {
         load();
         return artifacts.get(descriptor);
+    }
+
+    @Override
+    public URI uri()
+    {
+        return downloadCacheFolder().uri();
     }
 
     /**

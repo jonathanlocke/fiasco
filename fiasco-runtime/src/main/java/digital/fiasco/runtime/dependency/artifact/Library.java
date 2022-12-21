@@ -5,24 +5,16 @@
 // terms of the license agreement you entered into with Telenav.                                             /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package digital.fiasco.runtime.dependency.library;
+package digital.fiasco.runtime.dependency.artifact;
 
 import com.telenav.kivakit.core.registry.RegistryTrait;
-import com.telenav.kivakit.core.version.Version;
-import com.telenav.kivakit.interfaces.comparison.Filter;
-import com.telenav.kivakit.interfaces.comparison.Matcher;
-import digital.fiasco.runtime.build.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.DependencyList;
-import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
-import static com.telenav.kivakit.core.language.Arrays.arrayContains;
-import static com.telenav.kivakit.core.version.Version.parseVersion;
-import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactType.LIBRARY;
 
 /**
  * A library is an artifact with zero or more excluded artifacts
@@ -30,7 +22,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.arti
  * @author jonathan
  */
 @SuppressWarnings("unused")
-public class Library implements
+public class Library extends BaseArtifact<Library> implements
         Dependency<Library>,
         RegistryTrait
 {
@@ -40,10 +32,10 @@ public class Library implements
      * @param descriptors The library descriptors
      * @return The library dependency list
      */
-    public static DependencyList<Library> libraries(String... descriptors)
+    public static DependencyList libraries(String... descriptors)
     {
         var libraries = stringList(descriptors).map(Library::library);
-        return dependencyList(libraries);
+        return libraries(libraries.asArray(Library.class));
     }
 
     /**
@@ -52,7 +44,7 @@ public class Library implements
      * @param libraries The libraries
      * @return The library dependency list
      */
-    public static DependencyList<Library> libraries(Library... libraries)
+    public static DependencyList libraries(Library... libraries)
     {
         return dependencyList(libraries);
     }
@@ -69,81 +61,72 @@ public class Library implements
     }
 
     /**
+     * Creates a {@link Library} with the given artifact descriptor
+     *
+     * @param artifactDescriptor The artifact descriptor
+     * @return The library
+     */
+    public static Library library(ArtifactDescriptor artifactDescriptor)
+    {
+        return new Library(artifactDescriptor).withType(LIBRARY);
+    }
+
+    /**
      * Creates a library for the given artifact
      *
      * @param artifact The library artifact
      * @return The library
      */
-    public static Library library(Artifact artifact)
+    public static Library library(Artifact<?> artifact)
     {
         return new Library(artifact.descriptor());
     }
 
-    /** This library's artifact */
-    private ArtifactDescriptor descriptor;
+    /** The Javadoc content for this library */
+    private ArtifactContent javadoc;
 
-    /** Dependency exclusions for this artifact */
-    private Filter<ArtifactDescriptor> exclusions = acceptAll();
+    /** The source code for this library */
+    private ArtifactContent source;
 
     protected Library(ArtifactDescriptor descriptor)
     {
-        this.descriptor = descriptor;
+        super(descriptor);
     }
 
     protected Library(Library that)
     {
-        descriptor = that.descriptor;
-        exclusions = that.exclusions;
+        super(that);
+        this.javadoc = that.javadoc;
+        this.source = that.source;
     }
 
+    @Override
     public Library copy()
     {
         return new Library(this);
     }
 
-    @Override
-    public DependencyList<Library> dependencies()
+    public ArtifactContent javadoc()
     {
-        return require(Librarian.class).dependencies(this);
+        return javadoc;
     }
 
-    public ArtifactDescriptor descriptor()
+    public ArtifactContent source()
     {
-        return descriptor;
+        return source;
     }
 
-    public boolean excludes(ArtifactDescriptor descriptor)
-    {
-        return exclusions.accepts(descriptor);
-    }
-
-    public Library excluding(ArtifactDescriptor... exclude)
-    {
-        return excluding(library -> arrayContains(exclude, library));
-    }
-
-    public Library excluding(Matcher<ArtifactDescriptor> pattern)
-    {
-        exclusions = exclusions.exclude(pattern);
-        return this;
-    }
-
-    public Library version(Version version)
+    public Library withJavadoc(ArtifactContent javadoc)
     {
         var copy = copy();
-        copy.descriptor = descriptor.withVersion(version);
+        copy.javadoc = javadoc;
         return copy;
     }
 
-    public Library version(String version)
-    {
-        return version(parseVersion(version));
-    }
-
-    public Library withIdentifier(String identifier)
+    public Library withSource(ArtifactContent source)
     {
         var copy = copy();
-        copy.descriptor = descriptor.withIdentifier(identifier);
+        copy.source = source;
         return copy;
     }
 }

@@ -19,7 +19,7 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactResources;
  * <p><b>Adding and Removing Artifacts</b></p>
  *
  * <ul>
- *     <li>{@link #add(Artifact, ArtifactResources)} - Adds the given artifact with the given attached resources</li>
+ *     <li>{@link #install(Artifact, ArtifactResources)} - Adds the given artifact with the given attached resources</li>
  *     <li>{@link #clear()} - Removes all data from this repository</li>
  * </ul>
  *

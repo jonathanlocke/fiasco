@@ -17,6 +17,7 @@ import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
 
+import java.net.URI;
 import java.util.List;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
@@ -62,7 +63,6 @@ public class MavenResolver extends BaseComponent implements TryTrait
                 .getInstance(RepositorySystem.class);
 
         repositories = list();
-        repositories.add(newRepository("maven-central", "https://repo1.maven.org/maven2/"));
     }
 
     protected MavenResolver(MavenResolver that)
@@ -152,16 +152,16 @@ public class MavenResolver extends BaseComponent implements TryTrait
      * @param uri The repository URI
      * @return The new resolver
      */
-    public MavenResolver withRepository(String name, String uri)
+    public MavenResolver withRepository(MavenRepository repository)
     {
         var copy = copy();
-        copy.repositories.add(newRepository(name, uri));
+        copy.repositories.add(newRepository(repository.name(), repository.uri()));
         return copy;
     }
 
-    private RemoteRepository newRepository(String id, String url)
+    private RemoteRepository newRepository(String id, URI uri)
     {
-        return new RemoteRepository.Builder(id, "default", url).build();
+        return new RemoteRepository.Builder(id, "default", uri.toString()).build();
     }
 
     private MavenRepository repository(String id)

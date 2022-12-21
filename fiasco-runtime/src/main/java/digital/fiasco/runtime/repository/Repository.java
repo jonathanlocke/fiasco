@@ -23,7 +23,7 @@ import java.net.URI;
  * <p><b>Adding and Removing Artifacts</b></p>
  *
  * <ul>
- *     <li>{@link #add(Artifact, ArtifactResources)} - Adds the given artifact with the given attached resources</li>
+ *     <li>{@link #install(Artifact, ArtifactResources)} - Adds the given artifact with the given attached resources</li>
  *     <li>{@link #clear()} - Removes all data from this repository</li>
  * </ul>
  *
@@ -32,15 +32,6 @@ import java.net.URI;
 @SuppressWarnings("unused")
 public interface Repository extends Repeater, Named
 {
-    /**
-     * Adds the given content {@link Resource}s to content.bin, and the {@link Artifact} metadata to metadata.txt in
-     * JSON format.
-     *
-     * @param metadata The cache entry metadata to append to metadata.txt in JSON format
-     * @param resources The resources to add to content.bin
-     */
-    boolean add(Artifact metadata, ArtifactResources resources);
-
     /**
      * Removes all data from this repository
      */
@@ -54,14 +45,16 @@ public interface Repository extends Repeater, Named
      * @param suffix A suffix to add to the resource path
      * @return The resource section for the artifact
      */
-    Resource content(Artifact metadata, ArtifactContent content, String suffix);
+    Resource content(Artifact<?> metadata, ArtifactContent content, String suffix);
 
     /**
-     * Returns the URI of this repository
+     * Adds the given content {@link Resource}s to content.bin, and the {@link Artifact} metadata to metadata.txt in
+     * JSON format.
      *
-     * @return The repository URI
+     * @param metadata The cache entry metadata to append to metadata.txt in JSON format
+     * @param resources The resources to add to content.bin
      */
-    URI location();
+    boolean install(Artifact<?> metadata, ArtifactResources resources);
 
     /**
      * Gets the cache entry for the given artifact descriptor
@@ -69,5 +62,12 @@ public interface Repository extends Repeater, Named
      * @param descriptor The artifact descriptor
      * @return The cache entry for the descriptor
      */
-    Artifact resolve(ArtifactDescriptor descriptor);
+    Artifact<?> resolve(ArtifactDescriptor descriptor);
+
+    /**
+     * Returns the URI of this repository
+     *
+     * @return The repository URI
+     */
+    URI uri();
 }
