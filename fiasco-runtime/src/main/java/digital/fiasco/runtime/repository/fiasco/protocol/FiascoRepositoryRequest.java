@@ -36,7 +36,7 @@ public class FiascoRepositoryRequest
     }
 
     /** The artifacts to retrieve */
-    private final StringList artifacts = stringList();
+    private final StringList descriptors = stringList();
 
     /**
      * Adds an artifact to retrieve
@@ -46,16 +46,26 @@ public class FiascoRepositoryRequest
      */
     public FiascoRepositoryRequest add(ArtifactDescriptor descriptor)
     {
-        artifacts.add(descriptor.name());
+        descriptors.add(descriptor.name());
         return this;
+    }
+
+    /**
+     * Adds the give list of descriptors to this request
+     *
+     * @param descriptors The descriptors to add
+     */
+    public void addAll(ObjectList<ArtifactDescriptor> descriptors)
+    {
+        descriptors.forEach(this::add);
     }
 
     /**
      * Returns the artifact descriptors for this request
      */
-    public ObjectList<ArtifactDescriptor> artifacts()
+    public ObjectList<ArtifactDescriptor> descriptors()
     {
-        return artifacts.map(ArtifactDescriptor::artifactDescriptor);
+        return descriptors.map(ArtifactDescriptor::artifactDescriptor);
     }
 
     /**

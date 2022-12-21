@@ -105,14 +105,14 @@ public class Librarian extends BaseTool
         {
             // resolve the library's descriptor to an artifact,
             var descriptor = resolveArtifactVersion(artifact.descriptor());
-            var resolved = repository.resolve(descriptor);
+            var resolved = repository.resolve(list(descriptor));
             if (resolved != null)
             {
                 // and if it isn't excluded,
-                if (resolved.excludes(resolved.descriptor()))
+                if (resolved.first().excludes(resolved.first().descriptor()))
                 {
                     // add it to the dependencies.
-                    dependencies = dependencies.with(library(resolved));
+                    dependencies = dependencies.with(library(resolved.first()));
                     found = true;
                 }
             }
@@ -135,8 +135,8 @@ public class Librarian extends BaseTool
      */
     public Librarian install(Repository target, Library library, ArtifactAttachments resources)
     {
-        var resolved = target.resolve(library.descriptor());
-        target.install(resolved, resources);
+        var resolved = target.resolve(list(library.descriptor()));
+        target.install(resolved.first(), resources);
         return this;
     }
 
@@ -195,11 +195,11 @@ public class Librarian extends BaseTool
         for (var at : repositories())
         {
             // and if we can resolve the artifact,
-            var resolved = at.resolve(resolveArtifactVersion(descriptor));
+            var resolved = at.resolve(list(resolveArtifactVersion(descriptor)));
             if (resolved != null)
             {
                 // return it as a library.
-                return library(resolved);
+                return library(resolved.first());
             }
         }
 

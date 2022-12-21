@@ -8,7 +8,6 @@ import digital.fiasco.runtime.repository.fiasco.protocol.FiascoRepositoryRespons
 import java.net.URI;
 
 import static digital.fiasco.runtime.repository.fiasco.FiascoServer.FIASCO_PORT;
-import static digital.fiasco.runtime.repository.fiasco.protocol.FiascoRepositoryResponse.responseFromJson;
 
 /**
  * Client that resolves requests to a {@link FiascoRepository} using the Fiasco repository protocol over HTTPS.

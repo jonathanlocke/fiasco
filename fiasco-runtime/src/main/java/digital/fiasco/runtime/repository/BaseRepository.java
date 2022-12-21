@@ -1,10 +1,10 @@
 package digital.fiasco.runtime.repository;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachments;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContentMetadata;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
 
 import java.net.URI;
@@ -23,7 +23,7 @@ import java.util.Objects;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolve(ArtifactDescriptor)} - Gets the {@link Artifact} for the given descriptor</li>
+ *     <li>{@link #resolve(ObjectList)} - Gets the {@link Artifact}s for the given descriptors</li>
  *     <li>{@link #content(Artifact, ArtifactContentMetadata, String)} - Gets the cached resource for the given artifact and content metadata</li>
  * </ul>
  *

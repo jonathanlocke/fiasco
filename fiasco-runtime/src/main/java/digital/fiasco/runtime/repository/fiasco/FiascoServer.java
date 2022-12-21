@@ -16,7 +16,6 @@ import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressRep
 import static com.telenav.kivakit.core.value.count.Maximum._8;
 import static com.telenav.kivakit.resource.CloseMode.LEAVE_OPEN;
 import static com.telenav.kivakit.resource.CopyMode.STREAM;
-import static digital.fiasco.runtime.repository.fiasco.protocol.FiascoRepositoryRequest.requestFromJson;
 
 /**
  * A server application that accepts JSON {@link FiascoRepositoryRequest}s and produces
@@ -57,10 +56,7 @@ public class FiascoServer extends Application
 
                         // compose a response,
                         var response = new FiascoRepositoryResponse();
-                        for (var descriptor : request.artifacts())
-                        {
-                            response.add(repository.resolve(descriptor));
-                        }
+                        response.addAll(repository.resolve(request.descriptors()));
 
                         // push the header to the requester.
                         var printWriter = out.writer().printWriter();

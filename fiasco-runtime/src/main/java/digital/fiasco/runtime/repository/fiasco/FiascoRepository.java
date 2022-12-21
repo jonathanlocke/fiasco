@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.repository.fiasco;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
@@ -12,10 +13,13 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.Asset;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.BaseRepository;
+import digital.fiasco.runtime.repository.fiasco.protocol.FiascoRepositoryRequest;
 
 import java.net.URI;
 import java.nio.file.Files;
 
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.value.count.Bytes.bytes;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachments.JAR_SUFFIX;
@@ -63,7 +67,7 @@ import static java.nio.file.StandardOpenOption.APPEND;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolve(ArtifactDescriptor)} - Gets the {@link Artifact} for the given descriptor</li>
+ *     <li>{@link #resolve(ObjectList)} - Gets the {@link Artifact} for the given descriptor</li>
  *     <li>{@link #content(Artifact, ArtifactContentMetadata, String)} - Gets the cached resource for the given artifact and content metadata</li>
  * </ul>
  *
@@ -86,7 +90,7 @@ public class FiascoRepository extends BaseRepository
     private final String ARTIFACT_SEPARATOR = "\n========\n";
 
     /** The root folder of this repository */
-    private Folder rootFolder;
+    private final Folder rootFolder;
 
     /** The file for storing artifact metadata in JSON format */
     private final File metadataFile = cacheFile("artifacts.txt");
@@ -97,6 +101,14 @@ public class FiascoRepository extends BaseRepository
     public FiascoRepository(String name, Folder rootFolder)
     {
         super(name, rootFolder.uri());
+        this.rootFolder = rootFolder;
+        loadMetadata();
+    }
+
+    public FiascoRepository(String name, URI uri)
+    {
+        super(name, uri);
+        this.rootFolder = null;
         loadMetadata();
     }
 
@@ -111,6 +123,7 @@ public class FiascoRepository extends BaseRepository
     @Override
     public synchronized void clear()
     {
+        ensure(!isRemote(), "Cannot clear a remote repository");
         metadataFile.delete();
         attachmentsFile.delete();
     }
@@ -143,6 +156,8 @@ public class FiascoRepository extends BaseRepository
     @Override
     public synchronized boolean install(Artifact<?> artifact, ArtifactAttachments resources)
     {
+        ensure(!isRemote(), "Cannot install artifacts in a remote repository");
+
         try
         {
             // If the artifact is a library
@@ -186,24 +201,39 @@ public class FiascoRepository extends BaseRepository
     }
 
     /**
-     * Gets the cache entry for the given artifact descriptor
-     *
-     * @param descriptor The artifact descriptor
-     * @return The cache entry for the descriptor
-     */
-    @Override
-    public synchronized Artifact<?> resolve(ArtifactDescriptor descriptor)
-    {
-        return artifacts.get(descriptor);
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
-    public URI uri()
+    public boolean isRemote()
     {
-        return rootFolder.uri();
+        return rootFolder != null;
+    }
+
+    /**
+     * Gets the artifacts for the given artifact descriptors
+     *
+     * @param descriptors The artifact descriptors
+     * @return The artifacts
+     */
+    @Override
+    public synchronized ObjectList<Artifact<?>> resolve(ObjectList<ArtifactDescriptor> descriptors)
+    {
+        ObjectList<Artifact<?>> resolved = list();
+
+        if (isRemote())
+        {
+            var client = new FiascoClient();
+            var request = new FiascoRepositoryRequest();
+            request.addAll(descriptors);
+            var response = client.request(this, request);
+            resolved.addAll(response.artifacts());
+        }
+        else
+        {
+            resolved.addAll(descriptors.map(artifacts::get));
+        }
+
+        return resolved;
     }
 
     /**

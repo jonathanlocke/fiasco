@@ -38,22 +38,17 @@
         </dependency>
         <dependency>
             <groupId>com.telenav.kivakit</groupId>
-            <artifactId>kivakit-network-core</artifactId>
-            <version>${kivakit.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.telenav.kivakit</groupId>
             <artifactId>kivakit-network-http</artifactId>
             <version>${kivakit.version}</version>
         </dependency>
         <dependency>
             <groupId>com.telenav.kivakit</groupId>
-            <artifactId>kivakit-serialization-gson</artifactId>
+            <artifactId>kivakit-network-socket</artifactId>
             <version>${kivakit.version}</version>
         </dependency>
         <dependency>
             <groupId>com.telenav.kivakit</groupId>
-            <artifactId>kivakit-network-socket</artifactId>
+            <artifactId>kivakit-serialization-gson</artifactId>
             <version>${kivakit.version}</version>
         </dependency>
 
@@ -152,6 +147,12 @@
             <groupId>org.apache.httpcomponents</groupId>
             <artifactId>httpclient</artifactId>
             <version>4.5.14</version>
+            <exclusions>
+                <exclusion>
+                    <groupId>commons-codec</groupId>
+                    <artifactId>commons-codec</artifactId>
+                </exclusion>
+            </exclusions>
         </dependency>
 
     </dependencies>
@@ -169,7 +170,6 @@
                         <goals>
                             <goal>shade</goal>
                         </goals>
-
                         <configuration>
                             <finalName>${project.artifactId}-${project.parent.version}</finalName>
                             <minimizeJar>true</minimizeJar>
@@ -182,15 +182,26 @@
                                 <filter>
                                     <artifact>*:*</artifact>
                                     <excludes>
-                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>**/module-info.class</exclude>
+                                        <exclude>project.properties</exclude>
+                                        <exclude>build.properties</exclude>
+                                        <exclude>LICENSE</exclude>
+                                        <exclude>META-INF/versions/9/*</exclude>
                                         <exclude>META-INF/*.DSA</exclude>
                                         <exclude>META-INF/*.RSA</exclude>
-                                        <exclude>META-INF/LICENSE</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/NOTICE.txt</exclude>
                                         <exclude>META-INF/LICENSE.txt</exclude>
+                                        <exclude>META-INF/LICENSE</exclude>
+                                        <exclude>META-INF/DEPENDENCIES</exclude>
+                                        <exclude>META-INF/NOTICE</exclude>
+                                        <exclude>META-INF/maven/**</exclude>
                                     </excludes>
                                 </filter>
                             </filters>
                             <transformers>
+                                <transformer implementation = "org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
                                 <transformer implementation = "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
                                     <manifestEntries>
 

@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.repository.maven;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.network.http.HttpResourceFolder;
@@ -7,7 +8,7 @@ import com.telenav.kivakit.resource.FileName;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.ResourceFolder;
 import com.telenav.kivakit.resource.ResourcePath;
-import digital.fiasco.runtime.dependency.DependencyList;
+import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachments;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContentMetadata;
@@ -20,6 +21,7 @@ import digital.fiasco.runtime.repository.maven.resolver.MavenResolver;
 
 import java.net.URI;
 
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static com.telenav.kivakit.resource.CopyMode.OVERWRITE;
 import static com.telenav.kivakit.resource.FileName.parseFileName;
@@ -45,7 +47,7 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolve(ArtifactDescriptor)} - Gets the {@link Artifact} for the given descriptor</li>
+ *     <li>{@link #resolve(ObjectList)} - Gets the {@link Artifact}s for the given descriptors</li>
  *     <li>{@link #content(Artifact, ArtifactContentMetadata, String)} - Gets the cached resource for the given artifact and content metadata</li>
  * </ul>
  *
@@ -123,38 +125,59 @@ public class MavenRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public Artifact<?> resolve(ArtifactDescriptor descriptor)
+    public boolean isRemote()
     {
-        // Read artifact content,
-        var jar = mavenReadContent(descriptor, JAR_SUFFIX);
-        var javadoc = mavenReadContent(descriptor, JAVADOC_JAR_SUFFIX);
-        var source = mavenReadContent(descriptor, SOURCES_JAR_SUFFIX);
+        return !(root instanceof Folder);
+    }
 
-        // and resolve dependencies for the artifact from remote repositories.
-        var descriptors = mavenResolver.resolveDependencies(descriptor).map(MavenDependency::descriptor);
-        DependencyList dependencies = dependencyList();
-        for (var at : descriptors)
-        {
-            dependencies = dependencies.with(resolve(at));
-        }
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public ObjectList<Artifact<?>> resolve(ObjectList<ArtifactDescriptor> descriptors)
+    {
+        ObjectList<Artifact<?>> resolved = list();
 
-        // If the artifact has source code,
-        if (source != null)
+        // Go through each descriptor,
+        for (var descriptor : descriptors)
         {
-            // return it as a library,
-            return library(descriptor)
-                    .withDependencies(dependencies)
-                    .withJar(jar)
-                    .withJavadoc(javadoc)
-                    .withSource(source);
+            // read any artifact jar attachment (if the repository does not contain the artifact,
+            // the return value assigned to jar will be null),
+            var jar = mavenReadContent(descriptor, JAR_SUFFIX);
+            if (jar != null)
+            {
+                // then read any Javadoc or source code attachments,
+                var javadoc = mavenReadContent(descriptor, JAVADOC_JAR_SUFFIX);
+                var source = mavenReadContent(descriptor, SOURCES_JAR_SUFFIX);
+
+                // and resolve dependencies for the artifact from remote repositories.
+                var dependencyDescriptors = mavenResolver
+                        .resolveDependencies(descriptor)
+                        .map(MavenDependency::descriptor);
+
+                var artifacts = resolve(dependencyDescriptors);
+                var dependencies = dependencyList((Dependency<?>) artifacts);
+
+                // If the artifact has source code,
+                if (source != null)
+                {
+                    // return it as a library,
+                    resolved.add(library(descriptor)
+                            .withDependencies(dependencies)
+                            .withJar(jar)
+                            .withJavadoc(javadoc)
+                            .withSource(source));
+                }
+                else
+                {
+                    // otherwise, return it as an asset.
+                    resolved.add(asset(descriptor)
+                            .withDependencies(dependencies)
+                            .withJar(jar));
+                }
+            }
         }
-        else
-        {
-            // otherwise, return it as an asset.
-            return asset(descriptor)
-                    .withDependencies(dependencies)
-                    .withJar(jar);
-        }
+        return resolved;
     }
 
     /**

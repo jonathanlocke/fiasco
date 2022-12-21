@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.repository;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.resource.Resource;
@@ -16,7 +17,7 @@ import java.net.URI;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolve(ArtifactDescriptor)} - Gets the {@link Artifact} for the given descriptor</li>
+ *     <li>{@link #resolve(ObjectList)} - Gets the {@link Artifact} for the given descriptor</li>
  *     <li>{@link #content(Artifact, ArtifactContentMetadata, String)} - Gets the cached resource for the given artifact and content metadata</li>
  * </ul>
  *
@@ -57,12 +58,17 @@ public interface Repository extends Repeater, Named
     boolean install(Artifact<?> metadata, ArtifactAttachments resources);
 
     /**
+     * Returns true if this is a remote repository
+     */
+    boolean isRemote();
+
+    /**
      * Gets the cache entry for the given artifact descriptor
      *
      * @param descriptor The artifact descriptor
      * @return The cache entry for the descriptor
      */
-    Artifact<?> resolve(ArtifactDescriptor descriptor);
+    ObjectList<Artifact<?>> resolve(ObjectList<ArtifactDescriptor> descriptor);
 
     /**
      * Returns the URI of this repository

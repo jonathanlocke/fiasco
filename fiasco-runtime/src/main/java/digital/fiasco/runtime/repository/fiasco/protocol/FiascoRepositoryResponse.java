@@ -9,6 +9,7 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContentMetadata;
 
 import java.io.InputStream;
+import java.util.Collection;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 
@@ -40,15 +41,25 @@ public class FiascoRepositoryResponse
     private transient final ObjectList<Artifact<?>> artifacts = list();
 
     /**
-     * Adds the given content metadata to this response
+     * Adds the given artifact to this response
      *
-     * @param content The content metadata to add
+     * @param artifact The artifact to add
      */
     public FiascoRepositoryResponse add(Artifact<?> artifact)
     {
         metadata.addAll(artifact.attachments());
         artifacts.add(artifact);
         return this;
+    }
+
+    /**
+     * Adds the given artifacts to this response
+     *
+     * @param artifacts The artifacts to add
+     */
+    public void addAll(Collection<Artifact<?>> artifacts)
+    {
+        artifacts.forEach(this::add);
     }
 
     /**
