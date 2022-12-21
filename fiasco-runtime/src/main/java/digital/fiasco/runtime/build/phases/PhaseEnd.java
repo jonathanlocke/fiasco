@@ -15,7 +15,7 @@ public class PhaseEnd extends Phase
     @Override
     public String description()
     {
-        return "Ends the build";
+        return "ends the build";
     }
 
     @Override

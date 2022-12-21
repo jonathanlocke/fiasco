@@ -43,7 +43,7 @@ public abstract class BaseTool extends BaseRepeater implements Tool
 
     protected boolean describe()
     {
-        return build.describe();
+        return build.dryRun();
     }
 
     protected abstract String description();

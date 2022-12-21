@@ -15,7 +15,7 @@ public class PhaseDeployPackages extends Phase
     @Override
     public String description()
     {
-        return "Deploy packaged artifacts";
+        return "deploys packaged artifacts";
     }
 
     @Override

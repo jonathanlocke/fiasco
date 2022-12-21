@@ -15,7 +15,7 @@ public class PhaseClean extends Phase
     @Override
     public String description()
     {
-        return "Clean targets";
+        return "cleans targets";
     }
 
     @Override

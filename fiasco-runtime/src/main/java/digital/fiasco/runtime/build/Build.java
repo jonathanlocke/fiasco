@@ -37,6 +37,7 @@ import digital.fiasco.runtime.build.phases.PhaseDocument;
 import digital.fiasco.runtime.build.phases.PhaseEnd;
 import digital.fiasco.runtime.build.phases.PhaseInstall;
 import digital.fiasco.runtime.build.phases.PhaseIntegrationTest;
+import digital.fiasco.runtime.build.phases.PhaseList;
 import digital.fiasco.runtime.build.phases.PhasePackage;
 import digital.fiasco.runtime.build.phases.PhasePrepare;
 import digital.fiasco.runtime.build.phases.PhaseStart;
@@ -46,16 +47,14 @@ import digital.fiasco.runtime.build.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.Library;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
-import static com.google.common.base.Strings.repeat;
 import static com.telenav.kivakit.commandline.ArgumentParser.argumentParser;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
-import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
+import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.parseArtifactDescriptor;
@@ -68,8 +67,8 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
  *
  * <p>
  * Build phases are executed in a pre-defined order, as below. Each phase is defined by a class that extends
- * {@link Phase}. Additional phases can be inserted with {@link #addPhaseAfter(String, Phase)} and
- * {@link #addPhaseBefore(String, Phase)}.
+ * {@link Phase}. Additional phases can be inserted into {@link #phases()} with
+ * {@link PhaseList#addPhaseAfter(String, Phase)} and {@link PhaseList#addPhaseBefore(String, Phase)}.
  * </p>
  *
  * <p>
@@ -98,8 +97,9 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
  * <p><b>Examples</b></p>
  *
  * <table>
+ *     <caption>Examples</caption>
  *     <tr>
- *         <td>fiasco</td> <td>&nbsp;&nbsp;</td> </td><td>show help</td>
+ *         <td>fiasco</td> <td>&nbsp;&nbsp;</td> <td>show help</td>
  *     </tr>
  *     <tr>
  *         <td>fiasco clean</td> <td>&nbsp;&nbsp;</td> <td>clean targets</td>
@@ -123,7 +123,8 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
  *
  * @author Jonathan Locke
  */
-@SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused", "SwitchStatementWithTooFewBranches" })
+@SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused", "SwitchStatementWithTooFewBranches",
+        "StringConcatenationInLoop" })
 public abstract class Build extends Application implements
         ToolFactory,
         BuildEnvironment,
@@ -147,11 +148,8 @@ public abstract class Build extends Application implements
     /** The librarian to manage libraries */
     private final Librarian librarian = listenTo(new Librarian(this));
 
-    /** Maps from the name of a phase to the {@link Phase} object */
-    private ObjectMap<String, Phase> nameToPhase = new ObjectMap<>();
-
     /** Phases in order of execution */
-    private ObjectList<Phase> orderedPhases = list();
+    private final PhaseList phases = new PhaseList();
 
     /** Enable state of each phase */
     private ObjectMap<Phase, Boolean> phaseEnabled = new ObjectMap<>();
@@ -160,7 +158,7 @@ public abstract class Build extends Application implements
     private Folder rootFolder = currentFolder();
 
     /** If true, describe the build rather than executing it */
-    private boolean describe = false;
+    private boolean dryRun = false;
 
     protected Build()
     {
@@ -170,7 +168,7 @@ public abstract class Build extends Application implements
 
     protected Build(Build that)
     {
-        copy(that);
+        copyFrom(that);
     }
 
     /**
@@ -193,43 +191,6 @@ public abstract class Build extends Application implements
         buildListeners.add(listener);
     }
 
-    /**
-     * Appends the given phase to the end of the list of phases
-     *
-     * @param phase The phase to add
-     */
-    public void addPhase(Phase phase)
-    {
-        nameToPhase.put(phase.name(), phase);
-        orderedPhases.add(phase);
-    }
-
-    /**
-     * Inserts the given phase after the named phase
-     *
-     * @param name The name of the phase to insert after
-     * @param phase The phase to insert
-     */
-    public void addPhaseAfter(String name, Phase phase)
-    {
-        var at = orderedPhases.indexOf(phase(name));
-        orderedPhases.add(at + 1, phase);
-        nameToPhase.put(phase.name(), phase);
-    }
-
-    /**
-     * Inserts the given phase before the named phase
-     *
-     * @param name The name of the phase to insert before
-     * @param phase The phase to insert
-     */
-    public void addPhaseBefore(String name, Phase phase)
-    {
-        var at = orderedPhases.indexOf(phase(name));
-        orderedPhases.add(at, phase);
-        nameToPhase.put(phase.name(), phase);
-    }
-
     public ArtifactDescriptor artifactDescriptor()
     {
         return artifactDescriptor;
@@ -246,56 +207,49 @@ public abstract class Build extends Application implements
         return buildListeners;
     }
 
-    public void copy(Build that)
+    public Build copy()
+    {
+        var copy = typeForClass(getClass()).newInstance();
+        copy.copyFrom(this);
+        return copy;
+    }
+
+    public void copyFrom(Build that)
     {
         this.artifactDescriptor = that.artifactDescriptor;
         this.metadata = that.metadata;
         this.buildListeners = that.buildListeners.copy();
         this.libraries = that.libraries.copy();
-        this.nameToPhase = that.nameToPhase.copy();
-        this.orderedPhases = that.orderedPhases.copy();
         this.phaseEnabled = that.phaseEnabled.copy();
         this.rootFolder = that.rootFolder;
-        this.describe = that.describe;
+        this.dryRun = that.dryRun;
     }
 
-    public Build copy()
-    {
-        var copy = typeForClass(getClass()).newInstance();
-        copy.copy(this);
-        return copy;
-    }
-
-    public boolean describe()
-    {
-        return describe;
-    }
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public String description()
     {
-        return """
+        var description = """
                 Commands
                                 
-                  command               purpose
+                  command               description
                   -----------           ---------------------------------------------
                   describe              describe the build rather than running it
                                 
-                Phase arguments will be enabled, those preceded by a dash will be disabled.
+                Phases (those preceded by a dash will be disabled)
                             
-                  phase                 purpose
+                  phase                 description
                   -----------           ---------------------------------------------
-                  clean                 cleans targets
-                  prepare               prepares resources and sources
-                  compile               builds sources
-                  test                  runs tests
-                  document              builds documentation
-                  package               creates packages
-                  integration-test      runs integration tests
-                  install               installs packages
-                  deploy-packages       deploys packages
-                  deploy-documentation  deploys documentation
                 """;
+
+        for (var phase : phases)
+        {
+            description += String.format("  %-22s%s\n", phase.name(), phase.description());
+        }
+
+        return description;
     }
 
     /**
@@ -306,6 +260,14 @@ public abstract class Build extends Application implements
     public void disable(Phase phase)
     {
         phaseEnabled.put(phase, false);
+    }
+
+    /**
+     * Returns true if this build should only describe what will be done
+     */
+    public boolean dryRun()
+    {
+        return dryRun;
     }
 
     /**
@@ -342,11 +304,17 @@ public abstract class Build extends Application implements
         return libraries;
     }
 
+    /**
+     * Sets the metadata for this build
+     */
     public void metadata(BuildMetadata metadata)
     {
         this.metadata = metadata;
     }
 
+    /**
+     * Returns the metadata for this build
+     */
     public BuildMetadata metadata()
     {
         if (metadata == null)
@@ -356,9 +324,9 @@ public abstract class Build extends Application implements
         return metadata;
     }
 
-    public Phase phase(String name)
+    public PhaseList phases()
     {
-        return ensureNotNull(nameToPhase.get(name), "Could not find phase: $", name);
+        return phases;
     }
 
     public Build project(String path)
@@ -407,7 +375,7 @@ public abstract class Build extends Application implements
         issues.listenTo(this);
 
         // go through each phase in order,
-        for (var phase : orderedPhases)
+        for (var phase : phases)
         {
             // and if the phase is enabled,
             if (enabled(phase))
@@ -417,13 +385,13 @@ public abstract class Build extends Application implements
                 multicaster.onPhaseStart(phase);
 
                 // run the phase calling all listeners,
-                if (describe)
+                if (dryRun)
                 {
-                    announce(" \n$ $ $", bar("="), phase.name(), bar("="));
+                    announce(" \n$", bannerLine(phase.name()));
                 }
                 else
                 {
-                    announce("$ $ $", bar("="), phase.name(), bar("="));
+                    announce(bannerLine(phase.name()));
                 }
                 phase.run(multicaster);
 
@@ -518,18 +486,18 @@ public abstract class Build extends Application implements
 
     protected final void onInstallPhases()
     {
-        addPhase(new PhaseStart());
-        addPhase(new PhaseClean());
-        addPhase(new PhasePrepare());
-        addPhase(new PhaseCompile());
-        addPhase(new PhaseTest());
-        addPhase(new PhaseDocument());
-        addPhase(new PhasePackage());
-        addPhase(new PhaseIntegrationTest());
-        addPhase(new PhaseInstall());
-        addPhase(new PhaseDeployPackages());
-        addPhase(new PhaseDeployDocumentation());
-        addPhase(new PhaseEnd());
+        phases.add(new PhaseStart());
+        phases.add(new PhaseClean());
+        phases.add(new PhasePrepare());
+        phases.add(new PhaseCompile());
+        phases.add(new PhaseTest());
+        phases.add(new PhaseDocument());
+        phases.add(new PhasePackage());
+        phases.add(new PhaseIntegrationTest());
+        phases.add(new PhaseInstall());
+        phases.add(new PhaseDeployPackages());
+        phases.add(new PhaseDeployDocumentation());
+        phases.add(new PhaseEnd());
 
         enable(phase("start"));
         enable(phase("end"));
@@ -547,7 +515,7 @@ public abstract class Build extends Application implements
 
                 switch (value)
                 {
-                    case "describe" -> describe = true;
+                    case "describe" -> dryRun = true;
 
                     default ->
                     {
@@ -567,14 +535,13 @@ public abstract class Build extends Application implements
         }
     }
 
-    @NotNull
-    private static String bar(String text)
-    {
-        return repeat(text, 8);
-    }
-
     private boolean enabled(Phase phase)
     {
         return phaseEnabled.getOrDefault(phase, false);
+    }
+
+    private Phase phase(final String value)
+    {
+        return phases.phase(value);
     }
 }

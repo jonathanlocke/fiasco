@@ -15,7 +15,7 @@ public class PhaseTest extends Phase
     @Override
     public String description()
     {
-        return "Run unit tests";
+        return "runs unit tests";
     }
 
     @Override

@@ -15,7 +15,7 @@ public class PhaseCompile extends Phase
     @Override
     public String description()
     {
-        return "Build targets";
+        return "compiles targets";
     }
 
     @Override

@@ -15,7 +15,7 @@ public class PhaseInstall extends Phase
     @Override
     public String description()
     {
-        return "Install packaged artifacts";
+        return "installs packaged artifacts";
     }
 
     @Override

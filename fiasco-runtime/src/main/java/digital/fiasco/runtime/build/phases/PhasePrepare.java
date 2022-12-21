@@ -15,7 +15,7 @@ public class PhasePrepare extends Phase
     @Override
     public String description()
     {
-        return "Prepare resources and sources for compilation";
+        return "prepares resources and sources for compilation";
     }
 
     @Override

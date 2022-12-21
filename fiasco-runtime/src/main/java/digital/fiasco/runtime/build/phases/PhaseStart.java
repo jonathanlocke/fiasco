@@ -15,7 +15,7 @@ public class PhaseStart extends Phase
     @Override
     public String description()
     {
-        return "Starts the build";
+        return "starts the build";
     }
 
     @Override

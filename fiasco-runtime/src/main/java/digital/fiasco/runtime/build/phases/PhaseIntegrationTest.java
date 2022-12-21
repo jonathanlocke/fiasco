@@ -15,7 +15,7 @@ public class PhaseIntegrationTest extends Phase
     @Override
     public String description()
     {
-        return "Run integration tests";
+        return "runs integration tests";
     }
 
     @Override

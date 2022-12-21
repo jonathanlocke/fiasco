@@ -15,7 +15,7 @@ public class PhaseDocument extends Phase
     @Override
     public String description()
     {
-        return "Build documentation";
+        return "builds documentation";
     }
 
     @Override

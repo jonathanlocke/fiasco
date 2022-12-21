@@ -15,7 +15,7 @@ public class PhaseDeployDocumentation extends Phase
     @Override
     public String description()
     {
-        return "Deploy documentation";
+        return "deploys documentation";
     }
 
     @Override
