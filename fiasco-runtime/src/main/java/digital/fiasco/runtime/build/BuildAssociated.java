@@ -3,7 +3,7 @@ package digital.fiasco.runtime.build;
 /**
  * An object that has an associated {@link Build}
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 public interface BuildAssociated
 {

@@ -8,10 +8,14 @@
 package digital.fiasco.runtime.build.tools;
 
 import com.telenav.kivakit.core.messaging.Repeater;
+import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.BuildAssociated;
 
 /**
- * Interface for executable tools.
+ * Interface for executable tools. Tools are runnable message repeaters that are associated with a {@link Build} that
+ * can be retrieved with {@link #associatedBuild()}.
+ *
+ * @author Jonathan locke
  */
 public interface Tool extends
         Repeater,

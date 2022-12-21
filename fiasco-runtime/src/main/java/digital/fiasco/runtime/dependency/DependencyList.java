@@ -32,10 +32,19 @@ import static com.telenav.kivakit.core.thread.Threads.shutdownAndAwaitTerminatio
  *     <li>{@link #dependencyList(Collection)} - List factory method</li>
  * </ul>
  *
+ * <p><b>Conversions</b></p>
+ *
+ * <ul>
+ *     <li>{@link #asList()}</li>
+ *     <li>{@link #asSet()}</li>
+ *     <li>{@link #asArtifactList()}</li>
+ * </ul>
+ *
  * <p><b>Functional</b></p>
  *
  * <ul>
- *     <li>{@link #with(Dependency, Dependency[])} - Returns a copy of this list with the given variable-argument dependencies</li>
+ *     <li>{@link #with(Dependency, Dependency[])} - Returns a copy of this list with the given additional dependencies</li>
+ *     <li>{@link #with(DependencyList)} - Returns a copy of this list with the given additional dependencies</li>
  *     <li>{@link #without(Matcher)} - Returns a copy of this list without the given dependencies</li>
  *     <li>{@link #without(Collection) - Returns a copy of this list without the given dependencies}</li>
  * </ul>
@@ -48,7 +57,7 @@ import static com.telenav.kivakit.core.thread.Threads.shutdownAndAwaitTerminatio
  *     <li>{@link #queue()} - Returns a blocking queue containing the dependencies in this list</li>
  * </ul>
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public class DependencyList implements Iterable<Dependency<?>>

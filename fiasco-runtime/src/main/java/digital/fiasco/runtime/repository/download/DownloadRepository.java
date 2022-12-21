@@ -6,9 +6,9 @@ import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.ResourceSection;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
+import digital.fiasco.runtime.dependency.artifact.ArtifactAttachments;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.ArtifactResources;
 import digital.fiasco.runtime.dependency.artifact.Asset;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.BaseRepository;
@@ -16,16 +16,36 @@ import digital.fiasco.runtime.repository.BaseRepository;
 import java.net.URI;
 import java.nio.file.Files;
 
+import static com.telenav.kivakit.core.value.count.Bytes.bytes;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactResources.JAR_SUFFIX;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactResources.JAVADOC_JAR_SUFFIX;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactResources.SOURCES_JAR_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachments.JAR_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachments.JAVADOC_JAR_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachments.SOURCES_JAR_SUFFIX;
+import static java.nio.file.Files.writeString;
 import static java.nio.file.StandardOpenOption.APPEND;
 
 /**
  * A fast cache of downloaded artifacts and their metadata. This cache helps to avoid unnecessary downloads when a user
  * wipes out their repository, causing it to repopulate. Instead of repopulating from Maven Central or another remote
- * repository, the artifacts in this cache can be used.
+ * repository, the artifacts in this cache can be used. Because downloaded artifacts are not mutable in Maven Central
+ * (and should not be mutable in any other repository), it should rarely be necessary to remove the download
+ * repository.
+ *
+ * <p><b>Artifact Storage</b></p>
+ *
+ * <p>
+ * Artifacts are stored in this repository in two separate files, <i>artifacts.txt</i> containing metdata about each
+ * stored artifact, and <i>attachents.binary</i> containing the concatenated binary content of artifact attachments.
+ * Metadata is in text format and separated with <i>========</i> bars. Since the metadata is relatively small, it is
+ * loaded into memory and used to locate {@link ResourceSection}s in the attachment file for each content attachment to
+ * an artifact.
+ * </p>
+ *
+ * <p><b>Properties</b></p>
+ *
+ * <ul>
+ *     <li>{@link #uri()}</li>
+ * </ul>
  *
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
@@ -37,23 +57,20 @@ import static java.nio.file.StandardOpenOption.APPEND;
  * <p><b>Adding and Removing Artifacts</b></p>
  *
  * <ul>
- *     <li>{@link #install(Artifact, ArtifactResources)} - Adds the given artifact with the given attached resources</li>
+ *     <li>{@link #install(Artifact, ArtifactAttachments)} - Adds the given artifact with the given attached resources</li>
  *     <li>{@link #clear()} - Removes all data from this repository</li>
  * </ul>
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public class DownloadRepository extends BaseRepository
 {
-    /** True if this cache has been loaded */
-    private boolean loaded;
-
     /** The file for storing artifact metadata in JSON format */
-    private final File artifactsFile = cacheFile("artifacts.txt");
+    private final File metadataFile = cacheFile("artifacts.txt");
 
     /** The binary file containing artifacts, laid out end-to-end */
-    private final File contentFile = cacheFile("content.bin");
+    private final File attachmentsFile = cacheFile("attachments.binary");
 
     /** The cached artifact entries */
     private final ObjectMap<ArtifactDescriptor, Artifact<?>> artifacts = new ObjectMap<>();
@@ -61,31 +78,37 @@ public class DownloadRepository extends BaseRepository
     /** Separator to use between artifact entries in the artifacts.txt file */
     private final String ARTIFACT_SEPARATOR = "\n========\n";
 
+    public DownloadRepository()
+    {
+        loadMetadata();
+    }
+
     /**
      * Removes all data from this repository
      */
     @Override
     public synchronized void clear()
     {
-        artifactsFile.delete();
-        contentFile.delete();
+        metadataFile.delete();
+        attachmentsFile.delete();
     }
 
     /**
      * Returns the section of the binary resources file containing the given artifact
      *
-     * @param artifact The artifact, including its offset and size
-     * @param content The artifact content to retrieve
+     * @param ignored1 The download repository does not require the artifact
+     * @param content The artifact content, including its offset and size
+     * @param ignored2 The download repository does not require an attachment suffix
      * @return The resource section for the artifact's content in content.bin
      */
     @Override
-    public synchronized Resource content(Artifact<?> artifact,
+    public synchronized Resource content(Artifact<?> ignored1,
                                          ArtifactContent content,
-                                         String suffix)
+                                         String ignored2)
     {
         var start = content.offset();
         var end = start + content.size().asBytes();
-        return new ResourceSection(contentFile, start, end);
+        return new ResourceSection(attachmentsFile, start, end);
     }
 
     /**
@@ -96,34 +119,41 @@ public class DownloadRepository extends BaseRepository
      * @param resources The resources to add to content.bin
      */
     @Override
-    public synchronized boolean install(Artifact<?> artifact, ArtifactResources resources)
+    public synchronized boolean install(Artifact<?> artifact, ArtifactAttachments resources)
     {
         try
         {
+            // If the artifact is a library
             if (artifact instanceof Library library)
             {
-                // Save resources to artifactsFile and attach cached artifacts to the cache entry.
+                // append the binary, source, and Javadoc JARs to the attachments file, and attach
+                // the metadata for each to the library.
                 artifact = library
-                        .withJar(appendArtifactContent(library.jar(), resources.get(JAR_SUFFIX)))
-                        .withJavadoc(appendArtifactContent(library.javadoc(), resources.get(JAVADOC_JAR_SUFFIX)))
-                        .withSource(appendArtifactContent(library.source(), resources.get(SOURCES_JAR_SUFFIX)));
+                        .withJar(appendArtifactContent(library.jar(), resources.attachment(JAR_SUFFIX)))
+                        .withJavadoc(appendArtifactContent(library.javadoc(), resources.attachment(JAVADOC_JAR_SUFFIX)))
+                        .withSource(appendArtifactContent(library.source(), resources.attachment(SOURCES_JAR_SUFFIX)));
             }
 
+            // If the artifact is an asset
             if (artifact instanceof Asset asset)
             {
-                artifact = asset.withJar(appendArtifactContent(asset.jar(), resources.get(JAR_SUFFIX)));
+                // append the asset JAR to the attachments file and attach the metadata to the asset.
+                artifact = asset.withJar(appendArtifactContent(asset.jar(), resources.attachment(JAR_SUFFIX)));
             }
 
+            // Store the artifact in the artifacts map by its descriptor.
+            artifacts.put(artifact.descriptor(), artifact);
+
             // If the artifact file is missing or empty,
-            var path = artifactsFile.asJavaPath();
+            var path = metadataFile.asJavaPath();
             if (!Files.exists(path) || Files.size(path) > 0)
             {
                 // write out a separator to make the file easy to read,
-                Files.writeString(path, ARTIFACT_SEPARATOR);
+                writeString(path, ARTIFACT_SEPARATOR);
             }
 
             // then append the cache entry in JSON to the end of the file.
-            Files.writeString(path, artifact.toJson(), APPEND);
+            writeString(path, artifact.toJson(), APPEND);
             return true;
         }
         catch (Exception e)
@@ -142,10 +172,12 @@ public class DownloadRepository extends BaseRepository
     @Override
     public synchronized Artifact<?> resolve(ArtifactDescriptor descriptor)
     {
-        load();
         return artifacts.get(descriptor);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public URI uri()
     {
@@ -175,7 +207,7 @@ public class DownloadRepository extends BaseRepository
         try
         {
             // Get path to resources file,
-            var path = contentFile.asJavaPath();
+            var path = attachmentsFile.asJavaPath();
 
             // make a note of where we are going to start writing,
             var start = Files.size(path);
@@ -193,7 +225,7 @@ public class DownloadRepository extends BaseRepository
             return artifact
                     .withOffset(start)
                     .withLastModified(lastModified)
-                    .withSize(end - start);
+                    .withSize(bytes(end - start));
         }
         catch (Exception e)
         {
@@ -215,25 +247,21 @@ public class DownloadRepository extends BaseRepository
     }
 
     /**
-     * Loads artifacts.txt into the artifacts map
+     * Loads the metadata in <i>artifacts.txt</i> into the artifacts map
      */
-    private synchronized void load()
+    private synchronized void loadMetadata()
     {
-        if (!loaded)
+        // Read the file,
+        var text = metadataFile.reader().readText();
+
+        // split it into chunks,
+        for (var at : text.split(ARTIFACT_SEPARATOR))
         {
-            // Read the file,
-            var text = artifactsFile.reader().readText();
+            // convert the chunk to a cache entry,
+            var entry = Artifact.fromJson(at);
 
-            // split it into chunks,
-            for (var at : text.split(ARTIFACT_SEPARATOR))
-            {
-                // convert the chunk to a cache entry,
-                var entry = Artifact.fromJson(at);
-
-                // and put the entry into the entries map.
-                artifacts.put(entry.descriptor(), entry);
-            }
-            loaded = true;
+            // and put the entry into the entries map.
+            artifacts.put(entry.descriptor(), entry);
         }
     }
 }

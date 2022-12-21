@@ -19,7 +19,7 @@ import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
 /**
  * Creates a build.txt file in the root of the classes folder containing information about the build.
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public class BuildStamper extends BaseTool implements

@@ -8,6 +8,15 @@ import java.net.URL;
 
 import static com.telenav.kivakit.core.ensure.Ensure.illegalArgument;
 
+/**
+ * A software license for a project
+ *
+ * @param name The name of the license
+ * @param url A URL to the full license text
+ * @param description A description of the license
+ *
+ * @author Jonathan Locke
+ */
 @SuppressWarnings("unused")
 public record License(@FormatProperty String name,
                       @FormatProperty URL url,

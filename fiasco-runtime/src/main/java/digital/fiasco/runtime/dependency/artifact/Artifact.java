@@ -11,7 +11,7 @@ import digital.fiasco.runtime.repository.Repository;
 /**
  * Represents an artifact, either an {@link ArtifactType#ASSET}, or an {@link ArtifactType#LIBRARY}.
  *
- * @author jonathanl (shibo)
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public interface Artifact<A extends Artifact<A>> extends Dependency<A>

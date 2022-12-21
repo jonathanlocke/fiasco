@@ -18,7 +18,17 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactType.ASSET;
 /**
  * An asset is an artifact having only a single JAR containing resource content
  *
- * @author jonathan
+ * <p><b>Creation</b></p>
+ *
+ * <ul>
+ *     <li>{@link #asset(String)} - Returns an asset with the given artifact descriptor</li>
+ *     <li>{@link #asset(Artifact)} - Returns an asset with the given artifact descriptor</li>
+ *     <li>{@link #asset(ArtifactDescriptor)} - Returns an asset with the given artifact descriptor</li>
+ *     <li>{@link #assets(Asset...)} - Returns a {@link DependencyList} with the given assets</li>
+ *     <li>{@link #assets(String...)} - Returns a {@link DependencyList} with assets for each of the given artifact descriptors</li>
+ * </ul>
+ *
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public class Asset extends BaseArtifact<Asset> implements RegistryTrait
@@ -89,6 +99,9 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
         super(that);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public Asset copy()
     {

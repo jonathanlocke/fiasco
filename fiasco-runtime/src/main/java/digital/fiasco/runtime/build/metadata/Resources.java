@@ -5,10 +5,17 @@ import com.telenav.kivakit.core.string.ObjectFormatter;
 
 import java.net.URL;
 
+/**
+ * Locations of project resources
+ *
+ * @param home The project home page
+ * @param issues The issue database for the project
+ * @param sources The location of project source code
+ */
 @SuppressWarnings("unused")
 public record Resources(@FormatProperty URL home,
                         @FormatProperty URL issues,
-                        @FormatProperty URL code)
+                        @FormatProperty URL sources)
 {
     public Resources()
     {
@@ -21,18 +28,18 @@ public record Resources(@FormatProperty URL home,
         return new ObjectFormatter(this).toString();
     }
 
-    public Resources withCode(URL code)
-    {
-        return new Resources(home, issues, code);
-    }
-
     public Resources withHome(URL home)
     {
-        return new Resources(home, issues, code);
+        return new Resources(home, issues, sources);
     }
 
     public Resources withIssues(URL issues)
     {
-        return new Resources(home, issues, code);
+        return new Resources(home, issues, sources);
+    }
+
+    public Resources withSources(URL sources)
+    {
+        return new Resources(home, issues, sources);
     }
 }

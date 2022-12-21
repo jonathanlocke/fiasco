@@ -1,5 +1,10 @@
 package digital.fiasco.runtime.build.metadata;
 
+/**
+ * Roles that can be assumed by {@link Contributor}s to a project. Contributors can have multiple roles on a project.
+ *
+ * @author Jonathan Locke
+ */
 public enum Role
 {
     ORIGINATOR,

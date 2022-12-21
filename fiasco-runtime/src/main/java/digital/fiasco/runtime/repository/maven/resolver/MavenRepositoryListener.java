@@ -4,13 +4,10 @@ import com.telenav.kivakit.component.ComponentMixin;
 import org.eclipse.aether.AbstractRepositoryListener;
 import org.eclipse.aether.RepositoryEvent;
 
-import static digital.fiasco.runtime.repository.maven.resolver.MavenUtilities.artifact;
-import static digital.fiasco.runtime.repository.maven.resolver.MavenUtilities.metadata;
-import static digital.fiasco.runtime.repository.maven.resolver.MavenUtilities.repositoryAndArtifact;
-import static digital.fiasco.runtime.repository.maven.resolver.MavenUtilities.repositoryAndMetadata;
-
 /**
- * A simplistic repository listener that logs events to the console.
+ * A repository listener that broadcasts messages as repository events occur.
+ *
+ * @author Jonathan Locke
  */
 public class MavenRepositoryListener extends AbstractRepositoryListener implements ComponentMixin
 {
@@ -114,5 +111,36 @@ public class MavenRepositoryListener extends AbstractRepositoryListener implemen
     public void metadataResolving(RepositoryEvent event)
     {
         trace("Resolving metadata " + repositoryAndMetadata(event));
+    }
+
+    private String artifact(RepositoryEvent event)
+    {
+        var artifact = event.getArtifact();
+        return artifact.getGroupId()
+                + ":" + artifact.getArtifactId()
+                + ":" + artifact.getVersion();
+    }
+
+    private String metadata(RepositoryEvent event)
+    {
+        var metadata = event.getMetadata();
+        return metadata.getGroupId()
+                + ":" + metadata.getArtifactId()
+                + ":" + metadata.getVersion();
+    }
+
+    private String repository(RepositoryEvent event)
+    {
+        return event.getRepository().getId();
+    }
+
+    private String repositoryAndArtifact(RepositoryEvent event)
+    {
+        return repository(event) + "/" + artifact(event);
+    }
+
+    private String repositoryAndMetadata(RepositoryEvent event)
+    {
+        return metadata(event) + "/" + artifact(event);
     }
 }

@@ -8,7 +8,7 @@ import static com.telenav.kivakit.interfaces.comparison.Matcher.matchAll;
 /**
  * A listener that is called as the build proceeds
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 public interface BuildListener extends
         ToolFactory,

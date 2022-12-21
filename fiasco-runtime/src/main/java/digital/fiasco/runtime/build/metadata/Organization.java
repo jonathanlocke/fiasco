@@ -9,7 +9,7 @@ import java.net.URL;
 /**
  * Model for an organization managing a project
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public record Organization(@FormatProperty String name,

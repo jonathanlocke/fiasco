@@ -15,7 +15,9 @@ import static java.util.Objects.requireNonNull;
 import static org.eclipse.aether.transfer.TransferEvent.RequestType.PUT;
 
 /**
- * A simplistic transfer listener that logs uploads/downloads to the console.
+ * A simple transfer listener that broadcasts messages as transfers proceed.
+ *
+ * @author Jonathan Locke
  */
 public class MavenArtifactTransferListener extends AbstractTransferListener implements ComponentMixin
 {

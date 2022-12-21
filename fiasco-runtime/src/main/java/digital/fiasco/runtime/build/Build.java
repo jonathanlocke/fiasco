@@ -121,7 +121,7 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
  *     </tr>
  * </table>
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 @SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused", "SwitchStatementWithTooFewBranches" })
 public abstract class Build extends Application implements

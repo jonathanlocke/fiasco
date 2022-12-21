@@ -9,7 +9,7 @@ import static com.telenav.kivakit.resource.ResourceGlob.glob;
 /**
  * Information about the folder structure of a build.
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public interface BuildStructure extends BuildAssociated

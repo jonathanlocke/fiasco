@@ -11,7 +11,7 @@ import static digital.fiasco.runtime.dependency.DependencyGraph.dependencyGraph;
  * This structure of a dependency graph is similar to typical project structure where the root module has a set of child
  * modules that must be built and those projects have their own child projects, etc.
  *
- * @author shibo
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public interface Dependency<D extends Dependency<D>> extends Named

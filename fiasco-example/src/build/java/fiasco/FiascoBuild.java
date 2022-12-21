@@ -6,7 +6,7 @@ import digital.fiasco.runtime.build.MultiBuild;
 /**
  * Example Fiasco build.
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 public class FiascoBuild extends MultiBuild implements Libraries
 {

@@ -13,7 +13,7 @@ import static com.telenav.kivakit.interfaces.comparison.Matcher.matchAll;
 /**
  * A compound matcher of {@link ResourcePathed} objects.
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 public class Matchers implements Matcher<ResourcePathed>
 {

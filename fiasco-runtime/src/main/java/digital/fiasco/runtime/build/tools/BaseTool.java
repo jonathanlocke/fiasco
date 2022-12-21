@@ -7,7 +7,7 @@ import digital.fiasco.runtime.build.Build;
 /**
  * Base class for {@link Tool}s.
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public abstract class BaseTool extends BaseRepeater implements Tool

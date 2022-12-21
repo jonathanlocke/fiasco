@@ -15,7 +15,7 @@ import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.ArtifactResources;
+import digital.fiasco.runtime.dependency.artifact.ArtifactAttachments;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.download.DownloadRepository;
@@ -50,7 +50,7 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
  * <p><b>Adding Libraries</b></p>
  *
  * <ul>
- *     <li>{@link #install(Repository, Library, ArtifactResources)} - Adds the given library and its attached content to the given repository</li>
+ *     <li>{@link #install(Repository, Library, ArtifactAttachments)} - Adds the given library and its attached content to the given repository</li>
  * </ul>
  *
  * @author shibo
@@ -132,7 +132,7 @@ public class Librarian extends BaseTool
      * @param library The library to install
      * @param resources The resource jar attachments
      */
-    public Librarian install(Repository target, Library library, ArtifactResources resources)
+    public Librarian install(Repository target, Library library, ArtifactAttachments resources)
     {
         var resolved = target.resolve(library.descriptor());
         target.install(resolved, resources);

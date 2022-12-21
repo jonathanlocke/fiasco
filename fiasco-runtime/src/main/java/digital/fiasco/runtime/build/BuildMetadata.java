@@ -13,6 +13,17 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactType;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.parseArtifactDescriptor;
 
+/**
+ * The metadata for a build.
+ *
+ * @param artifactDescriptor The main artifact produced by the build
+ * @param artifactType The type of artifact that is built
+ * @param organization The organization responsible for the artifact
+ * @param copyright Any copyright
+ * @param license Any license
+ * @param resources Locations of resources for developers
+ * @param contributors The project contributors
+ */
 public record BuildMetadata(@FormatProperty ArtifactDescriptor artifactDescriptor,
                             @FormatProperty ArtifactType artifactType,
                             @FormatProperty Organization organization,

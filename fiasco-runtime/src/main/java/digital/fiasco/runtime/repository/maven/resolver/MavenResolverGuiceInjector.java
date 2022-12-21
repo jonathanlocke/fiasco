@@ -34,14 +34,13 @@ import static java.util.Collections.emptyMap;
  * Javadoc) and adding bits from Maven itself (binding those components that completes repository system).
  */
 @SuppressWarnings("unused")
-public class MavenResolverGuiceModule extends AbstractModule
+public class MavenResolverGuiceInjector extends AbstractModule
 {
     @Override
     protected void configure()
     {
         install(new AetherModule());
 
-        // make module "complete" by binding things not bound by AetherModule
         bind(ArtifactDescriptorReader.class)
                 .to(DefaultArtifactDescriptorReader.class)
                 .in(Singleton.class);

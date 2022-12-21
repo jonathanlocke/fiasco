@@ -6,7 +6,7 @@ import digital.fiasco.runtime.repository.maven.MavenRepository;
 import static com.telenav.kivakit.resource.Uris.uri;
 
 /**
- * @author jonathan
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public interface BuildRepositories

@@ -4,14 +4,14 @@ import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.resource.Resource;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
+import digital.fiasco.runtime.dependency.artifact.ArtifactAttachments;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.ArtifactResources;
 
 import java.net.URI;
 
 /**
- * Interface to a repository that stores libraries
+ * Interface to a repository that stores and resolves artifacts and their content attachments.
  *
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
@@ -23,11 +23,11 @@ import java.net.URI;
  * <p><b>Adding and Removing Artifacts</b></p>
  *
  * <ul>
- *     <li>{@link #install(Artifact, ArtifactResources)} - Adds the given artifact with the given attached resources</li>
+ *     <li>{@link #install(Artifact, ArtifactAttachments)} - Adds the given artifact with the given attached resources</li>
  *     <li>{@link #clear()} - Removes all data from this repository</li>
  * </ul>
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public interface Repository extends Repeater, Named
@@ -54,7 +54,7 @@ public interface Repository extends Repeater, Named
      * @param metadata The cache entry metadata to append to metadata.txt in JSON format
      * @param resources The resources to add to content.bin
      */
-    boolean install(Artifact<?> metadata, ArtifactResources resources);
+    boolean install(Artifact<?> metadata, ArtifactAttachments resources);
 
     /**
      * Gets the cache entry for the given artifact descriptor

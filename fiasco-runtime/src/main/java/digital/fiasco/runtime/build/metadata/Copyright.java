@@ -7,7 +7,7 @@ import com.telenav.kivakit.core.time.Year;
 /**
  * Copyright text
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused" })
 public record Copyright(@FormatProperty String text,

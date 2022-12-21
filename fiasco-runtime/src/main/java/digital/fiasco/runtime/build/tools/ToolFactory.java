@@ -14,7 +14,7 @@ import digital.fiasco.runtime.build.tools.tester.Tester;
 import static com.telenav.kivakit.core.version.Version.version;
 
 /**
- * @author jonathan
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public interface ToolFactory extends

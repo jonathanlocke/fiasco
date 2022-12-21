@@ -5,6 +5,11 @@ import com.telenav.kivakit.filesystem.Folder;
 
 import static com.telenav.kivakit.filesystem.Folders.userHome;
 
+/**
+ * The {@link Project} for Fiasco.
+ *
+ * @author Jonathan locke
+ */
 public class FiascoRuntime extends Project
 {
     /**

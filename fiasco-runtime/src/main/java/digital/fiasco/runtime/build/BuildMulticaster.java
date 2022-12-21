@@ -7,7 +7,7 @@ import digital.fiasco.runtime.build.phases.Phase;
 /**
  * A {@link BuildListener} that calls a list of {@link BuildListener}s
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 public class BuildMulticaster extends BaseComponent implements
         BuildListener,

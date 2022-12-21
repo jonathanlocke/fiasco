@@ -13,7 +13,7 @@ import static com.telenav.kivakit.filesystem.Folder.parseFolder;
 /**
  * Build environment information, such as operating system and hardware information
  *
- * @author jonathanl (shibo)
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public interface BuildEnvironment

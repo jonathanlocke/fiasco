@@ -14,13 +14,12 @@ import org.eclipse.aether.collection.CollectRequest;
 import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
-import org.eclipse.aether.resolution.ArtifactResult;
 import org.eclipse.aether.resolution.DependencyRequest;
 
 import java.net.URI;
-import java.util.List;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.os.Console.console;
 import static com.telenav.kivakit.resource.Urls.url;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
@@ -30,14 +29,35 @@ import static org.eclipse.aether.util.artifact.JavaScopes.COMPILE;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.classpathFilter;
 
 /**
- * Resolves Maven dependencies
+ * Resolves {@link MavenDependency}s for {@link ArtifactDescriptor}s.
+ *
+ * <p><b>Dependency Resolution</b></p>
+ *
+ * <ul>
+ *     <li>{@link #resolveDependencies(String)} - Resolves the Maven dependencies for the given artifact descriptor</li>
+ *     <li>{@link #resolveDependencies(ArtifactDescriptor)} - Resolves the Maven dependencies for the given artifact descriptor</li>
+ * </ul>
+ *
+ * <p><b>Repositories</b></p>
+ *
+ * <ul>
+ *     <li>{@link #withRepository(MavenRepository)} - Returns a copy of this resolver with the given Maven repository added</li>
+ *     <li>{@link #withLocalRepository(LocalRepository)} - Returns a copy of this resolver with the given local Maven repostitory added</li>
+ * </ul>
+ *
+ * @author Jonathan Locke
  */
 public class MavenResolver extends BaseComponent implements TryTrait
 {
     /** The per-thread {@link RepositorySystemSession} object, to maintain thread safety */
-    private static final ThreadLocal<RepositorySystemSession> session = new ThreadLocal<>();
+    private static final ThreadLocal<RepositorySystemSession> threadLocalSession = new ThreadLocal<>();
 
-    public static void main(String[] args)
+    /**
+     * Sanity test entrypoint
+     *
+     * @param arguments Ignored
+     */
+    public static void main(String[] arguments)
     {
         console().println(new MavenResolver()
                 .resolveDependencies("com.telenav.kivakit:kivakit-application:1.9.0")
@@ -56,15 +76,24 @@ public class MavenResolver extends BaseComponent implements TryTrait
             .folder("maven-repository")
             .toString());
 
+    /**
+     * Creates a resolver, using the Guice injector {@link MavenResolverGuiceInjector} to configure the
+     * {@link RepositorySystem}.
+     */
     public MavenResolver()
     {
         system = Guice
-                .createInjector(new MavenResolverGuiceModule())
+                .createInjector(new MavenResolverGuiceInjector())
                 .getInstance(RepositorySystem.class);
 
         repositories = list();
     }
 
+    /**
+     * Creates a copy of the given resolver
+     *
+     * @param that The resolver to copy
+     */
     protected MavenResolver(MavenResolver that)
     {
         this.system = that.system;
@@ -99,7 +128,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
             collectRequest.setRepositories(repositories);
 
             DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, classpathFilter(COMPILE));
-            List<ArtifactResult> artifactResults = system
+            var artifactResults = system
                     .resolveDependencies(session(), dependencyRequest)
                     .getArtifactResults();
 
@@ -148,22 +177,36 @@ public class MavenResolver extends BaseComponent implements TryTrait
     /**
      * Returns a copy of this resolver with the given Maven local respository
      *
-     * @param name The repository name
-     * @param uri The repository URI
+     * @param repository The repository to append
      * @return The new resolver
      */
     public MavenResolver withRepository(MavenRepository repository)
     {
         var copy = copy();
-        copy.repositories.add(newRepository(repository.name(), repository.uri()));
+        var newRepository = newRepository(repository.name(), repository.uri());
+        ensure(!repositories.contains(newRepository), "A repository with the name '$' was already added", repository.name());
+        copy.repositories.add(newRepository);
         return copy;
     }
 
+    /**
+     * Returns a new {@link RemoteRepository} with the given id and location
+     *
+     * @param id The repository identifier
+     * @param uri The repository location
+     * @return The new repository
+     */
     private RemoteRepository newRepository(String id, URI uri)
     {
         return new RemoteRepository.Builder(id, "default", uri.toString()).build();
     }
 
+    /**
+     * Returns the {@link MavenRepository} with the given identifier
+     *
+     * @param id The identifier
+     * @return The repository, or null if a repository with the given identifier cannot be found
+     */
     private MavenRepository repository(String id)
     {
         return tryCatch(() ->
@@ -179,17 +222,29 @@ public class MavenResolver extends BaseComponent implements TryTrait
         });
     }
 
+    /**
+     * Creates a thread-local {@link RepositorySystemSession} using the {@link RepositorySystem} created in the
+     * constructor. It is necessary to maintain one session per thread because the session object is not thread-safe.
+     *
+     * @return An existing or new session for this thread
+     */
     private RepositorySystemSession session()
     {
-        RepositorySystemSession session = MavenResolver.session.get();
+        // Get any thread-local session,
+        var session = MavenResolver.threadLocalSession.get();
+
+        // and if there is none,
         if (session == null)
         {
+            // then create and attach a new session.
             var newSession = MavenRepositorySystemUtils.newSession();
             newSession.setLocalRepositoryManager(system.newLocalRepositoryManager(newSession, localRepository));
             newSession.setTransferListener(new MavenArtifactTransferListener());
             newSession.setRepositoryListener(new MavenRepositoryListener());
-            MavenResolver.session.set(session = newSession);
+            MavenResolver.threadLocalSession.set(session = newSession);
         }
+
+        // Return the session for this thread.
         return session;
     }
 }

@@ -15,7 +15,7 @@ import static com.telenav.kivakit.filesystem.FileList.fileList;
 /**
  * Removes files matching the given pattern from the build output folder
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public class Cleaner extends BaseTool

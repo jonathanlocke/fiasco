@@ -17,7 +17,7 @@ import static digital.fiasco.runtime.build.metadata.Role.ORIGINATOR;
 /**
  * Example Fiasco build.
  *
- * @author jonathan
+ * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused" })
 public class ProjectBuild extends Build
@@ -41,9 +41,10 @@ public class ProjectBuild extends Build
                 .withResources(new Resources()
                         .withHome(url("https://github.com/jonathanlocke/fiasco"))
                         .withIssues(url("https://github.com/jonathanlocke/fiasco/issues"))
-                        .withCode(url("https://github.com/jonathanlocke/fiasco.git")))
+                        .withSources(url("https://github.com/jonathanlocke/fiasco.git")))
                 .withContributors(list(
                         new Contributor("Jonathan Locke")
+                                .withNickname("Shibo")
                                 .withOrganization(jonathanLocke)
                                 .withTimeZone("America/Denver")
                                 .withRoles(ORIGINATOR, ARCHITECT, LEAD_DEVELOPER)
