@@ -1,6 +1,7 @@
 package fiasco;
 
 import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.BuildMetadata;
 import digital.fiasco.runtime.build.metadata.Contributor;
 import digital.fiasco.runtime.build.metadata.Copyright;
 import digital.fiasco.runtime.build.metadata.Organization;
@@ -28,12 +29,12 @@ public class ProjectBuild extends Build
     }
 
     @Override
-    public void onInitialize()
+    public BuildMetadata metadata()
     {
         var jonathanLocke = new Organization("Jonathan Locke")
                 .withUrl(url("https://state-of-the-art.org"));
 
-        metadata(metadata()
+        return new BuildMetadata()
                 .withArtifactDescriptor("digital.fiasco:fiasco-example:1.0")
                 .withLicense(APACHE_LICENSE)
                 .withOrganization(jonathanLocke)
@@ -48,8 +49,12 @@ public class ProjectBuild extends Build
                                 .withOrganization(jonathanLocke)
                                 .withTimeZone("America/Denver")
                                 .withRoles(ORIGINATOR, ARCHITECT, LEAD_DEVELOPER)
-                                .withEmail("jon@thanlocke.com"))));
+                                .withEmail("jon@thanlocke.com")));
+    }
 
+    @Override
+    public void onInitialize()
+    {
         librarian().lookIn(MAVEN_CENTRAL);
     }
 }

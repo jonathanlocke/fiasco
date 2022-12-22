@@ -46,7 +46,6 @@ import digital.fiasco.runtime.build.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.Library;
 
 import java.util.Set;
 
@@ -58,7 +57,6 @@ import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
 import static com.telenav.kivakit.core.string.Paths.pathTail;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
 /**
  * Base {@link Application} for Fiasco command-line builds.
@@ -121,6 +119,75 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
  *     </tr>
  * </table>
  *
+ * <p><b>Execution</b></p>
+ *
+ * <ul>
+ *     <li>{@link #buildProject()}</li>
+ *     <li>{@link #buildProject(Count)}</li>
+ * </ul>
+ *
+ * <p><b>Build Phases</b></p>
+ *
+ * <ul>
+ *     <li>{@link #disable(Phase)}</li>
+ *     <li>{@link #enable(Phase)}</li>
+ *     <li>{@link #enabled(Phase)}</li>
+ *     <li>{@link #phase()}</li>
+ *     <li>{@link #phase(String)}</li>
+ *     <li>{@link #phases()}</li>
+ * </ul>
+ *
+ * <p><b>Dependencies</b></p>
+ *
+ * <ul>
+ *     <li>{@link #dependencies()}</li>
+ *     <li>{@link #requires(DependencyList)}</li>
+ *     <li>{@link #requires(Artifact, Artifact)}</li>
+ *     <li>{@link #withDependencies(DependencyList)}</li>
+ *     <li>{@link #withDependencies(Artifact[])}</li>
+ * </ul>
+ *
+ * <p><b>Build Listeners</b></p>
+ *
+ * <ul>
+ *     <li>{@link #addBuildListener(BuildListener)}</li>
+ *     <li>{@link #buildListeners()}</li>
+ * </ul>
+ *
+ * <p><b>Hierarchy</b></p>
+ *
+ * <ul>
+ *     <li>{@link #childBuild(String)}</li>
+ * </ul>
+ *
+ * <p><b>Functional</b></p>
+ *
+ * <ul>
+ *     <li>{@link #copy()}</li>
+ *     <li>{@link #withArtifactDescriptor(String)}</li>
+ *     <li>{@link #withArtifactDescriptor(ArtifactDescriptor)}</li>
+ *     <li>{@link #withArtifactIdentifier(String)}</li>
+ *     <li>{@link #withChildFolder(String)}</li>
+ *     <li>{@link #withDependencies(Artifact[])}</li>
+ *     <li>{@link #withDependencies(DependencyList)}</li>
+ *     <li>{@link #withRootFolder(Folder)}</li>
+ * </ul>
+ *
+ * <p><b>Properties</b></p>
+ *
+ * <ul>
+ *     <li>{@link #dependencies()}</li>
+ *     <li>{@link #description()}</li>
+ *     <li>{@link #dryRun()}</li>
+ *     <li>{@link #librarian()}</li>
+ *     <li>{@link #metadata()}</li>
+ *     <li>{@link #name()}</li>
+ *     <li>{@link #phases()}</li>
+ *     <li>{@link #rootFolder()}</li>
+ * </ul>
+ *
+ * <p><b>Functional</b></p>
+ *
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused", "SwitchStatementWithTooFewBranches",
@@ -136,17 +203,11 @@ public abstract class Build extends Application implements
     /** The primary artifact being built */
     private ArtifactDescriptor artifactDescriptor;
 
-    /** Metadata about the build */
-    private BuildMetadata metadata;
-
     /** Listeners to call as the build proceeds */
     private ObjectList<BuildListener> buildListeners = list(this);
 
     /** Libraries to compile with */
     private DependencyList dependencies = dependencyList();
-
-    /** The librarian to manage libraries */
-    private final Librarian librarian = listenTo(new Librarian(this));
 
     /** Phases in order of execution */
     private final PhaseList phases = new PhaseList();
@@ -179,21 +240,11 @@ public abstract class Build extends Application implements
     }
 
     /**
-     * Adds the given library to the list of libraries for this build
-     *
-     * @param library The library to add
-     */
-    public void addLibrary(String library)
-    {
-        dependencies = dependencies.with(library(library));
-    }
-
-    /**
      * Adds the given build listener to this build
      *
      * @param listener The listener to call with build events
      */
-    public void addListener(BuildListener listener)
+    public void addBuildListener(BuildListener listener)
     {
         buildListeners.add(listener);
     }
@@ -221,6 +272,62 @@ public abstract class Build extends Application implements
     public ObjectList<BuildListener> buildListeners()
     {
         return buildListeners;
+    }
+
+    /**
+     * Builds with one thread for each processor
+     *
+     * @return True if the build succeeded without any problems
+     */
+    public final boolean buildProject()
+    {
+        return buildProject(processors());
+    }
+
+    /**
+     * Builds with the given number of worker threads
+     *
+     * @return True if the build succeeded without any problems
+     */
+    @SuppressWarnings("unchecked")
+    public final boolean buildProject(Count threads)
+    {
+        // Listen to any problems broadcast by the build,
+        var issues = new MessageList(message -> !message.status().succeeded());
+        issues.listenTo(this);
+
+        // go through each phase in order,
+        for (var phase : phases)
+        {
+            // and if the phase is enabled,
+            if (enabled(phase))
+            {
+                // notify that the phase has started,
+                var multicaster = new BuildMulticaster(this);
+                multicaster.onPhaseStart(phase);
+
+                // run the phase calling all listeners,
+                if (dryRun)
+                {
+                    announce(" \n$", bannerLine(phase.name()));
+                }
+                else
+                {
+                    announce(bannerLine(phase.name()));
+                }
+                phase.run(multicaster);
+
+                // notify that the phase has ended,
+                multicaster.onPhaseEnd(phase);
+            }
+        }
+
+        // then collect statistics and display them,
+        var statistics = issues.statistics(Problem.class, Warning.class, Quibble.class);
+        information(statistics.titledBox("Build Results"));
+
+        // and return true if there are no problems (or worse).
+        return issues.countWorseThanOrEqualTo(Problem.class).isZero();
     }
 
     /**
@@ -252,12 +359,21 @@ public abstract class Build extends Application implements
     public void copyFrom(Build that)
     {
         this.artifactDescriptor = that.artifactDescriptor;
-        this.metadata = that.metadata;
         this.buildListeners = that.buildListeners.copy();
         this.dependencies = that.dependencies.copy();
         this.phaseEnabled = that.phaseEnabled.copy();
         this.rootFolder = that.rootFolder;
         this.dryRun = that.dryRun;
+    }
+
+    /**
+     * The libraries required by this build
+     *
+     * @return The libraries to compile against
+     */
+    public DependencyList dependencies()
+    {
+        return dependencies;
     }
 
     /**
@@ -324,40 +440,16 @@ public abstract class Build extends Application implements
      *
      * @return The librarian
      */
+    @Override
     public Librarian librarian()
     {
         return librarian;
     }
 
     /**
-     * The libraries required by this build
-     *
-     * @return The libraries to compile against
-     */
-    public DependencyList libraries()
-    {
-        return dependencies;
-    }
-
-    /**
-     * Sets the metadata for this build
-     */
-    public void metadata(BuildMetadata metadata)
-    {
-        this.metadata = metadata;
-    }
-
-    /**
      * Returns the metadata for this build
      */
-    public BuildMetadata metadata()
-    {
-        if (metadata == null)
-        {
-            metadata = new BuildMetadata();
-        }
-        return metadata;
-    }
+    public abstract BuildMetadata metadata();
 
     /**
      * Returns the list of phases in execution order for this build
@@ -379,11 +471,23 @@ public abstract class Build extends Application implements
     /**
      * Adds the given artifact to this build's dependencies
      *
-     * @param artifact The artifact to add
+     * @param first The artifact to add
+     * @param rest The rest of the artifacts to add
      */
-    public Build requires(Artifact<?> artifact)
+    public Build requires(Artifact<?> first, Artifact<?> rest)
     {
-        dependencies = dependencies.with(artifact);
+        dependencies = dependencies.with(first, rest);
+        return this;
+    }
+
+    /**
+     * Adds the given dependencies to this build
+     *
+     * @param dependencies The dependencies to add
+     */
+    public Build requires(DependencyList dependencies)
+    {
+        this.dependencies = this.dependencies.with(dependencies);
         return this;
     }
 
@@ -396,61 +500,11 @@ public abstract class Build extends Application implements
     }
 
     /**
-     * Builds with one thread for each processor
+     * Returns a copy of this build with the given main artifact descriptor
      *
-     * @return True if the build succeeded without any problems
+     * @param descriptor The artifact desriptor
+     * @return The copy
      */
-    public final boolean runBuild()
-    {
-        return runBuild(processors());
-    }
-
-    /**
-     * Builds with the given number of worker threads
-     *
-     * @return True if the build succeeded without any problems
-     */
-    @SuppressWarnings("unchecked")
-    public final boolean runBuild(Count threads)
-    {
-        // Listen to any problems broadcast by the build,
-        var issues = new MessageList(message -> !message.status().succeeded());
-        issues.listenTo(this);
-
-        // go through each phase in order,
-        for (var phase : phases)
-        {
-            // and if the phase is enabled,
-            if (enabled(phase))
-            {
-                // notify that the phase has started,
-                var multicaster = new BuildMulticaster(this);
-                multicaster.onPhaseStart(phase);
-
-                // run the phase calling all listeners,
-                if (dryRun)
-                {
-                    announce(" \n$", bannerLine(phase.name()));
-                }
-                else
-                {
-                    announce(bannerLine(phase.name()));
-                }
-                phase.run(multicaster);
-
-                // notify that the phase has ended,
-                multicaster.onPhaseEnd(phase);
-            }
-        }
-
-        // then collect statistics and display them,
-        var statistics = issues.statistics(Problem.class, Warning.class, Quibble.class);
-        information(statistics.titledBox("Build Results"));
-
-        // and return true if there are no problems (or worse).
-        return issues.countWorseThanOrEqualTo(Problem.class).isZero();
-    }
-
     public Build withArtifactDescriptor(ArtifactDescriptor descriptor)
     {
         var copy = copy();
@@ -458,6 +512,12 @@ public abstract class Build extends Application implements
         return copy;
     }
 
+    /**
+     * Returns a copy of this build with the given main artifact descriptor
+     *
+     * @param descriptor The artifact desriptor
+     * @return The copy
+     */
     public Build withArtifactDescriptor(String descriptor)
     {
         var copy = copy();
@@ -465,6 +525,12 @@ public abstract class Build extends Application implements
         return copy;
     }
 
+    /**
+     * Returns a copy of this build with the given main artifact identifier
+     *
+     * @param identifier The artifact identifier
+     * @return The copy
+     */
     public Build withArtifactIdentifier(String identifier)
     {
         var copy = copy();
@@ -472,13 +538,37 @@ public abstract class Build extends Application implements
         return copy;
     }
 
+    /**
+     * Returns a copy of this build with the given child folder
+     *
+     * @param child The name of the child folder
+     * @return The copy
+     */
     public Build withChildFolder(String child)
     {
         var copy = copy();
         copy.rootFolder = rootFolder.folder(child);
         return copy;
+    }    /** The librarian to manage libraries */
+    private final Librarian librarian = listenTo(librarian());
+
+    /**
+     * Returns a copy of this build with the given dependencies
+     *
+     * @param dependencies The dependencies
+     * @return The copy
+     */
+    public Build withDependencies(Artifact<?>... dependencies)
+    {
+        return withDependencies(dependencyList(dependencies));
     }
 
+    /**
+     * Returns a copy of this build with the given dependencies
+     *
+     * @param dependencies The dependencies
+     * @return The copy
+     */
     public Build withDependencies(DependencyList dependencies)
     {
         var copy = copy();
@@ -486,20 +576,12 @@ public abstract class Build extends Application implements
         return copy;
     }
 
-    public Build withDependencies(Library... dependencies)
-    {
-        var copy = copy();
-        copy.dependencies = dependencyList(dependencies);
-        return copy;
-    }
-
-    public Build withMetadata(BuildMetadata metadata)
-    {
-        var copy = copy();
-        copy.metadata = metadata;
-        return copy;
-    }
-
+    /**
+     * Returns a copy of this build with the given root folder
+     *
+     * @param root The new root folder
+     * @return The copy
+     */
     public Build withRootFolder(Folder root)
     {
         var copy = copy();
@@ -551,7 +633,7 @@ public abstract class Build extends Application implements
                 }
             }
 
-            runBuild();
+            buildProject();
         }
     }
 
@@ -598,4 +680,6 @@ public abstract class Build extends Application implements
     {
         return phases.phase(name);
     }
+
+
 }

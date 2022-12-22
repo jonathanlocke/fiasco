@@ -42,8 +42,8 @@ public interface BuildListener extends
 
     default void onCompile()
     {
-        compiler().sources(javaSources()).run();
-        buildStamper().run();
+        compiler().withSources(javaSources()).run();
+        stamper().run();
     }
 
     default void onCompiled()

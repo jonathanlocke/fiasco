@@ -1,6 +1,5 @@
 package digital.fiasco.runtime.build.tools.compiler;
 
-import com.telenav.kivakit.core.string.Formatter;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.FileList;
 import digital.fiasco.runtime.build.Build;
@@ -12,12 +11,41 @@ import javax.tools.JavaFileObject;
 import java.nio.charset.Charset;
 import java.util.Locale;
 
+import static com.telenav.kivakit.core.string.Formatter.format;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
+/**
+ * Compiles one or more files containing Java code.
+ *
+ * <p><b>Properties</b></p>
+ *
+ * <ul>
+ *     <li>{@link #encoding()}</li>
+ *     <li>{@link #sourceLocale()}</li>
+ *     <li>{@link #sourceVersion()}</li>
+ *     <li>{@link #sources()}</li>
+ *     <li>{@link #targetVersion()}</li>
+ * </ul>
+ *
+ * <p><b>Functional</b></p>
+ *
+ * <ul>
+ *     <li>{@link #withEncoding(Charset)}</li>
+ *     <li>{@link #withLocale(Locale)}</li>
+ *     <li>{@link #withSourceVersion(Version)}</li>
+ *     <li>{@link #withSources(FileList)}</li>
+ *     <li>{@link #withTargetVersion(Version)}</li>
+ * </ul>
+ *
+ * @author Jonathan Locke
+ */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
 public class Compiler extends BaseTool
 {
+    /**
+     * Broadcasts compilation errors
+     */
     private class ProblemListener implements DiagnosticListener<JavaFileObject>
     {
         @Override
@@ -32,75 +60,194 @@ public class Compiler extends BaseTool
         }
     }
 
+    /** The Java source code compatibility version */
     private Version sourceVersion;
 
+    /** The Java virtual machine bytecode target version */
     private Version targetVersion;
 
+    /** The source resources to compile */
     private FileList sources;
 
-    private Charset charset = UTF_8;
+    /** The source file encoding */
+    private Charset sourceEncoding = UTF_8;
 
-    private Locale locale = Locale.getDefault();
+    /** The source file locale */
+    private Locale sourceLocale = Locale.getDefault();
 
+    /**
+     * Create a new Java compiler associated with the given build
+     *
+     * @param build The build
+     */
     public Compiler(Build build)
     {
         super(build);
     }
 
-    public Compiler charSet(Charset charset)
+    /**
+     * Creates a copy of the given compiler
+     *
+     * @param that The compiler to copy
+     */
+    public Compiler(Compiler that)
     {
-        this.charset = charset;
+        super(that.associatedBuild());
+        this.sourceVersion = that.sourceVersion;
+        this.targetVersion = that.targetVersion;
+        this.sources = (FileList) that.sources.copy();
+        this.sourceEncoding = that.sourceEncoding;
+        this.sourceLocale = that.sourceLocale;
+    }
+
+    /**
+     * Returns a copy of this compiler tool
+     */
+    public Compiler copy()
+    {
+        return new Compiler(this);
+    }
+
+    /**
+     * Returns the source code encoding
+     */
+    public Charset encoding()
+    {
+        return sourceEncoding;
+    }
+
+    /**
+     * Returns the source code locale
+     */
+    public Locale sourceLocale()
+    {
+        return sourceLocale;
+    }
+
+    /**
+     * Returns the source code version
+     */
+    public Version sourceVersion()
+    {
+        return sourceVersion;
+    }
+
+    /**
+     * Returns the source files to compile
+     */
+    public FileList sources()
+    {
+        return sources;
+    }
+
+    /**
+     * Returns the targeted VM version
+     */
+    public Version targetVersion()
+    {
+        return targetVersion;
+    }
+
+    /**
+     * Returns a copy of this compiler tool with the given source encoding
+     *
+     * @param sourceEncoding The new encoding
+     * @return The new copy of this compiler tool
+     */
+    public Compiler withEncoding(Charset sourceEncoding)
+    {
+        var copy = copy();
+        copy.sourceEncoding = sourceEncoding;
         return this;
     }
 
-    public Compiler locale(Locale locale)
+    /**
+     * Returns a copy of this compiler tool with the given source locale
+     *
+     * @param sourceLocale The new locale
+     * @return The new copy of this compiler tool
+     */
+    public Compiler withLocale(Locale sourceLocale)
     {
-        this.locale = locale;
-        return this;
+        var copy = copy();
+        copy.sourceLocale = sourceLocale;
+        return copy;
     }
 
-    public Compiler sourceVersion(Version version)
+    /**
+     * Returns a copy of this compiler tool with the given source code version
+     *
+     * @param version The new source version
+     * @return The new copy of this compiler tool
+     */
+    public Compiler withSourceVersion(Version version)
     {
-        sourceVersion = version;
-        return this;
+        var copy = copy();
+        copy.sourceVersion = version;
+        return copy;
     }
 
-    public Compiler sources(FileList sources)
+    /**
+     * Returns a copy of this compiler tool with the given source files
+     *
+     * @param sources The sources to compile
+     * @return The new copy of this compiler tool
+     */
+    public Compiler withSources(FileList sources)
     {
-        this.sources = sources;
-        return this;
+        var copy = copy();
+        copy.sources = (FileList) sources.copy();
+        return copy;
     }
 
-    public Compiler targetVersion(Version version)
+    /**
+     * Returns a copy of this compiler tool with the given target JVM version
+     *
+     * @param version The new JVM version
+     * @return The new copy of this compiler tool
+     */
+    public Compiler withTargetVersion(Version version)
     {
-        targetVersion = version;
-        return this;
+        var copy = copy();
+        copy.targetVersion = version;
+        return copy;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String description()
     {
-        return Formatter.format("""
+        return format("""
                 Compiler
                   sources: $
                   source version: $
                   target version: $
-                  charset: $
-                """, sources, sourceVersion, targetVersion, charset);
+                  source encoding: $
+                """, sources, sourceVersion, targetVersion, sourceEncoding);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onRun()
     {
         compile(associatedBuild().javaSources());
     }
 
+    /**
+     * Compiles the given source files
+     *
+     * @param sources The sources to compile
+     */
     private boolean compile(FileList sources)
     {
         information("Compiling");
 
         var compiler = getSystemJavaCompiler();
-        var fileManager = compiler.getStandardFileManager(new ProblemListener(), locale, charset);
+        var fileManager = compiler.getStandardFileManager(new ProblemListener(), sourceLocale, sourceEncoding);
         var files = fileManager.getJavaFileObjectsFromFiles(sources.asJavaFiles());
         return compiler.getTask(null, fileManager, new ProblemListener(), null, null, files).call();
     }
