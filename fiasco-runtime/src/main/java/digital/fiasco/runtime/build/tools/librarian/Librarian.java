@@ -53,7 +53,7 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
  *     <li>{@link #install(Repository, Library, ArtifactAttachments)} - Adds the given library and its attached content to the given repository</li>
  * </ul>
  *
- * @author shibo
+ * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
 public class Librarian extends BaseTool

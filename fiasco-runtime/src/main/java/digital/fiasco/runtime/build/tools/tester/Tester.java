@@ -13,7 +13,7 @@ import digital.fiasco.runtime.build.tools.BaseTool;
 /**
  * Runs unit tests
  *
- * @author shibo
+ * @author Jonathan Locke
  */
 public class Tester extends BaseTool
 {

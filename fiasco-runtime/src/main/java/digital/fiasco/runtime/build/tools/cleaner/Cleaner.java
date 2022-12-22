@@ -48,6 +48,9 @@ public class Cleaner extends BaseTool
         return this;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String description()
     {
@@ -63,6 +66,9 @@ public class Cleaner extends BaseTool
                 """, paths.indented(4).join("\n"));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onRun()
     {

@@ -23,7 +23,7 @@ import static com.telenav.kivakit.resource.ResourceGlob.glob;
 /**
  * Copies selected files from one folder to another.
  *
- * @author shibo
+ * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
 public class Copier extends BaseTool
@@ -32,7 +32,7 @@ public class Copier extends BaseTool
     private Folder to;
 
     /** The folder to copy from */
-    private Folder from;
+    private Folder source;
 
     /** Pattern matching files to include */
     private Matcher<ResourcePathed> includes;
@@ -43,68 +43,98 @@ public class Copier extends BaseTool
     /** Progress in copying files */
     private final ProgressReporter progress = progressReporter(this, "files");
 
+    /** The type of traversal to use when copying */
     private Traversal traversal;
 
+    /**
+     * Creates a copier associated with the given build
+     *
+     * @param build The build
+     */
     public Copier(Build build)
     {
         super(build);
     }
 
+    /**
+     * Creates a copy of the given copier
+     *
+     * @param that The copier to copy
+     */
     public Copier(Copier that)
     {
         super(that.associatedBuild());
         this.to = that.to;
-        this.from = that.from;
+        this.source = that.source;
         this.includes = that.includes;
         this.excludes = that.excludes;
         this.traversal = that.traversal;
     }
 
+    /**
+     * Returns a copy of this copier
+     */
     public Copier copy()
     {
         return new Copier(this);
     }
 
-    public Copier excluding(String glob)
-    {
-        var copy = copy();
-        copy.excludes = glob(glob);
-        return copy;
-    }
-
-    public Copier excluding(Matcher<ResourcePathed> matcher)
-    {
-        var copy = copy();
-        copy.excludes = (Matcher<ResourcePathed>) excludes.or(matcher);
-        return copy;
-    }
-
-    public Copier including(Matcher<ResourcePathed> matcher)
+    /**
+     * Returns a copy of this copier that includes resources matching the given matcher
+     *
+     * @param matcher The matcher
+     * @return The new copier
+     */
+    public Copier with(Matcher<ResourcePathed> matcher)
     {
         var copy = copy();
         copy.includes = (Matcher<ResourcePathed>) includes.and(matcher);
         return copy;
     }
 
-    public Copier including(String glob)
+    /**
+     * Returns a copy of this copier that includes resources matching the given glob
+     *
+     * @param glob The glob pattern
+     * @return The new copier
+     */
+    public Copier with(String glob)
     {
-        return including(glob(glob));
+        return with(glob(glob));
     }
 
-    public Copier withFrom(Folder from)
+    /**
+     * Returns a copy of this copier with the given source folder
+     *
+     * @param source The source folder
+     * @return The new copier
+     */
+    public Copier withSource(Folder source)
     {
         var copy = copy();
-        copy.from = from;
+        copy.source = source;
         return copy;
     }
 
-    public Copier withTo(Folder to)
+    /**
+     * Returns a copy of this copier with the given target folder
+     *
+     * @param target The target folder
+     * @return The new copier
+     */
+    public Copier withTarget(Folder target)
     {
         var copy = copy();
-        copy.to = to;
+        copy.to = target;
         return copy;
     }
 
+    /**
+     * Returns a copy of this copier with the given traversal style
+     *
+     * @param traversal The traversal to use when copying recursively
+     * @return The new copier
+     */
     public Copier withTraversal(Traversal traversal)
     {
         var copy = copy();
@@ -112,6 +142,35 @@ public class Copier extends BaseTool
         return copy;
     }
 
+    /**
+     * Returns a copy of this copier that excludes the resources matching the given matcher
+     *
+     * @param matcher The matcher
+     * @return The new copier
+     */
+    public Copier without(Matcher<ResourcePathed> matcher)
+    {
+        var copy = copy();
+        copy.excludes = (Matcher<ResourcePathed>) excludes.or(matcher);
+        return copy;
+    }
+
+    /**
+     * Returns a copy of this copier that excludes the resources matching the given glob pattern
+     *
+     * @param glob The glob pattern
+     * @return The new copier
+     */
+    public Copier without(String glob)
+    {
+        var copy = copy();
+        copy.excludes = glob(glob);
+        return copy;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String description()
     {
@@ -121,25 +180,28 @@ public class Copier extends BaseTool
                   to: $
                   includes: $
                   excludes: $
-                """, from, to, includes, excludes);
+                """, source, to, includes, excludes);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onRun()
     {
         information("Copying from $ to $",
-                from.relativeTo(rootFolder()),
+                source.relativeTo(rootFolder()),
                 to.relativeTo(rootFolder()));
 
         // For each source file in the 'from' folder that matches,
-        var files = from.files(file -> (includes == null || includes.matches(file))
+        var files = source.files(file -> (includes == null || includes.matches(file))
                 && (excludes == null || !excludes.matches(file)), traversal);
         progress.steps(files.count());
         progress.start("Copying " + files.size() + " files");
         for (var source : files)
         {
             // find the path relative to the root,
-            var relative = source.relativeTo(from);
+            var relative = source.relativeTo(this.source);
 
             // construct a file with the same path relative to the 'to' folder,
             var destination = to.file(relative);

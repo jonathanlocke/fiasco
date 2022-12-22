@@ -17,7 +17,31 @@ import static com.telenav.kivakit.core.time.Time.now;
 import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
 
 /**
- * Creates a build.txt file in the root of the classes folder containing information about the build.
+ * Creates files in the root of the classes folder containing information about the project and the build. Both project
+ * properties and build properties files are prefixed with the application or project name to ensure that these files
+ * don't conflict in shaded JARs.
+ *
+ * <p><b>Build Properties</b></p>
+ *
+ * <p>Build properties files contain content similar to this:</p>
+ *
+ * <pre>
+ * build-date = 2022.12.21
+ * build-name = happy mouse
+ * build-number = 746
+ * commit-long-hash = 1bb7eba5cc7527e76950d6edbed931bbadb16dd6
+ * commit-timestamp = 2022-12-21T22:10:26Z[GMT]
+ * no-local-modifications = false</pre>
+ *
+ * <p><b>Project Properties</b></p>
+ *
+ * <p>Project properties files look similar to this:</p>
+ *
+ * <pre>
+ * project-name=fiasco-runtime
+ * project-version=0.9.0
+ * project-group-id=digital.fiasco
+ * project-artifact-id=fiasco-runtime</pre>
  *
  * @author Jonathan Locke
  */
@@ -26,11 +50,19 @@ public class BuildStamper extends BaseTool implements
         BuildStructure,
         ToolFactory
 {
+    /**
+     * Creates a build stamper associated with this build
+     *
+     * @param build The build
+     */
     public BuildStamper(Build build)
     {
         super(build);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected String description()
     {
@@ -45,6 +77,9 @@ public class BuildStamper extends BaseTool implements
                 buildProperties().indented(4));
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onRun()
     {
@@ -59,11 +94,17 @@ public class BuildStamper extends BaseTool implements
                 .saveText(buildProperties().join("\n"));
     }
 
+    /**
+     * Returns the artifact descriptor for the build that this tool is associated with
+     */
     private ArtifactDescriptor artifact()
     {
         return associatedBuild().artifactDescriptor();
     }
 
+    /**
+     * Returns build properties as a {@link StringList}
+     */
     private StringList buildProperties()
     {
         var git = git();
@@ -84,6 +125,9 @@ public class BuildStamper extends BaseTool implements
                 "build.commit.time = " + commitTime);
     }
 
+    /**
+     * Returns project properties as a {@link StringList}
+     */
     private StringList projectProperties()
     {
         return stringList("artifact.group = " + artifact().group(),

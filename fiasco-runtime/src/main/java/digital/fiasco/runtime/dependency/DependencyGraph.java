@@ -9,7 +9,7 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
  * Graph of dependencies created by traversing dependencies from a root. If the dependency graph is cyclic, terminal
  * failure will be reported via validation.
  *
- * @author shibo
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public class DependencyGraph
