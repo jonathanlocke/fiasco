@@ -9,6 +9,7 @@ import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 
 import java.io.InputStream;
+import java.util.Collection;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 
@@ -69,7 +70,7 @@ public class FiascoRepositoryRequest
      *
      * @param descriptors The descriptors to add
      */
-    public void addAll(ObjectList<ArtifactDescriptor> descriptors)
+    public void addAll(Collection<ArtifactDescriptor> descriptors)
     {
         descriptors.forEach(this::add);
     }

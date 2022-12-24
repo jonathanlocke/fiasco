@@ -1,13 +1,13 @@
 package digital.fiasco.runtime.build.tools.cleaner;
 
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.filesystem.File;
+import com.telenav.kivakit.filesystem.FileList;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
 
+import java.util.Collection;
 import java.util.List;
 
-import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.filesystem.FileList.fileList;
@@ -21,7 +21,7 @@ import static com.telenav.kivakit.filesystem.FileList.fileList;
 public class Cleaner extends BaseTool
 {
     /** The files to be removed */
-    private ObjectList<File> files = list();
+    private FileList files;
 
     public Cleaner(Build build)
     {
@@ -33,6 +33,19 @@ public class Cleaner extends BaseTool
         var copy = new Cleaner(associatedBuild());
         copy.files = files.copy();
         return copy;
+    }
+
+    /**
+     * Records the list of files to remove
+     *
+     * @param files The files to remove
+     * @return This for chaining
+     */
+    public Cleaner withAdditionalFiles(Collection<File> files)
+    {
+        var copy = copy();
+        this.files = fileList(this.files).with(files);
+        return this;
     }
 
     /**

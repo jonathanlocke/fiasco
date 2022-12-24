@@ -13,6 +13,8 @@ import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collection;
+
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
@@ -47,7 +49,7 @@ import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJs
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(ObjectList)} - Gets the {@link Artifact} for the given descriptor</li>
+ *     <li>{@link #resolveArtifacts(Collection)} - Gets the {@link Artifact} for the given descriptor</li>
  * </ul>
  *
  * <p><b>Adding and Removing Artifacts</b></p>
@@ -145,7 +147,7 @@ public class LocalFiascoRepository extends BaseRepository
      * @return The artifacts
      */
     @Override
-    public ObjectList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
+    public ObjectList<Artifact<?>> resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
     {
         return lock().read(() ->
         {
@@ -175,19 +177,6 @@ public class LocalFiascoRepository extends BaseRepository
         return rootFolder;
     }
 
-
-
-    /**
-     * Returns a cache file for the given name
-     *
-     * @param name The name of the file
-     * @return The file
-     */
-    protected File cacheFile(String name)
-    {
-        return ensureNotNull(rootFolder).file(name);
-    }
-
     /**
      * Adds artifact metadata to metadata.txt file
      *
@@ -206,6 +195,17 @@ public class LocalFiascoRepository extends BaseRepository
 
         // then append the JSON to the metadata file.
         new StringResource(text).copyTo(metadataFile, APPEND);
+    }
+
+    /**
+     * Returns a cache file for the given name
+     *
+     * @param name The name of the file
+     * @return The file
+     */
+    protected File cacheFile(String name)
+    {
+        return ensureNotNull(rootFolder).file(name);
     }
 
     private File attachmentFile(@NotNull ArtifactAttachment attachment)

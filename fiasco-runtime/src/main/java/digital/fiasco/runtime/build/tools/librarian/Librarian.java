@@ -21,9 +21,10 @@ import digital.fiasco.runtime.repository.fiasco.CacheFiascoRepository;
 import digital.fiasco.runtime.repository.fiasco.LocalFiascoRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
 
+import java.util.Collection;
+
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
-import static com.telenav.kivakit.core.ensure.Ensure.illegalArgument;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.string.Formatter.format;
@@ -166,6 +167,31 @@ public class Librarian extends BaseTool
      * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
      * descriptor will be assigned the version.
      *
+     * @param artifact The group and artifact identifier (which can be lacking a version)
+     * @param version The version to enforce for the descriptor
+     */
+    public void pinVersion(Artifact<?> artifact, Version version)
+    {
+        var descriptor = artifact.descriptor();
+        pinnedVersions.put(descriptor, version);
+    }
+
+    /**
+     * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
+     * descriptor will be assigned the version.
+     *
+     * @param artifact The artifact to pin
+     * @param version The version to enforce for the descriptor
+     */
+    public void pinVersion(Artifact<?> artifact, String version)
+    {
+        pinVersion(artifact.descriptor(), version(version));
+    }
+
+    /**
+     * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
+     * descriptor will be assigned the version.
+     *
      * @param descriptor The group and artifact identifier (but without a version)
      * @param version The version to enforce for the descriptor
      */
@@ -188,22 +214,27 @@ public class Librarian extends BaseTool
      * @param descriptor The descriptor
      * @return The library
      */
-    public Library resolve(ArtifactDescriptor descriptor)
+    public Artifact<?> resolve(ArtifactDescriptor descriptor)
+    {
+        return resolve(list(descriptor)).first();
+    }
+
+    /**
+     * Resolves the given artifact descriptor to a library
+     *
+     * @param descriptors The descriptor
+     * @return The library
+     */
+    public ObjectList<Artifact<?>> resolve(Collection<ArtifactDescriptor> descriptors)
     {
         // Go through each repository,
+        ObjectList<Artifact<?>> artifacts = list();
         for (var at : repositories())
         {
             // and if we can resolve the artifact,
-            var resolved = at.resolveArtifacts(list(resolveArtifactVersion(descriptor)));
-            if (resolved != null)
-            {
-                // return it as a library.
-                return library(resolved.first());
-            }
+            artifacts.addAll(at.resolveArtifacts(descriptors));
         }
-
-        // Cannot resolve the descriptor
-        return illegalArgument("Cannot resolve: " + descriptor);
+        return artifacts;
     }
 
     /**

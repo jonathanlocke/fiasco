@@ -45,8 +45,8 @@ public interface ToolFactory extends
     {
         return new Compiler(associatedBuild())
                 .withSources(associatedBuild().javaSources())
-                .withSourceVersion(version("17"))
-                .withTargetVersion(version("17"));
+                .withSourceVersion(version(17))
+                .withTargetVersion(version(17));
     }
 
     /**

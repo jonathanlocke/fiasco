@@ -136,13 +136,13 @@ public interface BuildListener extends
 
     default void onPrepareResources()
     {
-        copier().withSource(mainResourceFolder())
-                .withTarget(classesFolder())
+        copier().withSourceFolder(mainResourceFolder())
+                .withTargetFolder(classesFolder())
                 .with("**/*")
                 .run();
 
-        copier().withSource(testResourceFolder())
-                .withTarget(testClassesFolder())
+        copier().withSourceFolder(testResourceFolder())
+                .withTargetFolder(testClassesFolder())
                 .with("**/*")
                 .run();
     }

@@ -8,6 +8,7 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 
 import java.net.URI;
+import java.util.Collection;
 
 /**
  * Interface to a repository that stores and resolves artifacts and their content attachments.
@@ -15,7 +16,7 @@ import java.net.URI;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(ObjectList)} - Resolves a list of descriptors into a list of {@link Artifact}s, including content attachments</li>
+ *     <li>{@link #resolveArtifacts(Collection)} - Resolves a list of descriptors into a list of {@link Artifact}s, including content attachments</li>
  * </ul>
  *
  * <p><b>Adding and Removing Artifacts</b></p>
@@ -58,7 +59,7 @@ public interface Repository extends Repeater, Named
      * @return The resolved artifacts
      * @throws IllegalArgumentException Thrown if any descriptor cannot be resolved
      */
-    ObjectList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors);
+    ObjectList<Artifact<?>> resolveArtifacts(Collection<ArtifactDescriptor> descriptors);
 
     /**
      * Returns the URI of this repository

@@ -227,7 +227,9 @@ public abstract class Build extends Application implements
     protected Build()
     {
         installDefaultPhases();
-    }
+        addBuildListener(this);
+    }    /** The librarian to manage libraries */
+    private final Librarian librarian = listenTo(librarian());
 
     /**
      * Creates a copy of the given build
@@ -474,7 +476,7 @@ public abstract class Build extends Application implements
      * @param first The artifact to add
      * @param rest The rest of the artifacts to add
      */
-    public Build requires(Artifact<?> first, Artifact<?> rest)
+    public Build requires(Artifact<?> first, Artifact<?>... rest)
     {
         dependencies = dependencies.with(first, rest);
         return this;
@@ -549,8 +551,7 @@ public abstract class Build extends Application implements
         var copy = copy();
         copy.rootFolder = rootFolder.folder(child);
         return copy;
-    }    /** The librarian to manage libraries */
-    private final Librarian librarian = listenTo(librarian());
+    }
 
     /**
      * Returns a copy of this build with the given dependencies

@@ -10,6 +10,8 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 
+import java.util.Collection;
+
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.resource.WriteMode.APPEND;
@@ -35,7 +37,7 @@ import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(ObjectList)} - Gets the {@link Artifact} for the given descriptor, including its content attachments</li>
+ *     <li>{@link #resolveArtifacts(Collection)} - Gets the {@link Artifact} for the given descriptor, including its content attachments</li>
  * </ul>
  *
  * <p><b>Adding and Removing Artifacts</b></p>
@@ -64,8 +66,8 @@ public class CacheFiascoRepository extends LocalFiascoRepository
     }
 
     /**
-     * Adds the given content to the attachments file, and the {@link Artifact} metadata to
-     * artifacts.txt in JSON format.
+     * Adds the given content to the attachments file, and the {@link Artifact} metadata to artifacts.txt in JSON
+     * format.
      *
      * @param artifact The artifact to install
      */
@@ -99,7 +101,7 @@ public class CacheFiascoRepository extends LocalFiascoRepository
      * @return The artifacts
      */
     @Override
-    public ObjectList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
+    public ObjectList<Artifact<?>> resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
     {
         return lock().read(() ->
         {

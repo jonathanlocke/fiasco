@@ -21,11 +21,11 @@ import static digital.fiasco.runtime.build.metadata.Role.ORIGINATOR;
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused" })
-public class ProjectBuild extends Build
+public class BaseProjectBuild extends Build
 {
     public static void main(String[] arguments)
     {
-        run(ProjectBuild.class, arguments);
+        run(BaseProjectBuild.class, arguments);
     }
 
     @Override

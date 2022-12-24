@@ -1,43 +1,29 @@
 package fiasco;
 
 import digital.fiasco.libraries.Libraries;
-import digital.fiasco.runtime.build.MultiBuild;
+import digital.fiasco.runtime.build.BuildListener;
 
 /**
  * Example Fiasco build.
  *
  * @author Jonathan Locke
  */
-public class FiascoBuild extends MultiBuild implements Libraries
+public class FiascoBuild extends BaseProjectBuild implements
+        Libraries,
+        BuildListener
 {
     public static void main(String[] arguments)
     {
-        new FiascoBuild().arguments(arguments).run(arguments);
+        new FiascoBuild().run(arguments);
     }
 
-    final String version_kivakit = "1.9.0";
-
-    final String version_kryo = "4.3.1";
-
     @Override
-    protected void onInitialize()
+    public void onInitialize()
     {
-        var build = new ProjectBuild();
+        requires(apache_ant,
+                apache_commons_logging.version("1.9.0"),
+                kryo.version("4.3.1"));
 
-        build.librarian().pinVersion("org.apache.commons:logging", "1.0.3");
-
-        addBuild(build
-                .childBuild("example1")
-                .withDependencies(
-                        apache_commons_logging,
-                        kryo.version(version_kryo)
-                ));
-
-        addBuild(build
-                .childBuild("example2")
-                .withDependencies(
-                        kivakit_application.version(version_kivakit),
-                        kivakit_network_core.version(version_kivakit)
-                ));
+        librarian().pinVersion(apache_ant, "1.0.3");
     }
 }

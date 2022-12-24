@@ -109,7 +109,7 @@ public class Copier extends BaseTool
      * @param source The source folder
      * @return The new copier
      */
-    public Copier withSource(Folder source)
+    public Copier withSourceFolder(Folder source)
     {
         var copy = copy();
         copy.source = source;
@@ -122,7 +122,7 @@ public class Copier extends BaseTool
      * @param target The target folder
      * @return The new copier
      */
-    public Copier withTarget(Folder target)
+    public Copier withTargetFolder(Folder target)
     {
         var copy = copy();
         copy.to = target;

@@ -1,6 +1,5 @@
 package digital.fiasco.runtime.repository;
 
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.core.thread.locks.ReadWriteLock;
@@ -73,7 +72,7 @@ import java.util.Objects;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(ObjectList)} - Gets the {@link Artifact} for the given descriptor, including content attachments</li>
+ *     <li>{@link #resolveArtifacts(Collection)} - Gets the {@link Artifact} for the given descriptor, including content attachments</li>
  * </ul>
  *
  * <p><b>Adding and Removing Artifacts</b></p>

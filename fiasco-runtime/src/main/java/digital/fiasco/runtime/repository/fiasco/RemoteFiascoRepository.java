@@ -10,6 +10,7 @@ import digital.fiasco.runtime.repository.fiasco.server.FiascoRepositoryRequest;
 import digital.fiasco.runtime.repository.fiasco.server.FiascoServer;
 
 import java.net.URI;
+import java.util.Collection;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
@@ -27,7 +28,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(ObjectList)} - Gets the {@link Artifact} for the given descriptor</li>
+ *     <li>{@link #resolveArtifacts(Collection)} - Gets the {@link Artifact} for the given descriptor</li>
  * </ul>
  *
  * <p><b>Adding and Removing Artifacts</b></p>
@@ -76,7 +77,7 @@ public class RemoteFiascoRepository extends BaseRepository
      * @return The artifacts
      */
     @Override
-    public synchronized ObjectList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
+    public synchronized ObjectList<Artifact<?>> resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
     {
         // Create list of resolved artifacts,
         ObjectList<Artifact<?>> resolved = list();

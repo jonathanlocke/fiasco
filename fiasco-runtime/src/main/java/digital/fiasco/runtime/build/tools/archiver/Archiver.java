@@ -5,6 +5,9 @@ import com.telenav.kivakit.filesystem.FileList;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
 
+import java.util.Collection;
+
+import static com.telenav.kivakit.filesystem.FileList.fileList;
 import static com.telenav.kivakit.resource.compression.archive.ZipArchive.AccessMode.WRITE;
 import static com.telenav.kivakit.resource.compression.archive.ZipArchive.zipArchive;
 
@@ -13,7 +16,7 @@ import static com.telenav.kivakit.resource.compression.archive.ZipArchive.zipArc
  *
  * @author Jonathan Locke
  */
-public class Archiver extends BaseTool
+@SuppressWarnings("unused") public class Archiver extends BaseTool
 {
     /** The files to archive */
     private FileList files;
@@ -39,7 +42,7 @@ public class Archiver extends BaseTool
     public Archiver(Archiver that)
     {
         super(that.associatedBuild());
-        this.files = (FileList) that.files.copy();
+        this.files = that.files.copy();
         this.archiveFile = that.archiveFile;
     }
 
@@ -49,6 +52,19 @@ public class Archiver extends BaseTool
     public Archiver copy()
     {
         return new Archiver(this);
+    }
+
+    /**
+     * Returns a copy of this archiver with the given files
+     *
+     * @param files The files to add to the archive
+     * @return A copy of this archive with the given files
+     */
+    public Archiver withAdditionalFiles(Collection<File> files)
+    {
+        var copy = copy();
+        copy.files.addAll(files);
+        return copy;
     }
 
     /**
@@ -70,10 +86,10 @@ public class Archiver extends BaseTool
      * @param files The files to add to the archive
      * @return A copy of this archive with the given files
      */
-    public Archiver withFiles(FileList files)
+    public Archiver withFiles(Collection<File> files)
     {
         var copy = copy();
-        copy.files.addAll(files);
+        copy.files = fileList(files);
         return copy;
     }
 
@@ -92,8 +108,9 @@ public class Archiver extends BaseTool
     @Override
     protected void onRun()
     {
-        var archive = zipArchive(this, archiveFile, WRITE);
-        archive.add(files);
-        archive.close();
+        try (var archive = zipArchive(this, archiveFile, WRITE))
+        {
+            archive.add(files);
+        }
     }
 }

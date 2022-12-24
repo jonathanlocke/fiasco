@@ -21,6 +21,7 @@ import digital.fiasco.runtime.repository.maven.resolver.MavenResolver;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
+import java.util.Collection;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.fail;
@@ -49,7 +50,7 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(ObjectList)} - Gets the {@link Artifact}s for the given descriptors</li>
+ *     <li>{@link #resolveArtifacts(Collection)} - Gets the {@link Artifact}s for the given descriptors</li>
  * </ul>
  *
  * <p><b>Adding and Removing Artifacts</b></p>
@@ -126,7 +127,7 @@ public class MavenRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public ObjectList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
+    public ObjectList<Artifact<?>> resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
     {
         ObjectList<Artifact<?>> resolved = list();
 
