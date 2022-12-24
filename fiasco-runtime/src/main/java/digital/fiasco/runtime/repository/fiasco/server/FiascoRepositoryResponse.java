@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.fiasco.protocol;
+package digital.fiasco.runtime.repository.fiasco.server;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.resource.resources.StringOutputResource;
@@ -6,7 +6,7 @@ import com.telenav.kivakit.resource.resources.StringResource;
 import com.telenav.kivakit.resource.serialization.SerializableObject;
 import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactContentMetadata;
+import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 
 import java.io.InputStream;
 import java.util.Collection;
@@ -14,8 +14,8 @@ import java.util.Collection;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 
 /**
- * The response header for a {@link FiascoRepositoryRequest} containing the {@link ArtifactContentMetadata} metadata for
- * each artifact requested. The artifact content blocks themselves follow this header in the {@link InputStream}.
+ * The response header for a {@link FiascoRepositoryRequest} containing the {@link ArtifactContent} metadata for each
+ * artifact requested. The artifact content blocks themselves follow this header in the {@link InputStream}.
  *
  * @author Jonathan Locke
  */
@@ -35,7 +35,7 @@ public class FiascoRepositoryResponse
     }
 
     /** The list of artifact content metadata */
-    private final ObjectList<ArtifactContentMetadata> metadata = list();
+    private final ObjectList<ArtifactContent> contents = list();
 
     /** The list of artifact content metadata */
     private transient final ObjectList<Artifact<?>> artifacts = list();
@@ -47,7 +47,7 @@ public class FiascoRepositoryResponse
      */
     public FiascoRepositoryResponse add(Artifact<?> artifact)
     {
-        metadata.addAll(artifact.attachments());
+        artifact.attachments().values().forEach(at -> contents.add(at.content()));
         artifacts.add(artifact);
         return this;
     }
@@ -73,9 +73,9 @@ public class FiascoRepositoryResponse
     /**
      * Returns the list of metadata in this response header
      */
-    public ObjectList<ArtifactContentMetadata> contentMetadata()
+    public ObjectList<ArtifactContent> contents()
     {
-        return metadata;
+        return contents;
     }
 
     /**

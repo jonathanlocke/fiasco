@@ -1,12 +1,12 @@
-package digital.fiasco.runtime.repository.fiasco;
+package digital.fiasco.runtime.repository.fiasco.server;
 
 import com.telenav.kivakit.application.Application;
 import com.telenav.kivakit.core.thread.KivaKitThread;
 import com.telenav.kivakit.network.socket.server.ConnectionListener;
 import com.telenav.kivakit.resource.resources.InputResource;
 import com.telenav.kivakit.resource.resources.OutputResource;
-import digital.fiasco.runtime.repository.fiasco.protocol.FiascoRepositoryRequest;
-import digital.fiasco.runtime.repository.fiasco.protocol.FiascoRepositoryResponse;
+import digital.fiasco.runtime.repository.Repository;
+import digital.fiasco.runtime.repository.fiasco.CacheFiascoRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.Socket;
@@ -15,7 +15,7 @@ import java.util.function.Consumer;
 import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressReporter;
 import static com.telenav.kivakit.core.value.count.Maximum._8;
 import static com.telenav.kivakit.resource.CloseMode.LEAVE_OPEN;
-import static com.telenav.kivakit.resource.CopyMode.STREAM;
+import static com.telenav.kivakit.resource.WriteMode.STREAM;
 
 /**
  * A server application that accepts JSON {@link FiascoRepositoryRequest}s and produces
@@ -29,7 +29,7 @@ public class FiascoServer extends Application
     public static int FIASCO_PORT = 25_555;
 
     /** The server's repository */
-    private final FiascoRepository repository = new FiascoRepository("server-repository");
+    private final Repository repository = new CacheFiascoRepository("server-repository");
 
     @Override
     protected void onRun()
@@ -56,21 +56,19 @@ public class FiascoServer extends Application
 
                         // compose a response,
                         var response = new FiascoRepositoryResponse();
-                        response.addAll(repository.resolve(request.descriptors()));
+                        response.addAll(repository.resolveArtifacts(request.descriptors()));
 
                         // push the header to the requester.
+                        @SuppressWarnings("resource")
                         var printWriter = out.writer().printWriter();
                         printWriter.println(response.toJson());
                         printWriter.flush();
 
                         // For each attached piece of content,
-                        for (var contentMetadata : response.contentMetadata())
+                        for (var content : response.contents())
                         {
-                            // get the content from the repository,
-                            var content = repository.content(null, contentMetadata, null);
-
                             // and copy it back to the requester.
-                            content.copyTo(out, STREAM, LEAVE_OPEN, nullProgressReporter());
+                            content.resource().copyTo(out, STREAM, LEAVE_OPEN, nullProgressReporter());
                         }
                     }
                     catch (Exception e)

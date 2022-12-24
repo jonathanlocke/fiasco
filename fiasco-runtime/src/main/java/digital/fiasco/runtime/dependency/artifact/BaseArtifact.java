@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.dependency.artifact;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
+import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import digital.fiasco.runtime.dependency.DependencyList;
@@ -21,7 +22,6 @@ import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
  * <ul>
  *     <li>{@link #dependencies()} - The list of dependencies for this artifact</li>
  *     <li>{@link #descriptor()} - This artifact's descriptor (group:identifier:version)</li>
- *     <li>{@link #jar()} - The JAR content for this artifact</li>
  *     <li>{@link #mavenPom()} - Returns a skeletal Maven POM for this artifact</li>
  *     <li>{@link #repository()} - The repository where this artifact can be found</li>
  *     <li>{@link #type()} - The type of artifact</li>
@@ -36,16 +36,25 @@ import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
  *     <li>{@link #withoutDependencies(Matcher)} - Returns this artifact without the given dependencies</li>
  * </ul>
  *
+ * <p><b>Attachments</b></p>
+ *
+ * <ul>
+ *     <li>{@link #withAttachment(ArtifactAttachment)} - Attaches the given content</li>
+ *     <li>{@link #attachment(String)} - Returns the named content attachment</li>
+ *     <li>{@link #attachments()} - Returns the list of content attachments</li>
+ * </ul>
+ *
  * <p><b>Functional</b></p>
  *
  * <ul>
  *     <li>{@link #copy()} - Returns a copy of this artifact</li>
  *     <li>{@link #version(String)} - Returns this artifact with the given version</li>
  *     <li>{@link #version(Version)} - Returns this artifact with the given version</li>
+ *     <li>{@link #withAttachment(ArtifactAttachment)} - Attaches the given content</li>
  *     <li>{@link #withDependencies(DependencyList)} - Returns this artifact with the given dependencies</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
  *     <li>{@link #withIdentifier(String)} - Returns this artifact with the given identifier</li>
- *     <li>{@link #withJar(ArtifactContentMetadata)} - Returns this artifact with the given JAR content</li>
+ *     <li>{@link #withJar(ArtifactContent)} - Returns this artifact with the given JAR content</li>
  *     <li>{@link #withType(ArtifactType)} - Returns this artifact with the given type</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #withoutDependencies(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
@@ -70,15 +79,18 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     protected DependencyList dependencies;
 
     /** The artifact JAR */
-    protected ArtifactContentMetadata jar;
+    protected ArtifactContent jar;
 
     /** Dependency exclusions for this artifact */
     private ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptAll());
 
+    /** The content attachments by suffix */
+    private ObjectMap<String, ArtifactAttachment> attachments = new ObjectMap<>();
+
     /**
      * Create artifact
      *
-     * @param descriptor The artifact desdriptor
+     * @param descriptor The artifact descriptor
      */
     protected BaseArtifact(ArtifactDescriptor descriptor)
     {
@@ -96,12 +108,33 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
         this.descriptor = that.descriptor();
         this.type = that.type();
         this.dependencies = that.dependencies().copy();
-        this.jar = that.jar();
         this.exclusions = that.exclusions().copy();
+        this.attachments = that.attachments().copy();
     }
 
     protected BaseArtifact()
     {
+    }
+
+    /**
+     * Returns the attached resource for the given artifact suffix, such as <i>.jar</i>
+     *
+     * @param suffix The artifact suffix
+     * @return The attached resource
+     */
+    public ArtifactAttachment attachment(String suffix)
+    {
+        return attachments.get(suffix);
+    }
+
+    /**
+     * Returns the list of all attached resources
+     *
+     * @return The attachments
+     */
+    public final ObjectMap<String, ArtifactAttachment> attachments()
+    {
+        return attachments;
     }
 
     /**
@@ -146,15 +179,6 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     public ObjectList<Matcher<ArtifactDescriptor>> exclusions()
     {
         return exclusions;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final ArtifactContentMetadata jar()
-    {
-        return jar;
     }
 
     /**
@@ -206,6 +230,12 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
                         .join("\n"));
     }
 
+    @Override
+    public String name()
+    {
+        return descriptor.name();
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -238,6 +268,18 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     public A version(String version)
     {
         return withVersion(parseVersion(version));
+    }
+
+    /**
+     * Attaches the resource for the given artifact suffix, such as <i>.jar</i>
+     *
+     * @param attachment The content to attach
+     */
+    public A withAttachment(ArtifactAttachment attachment)
+    {
+        var copy = copy();
+        copy.attachments().put(attachment.suffix(), attachment);
+        return copy;
     }
 
     /**
@@ -285,7 +327,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
      * @param jar The new jar
      * @return The new artifact
      */
-    public A withJar(ArtifactContentMetadata jar)
+    public A withJar(ArtifactContent jar)
     {
         var copy = copy();
         copy.jar = jar;

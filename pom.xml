@@ -48,6 +48,7 @@
 
         <module>fiasco-runtime</module>
         <module>fiasco-libraries</module>
+        <module>fiasco-example</module>
 
     </modules>
 

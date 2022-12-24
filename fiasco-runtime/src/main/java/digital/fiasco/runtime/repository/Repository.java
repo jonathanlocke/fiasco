@@ -5,8 +5,6 @@ import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.resource.Resource;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactAttachments;
-import digital.fiasco.runtime.dependency.artifact.ArtifactContentMetadata;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 
 import java.net.URI;
@@ -17,15 +15,14 @@ import java.net.URI;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolve(ObjectList)} - Gets the {@link Artifact} for the given descriptor</li>
- *     <li>{@link #content(Artifact, ArtifactContentMetadata, String)} - Gets the cached resource for the given artifact and content metadata</li>
+ *     <li>{@link #resolveArtifacts(ObjectList)} - Resolves a list of descriptors into a list of {@link Artifact}s, including content attachments</li>
  * </ul>
  *
  * <p><b>Adding and Removing Artifacts</b></p>
  *
  * <ul>
- *     <li>{@link #install(Artifact, ArtifactAttachments)} - Adds the given artifact with the given attached resources</li>
- *     <li>{@link #clear()} - Removes all data from this repository</li>
+ *     <li>{@link #installArtifact(Artifact)} - Adds the given artifact and its content</li>
+ *     <li>{@link #clearArtifacts()} - Removes all data from this repository</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -34,28 +31,20 @@ import java.net.URI;
 public interface Repository extends Repeater, Named
 {
     /**
-     * Removes all data from this repository
-     */
-    void clear();
-
-    /**
-     * Returns the section of the binary resources file containing the given artifact
+     * Removes all artifacts from this repository
      *
-     * @param metadata The artifact metadata
-     * @param content The content metadata, including its offset and size
-     * @param suffix A suffix to add to the resource path
-     * @return The resource section for the artifact
+     * @throws IllegalArgumentException Thrown if the repository cannot be cleared
      */
-    Resource content(Artifact<?> metadata, ArtifactContentMetadata content, String suffix);
+    void clearArtifacts();
 
     /**
      * Adds the given content {@link Resource}s to content.bin, and the {@link Artifact} metadata to metadata.txt in
      * JSON format.
      *
-     * @param metadata The cache entry metadata to append to metadata.txt in JSON format
-     * @param resources The resources to add to content.bin
+     * @param artifact The cache entry metadata to append to metadata.txt in JSON format
+     * @throws IllegalStateException Thrown if the artifact cannot be installed in this repository
      */
-    boolean install(Artifact<?> metadata, ArtifactAttachments resources);
+    void installArtifact(Artifact<?> artifact);
 
     /**
      * Returns true if this is a remote repository
@@ -63,12 +52,13 @@ public interface Repository extends Repeater, Named
     boolean isRemote();
 
     /**
-     * Gets the cache entry for the given artifact descriptor
+     * Resolves each artifact descriptor to an {@link Artifact} complete with content attachments
      *
-     * @param descriptor The artifact descriptor
-     * @return The cache entry for the descriptor
+     * @param descriptors The artifact descriptors
+     * @return The resolved artifacts
+     * @throws IllegalArgumentException Thrown if any descriptor cannot be resolved
      */
-    ObjectList<Artifact<?>> resolve(ObjectList<ArtifactDescriptor> descriptor);
+    ObjectList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors);
 
     /**
      * Returns the URI of this repository

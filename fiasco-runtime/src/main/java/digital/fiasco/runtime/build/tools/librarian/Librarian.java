@@ -14,11 +14,11 @@ import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactAttachments;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.repository.fiasco.FiascoRepository;
+import digital.fiasco.runtime.repository.fiasco.CacheFiascoRepository;
+import digital.fiasco.runtime.repository.fiasco.LocalFiascoRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
@@ -50,7 +50,7 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
  * <p><b>Adding Libraries</b></p>
  *
  * <ul>
- *     <li>{@link #install(Repository, Library, ArtifactAttachments)} - Adds the given library and its attached content to the given repository</li>
+ *     <li>{@link #install(Repository, Artifact)} - Adds the given library and its attached content to the given repository</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -68,17 +68,17 @@ public class Librarian extends BaseTool
     {
         super(build);
 
-        lookIn(new FiascoRepository("user-repository"));
-        lookIn(new FiascoRepository("download-repository"));
+        lookIn(new LocalFiascoRepository("user-repository"));
+        lookIn(new CacheFiascoRepository("download-repository"));
         lookIn(new MavenRepository("maven-central", uri("https://repo1.maven.org/maven2/")));
     }
 
     /**
-     * Resolves the given artiface in the repositories managed by this librarian. Resolution of dependent artifacts
+     * Resolves the given artifact in the repositories managed by this librarian. Resolution of dependent artifacts
      * occurs in depth-first order.
      *
      * @param artifact The artifact
-     * @return The artiface and all of its dependencies
+     * @return The artifact and all of its dependencies
      */
     public DependencyList dependencies(Artifact<?> artifact)
     {
@@ -105,7 +105,7 @@ public class Librarian extends BaseTool
         {
             // resolve the library's descriptor to an artifact,
             var descriptor = resolveArtifactVersion(artifact.descriptor());
-            var resolved = repository.resolve(list(descriptor));
+            var resolved = repository.resolveArtifacts(list(descriptor));
             if (resolved != null)
             {
                 // and if it isn't excluded,
@@ -130,13 +130,12 @@ public class Librarian extends BaseTool
      * Installs the given library in the target repository
      *
      * @param target The repository to deploy to
-     * @param library The library to install
-     * @param resources The resource jar attachments
+     * @param artifact The library to install
      */
-    public Librarian install(Repository target, Library library, ArtifactAttachments resources)
+    public Librarian install(Repository target, Artifact<?> artifact)
     {
-        var resolved = target.resolve(list(library.descriptor()));
-        target.install(resolved.first(), resources);
+        var resolved = target.resolveArtifacts(list(artifact.descriptor()));
+        target.installArtifact(resolved.first());
         return this;
     }
 
@@ -195,7 +194,7 @@ public class Librarian extends BaseTool
         for (var at : repositories())
         {
             // and if we can resolve the artifact,
-            var resolved = at.resolve(list(resolveArtifactVersion(descriptor)));
+            var resolved = at.resolveArtifacts(list(resolveArtifactVersion(descriptor)));
             if (resolved != null)
             {
                 // return it as a library.

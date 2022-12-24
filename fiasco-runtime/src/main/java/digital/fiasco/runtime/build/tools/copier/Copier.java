@@ -17,8 +17,8 @@ import digital.fiasco.runtime.build.tools.BaseTool;
 
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
 import static com.telenav.kivakit.core.string.Formatter.format;
-import static com.telenav.kivakit.resource.CopyMode.OVERWRITE;
 import static com.telenav.kivakit.resource.ResourceGlob.glob;
+import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
 
 /**
  * Copies selected files from one folder to another.

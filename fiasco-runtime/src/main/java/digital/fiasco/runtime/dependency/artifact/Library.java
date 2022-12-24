@@ -7,14 +7,14 @@
 
 package digital.fiasco.runtime.dependency.artifact;
 
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.registry.RegistryTrait;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.DependencyList;
 
-import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.JAVADOC_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.SOURCES_SUFFIX;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactType.LIBRARY;
 
@@ -36,8 +36,8 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactType.LIBRARY;
  * <ul>
  *     <li>{@link #javadoc()} - The Javadoc attachment for this library</li>
  *     <li>{@link #source()} - The source attachment for this library</li>
- *     <li>{@link #withJavadoc(ArtifactContentMetadata)} - Returns a copy of this library with the given Javadoc content attached</li>
- *     <li>{@link #withSource(ArtifactContentMetadata)} - Returns a copy of this library with the given Javadoc source content attached</li>
+ *     <li>{@link #withJavadoc(ArtifactContent)} - Returns a copy of this library with the given Javadoc content attached</li>
+ *     <li>{@link #withSource(ArtifactContent)} - Returns a copy of this library with the given Javadoc source content attached</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -103,12 +103,6 @@ public class Library extends BaseArtifact<Library> implements
         return new Library(artifact.descriptor());
     }
 
-    /** The Javadoc content for this library */
-    private ArtifactContentMetadata javadoc;
-
-    /** The source code for this library */
-    private ArtifactContentMetadata source;
-
     protected Library(ArtifactDescriptor descriptor)
     {
         super(descriptor);
@@ -117,14 +111,6 @@ public class Library extends BaseArtifact<Library> implements
     protected Library(Library that)
     {
         super(that);
-        this.javadoc = that.javadoc;
-        this.source = that.source;
-    }
-
-    @Override
-    public ObjectList<ArtifactContentMetadata> attachments()
-    {
-        return list(jar(), javadoc(), source());
     }
 
     /**
@@ -141,9 +127,9 @@ public class Library extends BaseArtifact<Library> implements
      *
      * @return The Javadoc content
      */
-    public ArtifactContentMetadata javadoc()
+    public ArtifactContent javadoc()
     {
-        return javadoc;
+        return attachment(JAVADOC_SUFFIX).content();
     }
 
     /**
@@ -151,9 +137,9 @@ public class Library extends BaseArtifact<Library> implements
      *
      * @return The source code JAR
      */
-    public ArtifactContentMetadata source()
+    public ArtifactContent source()
     {
-        return source;
+        return attachment(SOURCES_SUFFIX).content();
     }
 
     /**
@@ -162,10 +148,10 @@ public class Library extends BaseArtifact<Library> implements
      * @param javadoc The Javadoc content
      * @return The new library
      */
-    public Library withJavadoc(ArtifactContentMetadata javadoc)
+    public Library withJavadoc(ArtifactContent javadoc)
     {
         var copy = copy();
-        copy.javadoc = javadoc;
+        copy.withAttachment(new ArtifactAttachment(this, JAVADOC_SUFFIX, javadoc));
         return copy;
     }
 
@@ -175,10 +161,10 @@ public class Library extends BaseArtifact<Library> implements
      * @param source The source code JAR attachment
      * @return The new library
      */
-    public Library withSource(ArtifactContentMetadata source)
+    public Library withSource(ArtifactContent source)
     {
         var copy = copy();
-        copy.source = source;
+        copy.withAttachment(new ArtifactAttachment(this, JAVADOC_SUFFIX, source));
         return copy;
     }
 }

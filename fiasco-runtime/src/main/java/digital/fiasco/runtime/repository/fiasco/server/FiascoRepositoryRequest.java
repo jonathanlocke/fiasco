@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.fiasco.protocol;
+package digital.fiasco.runtime.repository.fiasco.server;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.list.StringList;
@@ -7,7 +7,6 @@ import com.telenav.kivakit.resource.resources.StringResource;
 import com.telenav.kivakit.resource.serialization.SerializableObject;
 import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.repository.fiasco.FiascoRepository;
 
 import java.io.InputStream;
 
@@ -15,8 +14,8 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 
 /**
  * The request portion of the Fiasco repository protocol. Contains a JSON-serializable list of artifacts to retrieve. A
- * {@link FiascoRepository} responds to a JSON query with a {@link FiascoRepositoryResponse}, containing the metdata for
- * the subsequent content, which follows this header in the {@link InputStream}.
+ * {@link FiascoServer} responds to a JSON {@link FiascoRepositoryRequest} with a {@link FiascoRepositoryResponse},
+ * containing the metadata for the subsequent content, which follows this header in the {@link InputStream}.
  *
  * @author Jonathan Locke
  */

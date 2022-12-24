@@ -1,25 +1,24 @@
-package digital.fiasco.runtime.repository.fiasco;
+package digital.fiasco.runtime.repository.fiasco.server;
 
 import com.telenav.kivakit.network.http.secure.SecureHttpNetworkLocation;
 import com.telenav.kivakit.resource.Uris;
-import digital.fiasco.runtime.repository.fiasco.protocol.FiascoRepositoryRequest;
-import digital.fiasco.runtime.repository.fiasco.protocol.FiascoRepositoryResponse;
+import digital.fiasco.runtime.repository.fiasco.RemoteFiascoRepository;
 
 import java.net.URI;
 
-import static digital.fiasco.runtime.repository.fiasco.FiascoServer.FIASCO_PORT;
+import static digital.fiasco.runtime.repository.fiasco.server.FiascoServer.FIASCO_PORT;
 
 /**
- * Client that resolves requests to a {@link FiascoRepository} using the Fiasco repository protocol over HTTPS.
+ * Client that resolves requests to a {@link RemoteFiascoRepository} using the Fiasco repository protocol over HTTPS.
  *
  * @author Jonathan Locke
  */
 public class FiascoClient
 {
     /**
-     * Gets the requested artifacts from the given {@link FiascoRepository}
+     * Gets the requested artifacts from the given {@link RemoteFiascoRepository}
      */
-    public FiascoRepositoryResponse request(FiascoRepository repository, FiascoRepositoryRequest request)
+    public FiascoRepositoryResponse request(RemoteFiascoRepository repository, FiascoRepositoryRequest request)
     {
         // Get the fiasco server's HTTP location,
         var location = new SecureHttpNetworkLocation(fiascoServer(repository));
@@ -35,7 +34,7 @@ public class FiascoClient
      * @param repository The repository
      * @return The URI to the repository
      */
-    private URI fiascoServer(FiascoRepository repository)
+    private URI fiascoServer(RemoteFiascoRepository repository)
     {
         var uri = repository.uri();
         if (uri.getPort() <= 0)

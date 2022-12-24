@@ -22,9 +22,8 @@ public interface Dependency<D extends Dependency<D>> extends Named
     DependencyList dependencies();
 
     /**
-     * @return A dependency graph with this dependency at the root
+     * Returns a dependency graph with this dependency at the root
      */
-    @SuppressWarnings("unchecked")
     default DependencyGraph graph()
     {
         return dependencyGraph(this);
