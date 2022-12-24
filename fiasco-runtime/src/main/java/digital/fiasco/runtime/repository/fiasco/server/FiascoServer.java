@@ -19,7 +19,7 @@ import static com.telenav.kivakit.resource.WriteMode.STREAM;
 
 /**
  * A server application that accepts JSON {@link FiascoRepositoryRequest}s and produces
- * {@link FiascoRepositoryResponse}s followed by content data.
+ * {@link FiascoRepositoryResponse}s followed by content data. {@link FiascoServer}s run on port {@link #FIASCO_PORT}.
  *
  * @author Jonathan Locke
  */
@@ -65,10 +65,16 @@ public class FiascoServer extends Application
                         printWriter.flush();
 
                         // For each attached piece of content,
-                        for (var content : response.contents())
+                        for (var artifact : response.artifacts())
                         {
-                            // and copy it back to the requester.
-                            content.resource().copyTo(out, STREAM, LEAVE_OPEN, nullProgressReporter());
+                            for (var attachment : artifact.attachments().values())
+                            {
+                                // and copy it back to the requester.
+                                attachment
+                                        .content()
+                                        .resource()
+                                        .copyTo(out, STREAM, LEAVE_OPEN, nullProgressReporter());
+                            }
                         }
                     }
                     catch (Exception e)

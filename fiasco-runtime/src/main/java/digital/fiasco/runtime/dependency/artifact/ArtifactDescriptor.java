@@ -10,7 +10,8 @@ import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
 
 /**
- * An identifier that uniquely identifies an artifact, including its group, artifact identifier and version.
+ * An identifier that uniquely identifies an artifact, including its group, artifact identifier and version. Artifact
+ * descriptors take the text form group:identifier:version.
  *
  * <p><b>Creation</b></p>
  *

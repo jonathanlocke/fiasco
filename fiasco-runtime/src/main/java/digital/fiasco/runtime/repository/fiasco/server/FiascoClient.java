@@ -1,11 +1,12 @@
 package digital.fiasco.runtime.repository.fiasco.server;
 
 import com.telenav.kivakit.network.http.secure.SecureHttpNetworkLocation;
-import com.telenav.kivakit.resource.Uris;
 import digital.fiasco.runtime.repository.fiasco.RemoteFiascoRepository;
 
 import java.net.URI;
 
+import static com.telenav.kivakit.resource.Uris.uri;
+import static digital.fiasco.runtime.repository.fiasco.server.FiascoRepositoryResponse.responseFromJson;
 import static digital.fiasco.runtime.repository.fiasco.server.FiascoServer.FIASCO_PORT;
 
 /**
@@ -24,7 +25,7 @@ public class FiascoClient
         var location = new SecureHttpNetworkLocation(fiascoServer(repository));
 
         // then post the request to the server, and return the response.
-        return FiascoRepositoryResponse.responseFromJson(location.post("application/json", request.toJson()).asString());
+        return responseFromJson(location.post("application/json", request.toJson()).asString());
     }
 
     /**
@@ -39,7 +40,7 @@ public class FiascoClient
         var uri = repository.uri();
         if (uri.getPort() <= 0)
         {
-            uri = Uris.uri(uri + ":" + FIASCO_PORT);
+            uri = uri(uri + ":" + FIASCO_PORT);
         }
         return uri;
     }

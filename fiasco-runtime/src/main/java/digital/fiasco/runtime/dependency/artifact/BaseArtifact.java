@@ -9,41 +9,50 @@ import digital.fiasco.runtime.repository.Repository;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
-import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.core.string.Formatter.format;
-import static com.telenav.kivakit.core.version.Version.parseVersion;
 import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONTENT_SUFFIX;
 
 /**
  * Represents an artifact, either an {@link ArtifactType#ASSET}, or an {@link ArtifactType#LIBRARY}.
  *
- * <p><b>Properties</b></p>
+ * <p><b>Repository</b></p>
  *
  * <ul>
- *     <li>{@link #dependencies()} - The list of dependencies for this artifact</li>
- *     <li>{@link #descriptor()} - This artifact's descriptor (group:identifier:version)</li>
- *     <li>{@link #mavenPom()} - Returns a skeletal Maven POM for this artifact</li>
- *     <li>{@link #repository()} - The repository where this artifact can be found</li>
- *     <li>{@link #type()} - The type of artifact</li>
+ *     <li>{@link #repository()}</li>
+ * </ul>
+ *
+ * <p><b>Identity</b></p>
+ *
+ * <ul>
+ *     <li>{@link #descriptor()}</li>
+ *     <li>{@link #type()}</li>
+ *     <li>{@link #version(String)}</li>
+ *     <li>{@link #version(Version)}</li>
+ *     <li>{@link #withDescriptor(ArtifactDescriptor)}</li>
+ *     <li>{@link #withIdentifier(String)}</li>
+ *     <li>{@link #withType(ArtifactType)}</li>
+ *     <li>{@link #withVersion(Version)}</li>
  * </ul>
  *
  * <p><b>Dependencies</b></p>
  *
  * <ul>
- *     <li>{@link #dependencies()} - The list of dependencies for this artifact</li>
- *     <li>{@link #excludes(ArtifactDescriptor)} - Returns true if this artifact excludes the given artifact</li>
- *     <li>{@link #withoutDependencies(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
- *     <li>{@link #withoutDependencies(Matcher)} - Returns this artifact without the given dependencies</li>
+ *     <li>{@link #dependencies()}</li>
+ *     <li>{@link #excludes(ArtifactDescriptor)}</li>
+ *     <li>{@link #withDependencies(DependencyList)}</li>
+ *     <li>{@link #withoutDependencies(ArtifactDescriptor...)}</li>
+ *     <li>{@link #withoutDependencies(String...)}</li>
+ *     <li>{@link #withoutDependencies(Matcher)}</li>
  * </ul>
  *
  * <p><b>Attachments</b></p>
  *
  * <ul>
- *     <li>{@link #withAttachment(ArtifactAttachment)} - Attaches the given content</li>
- *     <li>{@link #attachment(String)} - Returns the named content attachment</li>
- *     <li>{@link #attachments()} - Returns the list of content attachments</li>
+ *     <li>{@link #attachments()}</li>
+ *     <li>{@link #attachment(String)}</li>
+ *     <li>{@link #withAttachment(ArtifactAttachment)}</li>
  * </ul>
+ *
  *
  * <p><b>Functional</b></p>
  *
@@ -52,13 +61,29 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONT
  *     <li>{@link #version(String)} - Returns this artifact with the given version</li>
  *     <li>{@link #version(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #withAttachment(ArtifactAttachment)} - Attaches the given content</li>
+ *     <li>{@link #withContent(ArtifactContent)}</li>
  *     <li>{@link #withDependencies(DependencyList)} - Returns this artifact with the given dependencies</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
  *     <li>{@link #withIdentifier(String)} - Returns this artifact with the given identifier</li>
  *     <li>{@link #withType(ArtifactType)} - Returns this artifact with the given type</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #withoutDependencies(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
+ *     <li>{@link #withoutDependencies(String...)} - Returns this artifact without the given dependencies</li>
  *     <li>{@link #withoutDependencies(Matcher)} - Returns this artifact without the given dependencies</li>
+ * </ul>
+ *
+ *
+ * <p><b>Maven</b></p>
+ *
+ * <ul>
+ *     <li>{@link #mavenPom()}</li>
+ * </ul>
+ *
+ * <p><b>Serialization</b></p>
+ *
+ * <ul>
+ *     <li>{@link #artifactFromJson(String)}</li>
+ *     <li>{@link #toJson()}</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -119,29 +144,21 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
      * @param suffix The artifact suffix
      * @return The attached resource
      */
+    @Override
     public ArtifactAttachment attachment(String suffix)
     {
         return attachments.get(suffix);
     }
-
+ 
     /**
      * Returns the list of all attached resources
      *
      * @return The attachments
      */
+    @Override
     public final ObjectMap<String, ArtifactAttachment> attachments()
     {
         return attachments;
-    }
-
-    /**
-     * Returns primary content attachment for this asset
-     *
-     * @return The content
-     */
-    public ArtifactContent content()
-    {
-        return attachment(CONTENT_SUFFIX).content();
     }
 
     /**
@@ -262,42 +279,15 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     }
 
     /**
-     * Convenience method for {@link #withVersion(Version)}
-     */
-    public A version(Version version)
-    {
-        return withVersion(version);
-    }
-
-    /**
-     * Convenience method for {@link #withVersion(Version)}
-     */
-    public A version(String version)
-    {
-        return withVersion(parseVersion(version));
-    }
-
-    /**
      * Attaches the resource for the given artifact suffix, such as <i>.jar</i>
      *
      * @param attachment The content to attach
      */
+    @Override
     public A withAttachment(ArtifactAttachment attachment)
     {
         var copy = copy();
         copy.attachments().put(attachment.suffix(), attachment);
-        return copy;
-    }
-
-    /**
-     * Returns primary content attachment for this asset
-     *
-     * @return The content
-     */
-    public A withContent(ArtifactContent content)
-    {
-        var copy = copy();
-        copy.withAttachment(new ArtifactAttachment(this, CONTENT_SUFFIX, content));
         return copy;
     }
 
@@ -307,6 +297,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
      * @param dependencies The new dependencies
      * @return The new artifact
      */
+    @Override
     public A withDependencies(DependencyList dependencies)
     {
         var copy = copy();
@@ -320,23 +311,11 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
      * @param descriptor The new descriptor
      * @return The new artifact
      */
+    @Override
     public A withDescriptor(ArtifactDescriptor descriptor)
     {
         var copy = copy();
         copy.descriptor = descriptor;
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this artifact with the given identifier
-     *
-     * @param identifier The new identifier
-     * @return The new artifact
-     */
-    public A withIdentifier(String identifier)
-    {
-        var copy = copy();
-        copy.descriptor = descriptor.withIdentifier(identifier);
         return copy;
     }
 
@@ -346,6 +325,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
      * @param type The new artifact type
      * @return The new artifact
      */
+    @Override
     public A withType(ArtifactType type)
     {
         var copy = copy();
@@ -354,46 +334,16 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     }
 
     /**
-     * Returns a copy of this artifact with the given version
-     *
-     * @param version The new version
-     * @return The new artifact
-     */
-    public A withVersion(Version version)
-    {
-        var copy = copy();
-        copy.descriptor = descriptor.withVersion(version);
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this artifact that excludes the given descriptors from its dependencies
-     *
-     * @param exclude The descriptors to exclude
-     * @return The new artifact
-     */
-    public A withoutDependencies(ArtifactDescriptor... exclude)
-    {
-        return withoutDependencies(library -> arrayContains(exclude, library));
-    }
-
-    /**
      * Returns a copy of this artifact that excludes all descriptors matching the given pattern from its dependencies
      *
      * @param pattern The pattern to exclude
      * @return The new artifact
      */
+    @Override
     public A withoutDependencies(Matcher<ArtifactDescriptor> pattern)
     {
         var copy = copy();
         ((BaseArtifact<?>) copy).exclusions.add(pattern);
         return copy;
     }
-
-    /**
-     * Returns a copy of this artifact
-     *
-     * @return The new artifact
-     */
-    protected abstract A copy();
 }

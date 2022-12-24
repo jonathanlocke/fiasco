@@ -2,6 +2,13 @@ package digital.fiasco.runtime.dependency.artifact;
 
 import org.jetbrains.annotations.NotNull;
 
+/**
+ * Represents an artifact content attachment
+ *
+ * @param artifact The artifact that owns this attachment
+ * @param suffix The attachment name suffix
+ * @param content The attached content
+ */
 public record ArtifactAttachment(@NotNull Artifact<?> artifact,
                                  @NotNull String suffix,
                                  ArtifactContent content)

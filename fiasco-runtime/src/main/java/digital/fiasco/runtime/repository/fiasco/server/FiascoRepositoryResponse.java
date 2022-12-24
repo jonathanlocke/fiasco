@@ -17,8 +17,22 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  * The response header for a {@link FiascoRepositoryRequest} containing the {@link ArtifactContent} metadata for each
  * artifact requested. The artifact content blocks themselves follow this header in the {@link InputStream}.
  *
+ * <p><b>Artifacts</b></p>
+ *
+ * <ul>
+ *     <li>{@link #artifacts()}</li>
+ * </ul>
+ *
+ * <p><b>Serialization</b></p>
+ *
+ * <ul>
+ *     <li>{@link #responseFromJson(String)}</li>
+ *     <li>{@link #toJson()}</li>
+ * </ul>
+ *
  * @author Jonathan Locke
  */
+@SuppressWarnings("UnusedReturnValue")
 public class FiascoRepositoryResponse
 {
     /**
@@ -35,32 +49,7 @@ public class FiascoRepositoryResponse
     }
 
     /** The list of artifact content metadata */
-    private final ObjectList<ArtifactContent> contents = list();
-
-    /** The list of artifact content metadata */
     private transient final ObjectList<Artifact<?>> artifacts = list();
-
-    /**
-     * Adds the given artifact to this response
-     *
-     * @param artifact The artifact to add
-     */
-    public FiascoRepositoryResponse add(Artifact<?> artifact)
-    {
-        artifact.attachments().values().forEach(at -> contents.add(at.content()));
-        artifacts.add(artifact);
-        return this;
-    }
-
-    /**
-     * Adds the given artifacts to this response
-     *
-     * @param artifacts The artifacts to add
-     */
-    public void addAll(Collection<Artifact<?>> artifacts)
-    {
-        artifacts.forEach(this::add);
-    }
 
     /**
      * Returns the artifacts that have been added to this response
@@ -68,14 +57,6 @@ public class FiascoRepositoryResponse
     public ObjectList<Artifact<?>> artifacts()
     {
         return artifacts;
-    }
-
-    /**
-     * Returns the list of metadata in this response header
-     */
-    public ObjectList<ArtifactContent> contents()
-    {
-        return contents;
     }
 
     /**
@@ -87,5 +68,26 @@ public class FiascoRepositoryResponse
         var serialized = new StringOutputResource();
         serializer.writeObject(serialized, new SerializableObject<>(this));
         return serialized.string();
+    }
+
+    /**
+     * Adds the given artifact to this response
+     *
+     * @param artifact The artifact to add
+     */
+    FiascoRepositoryResponse add(Artifact<?> artifact)
+    {
+        artifacts.add(artifact);
+        return this;
+    }
+
+    /**
+     * Adds the given artifacts to this response
+     *
+     * @param artifacts The artifacts to add
+     */
+    void addAll(Collection<Artifact<?>> artifacts)
+    {
+        artifacts.forEach(this::add);
     }
 }

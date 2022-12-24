@@ -1,7 +1,7 @@
 package digital.fiasco.runtime.dependency.artifact;
 
 /**
- * Holds PGP signature and md5 and sha1 hashes for a stored artifact.
+ * Holds PGP signature and MD5 and SHA-1 hashes for a stored artifact.
  *
  * @author Jonathan Locke
  */

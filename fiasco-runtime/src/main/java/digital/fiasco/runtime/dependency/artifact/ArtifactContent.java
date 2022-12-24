@@ -6,7 +6,7 @@ import com.telenav.kivakit.core.value.count.Bytes;
 import com.telenav.kivakit.resource.Resource;
 
 /**
- * Holds the resource and metadata for a single artifact content attachment (a class, javadoc, or source jar).
+ * Holds the content for a single artifact attachment, for example the main JAR, Javadoc, or source code.
  *
  * @param name The name of the artifact resource
  * @param signatures The signatures for this content

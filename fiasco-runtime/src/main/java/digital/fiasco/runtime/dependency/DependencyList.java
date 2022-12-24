@@ -32,6 +32,12 @@ import static com.telenav.kivakit.core.thread.Threads.shutdownAndAwaitTerminatio
  *     <li>{@link #dependencyList(Collection)} - List factory method</li>
  * </ul>
  *
+ * <p><b>Matching</b></p>
+ *
+ * <ul>
+ *     <li>{@link #matches(Dependency)} - Implementing this method allows use of a dependency list to match a given dependency</li>
+ * </ul>
+ *
  * <p><b>Conversions</b></p>
  *
  * <ul>
@@ -60,7 +66,9 @@ import static com.telenav.kivakit.core.thread.Threads.shutdownAndAwaitTerminatio
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class DependencyList implements Iterable<Dependency<?>>
+public class DependencyList implements
+        Iterable<Dependency<?>>,
+        Matcher<Dependency<?>>
 {
     /**
      * Creates a list of dependencies
@@ -141,6 +149,15 @@ public class DependencyList implements Iterable<Dependency<?>>
     public Iterator<Dependency<?>> iterator()
     {
         return dependencies.iterator();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean matches(Dependency<?> dependency)
+    {
+        return dependencies.contains(dependency);
     }
 
     /**

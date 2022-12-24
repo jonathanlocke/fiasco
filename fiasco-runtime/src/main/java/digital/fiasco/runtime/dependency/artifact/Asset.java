@@ -16,7 +16,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.arti
 import static digital.fiasco.runtime.dependency.artifact.ArtifactType.ASSET;
 
 /**
- * An asset is an artifact having only a single JAR containing resource content
+ * An asset is an artifact having only a single content attachment
  *
  * <p><b>Creation</b></p>
  *
