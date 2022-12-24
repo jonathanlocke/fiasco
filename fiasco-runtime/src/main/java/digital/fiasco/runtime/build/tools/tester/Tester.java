@@ -23,9 +23,9 @@ public class Tester extends BaseTool
     }
 
     @Override
-    protected String description()
+    public String description()
     {
-        return null;
+        return "Runs tests";
     }
 
     @Override

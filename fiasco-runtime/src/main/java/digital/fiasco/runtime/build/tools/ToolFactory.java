@@ -1,7 +1,7 @@
 package digital.fiasco.runtime.build.tools;
 
 import com.telenav.kivakit.core.messaging.Repeater;
-import digital.fiasco.runtime.build.BuildAssociated;
+import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.tools.archiver.Archiver;
 import digital.fiasco.runtime.build.tools.cleaner.Cleaner;
 import digital.fiasco.runtime.build.tools.compiler.Compiler;
@@ -20,14 +20,14 @@ import static com.telenav.kivakit.core.version.Version.version;
 @SuppressWarnings("unused")
 public interface ToolFactory extends
         Repeater,
-        BuildAssociated
+        Build
 {
     /**
      * Creates a new {@link Archiver} tool
      */
     default Archiver archiver()
     {
-        return new Archiver(associatedBuild());
+        return new Archiver(this);
     }
 
     /**
@@ -35,7 +35,7 @@ public interface ToolFactory extends
      */
     default Cleaner cleaner()
     {
-        return new Cleaner(associatedBuild());
+        return new Cleaner(this);
     }
 
     /**
@@ -43,8 +43,8 @@ public interface ToolFactory extends
      */
     default Compiler compiler()
     {
-        return new Compiler(associatedBuild())
-                .withSources(associatedBuild().javaSources())
+        return new Compiler(this)
+                .withSources(javaSources())
                 .withSourceVersion(version(17))
                 .withTargetVersion(version(17));
     }
@@ -54,7 +54,7 @@ public interface ToolFactory extends
      */
     default Copier copier()
     {
-        return new Copier(associatedBuild());
+        return new Copier(this);
     }
 
     /**
@@ -62,7 +62,7 @@ public interface ToolFactory extends
      */
     default Git git()
     {
-        return new Git(associatedBuild());
+        return new Git(this);
     }
 
     /**
@@ -70,7 +70,7 @@ public interface ToolFactory extends
      */
     default Librarian librarian()
     {
-        return new Librarian(associatedBuild());
+        return new Librarian(this);
     }
 
     /**
@@ -78,7 +78,7 @@ public interface ToolFactory extends
      */
     default Shader shader()
     {
-        return new Shader(associatedBuild());
+        return new Shader(this);
     }
 
     /**
@@ -86,7 +86,7 @@ public interface ToolFactory extends
      */
     default BuildStamper stamper()
     {
-        return new BuildStamper(associatedBuild());
+        return new BuildStamper(this);
     }
 
     /**
@@ -94,6 +94,6 @@ public interface ToolFactory extends
      */
     default Tester tester()
     {
-        return new Tester(associatedBuild());
+        return new Tester(this);
     }
 }

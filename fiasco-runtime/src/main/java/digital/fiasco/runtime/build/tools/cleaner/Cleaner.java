@@ -30,9 +30,27 @@ public class Cleaner extends BaseTool
 
     public Cleaner copy()
     {
-        var copy = new Cleaner(associatedBuild());
+        var copy = new Cleaner(this);
         copy.files = files.copy();
         return copy;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String description()
+    {
+        var paths = stringList();
+        for (var file : files)
+        {
+            paths.add(file.path().asString());
+        }
+        return format("""
+                Cleaner
+                  files:
+                $
+                """, paths.indented(4).join("\n"));
     }
 
     /**
@@ -59,24 +77,6 @@ public class Cleaner extends BaseTool
         var copy = copy();
         this.files = fileList(this.files.with(files));
         return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String description()
-    {
-        var paths = stringList();
-        for (var file : files)
-        {
-            paths.add(file.path().asString());
-        }
-        return format("""
-                Cleaner
-                  files:
-                $
-                """, paths.indented(4).join("\n"));
     }
 
     /**

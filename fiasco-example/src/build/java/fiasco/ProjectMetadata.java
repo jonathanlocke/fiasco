@@ -15,21 +15,9 @@ import static digital.fiasco.runtime.build.metadata.Role.ARCHITECT;
 import static digital.fiasco.runtime.build.metadata.Role.LEAD_DEVELOPER;
 import static digital.fiasco.runtime.build.metadata.Role.ORIGINATOR;
 
-/**
- * Example Fiasco build.
- *
- * @author Jonathan Locke
- */
-@SuppressWarnings({ "unused" })
-public class BaseProjectBuild extends Build
+public interface ProjectMetadata extends Build
 {
-    public static void main(String[] arguments)
-    {
-        run(BaseProjectBuild.class, arguments);
-    }
-
-    @Override
-    public BuildMetadata metadata()
+    default BuildMetadata metadata()
     {
         var jonathanLocke = new Organization("Jonathan Locke")
                 .withUrl(url("https://state-of-the-art.org"));
@@ -50,11 +38,5 @@ public class BaseProjectBuild extends Build
                                 .withTimeZone("America/Denver")
                                 .withRoles(ORIGINATOR, ARCHITECT, LEAD_DEVELOPER)
                                 .withEmail("jon@thanlocke.com")));
-    }
-
-    @Override
-    public void onInitialize()
-    {
-        librarian().lookIn(MAVEN_CENTRAL);
     }
 }

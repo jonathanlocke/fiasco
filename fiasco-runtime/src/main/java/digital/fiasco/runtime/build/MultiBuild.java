@@ -1,26 +1,25 @@
 package digital.fiasco.runtime.build;
 
-import com.telenav.kivakit.application.Application;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 
+/**
+ * Base class for multi-project builds
+ *
+ * @author Jonathan Locke
+ */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class MultiBuild extends Application
+public abstract class MultiBuild extends BaseBuild
 {
-    private final ObjectList<Build> builds = list();
+    private final ObjectList<BaseBuild> builds = list();
 
     private String[] arguments;
 
-    public MultiBuild addBuild(Build build)
+    public MultiBuild addBuild(BaseBuild build)
     {
         builds.add(build);
         return this;
-    }
-
-    public String[] arguments()
-    {
-        return arguments;
     }
 
     public MultiBuild arguments(String[] arguments)

@@ -2,6 +2,7 @@ package digital.fiasco.runtime.build;
 
 import com.telenav.kivakit.filesystem.FileList;
 import com.telenav.kivakit.filesystem.Folder;
+import com.telenav.kivakit.filesystem.Rooted;
 import com.telenav.kivakit.resource.ResourceList;
 
 import static com.telenav.kivakit.resource.ResourceGlob.glob;
@@ -12,7 +13,7 @@ import static com.telenav.kivakit.resource.ResourceGlob.glob;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public interface BuildStructure extends BuildAssociated
+public interface BuildStructure extends Rooted
 {
     /**
      * output/classes
@@ -67,7 +68,7 @@ public interface BuildStructure extends BuildAssociated
      */
     default Folder sourceFolder()
     {
-        return associatedBuild().rootFolder().folder("src");
+        return rootFolder().folder("src");
     }
 
     /**
@@ -75,7 +76,7 @@ public interface BuildStructure extends BuildAssociated
      */
     default Folder targetFolder()
     {
-        return associatedBuild().rootFolder().folder("target");
+        return rootFolder().folder("target");
     }
 
     /**

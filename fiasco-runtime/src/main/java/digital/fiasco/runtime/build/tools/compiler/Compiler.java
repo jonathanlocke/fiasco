@@ -92,10 +92,10 @@ public class Compiler extends BaseTool
      */
     public Compiler(Compiler that)
     {
-        super(that.associatedBuild());
+        super(that);
         this.sourceVersion = that.sourceVersion;
         this.targetVersion = that.targetVersion;
-        this.sources = (FileList) that.sources.copy();
+        this.sources = that.sources.copy();
         this.sourceEncoding = that.sourceEncoding;
         this.sourceLocale = that.sourceLocale;
     }
@@ -106,6 +106,21 @@ public class Compiler extends BaseTool
     public Compiler copy()
     {
         return new Compiler(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String description()
+    {
+        return format("""
+                Compiler
+                  sources: $
+                  source version: $
+                  target version: $
+                  source encoding: $
+                """, sources, sourceVersion, targetVersion, sourceEncoding);
     }
 
     /**
@@ -196,7 +211,7 @@ public class Compiler extends BaseTool
     public Compiler withSources(FileList sources)
     {
         var copy = copy();
-        copy.sources = (FileList) sources.copy();
+        copy.sources = sources.copy();
         return copy;
     }
 
@@ -217,24 +232,9 @@ public class Compiler extends BaseTool
      * {@inheritDoc}
      */
     @Override
-    protected String description()
-    {
-        return format("""
-                Compiler
-                  sources: $
-                  source version: $
-                  target version: $
-                  source encoding: $
-                """, sources, sourceVersion, targetVersion, sourceEncoding);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     protected void onRun()
     {
-        compile(associatedBuild().javaSources());
+        compile(javaSources());
     }
 
     /**

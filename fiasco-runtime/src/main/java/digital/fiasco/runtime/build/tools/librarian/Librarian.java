@@ -31,7 +31,6 @@ import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.resource.Uris.uri;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
 /**
@@ -128,6 +127,19 @@ public class Librarian extends BaseTool
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String description()
+    {
+        return format("""
+                Librarian
+                  repositories: $
+                  pinned versions: $
+                """, repositories, pinnedVersions);
+    }
+
+    /**
      * Installs the given library in the target repository
      *
      * @param target The repository to deploy to
@@ -157,10 +169,11 @@ public class Librarian extends BaseTool
      * @param descriptor The group and artifact identifier (but without a version)
      * @param version The version to enforce for the descriptor
      */
-    public void pinVersion(ArtifactDescriptor descriptor, Version version)
+    public Librarian pinVersion(ArtifactDescriptor descriptor, Version version)
     {
         ensure(descriptor.version() == null);
         pinnedVersions.put(descriptor, version);
+        return this;
     }
 
     /**
@@ -170,10 +183,11 @@ public class Librarian extends BaseTool
      * @param artifact The group and artifact identifier (which can be lacking a version)
      * @param version The version to enforce for the descriptor
      */
-    public void pinVersion(Artifact<?> artifact, Version version)
+    public Librarian pinVersion(Artifact<?> artifact, Version version)
     {
         var descriptor = artifact.descriptor();
         pinnedVersions.put(descriptor, version);
+        return this;
     }
 
     /**
@@ -183,9 +197,10 @@ public class Librarian extends BaseTool
      * @param artifact The artifact to pin
      * @param version The version to enforce for the descriptor
      */
-    public void pinVersion(Artifact<?> artifact, String version)
+    public Librarian pinVersion(Artifact<?> artifact, String version)
     {
         pinVersion(artifact.descriptor(), version(version));
+        return this;
     }
 
     /**
@@ -195,9 +210,10 @@ public class Librarian extends BaseTool
      * @param descriptor The group and artifact identifier (but without a version)
      * @param version The version to enforce for the descriptor
      */
-    public void pinVersion(String descriptor, String version)
+    public Librarian pinVersion(String descriptor, String version)
     {
-        pinVersion(artifactDescriptor(descriptor), version(version));
+        pinVersion(ArtifactDescriptor.artifactDescriptor(descriptor), version(version));
+        return this;
     }
 
     /**
@@ -235,19 +251,6 @@ public class Librarian extends BaseTool
             artifacts.addAll(at.resolveArtifacts(descriptors));
         }
         return artifacts;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String description()
-    {
-        return format("""
-                Librarian
-                  repositories: $
-                  pinned versions: $
-                """, repositories, pinnedVersions);
     }
 
     @Override

@@ -63,7 +63,7 @@ public class Copier extends BaseTool
      */
     public Copier(Copier that)
     {
-        super(that.associatedBuild());
+        super(that);
         this.to = that.to;
         this.source = that.source;
         this.includes = that.includes;
@@ -80,16 +80,18 @@ public class Copier extends BaseTool
     }
 
     /**
-     * Returns a copy of this copier that includes resources matching the given matcher
-     *
-     * @param matcher The matcher
-     * @return The new copier
+     * {@inheritDoc}
      */
-    public Copier with(Matcher<ResourcePathed> matcher)
+    @Override
+    public String description()
     {
-        var copy = copy();
-        copy.includes = (Matcher<ResourcePathed>) includes.and(matcher);
-        return copy;
+        return format("""
+                Copier
+                  from: $
+                  to: $
+                  includes: $
+                  excludes: $
+                """, source, to, includes, excludes);
     }
 
     /**
@@ -101,6 +103,19 @@ public class Copier extends BaseTool
     public Copier with(String glob)
     {
         return with(glob(glob));
+    }
+
+    /**
+     * Returns a copy of this copier that includes resources matching the given matcher
+     *
+     * @param matcher The matcher
+     * @return The new copier
+     */
+    public Copier with(Matcher<ResourcePathed> matcher)
+    {
+        var copy = copy();
+        copy.includes = (Matcher<ResourcePathed>) includes.and(matcher);
+        return copy;
     }
 
     /**
@@ -143,19 +158,6 @@ public class Copier extends BaseTool
     }
 
     /**
-     * Returns a copy of this copier that excludes the resources matching the given matcher
-     *
-     * @param matcher The matcher
-     * @return The new copier
-     */
-    public Copier without(Matcher<ResourcePathed> matcher)
-    {
-        var copy = copy();
-        copy.excludes = (Matcher<ResourcePathed>) excludes.or(matcher);
-        return copy;
-    }
-
-    /**
      * Returns a copy of this copier that excludes the resources matching the given glob pattern
      *
      * @param glob The glob pattern
@@ -169,18 +171,16 @@ public class Copier extends BaseTool
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a copy of this copier that excludes the resources matching the given matcher
+     *
+     * @param matcher The matcher
+     * @return The new copier
      */
-    @Override
-    protected String description()
+    public Copier without(Matcher<ResourcePathed> matcher)
     {
-        return format("""
-                Copier
-                  from: $
-                  to: $
-                  includes: $
-                  excludes: $
-                """, source, to, includes, excludes);
+        var copy = copy();
+        copy.excludes = (Matcher<ResourcePathed>) excludes.or(matcher);
+        return copy;
     }
 
     /**

@@ -79,7 +79,7 @@ public class Git extends BaseTool
      */
     public Git(Git that)
     {
-        super(that.associatedBuild());
+        super(that);
         this.folder = that.folder;
         this.arguments = that.arguments.copy();
         this.output = that.output;
@@ -119,6 +119,19 @@ public class Git extends BaseTool
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String description()
+    {
+        return format("""
+                Git
+                  folder: $
+                  arguments: $
+                """, folder, stringList(arguments).join(" "));
+    }
+
+    /**
      * Returns the output from running this tool
      */
     public String output()
@@ -150,19 +163,6 @@ public class Git extends BaseTool
         var copy = copy();
         copy.folder = folder;
         return copy;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String description()
-    {
-        return format("""
-                Git
-                  folder: $
-                  arguments: $
-                """, folder, stringList(arguments).join(" "));
     }
 
     /**

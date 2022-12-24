@@ -11,7 +11,7 @@ public class Shader extends BaseTool
     }
 
     @Override
-    protected String description()
+    public String description()
     {
         return null;
     }

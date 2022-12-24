@@ -8,7 +8,6 @@ import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.BuildStructure;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.build.tools.ToolFactory;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 
 import java.time.LocalDate;
 
@@ -45,7 +44,7 @@ import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
  *
  * @author Jonathan Locke
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "SpellCheckingInspection" })
 public class BuildStamper extends BaseTool implements
         BuildStructure,
         ToolFactory
@@ -64,7 +63,7 @@ public class BuildStamper extends BaseTool implements
      * {@inheritDoc}
      */
     @Override
-    protected String description()
+    public String description()
     {
         return Formatter.format("""
                         BuildStamper:
@@ -86,20 +85,12 @@ public class BuildStamper extends BaseTool implements
         information("Stamping build");
 
         classesFolder()
-                .file(artifact().name() + "-project.properties")
+                .file(artifactName() + "-project.properties")
                 .saveText(projectProperties().join("\n"));
 
         classesFolder()
-                .file(artifact().name() + "-build.properties")
+                .file(artifactName() + "-build.properties")
                 .saveText(buildProperties().join("\n"));
-    }
-
-    /**
-     * Returns the artifact descriptor for the build that this tool is associated with
-     */
-    private ArtifactDescriptor artifact()
-    {
-        return associatedBuild().artifactDescriptor();
     }
 
     /**
@@ -130,9 +121,9 @@ public class BuildStamper extends BaseTool implements
      */
     private StringList projectProperties()
     {
-        return stringList("artifact.group = " + artifact().group(),
-                "artifact.name = " + artifact().name(),
-                "artifact.version = " + artifact().version(),
-                "artifact = " + artifact());
+        return stringList("artifact.group = " + artifactDescriptor().group(),
+                "artifact.name = " + artifactDescriptor().name(),
+                "artifact.version = " + artifactDescriptor().version(),
+                "artifact = " + artifactDescriptor());
     }
 }

@@ -12,8 +12,7 @@ import static com.telenav.kivakit.interfaces.comparison.Matcher.matchAll;
  */
 public interface BuildListener extends
         ToolFactory,
-        BuildStructure,
-        BuildAssociated
+        Build
 {
     default void onBuildStart()
     {

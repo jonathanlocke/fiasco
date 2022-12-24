@@ -15,6 +15,7 @@ import static com.telenav.kivakit.interfaces.comparison.Matcher.matchAll;
  *
  * @author Jonathan Locke
  */
+@SuppressWarnings("unused")
 public class Matchers implements Matcher<ResourcePathed>
 {
     /** The files to copy */

@@ -16,7 +16,8 @@ import static com.telenav.kivakit.resource.compression.archive.ZipArchive.zipArc
  *
  * @author Jonathan Locke
  */
-@SuppressWarnings("unused") public class Archiver extends BaseTool
+@SuppressWarnings("unused")
+public class Archiver extends BaseTool
 {
     /** The files to archive */
     private FileList files;
@@ -41,7 +42,7 @@ import static com.telenav.kivakit.resource.compression.archive.ZipArchive.zipArc
      */
     public Archiver(Archiver that)
     {
-        super(that.associatedBuild());
+        super(that);
         this.files = that.files.copy();
         this.archiveFile = that.archiveFile;
     }
@@ -52,6 +53,15 @@ import static com.telenav.kivakit.resource.compression.archive.ZipArchive.zipArc
     public Archiver copy()
     {
         return new Archiver(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String description()
+    {
+        return "Archives resources";
     }
 
     /**
@@ -91,15 +101,6 @@ import static com.telenav.kivakit.resource.compression.archive.ZipArchive.zipArc
         var copy = copy();
         copy.files = fileList(files);
         return copy;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    protected String description()
-    {
-        return "Archives resources";
     }
 
     /**

@@ -22,7 +22,7 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
  *
  * <ul>
  *     <li>{@link #add(ArtifactDescriptor)}</li>
- *     <li>{@link #addAll(ObjectList)}</li>
+ *     <li>{@link #addAll(Collection)}</li>
  *     <li>{@link #descriptors()}</li>
  * </ul>
  *
