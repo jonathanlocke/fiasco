@@ -160,7 +160,7 @@ public class MavenRepository extends BaseRepository
                         // return it as a library,
                         resolved.add(library(descriptor)
                                 .withDependencies(dependencies)
-                                .withJar(jar)
+                                .withContent(jar)
                                 .withJavadoc(javadoc)
                                 .withSource(source));
                     }
@@ -169,7 +169,7 @@ public class MavenRepository extends BaseRepository
                         // otherwise, return it as an asset.
                         resolved.add(asset(descriptor)
                                 .withDependencies(dependencies)
-                                .withJar(jar));
+                                .withContent(jar));
                     }
                 }
             }

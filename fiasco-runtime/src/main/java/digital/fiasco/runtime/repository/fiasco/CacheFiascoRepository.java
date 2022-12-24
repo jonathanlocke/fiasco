@@ -87,7 +87,7 @@ public class CacheFiascoRepository extends LocalFiascoRepository
             }
             catch (Exception e)
             {
-                problem(e, "Unable to add cache entry: $", artifact);
+                problem(e, "Unable to install artifact: $", artifact);
             }
         });
     }

@@ -12,7 +12,6 @@ import digital.fiasco.runtime.dependency.DependencyList;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONTENT_SUFFIX;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactType.ASSET;
 
@@ -98,28 +97,6 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
     protected Asset(Asset that)
     {
         super(that);
-    }
-
-    /**
-     * Returns primary content attachment for this asset
-     *
-     * @return The content
-     */
-    public ArtifactContent content()
-    {
-        return attachment(CONTENT_SUFFIX).content();
-    }
-
-    /**
-     * Returns primary content attachment for this asset
-     *
-     * @return The content
-     */
-    public Asset withContent(ArtifactContent content)
-    {
-        var copy = copy();
-        copy.withAttachment(new ArtifactAttachment(this, CONTENT_SUFFIX, content));
-        return copy;
     }
 
     /**

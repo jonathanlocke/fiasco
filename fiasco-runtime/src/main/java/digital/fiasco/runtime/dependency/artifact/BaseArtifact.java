@@ -13,6 +13,7 @@ import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.core.version.Version.parseVersion;
 import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONTENT_SUFFIX;
 
 /**
  * Represents an artifact, either an {@link ArtifactType#ASSET}, or an {@link ArtifactType#LIBRARY}.
@@ -54,7 +55,6 @@ import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
  *     <li>{@link #withDependencies(DependencyList)} - Returns this artifact with the given dependencies</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
  *     <li>{@link #withIdentifier(String)} - Returns this artifact with the given identifier</li>
- *     <li>{@link #withJar(ArtifactContent)} - Returns this artifact with the given JAR content</li>
  *     <li>{@link #withType(ArtifactType)} - Returns this artifact with the given type</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #withoutDependencies(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
@@ -77,9 +77,6 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
 
     /** List of dependent artifacts */
     protected DependencyList dependencies;
-
-    /** The artifact JAR */
-    protected ArtifactContent jar;
 
     /** Dependency exclusions for this artifact */
     private ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptAll());
@@ -135,6 +132,16 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     public final ObjectMap<String, ArtifactAttachment> attachments()
     {
         return attachments;
+    }
+
+    /**
+     * Returns primary content attachment for this asset
+     *
+     * @return The content
+     */
+    public ArtifactContent content()
+    {
+        return attachment(CONTENT_SUFFIX).content();
     }
 
     /**
@@ -283,6 +290,18 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     }
 
     /**
+     * Returns primary content attachment for this asset
+     *
+     * @return The content
+     */
+    public A withContent(ArtifactContent content)
+    {
+        var copy = copy();
+        copy.withAttachment(new ArtifactAttachment(this, CONTENT_SUFFIX, content));
+        return copy;
+    }
+
+    /**
      * Returns a copy of this artifact with the given dependencies
      *
      * @param dependencies The new dependencies
@@ -318,19 +337,6 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     {
         var copy = copy();
         copy.descriptor = descriptor.withIdentifier(identifier);
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this artifact with the given jar
-     *
-     * @param jar The new jar
-     * @return The new artifact
-     */
-    public A withJar(ArtifactContent jar)
-    {
-        var copy = copy();
-        copy.jar = jar;
         return copy;
     }
 

@@ -16,6 +16,7 @@ import digital.fiasco.runtime.repository.maven.MavenRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
+import java.util.Collection;
 import java.util.Objects;
 
 /**
@@ -182,7 +183,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
         }
     }
 
-    protected void visitArtifactAttachments(@NotNull ObjectList<ArtifactDescriptor> descriptors,
+    protected void visitArtifactAttachments(@NotNull Collection<ArtifactDescriptor> descriptors,
                                             @NotNull ArtifactAttachmentVisitor visitor)
     {
         descriptors.forEach(at ->

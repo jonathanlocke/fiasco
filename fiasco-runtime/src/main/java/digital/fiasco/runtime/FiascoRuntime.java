@@ -19,6 +19,8 @@ public class FiascoRuntime extends Project
      */
     public static Folder fiascoCacheFolder()
     {
-        return userHome().folder(".fiasco").mkdirs();
+        return userHome()
+                .folder(".fiasco")
+                .mkdirs();
     }
 }
