@@ -8,7 +8,6 @@ import com.telenav.kivakit.core.messaging.messages.status.Warning;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.FileList;
-import com.telenav.kivakit.filesystem.Folder;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.BuildMulticaster;
 import digital.fiasco.runtime.build.BuildPhased;
@@ -33,7 +32,6 @@ import digital.fiasco.runtime.build.tools.librarian.Librarian;
 import java.util.Collection;
 import java.util.List;
 
-import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
 import static com.telenav.kivakit.filesystem.FileList.fileList;
 import static digital.fiasco.runtime.build.BuildOption.DRY_RUN;
@@ -270,15 +268,6 @@ public class Builder extends BaseTool implements
         var copy = copy();
         this.files = fileList(this.files.with(files));
         return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Build withRootFolder(Folder root)
-    {
-        return unsupported();
     }
 
     /**

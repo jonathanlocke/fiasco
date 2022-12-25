@@ -110,12 +110,4 @@ public interface BuildStructured extends Rooted
     {
         return sourceFolder().folder("test");
     }
-
-    /**
-     * Returns a copy of this build with the given root folder
-     *
-     * @param root The new root folder
-     * @return The copy
-     */
-    Build withRootFolder(Folder root);
 }
