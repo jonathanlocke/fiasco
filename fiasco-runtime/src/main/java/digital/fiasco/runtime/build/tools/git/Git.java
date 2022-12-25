@@ -79,7 +79,7 @@ public class Git extends BaseTool
      */
     public Git(Git that)
     {
-        super(that);
+        super(that.associatedBuild());
         this.folder = that.folder;
         this.arguments = that.arguments.copy();
         this.output = that.output;

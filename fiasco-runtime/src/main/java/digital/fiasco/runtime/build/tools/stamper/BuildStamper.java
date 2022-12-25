@@ -5,7 +5,7 @@ import com.telenav.kivakit.conversion.core.time.TimeConverter;
 import com.telenav.kivakit.core.collections.list.StringList;
 import com.telenav.kivakit.core.string.Formatter;
 import digital.fiasco.runtime.build.Build;
-import digital.fiasco.runtime.build.BuildStructure;
+import digital.fiasco.runtime.build.BuildStructured;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.build.tools.ToolFactory;
 
@@ -46,7 +46,7 @@ import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
  */
 @SuppressWarnings({ "unused", "SpellCheckingInspection" })
 public class BuildStamper extends BaseTool implements
-        BuildStructure,
+        BuildStructured,
         ToolFactory
 {
     /**
@@ -85,11 +85,11 @@ public class BuildStamper extends BaseTool implements
         information("Stamping build");
 
         classesFolder()
-                .file(artifactName() + "-project.properties")
+                .file(associatedBuild().artifactName() + "-project.properties")
                 .saveText(projectProperties().join("\n"));
 
         classesFolder()
-                .file(artifactName() + "-build.properties")
+                .file(associatedBuild().artifactName() + "-build.properties")
                 .saveText(buildProperties().join("\n"));
     }
 
@@ -98,7 +98,7 @@ public class BuildStamper extends BaseTool implements
      */
     private StringList buildProperties()
     {
-        var git = git();
+        var git = newGit();
 
         git.commitHash().run();
         var commitHash = git.output() != null
@@ -121,9 +121,10 @@ public class BuildStamper extends BaseTool implements
      */
     private StringList projectProperties()
     {
-        return stringList("artifact.group = " + artifactDescriptor().group(),
-                "artifact.name = " + artifactDescriptor().name(),
-                "artifact.version = " + artifactDescriptor().version(),
-                "artifact = " + artifactDescriptor());
+        var descriptor = associatedBuild().artifactDescriptor();
+        return stringList("artifact.group = " + descriptor.group(),
+                "artifact.name = " + descriptor.name(),
+                "artifact.version = " + descriptor.version(),
+                "artifact = " + descriptor);
     }
 }

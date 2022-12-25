@@ -11,16 +11,29 @@ import digital.fiasco.runtime.build.phases.Phase;
 public class BuildMulticaster extends BaseBuild implements
         BuildListener
 {
-    private final BaseBuild build;
+    private final Build build;
 
-    public BuildMulticaster(BaseBuild build)
+    public BuildMulticaster(Build build)
     {
         this.build = build;
     }
 
+    @Override
+    public Build associatedBuild()
+    {
+        return build;
+    }
+
+    @Override
     public ObjectList<BuildListener> buildListeners()
     {
         return build.buildListeners();
+    }
+
+    @Override
+    public boolean isEnabled(BuildOption option)
+    {
+        return build.isEnabled(option);
     }
 
     @Override

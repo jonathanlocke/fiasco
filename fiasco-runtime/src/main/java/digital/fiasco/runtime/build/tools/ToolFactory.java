@@ -1,8 +1,9 @@
 package digital.fiasco.runtime.build.tools;
 
-import com.telenav.kivakit.core.messaging.Repeater;
-import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.BuildAssociated;
+import digital.fiasco.runtime.build.BuildStructured;
 import digital.fiasco.runtime.build.tools.archiver.Archiver;
+import digital.fiasco.runtime.build.tools.builder.Builder;
 import digital.fiasco.runtime.build.tools.cleaner.Cleaner;
 import digital.fiasco.runtime.build.tools.compiler.Compiler;
 import digital.fiasco.runtime.build.tools.copier.Copier;
@@ -19,31 +20,39 @@ import static com.telenav.kivakit.core.version.Version.version;
  */
 @SuppressWarnings("unused")
 public interface ToolFactory extends
-        Repeater,
-        Build
+        BuildAssociated,
+        BuildStructured
 {
     /**
      * Creates a new {@link Archiver} tool
      */
-    default Archiver archiver()
+    default Archiver newArchiver()
     {
-        return new Archiver(this);
+        return new Archiver(associatedBuild());
+    }
+
+    /**
+     * Creates a new {@link Builder} tool
+     */
+    default Builder newBuilder()
+    {
+        return new Builder(associatedBuild());
     }
 
     /**
      * Creates a new {@link Cleaner} tool
      */
-    default Cleaner cleaner()
+    default Cleaner newCleaner()
     {
-        return new Cleaner(this);
+        return new Cleaner(associatedBuild());
     }
 
     /**
      * Creates a new {@link Compiler} tool, with default Java sources and source/target versions.
      */
-    default Compiler compiler()
+    default Compiler newCompiler()
     {
-        return new Compiler(this)
+        return new Compiler(associatedBuild())
                 .withSources(javaSources())
                 .withSourceVersion(version(17))
                 .withTargetVersion(version(17));
@@ -52,48 +61,48 @@ public interface ToolFactory extends
     /**
      * Creates a new {@link Copier} tool
      */
-    default Copier copier()
+    default Copier newCopier()
     {
-        return new Copier(this);
+        return new Copier(associatedBuild());
     }
 
     /**
      * Creates a new {@link Git} tool
      */
-    default Git git()
+    default Git newGit()
     {
-        return new Git(this);
+        return new Git(associatedBuild());
     }
 
     /**
      * Creates a new {@link Librarian} tool
      */
-    default Librarian librarian()
+    default Librarian newLibrarian()
     {
-        return new Librarian(this);
+        return new Librarian(associatedBuild());
     }
 
     /**
      * Creates a new {@link Shader} tool
      */
-    default Shader shader()
+    default Shader newShader()
     {
-        return new Shader(this);
+        return new Shader(associatedBuild());
     }
 
     /**
      * Creates a new {@link BuildStamper} tool
      */
-    default BuildStamper stamper()
+    default BuildStamper newStamper()
     {
-        return new BuildStamper(this);
+        return new BuildStamper(associatedBuild());
     }
 
     /**
      * Creates a new {@link Tester} tool
      */
-    default Tester tester()
+    default Tester newTester()
     {
-        return new Tester(this);
+        return new Tester(associatedBuild());
     }
 }

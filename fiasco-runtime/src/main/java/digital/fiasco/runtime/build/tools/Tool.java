@@ -7,9 +7,11 @@
 
 package digital.fiasco.runtime.build.tools;
 
-import com.telenav.kivakit.core.messaging.Repeater;
+import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.BaseBuild;
-import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.BuildAssociated;
+import digital.fiasco.runtime.build.BuildEnvironment;
+import digital.fiasco.runtime.build.BuildStructured;
 
 /**
  * Interface for executable tools. Tools are runnable message repeaters that are associated with a {@link BaseBuild}
@@ -19,8 +21,9 @@ import digital.fiasco.runtime.build.Build;
  */
 public interface Tool extends
         Runnable,
-        Repeater,
-        Build
+        Described,
+        BuildAssociated,
+        BuildStructured,
+        BuildEnvironment
 {
-    String description();
 }

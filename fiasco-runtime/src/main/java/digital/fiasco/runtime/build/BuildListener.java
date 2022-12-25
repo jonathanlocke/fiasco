@@ -10,9 +10,7 @@ import static com.telenav.kivakit.interfaces.comparison.Matcher.matchAll;
  *
  * @author Jonathan Locke
  */
-public interface BuildListener extends
-        ToolFactory,
-        Build
+public interface BuildListener extends ToolFactory
 {
     default void onBuildStart()
     {
@@ -28,7 +26,7 @@ public interface BuildListener extends
 
     default void onClean()
     {
-        cleaner().withFiles(targetFolder().nestedFiles(matchAll())).run();
+        newCleaner().withFiles(targetFolder().nestedFiles(matchAll())).run();
     }
 
     default void onCleaned()
@@ -41,8 +39,8 @@ public interface BuildListener extends
 
     default void onCompile()
     {
-        compiler().withSources(javaSources()).run();
-        stamper().run();
+        newCompiler().withSources(javaSources()).run();
+        newStamper().run();
     }
 
     default void onCompiled()
@@ -135,12 +133,12 @@ public interface BuildListener extends
 
     default void onPrepareResources()
     {
-        copier().withSourceFolder(mainResourceFolder())
+        newCopier().withSourceFolder(mainResourceFolder())
                 .withTargetFolder(classesFolder())
                 .with("**/*")
                 .run();
 
-        copier().withSourceFolder(testResourceFolder())
+        newCopier().withSourceFolder(testResourceFolder())
                 .withTargetFolder(testClassesFolder())
                 .with("**/*")
                 .run();

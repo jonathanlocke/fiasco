@@ -30,7 +30,7 @@ public class Cleaner extends BaseTool
 
     public Cleaner copy()
     {
-        var copy = new Cleaner(this);
+        var copy = new Cleaner(associatedBuild());
         copy.files = files.copy();
         return copy;
     }

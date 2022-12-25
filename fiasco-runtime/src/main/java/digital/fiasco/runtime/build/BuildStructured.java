@@ -13,7 +13,7 @@ import static com.telenav.kivakit.resource.ResourceGlob.glob;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public interface BuildStructure extends Rooted
+public interface BuildStructured extends Rooted
 {
     /**
      * output/classes
@@ -110,4 +110,12 @@ public interface BuildStructure extends Rooted
     {
         return sourceFolder().folder("test");
     }
+
+    /**
+     * Returns a copy of this build with the given root folder
+     *
+     * @param root The new root folder
+     * @return The copy
+     */
+    Build withRootFolder(Folder root);
 }

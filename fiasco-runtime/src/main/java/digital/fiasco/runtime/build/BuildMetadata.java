@@ -24,7 +24,9 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.pars
  * @param resources Locations of resources for developers
  * @param contributors The project contributors
  */
+@SuppressWarnings("unused")
 public record BuildMetadata(@FormatProperty ArtifactDescriptor artifactDescriptor,
+                            @FormatProperty String description,
                             @FormatProperty ArtifactType artifactType,
                             @FormatProperty Organization organization,
                             @FormatProperty Copyright copyright,
@@ -34,7 +36,7 @@ public record BuildMetadata(@FormatProperty ArtifactDescriptor artifactDescripto
 {
     public BuildMetadata()
     {
-        this(null, null, null, null, null, null, null);
+        this(null, null, null, null, null, null, null, null);
     }
 
     public BuildMetadata withArtifactDescriptor(String descriptor)
@@ -44,31 +46,36 @@ public record BuildMetadata(@FormatProperty ArtifactDescriptor artifactDescripto
 
     public BuildMetadata withArtifactDescriptor(ArtifactDescriptor artifact)
     {
-        return new BuildMetadata(artifact, artifactType, organization, copyright, license, resources, contributors);
+        return new BuildMetadata(artifact, description, artifactType, organization, copyright, license, resources, contributors);
     }
 
     public BuildMetadata withContributors(ObjectList<Contributor> contributors)
     {
-        return new BuildMetadata(artifactDescriptor, artifactType, organization, copyright, license, resources, contributors);
+        return new BuildMetadata(artifactDescriptor, description, artifactType, organization, copyright, license, resources, contributors);
     }
 
     public BuildMetadata withCopyright(Copyright copyright)
     {
-        return new BuildMetadata(artifactDescriptor, artifactType, organization, copyright, license, resources, contributors);
+        return new BuildMetadata(artifactDescriptor, description, artifactType, organization, copyright, license, resources, contributors);
+    }
+
+    public BuildMetadata withDescription(String description)
+    {
+        return new BuildMetadata(artifactDescriptor, description, artifactType, organization, copyright, license, resources, contributors);
     }
 
     public BuildMetadata withLicense(License license)
     {
-        return new BuildMetadata(artifactDescriptor, artifactType, organization, copyright, license, resources, contributors);
+        return new BuildMetadata(artifactDescriptor, description, artifactType, organization, copyright, license, resources, contributors);
     }
 
     public BuildMetadata withOrganization(Organization organization)
     {
-        return new BuildMetadata(artifactDescriptor, artifactType, organization, copyright, license, resources, contributors);
+        return new BuildMetadata(artifactDescriptor, description, artifactType, organization, copyright, license, resources, contributors);
     }
 
     public BuildMetadata withResources(Resources resources)
     {
-        return new BuildMetadata(artifactDescriptor, artifactType, organization, copyright, license, resources, contributors);
+        return new BuildMetadata(artifactDescriptor, description, artifactType, organization, copyright, license, resources, contributors);
     }
 }

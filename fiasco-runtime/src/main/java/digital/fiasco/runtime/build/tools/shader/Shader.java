@@ -5,9 +5,9 @@ import digital.fiasco.runtime.build.tools.BaseTool;
 
 public class Shader extends BaseTool
 {
-    public Shader(Build module)
+    public Shader(Build build)
     {
-        super(module);
+        super(build);
     }
 
     @Override

@@ -92,7 +92,7 @@ public class Compiler extends BaseTool
      */
     public Compiler(Compiler that)
     {
-        super(that);
+        super(that.associatedBuild());
         this.sourceVersion = that.sourceVersion;
         this.targetVersion = that.targetVersion;
         this.sources = that.sources.copy();

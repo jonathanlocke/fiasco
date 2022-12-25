@@ -18,31 +18,14 @@ import com.telenav.kivakit.application.Application;
 import com.telenav.kivakit.commandline.ArgumentParser;
 import com.telenav.kivakit.conversion.core.language.IdentityConverter;
 import com.telenav.kivakit.core.collections.list.ObjectList;
-import com.telenav.kivakit.core.collections.map.ObjectMap;
-import com.telenav.kivakit.core.messaging.listeners.MessageList;
-import com.telenav.kivakit.core.messaging.messages.status.Problem;
-import com.telenav.kivakit.core.messaging.messages.status.Quibble;
-import com.telenav.kivakit.core.messaging.messages.status.Warning;
+import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.project.Project;
-import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.serialization.gson.GsonSerializationProject;
 import digital.fiasco.runtime.build.phases.Phase;
-import digital.fiasco.runtime.build.phases.PhaseClean;
-import digital.fiasco.runtime.build.phases.PhaseCompile;
-import digital.fiasco.runtime.build.phases.PhaseDeployDocumentation;
-import digital.fiasco.runtime.build.phases.PhaseDeployPackages;
-import digital.fiasco.runtime.build.phases.PhaseDocument;
-import digital.fiasco.runtime.build.phases.PhaseEnd;
-import digital.fiasco.runtime.build.phases.PhaseInstall;
-import digital.fiasco.runtime.build.phases.PhaseIntegrationTest;
 import digital.fiasco.runtime.build.phases.PhaseList;
-import digital.fiasco.runtime.build.phases.PhasePackage;
-import digital.fiasco.runtime.build.phases.PhasePrepare;
-import digital.fiasco.runtime.build.phases.PhaseStart;
-import digital.fiasco.runtime.build.phases.PhaseTest;
 import digital.fiasco.runtime.build.tools.ToolFactory;
-import digital.fiasco.runtime.build.tools.librarian.Librarian;
+import digital.fiasco.runtime.build.tools.builder.Builder;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
@@ -53,9 +36,9 @@ import static com.telenav.kivakit.commandline.ArgumentParser.argumentParser;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
-import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
 import static com.telenav.kivakit.core.string.Paths.pathTail;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
+import static digital.fiasco.runtime.build.BuildOption.DRY_RUN;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 
 /**
@@ -65,16 +48,16 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
  *
  * <p>
  * Build phases are executed in a pre-defined order, as below. Each phase is defined by a class that extends
- * {@link Phase}. Additional phases can be inserted into {@link #phases()} with
+ * {@link Phase}. Additional phases can be inserted into {@link Builder#phases()} with
  * {@link PhaseList#addPhaseAfter(String, Phase)} and {@link PhaseList#addPhaseBefore(String, Phase)}.
  * </p>
  *
  * <p>
- * Phases are enabled and disabled with {@link #enable(Phase)} and {@link #disable(Phase)}. The {@link #onRun()} method
- * of the application enables and disables any phase names that were passed from the command line. The phase name itself
- * enables the phase and any dependent phases (for example, "compile" enables the "build-start", "prepare" and "compile"
- * phases). If the phase name is preceded by a dash (for example, -test), the phase is disabled (but not its dependent
- * phases).
+ * Phases are enabled and disabled with {@link Builder#enable(Phase)} and {@link Builder#disable(Phase)}. The
+ * {@link #onRun()} method of the application enables and disables any phase names that were passed from the command
+ * line. The phase name itself enables the phase and any dependent phases (for example, "compile" enables the
+ * "build-start", "prepare" and "compile" phases). If the phase name is preceded by a dash (for example, -test), the
+ * phase is disabled (but not its dependent phases).
  * </p>
  *
  * <ol>
@@ -119,22 +102,10 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
  *     </tr>
  * </table>
  *
- * <p><b>Execution</b></p>
+ * <p><b>Building</b></p>
  *
  * <ul>
- *     <li>{@link #buildProject()}</li>
- *     <li>{@link #buildProject(Count)}</li>
- * </ul>
- *
- * <p><b>Build Phases</b></p>
- *
- * <ul>
- *     <li>{@link #disable(Phase)}</li>
- *     <li>{@link #enable(Phase)}</li>
- *     <li>{@link #enabled(Phase)}</li>
- *     <li>{@link #phase()}</li>
- *     <li>{@link #phase(String)}</li>
- *     <li>{@link #phases()}</li>
+ *     <li>{@link #builder()}</li>
  * </ul>
  *
  * <p><b>Dependencies</b></p>
@@ -167,7 +138,6 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
  *     <li>{@link #withArtifactDescriptor(String)}</li>
  *     <li>{@link #withArtifactDescriptor(ArtifactDescriptor)}</li>
  *     <li>{@link #withArtifactIdentifier(String)}</li>
- *     <li>{@link #withChildFolder(String)}</li>
  *     <li>{@link #withDependencies(Artifact[])}</li>
  *     <li>{@link #withDependencies(DependencyList)}</li>
  *     <li>{@link #withRootFolder(Folder)}</li>
@@ -176,26 +146,21 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
  * <p><b>Properties</b></p>
  *
  * <ul>
+ *     <li>{@link #builder()}</li>
  *     <li>{@link #dependencies()}</li>
  *     <li>{@link #description()}</li>
- *     <li>{@link #dryRun()}</li>
- *     <li>{@link #librarian()}</li>
  *     <li>{@link #metadata()}</li>
  *     <li>{@link #name()}</li>
- *     <li>{@link #phases()}</li>
  *     <li>{@link #rootFolder()}</li>
  * </ul>
  *
- * <p><b>Functional</b></p>
- *
  * @author Jonathan Locke
  */
-@SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused", "SwitchStatementWithTooFewBranches",
-        "StringConcatenationInLoop" })
+@SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused", "SwitchStatementWithTooFewBranches" })
 public abstract class BaseBuild extends Application implements
         Build,
         BuildEnvironment,
-        BuildStructure,
+        BuildStructured,
         BuildListener,
         BuildRepositories,
         ToolFactory
@@ -209,28 +174,25 @@ public abstract class BaseBuild extends Application implements
     /** Libraries to compile with */
     private DependencyList dependencies = dependencyList();
 
-    /** Phases in order of execution */
-    private final PhaseList phases = new PhaseList();
-
-    /** Enable state of each phase */
-    private ObjectMap<Phase, Boolean> phaseEnabled = new ObjectMap<>();
-
     /** The root folder for this build */
     private Folder rootFolder = currentFolder();
 
-    /** If true, describe the build rather than executing it */
-    private boolean dryRun = false;
-
     /** Metadata associated with this build */
     private BuildMetadata metadata;
+
+    /** If true, describe the build rather than executing it */
+    private ObjectSet<BuildOption> options = set();
+
+    /** The builder to build the project */
+    private Builder builder;
 
     /**
      * Creates a build
      */
     protected BaseBuild()
     {
-        installDefaultPhases();
         addBuildListener(this);
+        builder = listenTo(newBuilder());
     }
 
     /**
@@ -256,6 +218,7 @@ public abstract class BaseBuild extends Application implements
     /**
      * Returns the primary artifact descriptor for this build
      */
+    @Override
     public ArtifactDescriptor artifactDescriptor()
     {
         return artifactDescriptor;
@@ -271,61 +234,12 @@ public abstract class BaseBuild extends Application implements
     }
 
     /**
-     * Builds with one thread for each processor
-     *
-     * @return True if the build succeeded without any problems
+     * Returns the builder for this build
      */
     @Override
-    public final boolean buildProject()
+    public Builder builder()
     {
-        return buildProject(processors());
-    }
-
-    /**
-     * Builds with the given number of worker threads
-     *
-     * @return True if the build succeeded without any problems
-     */
-    @Override
-    @SuppressWarnings("unchecked")
-    public final boolean buildProject(Count threads)
-    {
-        // Listen to any problems broadcast by the build,
-        var issues = new MessageList(message -> !message.status().succeeded());
-        issues.listenTo(this);
-
-        // go through each phase in order,
-        for (var phase : phases)
-        {
-            // and if the phase is enabled,
-            if (enabled(phase))
-            {
-                // notify that the phase has started,
-                var multicaster = new BuildMulticaster(this);
-                multicaster.onPhaseStart(phase);
-
-                // run the phase calling all listeners,
-                if (dryRun)
-                {
-                    announce(" \n$", bannerLine(phase.name()));
-                }
-                else
-                {
-                    announce(bannerLine(phase.name()));
-                }
-                phase.run(multicaster);
-
-                // notify that the phase has ended,
-                multicaster.onPhaseEnd(phase);
-            }
-        }
-
-        // then collect statistics and display them,
-        var statistics = issues.statistics(Problem.class, Warning.class, Quibble.class);
-        information(statistics.titledBox("Build Results"));
-
-        // and return true if there are no problems (or worse).
-        return issues.countWorseThanOrEqualTo(Problem.class).isZero();
+        return builder;
     }
 
     /**
@@ -334,9 +248,9 @@ public abstract class BaseBuild extends Application implements
      * @param path The path to the child build
      */
     @Override
-    public BaseBuild childBuild(String path)
+    public Build childBuild(String path)
     {
-        return withChildFolder(path)
+        return withRootFolder(rootFolder.folder(path))
                 .withArtifactIdentifier(pathTail(path, '/'));
     }
 
@@ -360,10 +274,10 @@ public abstract class BaseBuild extends Application implements
         this.artifactDescriptor = that.artifactDescriptor;
         this.buildListeners = that.buildListeners.copy();
         this.dependencies = that.dependencies.copy();
-        this.phaseEnabled = that.phaseEnabled.copy();
         this.rootFolder = that.rootFolder;
-        this.dryRun = that.dryRun;
         this.metadata = that.metadata;
+        this.builder = that.builder;
+        this.options = that.options.copy();
     }
 
     /**
@@ -383,25 +297,21 @@ public abstract class BaseBuild extends Application implements
     @Override
     public String description()
     {
-        var description = """
+        return """
                 Commands
                                 
                   command               description
                   -----------           ---------------------------------------------
                   describe              describe the build rather than running it
                                 
-                Phases (those preceded by a dash will be disabled)
-                            
-                  phase                 description
-                  -----------           ---------------------------------------------
-                """;
+                """ + builder.description();
+    }
 
-        for (var phase : phases)
-        {
-            description += String.format("  %-22s%s\n", phase.name(), phase.description());
-        }
-
-        return description;
+    @Override
+    public Build disable(BuildOption option)
+    {
+        options.remove(option);
+        return this;
     }
 
     /**
@@ -412,16 +322,14 @@ public abstract class BaseBuild extends Application implements
     @Override
     public void disable(Phase phase)
     {
-        phaseEnabled.put(phase, false);
+        builder.disable(phase);
     }
 
-    /**
-     * Returns true if this build should only describe what will be done
-     */
     @Override
-    public boolean dryRun()
+    public Build enable(BuildOption option)
     {
-        return dryRun;
+        options.add(option);
+        return this;
     }
 
     /**
@@ -432,24 +340,14 @@ public abstract class BaseBuild extends Application implements
     @Override
     public void enable(Phase phase)
     {
-        for (var at : phase.requiredPhases())
-        {
-            phaseEnabled.put(at, true);
-        }
-        phaseEnabled.put(phase, true);
+        builder.enable(phase);
     }
 
-    /**
-     * The librarian for this build
-     *
-     * @return The librarian
-     */
     @Override
-    public Librarian librarian()
+    public boolean isEnabled(BuildOption option)
     {
-        return librarian;
-    }    /** The librarian to manage libraries */
-    private final Librarian librarian = listenTo(librarian());
+        return options.contains(option);
+    }
 
     @Override
     public BuildMetadata metadata()
@@ -458,12 +356,24 @@ public abstract class BaseBuild extends Application implements
     }
 
     /**
+     * Returns the phase with the given name
+     *
+     * @param name The phase name to look up
+     * @return The phase, or null if no phase can be found with the given name
+     */
+    @Override
+    public Phase phase(String name)
+    {
+        return builder.phase(name);
+    }
+
+    /**
      * Returns the list of phases in execution order for this build
      */
     @Override
     public PhaseList phases()
     {
-        return phases;
+        return builder.phases();
     }
 
     @Override
@@ -510,6 +420,7 @@ public abstract class BaseBuild extends Application implements
     /**
      * Returns the root folder of this build
      */
+    @Override
     public Folder rootFolder()
     {
         return rootFolder;
@@ -522,52 +433,10 @@ public abstract class BaseBuild extends Application implements
      * @return The copy
      */
     @Override
-    public BaseBuild withArtifactDescriptor(ArtifactDescriptor descriptor)
+    public Build withArtifactDescriptor(ArtifactDescriptor descriptor)
     {
         var copy = copy();
         copy.artifactDescriptor = descriptor;
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this build with the given main artifact descriptor
-     *
-     * @param descriptor The artifact descriptor
-     * @return The copy
-     */
-    @Override
-    public BaseBuild withArtifactDescriptor(String descriptor)
-    {
-        var copy = copy();
-        copy.artifactDescriptor = ArtifactDescriptor.artifactDescriptor(descriptor);
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this build with the given main artifact identifier
-     *
-     * @param identifier The artifact identifier
-     * @return The copy
-     */
-    @Override
-    public BaseBuild withArtifactIdentifier(String identifier)
-    {
-        var copy = copy();
-        copy.artifactDescriptor = artifactDescriptor.withIdentifier(identifier);
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this build with the given child folder
-     *
-     * @param child The name of the child folder
-     * @return The copy
-     */
-    @Override
-    public BaseBuild withChildFolder(String child)
-    {
-        var copy = copy();
-        copy.rootFolder = rootFolder.folder(child);
         return copy;
     }
 
@@ -639,7 +508,7 @@ public abstract class BaseBuild extends Application implements
 
                 switch (value)
                 {
-                    case "describe" -> dryRun = true;
+                    case "describe" -> enable(DRY_RUN);
 
                     default ->
                     {
@@ -655,53 +524,7 @@ public abstract class BaseBuild extends Application implements
                 }
             }
 
-            buildProject();
+            builder().runBuild();
         }
     }
-
-    /**
-     * Returns true if the given phase is enabled
-     *
-     * @param phase The phase
-     * @return True if the phase is enabled
-     */
-    private boolean enabled(Phase phase)
-    {
-        return phaseEnabled.getOrDefault(phase, false);
-    }
-
-    /**
-     * Installs the default phases
-     */
-    private void installDefaultPhases()
-    {
-        phases.add(new PhaseStart());
-        phases.add(new PhaseClean());
-        phases.add(new PhasePrepare());
-        phases.add(new PhaseCompile());
-        phases.add(new PhaseTest());
-        phases.add(new PhaseDocument());
-        phases.add(new PhasePackage());
-        phases.add(new PhaseIntegrationTest());
-        phases.add(new PhaseInstall());
-        phases.add(new PhaseDeployPackages());
-        phases.add(new PhaseDeployDocumentation());
-        phases.add(new PhaseEnd());
-
-        enable(phase("start"));
-        enable(phase("end"));
-    }
-
-    /**
-     * Returns the phase with the given name
-     *
-     * @param name The phase name to look up
-     * @return The phase, or null if no phase can be found with the given name
-     */
-    private Phase phase(String name)
-    {
-        return phases.phase(name);
-    }
-
-
 }

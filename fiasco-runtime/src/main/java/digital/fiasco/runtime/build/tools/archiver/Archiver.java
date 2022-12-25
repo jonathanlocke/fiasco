@@ -42,7 +42,7 @@ public class Archiver extends BaseTool
      */
     public Archiver(Archiver that)
     {
-        super(that);
+        super(that.associatedBuild());
         this.files = that.files.copy();
         this.archiveFile = that.archiveFile;
     }

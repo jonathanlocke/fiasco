@@ -63,7 +63,7 @@ public class Copier extends BaseTool
      */
     public Copier(Copier that)
     {
-        super(that);
+        super(that.associatedBuild());
         this.to = that.to;
         this.source = that.source;
         this.includes = that.includes;
