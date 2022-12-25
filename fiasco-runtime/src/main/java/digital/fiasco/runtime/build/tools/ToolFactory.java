@@ -53,7 +53,7 @@ public interface ToolFactory extends
     default Compiler newCompiler()
     {
         return new Compiler(associatedBuild())
-                .withSources(javaSources())
+                .withSources(sourceMainJavaSources())
                 .withSourceVersion(version(17))
                 .withTargetVersion(version(17));
     }

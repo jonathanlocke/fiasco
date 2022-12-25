@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.build.tools.builder;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.messaging.listeners.MessageList;
 import com.telenav.kivakit.core.messaging.messages.status.Problem;
@@ -9,7 +10,6 @@ import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.FileList;
 import digital.fiasco.runtime.build.Build;
-import digital.fiasco.runtime.build.BuildMulticaster;
 import digital.fiasco.runtime.build.BuildPhased;
 import digital.fiasco.runtime.build.phases.Phase;
 import digital.fiasco.runtime.build.phases.PhaseClean;
@@ -32,6 +32,7 @@ import digital.fiasco.runtime.build.tools.librarian.Librarian;
 import java.util.Collection;
 import java.util.List;
 
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
 import static com.telenav.kivakit.filesystem.FileList.fileList;
 import static digital.fiasco.runtime.build.BuildOption.DRY_RUN;
@@ -88,6 +89,9 @@ public class Builder extends BaseTool implements
     /** Phases in order of execution */
     private final PhaseList phases = new PhaseList();
 
+    /** Listeners to call as the build proceeds */
+    private ObjectList<BuildListener> buildListeners = list();
+
     /** Enable state of each phase */
     private final ObjectMap<Phase, Boolean> phaseEnabled = new ObjectMap<>();
 
@@ -102,6 +106,16 @@ public class Builder extends BaseTool implements
         installDefaultPhases();
     }
 
+    /**
+     * Adds the given build listener to this build
+     *
+     * @param listener The listener to call with build events
+     */
+    public void addBuildListener(BuildListener listener)
+    {
+        buildListeners.add(listener);
+    }
+
     @Override
     public Builder builder()
     {
@@ -112,6 +126,7 @@ public class Builder extends BaseTool implements
     {
         var copy = new Builder(associatedBuild());
         copy.files = files.copy();
+        this.buildListeners = buildListeners.copy();
         return copy;
     }
 
@@ -166,6 +181,11 @@ public class Builder extends BaseTool implements
             phaseEnabled.put(at, true);
         }
         phaseEnabled.put(phase, true);
+    }
+
+    public boolean isEnabled(Phase phase)
+    {
+        return phaseEnabled.get(phase);
     }
 
     /**

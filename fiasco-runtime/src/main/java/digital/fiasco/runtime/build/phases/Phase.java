@@ -2,7 +2,8 @@ package digital.fiasco.runtime.build.phases;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.interfaces.naming.Named;
-import digital.fiasco.runtime.build.BuildListener;
+import com.telenav.kivakit.interfaces.string.Described;
+import digital.fiasco.runtime.build.tools.builder.BuildListener;
 
 /**
  * Base class for phases. A phase has a name, a description, and a set of dependent phases, accessed with
@@ -10,7 +11,9 @@ import digital.fiasco.runtime.build.BuildListener;
  *
  * @author Jonathan Locke
  */
-public abstract class Phase implements Named
+public abstract class Phase implements
+        Named,
+        Described
 {
     /** The name of this phase */
     private final String name;
@@ -24,11 +27,6 @@ public abstract class Phase implements Named
     {
         this.name = name;
     }
-
-    /**
-     * Returns the description of this phase
-     */
-    public abstract String description();
 
     /**
      * {@inheritDoc}

@@ -1,12 +1,11 @@
 package fiasco;
 
+import digital.fiasco.libraries.Libraries;
 import digital.fiasco.runtime.build.Build;
 
-import static digital.fiasco.libraries.build.ApacheAnt.apache_ant;
-import static digital.fiasco.libraries.languages.java.serialization.Kryo.kryo;
-import static digital.fiasco.libraries.logging.ApacheCommonsLogging.apache_commons_logging;
-
-public interface ProjectLibraries extends Build
+public interface ExampleLibraries extends
+        Build,
+        Libraries
 {
     /**
      * Pins versions to the associated build for this interface

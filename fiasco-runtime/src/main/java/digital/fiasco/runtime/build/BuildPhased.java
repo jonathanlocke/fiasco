@@ -3,6 +3,26 @@ package digital.fiasco.runtime.build;
 import digital.fiasco.runtime.build.phases.Phase;
 import digital.fiasco.runtime.build.phases.PhaseList;
 
+/**
+ * Allows access to build phases
+ *
+ * <p><b>Build Phases</b></p>
+ *
+ * <ul>
+ *     <li>{@link #phases()}</li>
+ *     <li>{@link #phase(String)}</li>
+ * </ul>
+ *
+ * <p><b>Enable State</b></p>
+ *
+ * <ul>
+ *     <li>{@link #disable(Phase)}</li>
+ *     <li>{@link #enable(Phase)}</li>
+ *     <li>{@link #isEnabled(Phase)}</li>
+ * </ul>
+ *
+ * @author Joonathan Locke
+ */
 public interface BuildPhased
 {
     /**
@@ -18,6 +38,14 @@ public interface BuildPhased
      * @param phase The phase
      */
     void enable(Phase phase);
+
+    /**
+     * Returns true if the given phase is enabled
+     *
+     * @param phase The phase
+     * @return The enable state
+     */
+    boolean isEnabled(Phase phase);
 
     /**
      * Returns the phase with the given name

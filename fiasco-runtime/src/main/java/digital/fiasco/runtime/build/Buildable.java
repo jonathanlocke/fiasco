@@ -1,30 +1,34 @@
 package digital.fiasco.runtime.build;
 
-import com.telenav.kivakit.core.collections.list.ObjectList;
-import com.telenav.kivakit.core.value.count.Count;
 import digital.fiasco.runtime.build.tools.builder.Builder;
 import digital.fiasco.runtime.build.tools.librarian.Librarian;
 
+/**
+ * An object that can be built.
+ *
+ * <p><b>Build Tools</b></p>
+ *
+ * <ul>
+ *     <li>{@link #builder()}</li>
+ * </ul>
+ *
+ * <p><b>Build Options</b></p>
+ *
+ * <ul>
+ *     <li>{@link #disable(BuildOption)}</li>
+ *     <li>{@link #enable(BuildOption)}</li>
+ *     <li>{@link #isEnabled(BuildOption)}</li>
+ * </ul>
+ *
+ * @author Jonathan Locke
+ */
 @SuppressWarnings({ "UnusedReturnValue", "unused" })
-public interface Buildable extends BuildEnvironment
+public interface Buildable
 {
-    /**
-     * Returns the build listeners for this build
-     */
-    ObjectList<BuildListener> buildListeners();
-
     /**
      * Returns the {@link Builder} for this build
      */
     Builder builder();
-
-    /**
-     * Returns the child build at the given path
-     *
-     * @param path The child path
-     * @return The child build
-     */
-    Build childBuild(String path);
 
     /**
      * Disables the given build option
@@ -49,34 +53,4 @@ public interface Buildable extends BuildEnvironment
      * @return True if the option is enabled
      */
     boolean isEnabled(BuildOption option);
-
-    /**
-     * Returns the librarian for this build
-     *
-     * @return The librarian
-     */
-    default Librarian librarian()
-    {
-        return builder().librarian();
-    }
-
-    /**
-     * Builds with one thread for each processor
-     *
-     * @return True if the build succeeded without any problems
-     */
-    default boolean runBuild()
-    {
-        return builder().runBuild();
-    }
-
-    /**
-     * Builds with the given number of worker threads
-     *
-     * @return True if the build succeeded without any problems
-     */
-    default boolean runBuild(Count threads)
-    {
-        return builder().runBuild(threads);
-    }
 }

@@ -20,11 +20,13 @@ import com.telenav.kivakit.conversion.core.language.IdentityConverter;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.project.Project;
+import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.serialization.gson.GsonSerializationProject;
 import digital.fiasco.runtime.build.phases.Phase;
 import digital.fiasco.runtime.build.phases.PhaseList;
 import digital.fiasco.runtime.build.tools.ToolFactory;
+import digital.fiasco.runtime.build.tools.builder.BuildListener;
 import digital.fiasco.runtime.build.tools.builder.Builder;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
@@ -106,52 +108,87 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
  *
  * <ul>
  *     <li>{@link #builder()}</li>
+ *     <li>{@link #childBuild(String)}</li>
+ *     <li>{@link #copy()}</li>
+ *     <li>{@link #disable(BuildOption)}</li>
+ *     <li>{@link #enable(BuildOption)}</li>
+ *     <li>{@link #isEnabled(BuildOption)}</li>
+ *     <li>{@link #rootFolder()}</li>
+ *     <li>{@link #withRootFolder(Folder)}</li>
  * </ul>
+ *
+ * <p><b>Artifact</b></p>
+ *
+ * <ul>
+ *     <li>{@link #artifactDescriptor()}</li>
+ *     <li>{@link #artifactName()}</li>
+ *     <li>{@link #artifactVersion()}</li>
+ *     <li>{@link #withArtifactDescriptor(ArtifactDescriptor)}</li>
+ *     <li>{@link #withArtifactDescriptor(String)}</li>
+ *     <li>{@link #withArtifactIdentifier(String)}</li>
+ *     <li>{@link #withArtifactVersion(String)}</li>
+ *     <li>{@link #withArtifactVersion(Version)}</li>
+ * </ul>
+ *
+ * <p><b>Build Phases</b></p>
+ *
+ * <ul>
+ *     <li>{@link #disable(Phase)}</li>
+ *     <li>{@link #enable(Phase)}</li>
+ *     <li>{@link #isEnabled(Phase)}</li>
+ *     <li>{@link #phase(String)}</li>
+ *     <li>{@link #phases()}</li>
+ * </ul>
+ *
  *
  * <p><b>Dependencies</b></p>
  *
  * <ul>
  *     <li>{@link #dependencies()}</li>
- *     <li>{@link #requires(DependencyList)}</li>
+ *     <li>{@link #pinVersion(Artifact, String)}</li>
+ *     <li>{@link #pinVersion(Artifact, Version)}</li>
  *     <li>{@link #requires(Artifact, Artifact...)}</li>
- *     <li>{@link #withDependencies(DependencyList)}</li>
- *     <li>{@link #withDependencies(Artifact[])}</li>
+ *     <li>{@link #requires(DependencyList)}</li>
  * </ul>
  *
- * <p><b>Build Listeners</b></p>
+ * <p><b>Build Metadata</b></p>
  *
  * <ul>
- *     <li>{@link #addBuildListener(BuildListener)}</li>
- *     <li>{@link #buildListeners()}</li>
- * </ul>
- *
- * <p><b>Hierarchy</b></p>
- *
- * <ul>
- *     <li>{@link #childBuild(String)}</li>
- * </ul>
- *
- * <p><b>Functional</b></p>
- *
- * <ul>
- *     <li>{@link #copy()}</li>
- *     <li>{@link #withArtifactDescriptor(String)}</li>
- *     <li>{@link #withArtifactDescriptor(ArtifactDescriptor)}</li>
- *     <li>{@link #withArtifactIdentifier(String)}</li>
- *     <li>{@link #withDependencies(Artifact[])}</li>
- *     <li>{@link #withDependencies(DependencyList)}</li>
- *     <li>{@link #withRootFolder(Folder)}</li>
- * </ul>
- *
- * <p><b>Properties</b></p>
- *
- * <ul>
- *     <li>{@link #builder()}</li>
- *     <li>{@link #dependencies()}</li>
  *     <li>{@link #description()}</li>
  *     <li>{@link #metadata()}</li>
  *     <li>{@link #name()}</li>
- *     <li>{@link #rootFolder()}</li>
+ * </ul>
+ *
+ * <p><b>Build Structure</b></p>
+ *
+ * <ul>
+ *     <li>{@link #sourceFolder()} - src</li>
+ *     <li>{@link #sourceMainJavaFolder()} - src/main/java</li>
+ *     <li>{@link #sourceMainResourcesFolder()} - src/main/resources</li>
+ *     <li>{@link #sourceTestFolder()} - src/test</li>
+ *     <li>{@link #sourceTestJavaFolder()} - src/test/java</li>
+ *     <li>{@link #sourceTestResourcesFolder()} - src/test/resources</li>
+ *     <li>{@link #targetClassesFolder()} - target/classes</li>
+ *     <li>{@link #targetTestClassesFolder()} - target/test-classes</li>
+ *     <li>{@link #sourceMainJavaSources()} - src/main/java/**.java</li>
+ *     <li>{@link #sourceMainResources()} - src/main/resources/**</li>
+ *     <li>{@link #sourceTestJavaSources()} - src/test/java/**.java</li>
+ *     <li>{@link #sourceTestResources()} - src/test/resources/**</li>
+ * </ul>
+ *
+ * <p><b>Build Environment</b></p>
+ *
+ * <ul>
+ *     <li>{@link #isMac()}</li>
+ *     <li>{@link #isUnix()}</li>
+ *     <li>{@link #isWindows()}</li>
+ *     <li>{@link #operatingSystemType()}</li>
+ *     <li>{@link #environmentVariables()}</li>
+ *     <li>{@link #property(String)}</li>
+ *     <li>{@link #processorArchitecture()}</li>
+ *     <li>{@link #processors()}</li>
+ *     <li>{@link #javaHome()}</li>
+ *     <li>{@link #mavenHome()}</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -159,6 +196,7 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 @SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused", "SwitchStatementWithTooFewBranches" })
 public abstract class BaseBuild extends Application implements
         Build,
+        BuildAssociated,
         BuildEnvironment,
         BuildStructured,
         BuildListener,
@@ -167,9 +205,6 @@ public abstract class BaseBuild extends Application implements
 {
     /** The primary artifact being built */
     private ArtifactDescriptor artifactDescriptor;
-
-    /** Listeners to call as the build proceeds */
-    private ObjectList<BuildListener> buildListeners = list(this);
 
     /** Libraries to compile with */
     private DependencyList dependencies = dependencyList();
@@ -191,7 +226,6 @@ public abstract class BaseBuild extends Application implements
      */
     protected BaseBuild()
     {
-        addBuildListener(this);
         builder = listenTo(newBuilder());
     }
 
@@ -206,16 +240,6 @@ public abstract class BaseBuild extends Application implements
     }
 
     /**
-     * Adds the given build listener to this build
-     *
-     * @param listener The listener to call with build events
-     */
-    public void addBuildListener(BuildListener listener)
-    {
-        buildListeners.add(listener);
-    }
-
-    /**
      * Returns the primary artifact descriptor for this build
      */
     @Override
@@ -224,13 +248,10 @@ public abstract class BaseBuild extends Application implements
         return artifactDescriptor;
     }
 
-    /**
-     * Returns the list of listeners to this build
-     */
     @Override
-    public ObjectList<BuildListener> buildListeners()
+    public Build associatedBuild()
     {
-        return buildListeners;
+        return this;
     }
 
     /**
@@ -262,22 +283,6 @@ public abstract class BaseBuild extends Application implements
         var copy = typeForClass(getClass()).newInstance();
         copy.copyFrom(this);
         return copy;
-    }
-
-    /**
-     * Copies the values of the given build into this build
-     *
-     * @param that The build to copy
-     */
-    public void copyFrom(BaseBuild that)
-    {
-        this.artifactDescriptor = that.artifactDescriptor;
-        this.buildListeners = that.buildListeners.copy();
-        this.dependencies = that.dependencies.copy();
-        this.rootFolder = that.rootFolder;
-        this.metadata = that.metadata;
-        this.builder = that.builder;
-        this.options = that.options.copy();
     }
 
     /**
@@ -350,6 +355,12 @@ public abstract class BaseBuild extends Application implements
     }
 
     @Override
+    public boolean isEnabled(Phase phase)
+    {
+        return builder.isEnabled(phase);
+    }
+
+    @Override
     public BuildMetadata metadata()
     {
         return metadata;
@@ -376,10 +387,13 @@ public abstract class BaseBuild extends Application implements
         return builder.phases();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public BaseBuild pinVersion(Artifact<?> artifact, String version)
+    public BaseBuild pinVersion(Artifact<?> artifact, Version version)
     {
-        librarian().pinVersion(artifact, version);
+        builder().librarian().pinVersion(artifact, version);
         return this;
     }
 
@@ -437,32 +451,6 @@ public abstract class BaseBuild extends Application implements
     {
         var copy = copy();
         copy.artifactDescriptor = descriptor;
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this build with the given dependencies
-     *
-     * @param dependencies The dependencies
-     * @return The copy
-     */
-    @Override
-    public BaseBuild withDependencies(Artifact<?>... dependencies)
-    {
-        return withDependencies(dependencyList(dependencies));
-    }
-
-    /**
-     * Returns a copy of this build with the given dependencies
-     *
-     * @param dependencies The dependencies
-     * @return The copy
-     */
-    @Override
-    public BaseBuild withDependencies(DependencyList dependencies)
-    {
-        var copy = copy();
-        copy.dependencies = dependencies;
         return copy;
     }
 
@@ -526,5 +514,20 @@ public abstract class BaseBuild extends Application implements
 
             builder().runBuild();
         }
+    }
+
+    /**
+     * Copies the values of the given build into this build
+     *
+     * @param that The build to copy
+     */
+    private void copyFrom(BaseBuild that)
+    {
+        this.artifactDescriptor = that.artifactDescriptor;
+        this.dependencies = that.dependencies.copy();
+        this.rootFolder = that.rootFolder;
+        this.metadata = that.metadata;
+        this.builder = that.builder;
+        this.options = that.options.copy();
     }
 }

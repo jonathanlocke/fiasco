@@ -6,6 +6,28 @@ import org.jetbrains.annotations.NotNull;
 
 import static com.telenav.kivakit.core.version.Version.version;
 
+/**
+ * Provides access to information about a build artifact.
+ *
+ * <p><b>Artifact Descriptors</b></p>
+ *
+ * <ul>
+ *     <li>{@link #artifactDescriptor()}</li>
+ *     <li>{@link #artifactName()}</li>
+ *     <li>{@link #artifactVersion()}</li>
+ * </ul>
+ *
+ * <p><b>Functional</b></p>
+ *
+ * <ul>
+ *     <li>{@link #withArtifactDescriptor(String)}</li>
+ *     <li>{@link #withArtifactDescriptor(ArtifactDescriptor)}</li>
+ *     <li>{@link #withArtifactVersion(String)}</li>
+ *     <li>{@link #withArtifactVersion(Version)}</li>
+ * </ul>
+ *
+ * @author Jonathan Locke
+ */
 @SuppressWarnings("unused")
 public interface BuildArtifact
 {
@@ -23,6 +45,14 @@ public interface BuildArtifact
     default String artifactName()
     {
         return artifactDescriptor().name();
+    }
+
+    /**
+     * Returns the artifact descriptor for this build
+     */
+    default Version artifactVersion()
+    {
+        return artifactDescriptor().version();
     }
 
     /**
@@ -45,7 +75,7 @@ public interface BuildArtifact
     }
 
     /**
-     * Returns a copy of this build with the given main artifact identifier
+     * Returns a copy of this build with the given artifact identifier
      *
      * @param identifier The artifact identifier
      * @return The copy

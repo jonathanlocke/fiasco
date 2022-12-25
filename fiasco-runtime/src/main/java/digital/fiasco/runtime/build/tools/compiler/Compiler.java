@@ -234,7 +234,7 @@ public class Compiler extends BaseTool
     @Override
     protected void onRun()
     {
-        compile(javaSources());
+        compile(sourceMainJavaSources());
     }
 
     /**

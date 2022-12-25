@@ -1,7 +1,7 @@
 package digital.fiasco.runtime.build.phases;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
-import digital.fiasco.runtime.build.BuildListener;
+import digital.fiasco.runtime.build.tools.builder.BuildListener;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 

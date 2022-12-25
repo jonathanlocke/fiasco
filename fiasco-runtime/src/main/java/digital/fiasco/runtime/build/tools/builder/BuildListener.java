@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.build;
+package digital.fiasco.runtime.build.tools.builder;
 
 import digital.fiasco.runtime.build.phases.Phase;
 import digital.fiasco.runtime.build.tools.ToolFactory;
@@ -39,7 +39,7 @@ public interface BuildListener extends ToolFactory
 
     default void onCompile()
     {
-        newCompiler().withSources(javaSources()).run();
+        newCompiler().withSources(sourceMainJavaSources()).run();
         newStamper().run();
     }
 
@@ -133,13 +133,13 @@ public interface BuildListener extends ToolFactory
 
     default void onPrepareResources()
     {
-        newCopier().withSourceFolder(mainResourceFolder())
-                .withTargetFolder(classesFolder())
+        newCopier().withSourceFolder(sourceMainResourcesFolder())
+                .withTargetFolder(targetClassesFolder())
                 .with("**/*")
                 .run();
 
-        newCopier().withSourceFolder(testResourceFolder())
-                .withTargetFolder(testClassesFolder())
+        newCopier().withSourceFolder(sourceTestResourcesFolder())
+                .withTargetFolder(targetTestClassesFolder())
                 .with("**/*")
                 .run();
     }
