@@ -46,8 +46,8 @@ import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
  */
 @SuppressWarnings({ "unused", "SpellCheckingInspection" })
 public class BuildStamper extends BaseTool implements
-        BuildStructured,
-        ToolFactory
+    BuildStructured,
+    ToolFactory
 {
     /**
      * Creates a build stamper associated with this build
@@ -66,14 +66,14 @@ public class BuildStamper extends BaseTool implements
     public String description()
     {
         return Formatter.format("""
-                        BuildStamper:
-                          project properties:
-                        $
-                          build properties:
-                        $
-                        """,
-                projectProperties().indented(4),
-                buildProperties().indented(4));
+                BuildStamper:
+                  project properties:
+                $
+                  build properties:
+                $
+                """,
+            projectProperties().indented(4),
+            buildProperties().indented(4));
     }
 
     /**
@@ -85,12 +85,12 @@ public class BuildStamper extends BaseTool implements
         information("Stamping build");
 
         targetClassesFolder()
-                .file(associatedBuild().artifactName() + "-project.properties")
-                .saveText(projectProperties().join("\n"));
+            .file(associatedBuild().artifactName() + "-project.properties")
+            .saveText(projectProperties().join("\n"));
 
         targetClassesFolder()
-                .file(associatedBuild().artifactName() + "-build.properties")
-                .saveText(buildProperties().join("\n"));
+            .file(associatedBuild().artifactName() + "-build.properties")
+            .saveText(buildProperties().join("\n"));
     }
 
     /**
@@ -102,18 +102,18 @@ public class BuildStamper extends BaseTool implements
 
         git.commitHash().run();
         var commitHash = git.output() != null
-                ? git.output()
-                : "[unknown]";
+            ? git.output()
+            : "[unknown]";
 
         git.commitTime().run();
         var commitTime = new TimeConverter(this, ISO_ZONED_DATE_TIME)
-                .convert(git.output());
+            .convert(git.output());
 
         return stringList("build.time = " + now().asString(),
-                "build.number = " + BuildName.name(LocalDate.now()),
-                "build.name = " + BuildName.toBuildNumber(LocalDate.now()),
-                "build.commit.hash = " + commitHash,
-                "build.commit.time = " + commitTime);
+            "build.number = " + BuildName.name(LocalDate.now()),
+            "build.name = " + BuildName.toBuildNumber(LocalDate.now()),
+            "build.commit.hash = " + commitHash,
+            "build.commit.time = " + commitTime);
     }
 
     /**
@@ -123,8 +123,8 @@ public class BuildStamper extends BaseTool implements
     {
         var descriptor = associatedBuild().artifactDescriptor();
         return stringList("artifact.group = " + descriptor.group(),
-                "artifact.name = " + descriptor.name(),
-                "artifact.version = " + descriptor.version(),
-                "artifact = " + descriptor);
+            "artifact.name = " + descriptor.name(),
+            "artifact.version = " + descriptor.version(),
+            "artifact = " + descriptor);
     }
 }

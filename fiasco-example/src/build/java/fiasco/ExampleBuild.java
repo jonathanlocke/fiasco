@@ -1,5 +1,6 @@
 package fiasco;
 
+import digital.fiasco.libraries.Libraries;
 import digital.fiasco.runtime.build.BaseBuild;
 import digital.fiasco.runtime.build.BuildMetadata;
 import digital.fiasco.runtime.build.metadata.Contributor;
@@ -10,6 +11,7 @@ import digital.fiasco.runtime.build.metadata.Resources;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.time.Year.year;
 import static com.telenav.kivakit.resource.Urls.url;
+import static digital.fiasco.libraries.utilities.serialization.Kryo.kryo;
 import static digital.fiasco.runtime.build.metadata.License.APACHE_LICENSE;
 import static digital.fiasco.runtime.build.metadata.Role.ARCHITECT;
 import static digital.fiasco.runtime.build.metadata.Role.LEAD_DEVELOPER;
@@ -20,30 +22,26 @@ import static digital.fiasco.runtime.build.metadata.Role.ORIGINATOR;
  *
  * @author Jonathan Locke
  */
-public class ExampleBuild extends BaseBuild implements
-        ExampleLibraries
+public class ExampleBuild extends BaseBuild implements Libraries
 {
     public static void main(String[] arguments)
     {
         run(ExampleBuild.class, arguments);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
-    public void onInitialize()
-    {
-        requires(apache_ant, apache_commons_logging, kryo);
-        pinVersions();
-    }
-
     public BuildMetadata metadata()
     {
-        var jonathanLocke = new Organization("Jonathan Locke")
-                .withUrl(url("https://state-of-the-art.org"));
+        var fiasco = new Organization("Fiasco")
+                .withUrl(url("https://fiasco.digital"));
 
         return new BuildMetadata()
                 .withArtifactDescriptor("digital.fiasco:fiasco-example:1.0")
                 .withLicense(APACHE_LICENSE)
-                .withOrganization(jonathanLocke)
+                .withOrganization(fiasco)
                 .withCopyright(new Copyright("Copyright 2022-2023, Jonathan Locke. All Rights Reserved.", year(2022), year(2023)))
                 .withResources(new Resources()
                         .withHome(url("https://github.com/jonathanlocke/fiasco"))
@@ -52,10 +50,23 @@ public class ExampleBuild extends BaseBuild implements
                 .withContributors(list(
                         new Contributor("Jonathan Locke")
                                 .withNickname("Shibo")
-                                .withOrganization(jonathanLocke)
+                                .withOrganization(fiasco)
                                 .withTimeZone("America/Denver")
                                 .withRoles(ORIGINATOR, ARCHITECT, LEAD_DEVELOPER)
                                 .withEmail("jon@thanlocke.com")));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onInitialize()
+    {
+        requires(apache_ant, apache_commons_logging, kryo);
+
+        pinVersion(apache_ant, "1.0.3");
+        pinVersion(apache_commons_logging, "1.9.0");
+        pinVersion(kryo, "4.3.1");
     }
 }
 

@@ -1,26 +1,25 @@
 package digital.fiasco.libraries.frameworks;
 
+import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-
 @SuppressWarnings("unused")
-public interface Spring
+public interface Spring extends LibraryGroups
 {
-    Library spring_beans = library("org.springframework:spring-beans");
-    Library spring_boot_autoconfigure = library("org.springframework.boot:spring-boot-autoconfigure");
-    Library spring_boot_configuration_processor = library("org.springframework.boot:spring-boot-configuration-processor");
-    Library spring_boot_devtools = library("org.springframework.boot:spring-boot-devtools");
-    Library spring_boot_starter_actuator = library("org.springframework.boot:spring-boot-starter-actuator");
-    Library spring_context = library("org.springframework:spring-context");
-    Library spring_core = library("org.springframework:spring-core");
-    Library spring_jdbc = library("org.springframework:spring-web");
-    Library spring_test = library("org.springframework:spring-test");
-    Library spring_tx = library("org.springframework:spring-tx");
-    Library spring_web = library("org.springframework:spring-jdbc");
-    Library spring_web_mvc = library("org.springframework:spring-webmvc");
-    Library spring_boot_starter = library("org.springframework.boot:spring-boot-starter");
-    Library spring_boot_starter_data_jpa = library("org.springframework.boot:spring-boot-starter-data-jpa");
-    Library spring_boot_starter_test = library("org.springframework.boot:spring-boot-starter-test");
-    Library spring_boot_starter_web = library("org.springframework.boot:spring-boot-starter-web");
+    Library spring_beans                        = spring_framework_group.library("spring-beans");
+    Library spring_boot_autoconfigure           = spring_boot_group.library("spring-boot-autoconfigure");
+    Library spring_boot_configuration_processor = spring_boot_group.library("spring-boot-configuration-processor");
+    Library spring_boot_devtools                = spring_boot_group.library("spring-boot-devtools");
+    Library spring_boot_starter                 = spring_boot_group.library("spring-boot-starter");
+    Library spring_boot_starter_actuator        = spring_boot_group.library("spring-boot-starter-actuator");
+    Library spring_boot_starter_data_jpa        = spring_boot_group.library("spring-boot-starter-data-jpa");
+    Library spring_boot_starter_test            = spring_boot_group.library("spring-boot-starter-test");
+    Library spring_boot_starter_web             = spring_boot_group.library("spring-boot-starter-web");
+    Library spring_context                      = spring_framework_group.library("spring-context");
+    Library spring_core                         = spring_framework_group.library("spring-core");
+    Library spring_jdbc                         = spring_framework_group.library("spring-web");
+    Library spring_test                         = spring_framework_group.library("spring-test");
+    Library spring_tx                           = spring_framework_group.library("spring-tx");
+    Library spring_web                          = spring_framework_group.library("spring-jdbc");
+    Library spring_web_mvc                      = spring_framework_group.library("spring-webmvc");
 }

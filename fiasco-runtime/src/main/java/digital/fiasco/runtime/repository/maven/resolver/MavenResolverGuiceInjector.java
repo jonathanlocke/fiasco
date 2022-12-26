@@ -42,38 +42,38 @@ public class MavenResolverGuiceInjector extends AbstractModule
         install(new AetherModule());
 
         bind(ArtifactDescriptorReader.class)
-                .to(DefaultArtifactDescriptorReader.class)
-                .in(Singleton.class);
+            .to(DefaultArtifactDescriptorReader.class)
+            .in(Singleton.class);
 
         bind(VersionResolver.class)
-                .to(DefaultVersionResolver.class)
-                .in(Singleton.class);
+            .to(DefaultVersionResolver.class)
+            .in(Singleton.class);
 
         bind(VersionRangeResolver.class)
-                .to(DefaultVersionRangeResolver.class)
-                .in(Singleton.class);
+            .to(DefaultVersionRangeResolver.class)
+            .in(Singleton.class);
 
         bind(MetadataGeneratorFactory.class)
-                .annotatedWith(Names.named("snapshot"))
-                .to(SnapshotMetadataGeneratorFactory.class)
-                .in(Singleton.class);
+            .annotatedWith(Names.named("snapshot"))
+            .to(SnapshotMetadataGeneratorFactory.class)
+            .in(Singleton.class);
 
         bind(MetadataGeneratorFactory.class)
-                .annotatedWith(Names.named("versions"))
-                .to(VersionsMetadataGeneratorFactory.class)
-                .in(Singleton.class);
+            .annotatedWith(Names.named("versions"))
+            .to(VersionsMetadataGeneratorFactory.class)
+            .in(Singleton.class);
 
         bind(RepositoryConnectorFactory.class)
-                .annotatedWith(Names.named("basic"))
-                .to(BasicRepositoryConnectorFactory.class);
+            .annotatedWith(Names.named("basic"))
+            .to(BasicRepositoryConnectorFactory.class);
 
         bind(TransporterFactory.class)
-                .annotatedWith(Names.named("file"))
-                .to(FileTransporterFactory.class);
+            .annotatedWith(Names.named("file"))
+            .to(FileTransporterFactory.class);
 
         bind(TransporterFactory.class)
-                .annotatedWith(Names.named("http"))
-                .to(HttpTransporterFactory.class);
+            .annotatedWith(Names.named("http"))
+            .to(HttpTransporterFactory.class);
     }
 
     /**
@@ -92,8 +92,8 @@ public class MavenResolverGuiceInjector extends AbstractModule
     @Provides
     @Singleton
     Set<MetadataGeneratorFactory> provideMetadataGeneratorFactories(
-            @Named("snapshot") MetadataGeneratorFactory snapshot,
-            @Named("versions") MetadataGeneratorFactory versions)
+        @Named("snapshot") MetadataGeneratorFactory snapshot,
+        @Named("versions") MetadataGeneratorFactory versions)
     {
         return Set.of(snapshot, versions);
     }
@@ -114,7 +114,7 @@ public class MavenResolverGuiceInjector extends AbstractModule
     @Provides
     @Singleton
     Set<RepositoryConnectorFactory> provideRepositoryConnectorFactories(
-            @Named("basic") RepositoryConnectorFactory basic)
+        @Named("basic") RepositoryConnectorFactory basic)
     {
         return Set.of(basic);
     }

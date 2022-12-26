@@ -22,11 +22,11 @@ public class PhaseInstall extends Phase
     public ObjectList<Phase> requiredPhases()
     {
         return list(new PhasePrepare(),
-                new PhaseCompile(),
-                new PhaseTest(),
-                new PhaseDocument(),
-                new PhasePackage(),
-                new PhaseIntegrationTest());
+            new PhaseCompile(),
+            new PhaseTest(),
+            new PhaseDocument(),
+            new PhasePackage(),
+            new PhaseIntegrationTest());
     }
 
     @Override

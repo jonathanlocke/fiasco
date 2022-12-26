@@ -22,9 +22,9 @@ public class PhasePackage extends Phase
     public ObjectList<Phase> requiredPhases()
     {
         return list(new PhasePrepare(),
-                new PhaseCompile(),
-                new PhaseTest(),
-                new PhaseDocument());
+            new PhaseCompile(),
+            new PhaseTest(),
+            new PhaseDocument());
     }
 
     @Override

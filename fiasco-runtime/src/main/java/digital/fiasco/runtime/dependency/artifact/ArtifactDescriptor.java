@@ -53,11 +53,11 @@ public record ArtifactDescriptor(ArtifactGroup group,
 {
     /** A lenient pattern for artifact descriptors */
     private static final Pattern DESCRIPTOR_PATTERN = Pattern.compile("(?<group>[A-Za-z0-9._-]+)"
-            + ":"
-            + "(?<identifier>[A-Za-z0-9._-]+)"
-            + "(:"
-            + "(?<version>[A-Za-z0-9._-]+)"
-            + ")?");
+        + ":"
+        + "(?<identifier>[A-Za-z0-9._-]+)"
+        + "(:"
+        + "(?<version>[A-Za-z0-9._-]+)"
+        + ")?");
 
     /**
      * Returns the artifact descriptor for the given text
@@ -109,8 +109,8 @@ public record ArtifactDescriptor(ArtifactGroup group,
     public String name()
     {
         return group
-                + (identifier == null ? "" : ":" + identifier)
-                + (version == null ? "" : ":" + version);
+            + (identifier == null ? "" : ":" + identifier)
+            + (version == null ? "" : ":" + version);
     }
 
     @Override

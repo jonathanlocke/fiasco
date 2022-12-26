@@ -52,11 +52,11 @@ public class Compiler extends BaseTool
         public void report(Diagnostic<? extends JavaFileObject> diagnostic)
         {
             problem("$ $ ($:$): $",
-                    diagnostic.getKind(),
-                    diagnostic.getCode(),
-                    diagnostic.getSource().getName(),
-                    diagnostic.getLineNumber(),
-                    diagnostic.getMessage(Locale.getDefault()));
+                diagnostic.getKind(),
+                diagnostic.getCode(),
+                diagnostic.getSource().getName(),
+                diagnostic.getLineNumber(),
+                diagnostic.getMessage(Locale.getDefault()));
         }
     }
 
@@ -115,12 +115,12 @@ public class Compiler extends BaseTool
     public String description()
     {
         return format("""
-                Compiler
-                  sources: $
-                  source version: $
-                  target version: $
-                  source encoding: $
-                """, sources, sourceVersion, targetVersion, sourceEncoding);
+            Compiler
+              sources: $
+              source version: $
+              target version: $
+              source encoding: $
+            """, sources, sourceVersion, targetVersion, sourceEncoding);
     }
 
     /**

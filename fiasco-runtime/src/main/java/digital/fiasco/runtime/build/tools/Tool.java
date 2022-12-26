@@ -20,10 +20,10 @@ import digital.fiasco.runtime.build.BuildStructured;
  * @author Jonathan locke
  */
 public interface Tool extends
-        Runnable,
-        Described,
-        BuildAssociated,
-        BuildStructured,
-        BuildEnvironment
+    Runnable,
+    Described,
+    BuildAssociated,
+    BuildStructured,
+    BuildEnvironment
 {
 }

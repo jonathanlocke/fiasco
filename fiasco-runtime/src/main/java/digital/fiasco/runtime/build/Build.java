@@ -164,15 +164,15 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
  */
 @SuppressWarnings("UnusedReturnValue")
 public interface Build extends
-        Repeater,
-        Described,
-        Named,
-        Buildable,
-        BuildStructured,
-        BuildDependencies,
-        BuildEnvironment,
-        BuildArtifact,
-        BuildPhased
+    Repeater,
+    Described,
+    Named,
+    Buildable,
+    BuildStructured,
+    BuildDependencies,
+    BuildEnvironment,
+    BuildArtifact,
+    BuildPhased
 {
     /**
      * Returns the child build at the given path

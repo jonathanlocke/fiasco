@@ -1,24 +1,23 @@
 package digital.fiasco.libraries.cloud;
 
+import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-
-@SuppressWarnings({ "SpellCheckingInspection", "unused" })
-public interface Aws
+@SuppressWarnings("unused")
+public interface Aws extends LibraryGroups
 {
-    Library aws_jmespath = library("com.amazonaws:jmespath-java");
-    Library aws_sdk_core = library("com.amazonaws:aws-java-sdk-core");
-    Library aws_sdk_test_utils = library("com.amazonaws:aws-java-sdk-test-utils");
-    Library software_aws_sdk_annotations = library("software.amazon.awssdk:annotations");
-    Library software_aws_sdk_apache_client = library("software.amazon.awssdk:apache-client");
-    Library software_aws_sdk_auth = library("software.amazon.awssdk:auth");
-    Library software_aws_sdk_core = library("software.amazon.awssdk:core");
-    Library software_aws_sdk_http_client_spi = library("software.amazon.awssdk:http-client-spi");
-    Library software_aws_sdk_json_protocol = library("software.amazon.awssdk:aws-json-protocol");
-    Library software_aws_sdk_netty_nio_client = library("software.amazon.awssdk:netty-nio-client");
-    Library software_aws_sdk_protocol_core = library("software.amazon.awssdk:protocol-core");
-    Library software_aws_sdk_regions = library("software.amazon.awssdk:regions");
-    Library software_aws_sdk_service_test_utils = library("software.amazon.awssdk:service-test-utils");
-    Library software_aws_sdk_utils = library("software.amazon.awssdk:utils");
+    Library aws_jmespath                        = aws_group.library("jmespath-java");
+    Library aws_sdk_core                        = aws_group.library("aws-java-sdk-core");
+    Library aws_sdk_test_utils                  = aws_group.library("aws-java-sdk-test-utils");
+    Library aws_software_sdk_annotations        = aws_software_sdk_group.library("annotations");
+    Library aws_software_sdk_apache_client      = aws_software_sdk_group.library("apache-client");
+    Library aws_software_sdk_auth               = aws_software_sdk_group.library("auth");
+    Library aws_software_sdk_core               = aws_software_sdk_group.library("core");
+    Library aws_software_sdk_http_client_spi    = aws_software_sdk_group.library("http-client-spi");
+    Library aws_software_sdk_json_protocol      = aws_software_sdk_group.library("aws-json-protocol");
+    Library aws_software_sdk_netty_nio_client   = aws_software_sdk_group.library("netty-nio-client");
+    Library aws_software_sdk_protocol_core      = aws_software_sdk_group.library("protocol-core");
+    Library aws_software_sdk_regions            = aws_software_sdk_group.library("regions");
+    Library aws_software_sdk_service_test_utils = aws_software_sdk_group.library("service-test-utils");
+    Library aws_software_sdk_utils              = aws_software_sdk_group.library("utils");
 }

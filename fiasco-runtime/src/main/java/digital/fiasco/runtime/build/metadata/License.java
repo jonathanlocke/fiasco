@@ -14,7 +14,6 @@ import static com.telenav.kivakit.core.ensure.Ensure.illegalArgument;
  * @param name The name of the license
  * @param url A URL to the full license text
  * @param description A description of the license
- *
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
@@ -23,8 +22,8 @@ public record License(@FormatProperty String name,
                       @FormatProperty String description)
 {
     public static final License APACHE_LICENSE = new License("Apache License 2.0")
-            .withDescription("Licensed under Apache License, Version 2.0")
-            .withUrl("https://www.apache.org/licenses/LICENSE-2.0");
+        .withDescription("Licensed under Apache License, Version 2.0")
+        .withUrl("https://www.apache.org/licenses/LICENSE-2.0");
 
     public License(String name)
     {

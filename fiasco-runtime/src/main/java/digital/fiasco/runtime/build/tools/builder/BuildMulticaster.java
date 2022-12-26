@@ -12,7 +12,7 @@ import digital.fiasco.runtime.build.phases.Phase;
  * @author Jonathan Locke
  */
 public class BuildMulticaster extends BaseBuild implements
-        BuildListener
+    BuildListener
 {
     private final Build build;
 
@@ -25,12 +25,6 @@ public class BuildMulticaster extends BaseBuild implements
     public Build associatedBuild()
     {
         return build;
-    }
-
-    @Override
-    public ObjectList<BuildListener> buildListeners()
-    {
-        return build.buildListeners();
     }
 
     @Override
@@ -319,5 +313,10 @@ public class BuildMulticaster extends BaseBuild implements
     public void onTesting()
     {
         buildListeners().forEach(BuildListener::onTesting);
+    }
+
+    private ObjectList<BuildListener> buildListeners()
+    {
+        return build.builder().buildListeners();
     }
 }

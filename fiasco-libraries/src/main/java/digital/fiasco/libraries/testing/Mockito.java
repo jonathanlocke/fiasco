@@ -1,12 +1,11 @@
 package digital.fiasco.libraries.testing;
 
+import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-
 @SuppressWarnings("unused")
-public interface Mockito
+public interface Mockito extends LibraryGroups
 {
-    Library mockito_all = library("org.mockito:mockito-all");
-    Library mockito_core = library("org.mockito:mockito-core");
+    Library mockito_all  = mockito_group.library("mockito-all");
+    Library mockito_core = mockito_group.library("mockito-core");
 }

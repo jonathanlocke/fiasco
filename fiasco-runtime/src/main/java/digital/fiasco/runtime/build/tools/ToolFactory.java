@@ -20,8 +20,8 @@ import static com.telenav.kivakit.core.version.Version.version;
  */
 @SuppressWarnings("unused")
 public interface ToolFactory extends
-        BuildAssociated,
-        BuildStructured
+    BuildAssociated,
+    BuildStructured
 {
     /**
      * Creates a new {@link Archiver} tool
@@ -53,9 +53,9 @@ public interface ToolFactory extends
     default Compiler newCompiler()
     {
         return new Compiler(associatedBuild())
-                .withSources(sourceMainJavaSources())
-                .withSourceVersion(version(17))
-                .withTargetVersion(version(17));
+            .withSources(sourceMainJavaSources())
+            .withSourceVersion(version(17))
+            .withTargetVersion(version(17));
     }
 
     /**

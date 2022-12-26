@@ -51,8 +51,8 @@ public class Matchers implements Matcher<ResourcePathed>
     public String toString()
     {
         return matchers.map(this::toString)
-                .join()
-                .replaceAll("\\$", ".");
+            .join()
+            .replaceAll("\\$", ".");
     }
 
     @NotNull

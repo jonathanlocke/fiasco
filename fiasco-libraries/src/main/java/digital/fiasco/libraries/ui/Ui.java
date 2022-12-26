@@ -5,8 +5,8 @@ import digital.fiasco.libraries.ui.mobile.Mobile;
 import digital.fiasco.libraries.ui.web.Web;
 
 public interface Ui extends
-        Desktop,
-        Mobile,
-        Web
+    Desktop,
+    Mobile,
+    Web
 {
 }

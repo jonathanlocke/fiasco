@@ -12,10 +12,10 @@ import static com.telenav.kivakit.resource.Uris.uri;
 public interface BuildRepositories
 {
     Repository MAVEN_CENTRAL = new MavenRepository(
-            "Maven Central",
-            uri("https://repo1.maven.org/maven2"));
+        "Maven Central",
+        uri("https://repo1.maven.org/maven2"));
 
     Repository MAVEN_CENTRAL_STAGING = new MavenRepository(
-            "Maven Central Staging",
-            uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"));
+        "Maven Central Staging",
+        uri("https://s01.oss.sonatype.org/service/local/staging/deploy/maven2"));
 }

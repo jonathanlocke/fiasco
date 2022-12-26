@@ -1,11 +1,10 @@
 package digital.fiasco.libraries.testing;
 
+import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-
 @SuppressWarnings("unused")
-public interface EasyMock
+public interface EasyMock extends LibraryGroups
 {
-    Library easymock = library("org.easymock:easymock");
+    Library easymock = easymock_group.library("easymock");
 }

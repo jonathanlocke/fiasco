@@ -44,43 +44,43 @@ public class FiascoServer extends Application
     {
         return socket ->
 
-                // handle it on a background thread.
-                KivaKitThread.run(this, "FiascoRequestHandler", () ->
+            // handle it on a background thread.
+            KivaKitThread.run(this, "FiascoRequestHandler", () ->
+            {
+                // Open the socket input and output,
+                try (var in = new InputResource(socket.getInputStream()); var out = new OutputResource(socket.getOutputStream()))
                 {
-                    // Open the socket input and output,
-                    try (var in = new InputResource(socket.getInputStream()); var out = new OutputResource(socket.getOutputStream()))
+                    // read the request,
+                    var json = in.reader().readText();
+                    var request = FiascoRepositoryRequest.requestFromJson(json);
+
+                    // compose a response,
+                    var response = new FiascoRepositoryResponse();
+                    response.addAll(repository.resolveArtifacts(request.descriptors()));
+
+                    // push the header to the requester.
+                    @SuppressWarnings("resource")
+                    var printWriter = out.writer().printWriter();
+                    printWriter.println(response.toJson());
+                    printWriter.flush();
+
+                    // For each attached piece of content,
+                    for (var artifact : response.artifacts())
                     {
-                        // read the request,
-                        var json = in.reader().readText();
-                        var request = FiascoRepositoryRequest.requestFromJson(json);
-
-                        // compose a response,
-                        var response = new FiascoRepositoryResponse();
-                        response.addAll(repository.resolveArtifacts(request.descriptors()));
-
-                        // push the header to the requester.
-                        @SuppressWarnings("resource")
-                        var printWriter = out.writer().printWriter();
-                        printWriter.println(response.toJson());
-                        printWriter.flush();
-
-                        // For each attached piece of content,
-                        for (var artifact : response.artifacts())
+                        for (var attachment : artifact.attachments().values())
                         {
-                            for (var attachment : artifact.attachments().values())
-                            {
-                                // and copy it back to the requester.
-                                attachment
-                                        .content()
-                                        .resource()
-                                        .copyTo(out, STREAM, LEAVE_OPEN, nullProgressReporter());
-                            }
+                            // and copy it back to the requester.
+                            attachment
+                                .content()
+                                .resource()
+                                .copyTo(out, STREAM, LEAVE_OPEN, nullProgressReporter());
                         }
                     }
-                    catch (Exception e)
-                    {
-                        problem(e, "");
-                    }
-                });
+                }
+                catch (Exception e)
+                {
+                    problem(e, "");
+                }
+            });
     }
 }

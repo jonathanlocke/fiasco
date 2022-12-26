@@ -1,11 +1,10 @@
 package digital.fiasco.libraries.data.database;
 
+import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-
 @SuppressWarnings("unused")
-public interface H2
+public interface H2 extends LibraryGroups
 {
-    Library h2 = library("com.h2database:h2");
+    Library h2_database = h2_database_group.library("h2");
 }

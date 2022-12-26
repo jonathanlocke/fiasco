@@ -134,14 +134,14 @@ public interface BuildListener extends ToolFactory
     default void onPrepareResources()
     {
         newCopier().withSourceFolder(sourceMainResourcesFolder())
-                .withTargetFolder(targetClassesFolder())
-                .with("**/*")
-                .run();
+            .withTargetFolder(targetClassesFolder())
+            .with("**/*")
+            .run();
 
         newCopier().withSourceFolder(sourceTestResourcesFolder())
-                .withTargetFolder(targetTestClassesFolder())
-                .with("**/*")
-                .run();
+            .withTargetFolder(targetTestClassesFolder())
+            .with("**/*")
+            .run();
     }
 
     default void onPrepareSources()

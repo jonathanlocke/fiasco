@@ -1,11 +1,10 @@
 package digital.fiasco.libraries.build;
 
+import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-
 @SuppressWarnings("unused")
-public interface ApacheAnt
+public interface ApacheAnt extends LibraryGroups
 {
-    Library apache_ant = library("org.apache.ant:ant");
+    Library apache_ant = apache_ant_group.library("ant");
 }

@@ -17,14 +17,14 @@ import com.telenav.kivakit.resource.Resource;
  */
 @SuppressWarnings("unused")
 public record ArtifactContent
-        (
-                @Expose String name,
-                @Expose ArtifactSignatures signatures,
-                @Expose Resource resource,
-                @Expose long offset,
-                @Expose Time lastModified,
-                @Expose Bytes size
-        )
+    (
+        @Expose String name,
+        @Expose ArtifactSignatures signatures,
+        @Expose Resource resource,
+        @Expose long offset,
+        @Expose Time lastModified,
+        @Expose Bytes size
+    )
 {
     public ArtifactContent()
     {

@@ -1,12 +1,11 @@
 package digital.fiasco.libraries.testing;
 
+import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-
 @SuppressWarnings("unused")
-public interface Powermock
+public interface Powermock extends LibraryGroups
 {
-    Library powermock_api_mockito = library("org.powermock:powermock-api-mockito");
-    Library powermock_module_junit4 = library("org.powermock:powermock-module-junit4");
+    Library powermock_api_mockito   = powermock_group.library("powermock-api-mockito");
+    Library powermock_module_junit4 = powermock_group.library("powermock-module-junit4");
 }

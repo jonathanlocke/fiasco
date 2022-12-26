@@ -125,10 +125,10 @@ public class Git extends BaseTool
     public String description()
     {
         return format("""
-                Git
-                  folder: $
-                  arguments: $
-                """, folder, stringList(arguments).join(" "));
+            Git
+              folder: $
+              arguments: $
+            """, folder, stringList(arguments).join(" "));
     }
 
     /**
@@ -173,6 +173,6 @@ public class Git extends BaseTool
     {
         information(description());
         output = operatingSystem().execute(this,
-                folder.asJavaFile(), arguments.asStringArray());
+            folder.asJavaFile(), arguments.asStringArray());
     }
 }

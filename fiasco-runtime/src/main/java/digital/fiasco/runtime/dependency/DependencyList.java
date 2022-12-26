@@ -67,8 +67,8 @@ import static com.telenav.kivakit.core.thread.Threads.shutdownAndAwaitTerminatio
  */
 @SuppressWarnings("unused")
 public class DependencyList implements
-        Iterable<Dependency<?>>,
-        Matcher<Dependency<?>>
+    Iterable<Dependency<?>>,
+    Matcher<Dependency<?>>
 {
     /**
      * Creates a list of dependencies

@@ -1,16 +1,15 @@
 package digital.fiasco.libraries.ui.mobile;
 
+import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-
 @SuppressWarnings({ "unused", "SpellCheckingInspection" })
-public interface ApacheFlex
+public interface ApacheFlex extends LibraryGroups
 {
-    Library apache_flex_blaze_ds = library("org.apache.flex:blazeds");
-    Library apache_flex_compiler = library("org.apache.flex:compiler");
-    Library apache_flex_framework = library("org.apache.flex:framework");
-    Library apache_flex_javascript = library("org.apache.flex:flexjs");
-    Library apache_flex_tool_api = library("org.apache.flex:flex-tool-api");
-    Library apache_flex_utilities = library("org.apache.flex:utilities");
+    Library apache_flex_blaze_ds   = apache_flex_group.library("blazeds");
+    Library apache_flex_compiler   = apache_flex_group.library("compiler");
+    Library apache_flex_framework  = apache_flex_group.library("framework");
+    Library apache_flex_javascript = apache_flex_group.library("flexjs");
+    Library apache_flex_tool_api   = apache_flex_group.library("flex-tool-api");
+    Library apache_flex_utilities  = apache_flex_group.library("utilities");
 }

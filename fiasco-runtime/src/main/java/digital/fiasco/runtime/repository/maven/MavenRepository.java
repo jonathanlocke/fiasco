@@ -149,8 +149,8 @@ public class MavenRepository extends BaseRepository
 
                     // and resolve dependencies for the artifact from remote repositories.
                     var dependencyDescriptors = mavenResolver
-                            .resolveDependencies(descriptor)
-                            .map(MavenDependency::descriptor);
+                        .resolveDependencies(descriptor)
+                        .map(MavenDependency::descriptor);
 
                     var artifacts = resolveArtifacts(dependencyDescriptors);
                     var dependencies = dependencyList((Dependency<?>) artifacts);
@@ -160,17 +160,17 @@ public class MavenRepository extends BaseRepository
                     {
                         // return it as a library,
                         resolved.add(library(descriptor)
-                                .withDependencies(dependencies)
-                                .withContent(jar)
-                                .withJavadoc(javadoc)
-                                .withSource(source));
+                            .withDependencies(dependencies)
+                            .withContent(jar)
+                            .withJavadoc(javadoc)
+                            .withSource(source));
                     }
                     else
                     {
                         // otherwise, return it as an asset.
                         resolved.add(asset(descriptor)
-                                .withDependencies(dependencies)
-                                .withContent(jar));
+                            .withDependencies(dependencies)
+                            .withContent(jar));
                     }
                 }
             }
@@ -188,7 +188,7 @@ public class MavenRepository extends BaseRepository
     {
         var descriptor = artifact.descriptor();
         return parseFileName(throwingListener(), descriptor.group()
-                + "-" + descriptor.version() + suffix);
+            + "-" + descriptor.version() + suffix);
     }
 
     /**
@@ -215,8 +215,8 @@ public class MavenRepository extends BaseRepository
         var descriptor = artifact.descriptor();
         var groupPath = descriptor.group().name().replaceAll("\\.", "/");
         return parseResourcePath(throwingListener(), groupPath
-                + "/" + descriptor.identifier()
-                + "/" + descriptor.version());
+            + "/" + descriptor.identifier()
+            + "/" + descriptor.version());
     }
 
     /**
@@ -237,11 +237,11 @@ public class MavenRepository extends BaseRepository
             var sha1 = mavenResource(rootFolder, attachment.withSuffix(suffix + "sha1")).reader().readText();
             var signatures = new ArtifactSignatures(pgp, md5, sha1);
             return new ArtifactContent()
-                    .withName(attachment.content().name())
-                    .withSignatures(signatures)
-                    .withResource(resource)
-                    .withLastModified(resource.lastModified())
-                    .withSize(resource.sizeInBytes());
+                .withName(attachment.content().name())
+                .withSignatures(signatures)
+                .withResource(resource)
+                .withLastModified(resource.lastModified())
+                .withSize(resource.sizeInBytes());
         }
         return null;
     }

@@ -1,12 +1,10 @@
 package digital.fiasco.libraries.build;
 
+import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-
 @SuppressWarnings("unused")
-public interface Gradle
+public interface Gradle extends LibraryGroups
 {
-    Library gradle = library("com.android.tools.build:gradle");
-    Library kotlin_gradle_plugin = library("org.jetbrains.kotlin:kotlin-gradle-plugin");
+    Library gradle = android_tools_build_group.library("gradle");
 }

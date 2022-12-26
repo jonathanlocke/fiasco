@@ -83,8 +83,8 @@ import static digital.fiasco.runtime.build.BuildOption.DRY_RUN;
  */
 @SuppressWarnings({ "unused", "StringConcatenationInLoop", "UnusedReturnValue" })
 public class Builder extends BaseTool implements
-        ToolFactory,
-        BuildPhased
+    ToolFactory,
+    BuildPhased
 {
     /** Phases in order of execution */
     private final PhaseList phases = new PhaseList();
@@ -116,6 +116,11 @@ public class Builder extends BaseTool implements
         buildListeners.add(listener);
     }
 
+    public ObjectList<BuildListener> buildListeners()
+    {
+        return buildListeners;
+    }
+
     @Override
     public Builder builder()
     {
@@ -137,17 +142,17 @@ public class Builder extends BaseTool implements
     public String description()
     {
         var description = """
-                Commands
-                                
-                  command               description
-                  -----------           ---------------------------------------------
-                  describe              describe the build rather than running it
-                                
-                Phases (those preceded by a dash will be disabled)
+            Commands
                             
-                  phase                 description
-                  -----------           ---------------------------------------------
-                """;
+              command               description
+              -----------           ---------------------------------------------
+              describe              describe the build rather than running it
+                            
+            Phases (those preceded by a dash will be disabled)
+                        
+              phase                 description
+              -----------           ---------------------------------------------
+            """;
 
         for (var phase : phases)
         {
@@ -183,6 +188,7 @@ public class Builder extends BaseTool implements
         phaseEnabled.put(phase, true);
     }
 
+    @Override
     public boolean isEnabled(Phase phase)
     {
         return phaseEnabled.get(phase);

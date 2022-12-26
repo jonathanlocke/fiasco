@@ -1,11 +1,10 @@
 package digital.fiasco.libraries.testing;
 
+import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-
 @SuppressWarnings("unused")
-public interface TestNG
+public interface TestNG extends LibraryGroups
 {
-    Library test_ng = library("org.testng:testng");
+    Library test_ng = test_ng_group.library("testng");
 }

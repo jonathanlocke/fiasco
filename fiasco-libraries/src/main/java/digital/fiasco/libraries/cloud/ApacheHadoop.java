@@ -1,14 +1,13 @@
 package digital.fiasco.libraries.cloud;
 
+import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-
 @SuppressWarnings("unused")
-public interface ApacheHadoop
+public interface ApacheHadoop extends LibraryGroups
 {
-    Library apache_hadoop_client = library("org.apache.hadoop:hadoop-client");
-    Library apache_hadoop_common = library("org.apache.hadoop:hadoop-common");
-    Library apache_hadoop_hdfs = library("org.apache.hadoop:hadoop-hdfs");
-    Library apache_hadoop_mapreduce_client_core = library("org.apache.hadoop:hadoop-mapreduce-client-core");
+    Library apache_hadoop_client                = apache_hadoop_group.library("hadoop-client");
+    Library apache_hadoop_common                = apache_hadoop_group.library("hadoop-common");
+    Library apache_hadoop_hdfs                  = apache_hadoop_group.library("hadoop-hdfs");
+    Library apache_hadoop_mapreduce_client_core = apache_hadoop_group.library("hadoop-mapreduce-client-core");
 }

@@ -81,8 +81,8 @@ public class CacheFiascoRepository extends LocalFiascoRepository
                 // Append each attachment to the attachments file,
                 var updated = new MutableValue<Artifact<?>>(artifact);
                 visitArtifactAttachments(artifact, attachment ->
-                        updated.set(updated.get()
-                                .withAttachment(appendAttachment(attachment))));
+                    updated.set(updated.get()
+                        .withAttachment(appendAttachment(attachment))));
 
                 // then append the updated metadata.
                 appendArtifactMetadata(updated.get());
@@ -118,7 +118,7 @@ public class CacheFiascoRepository extends LocalFiascoRepository
 
                 // and resolve the artifact content.
                 resolved.add(attachment.artifact().withAttachment(
-                        attachment.withContent(content.withResource(resource))));
+                    attachment.withContent(content.withResource(resource))));
             });
 
             return resolved;
@@ -150,9 +150,9 @@ public class CacheFiascoRepository extends LocalFiascoRepository
 
             // and return the artifact with its new content information.
             return attachment.withContent(content
-                    .withOffset(start)
-                    .withLastModified(lastModified)
-                    .withSize(size));
+                .withOffset(start)
+                .withLastModified(lastModified)
+                .withSize(size));
         }
         catch (Exception e)
         {

@@ -60,9 +60,9 @@ public class MavenResolver extends BaseComponent implements TryTrait
     public static void main(String[] arguments)
     {
         console().println(new MavenResolver()
-                .resolveDependencies("com.telenav.kivakit:kivakit-application:1.9.0")
-                .asStringList()
-                .join("\n"));
+            .resolveDependencies("com.telenav.kivakit:kivakit-application:1.9.0")
+            .asStringList()
+            .join("\n"));
     }
 
     /** The Maven repository system for resolving artifacts */
@@ -73,8 +73,8 @@ public class MavenResolver extends BaseComponent implements TryTrait
 
     /** The local Maven repository, defaults to ~/.fiasco/maven-repository */
     private LocalRepository localRepository = new LocalRepository(fiascoCacheFolder()
-            .folder("maven-repository")
-            .toString());
+        .folder("maven-repository")
+        .toString());
 
     /**
      * Creates a resolver, using the Guice injector {@link MavenResolverGuiceInjector} to configure the
@@ -83,8 +83,8 @@ public class MavenResolver extends BaseComponent implements TryTrait
     public MavenResolver()
     {
         system = Guice
-                .createInjector(new MavenResolverGuiceInjector())
-                .getInstance(RepositorySystem.class);
+            .createInjector(new MavenResolverGuiceInjector())
+            .getInstance(RepositorySystem.class);
 
         repositories = list();
     }
@@ -129,16 +129,16 @@ public class MavenResolver extends BaseComponent implements TryTrait
 
             DependencyRequest dependencyRequest = new DependencyRequest(collectRequest, classpathFilter(COMPILE));
             var artifactResults = system
-                    .resolveDependencies(session(), dependencyRequest)
-                    .getArtifactResults();
+                .resolveDependencies(session(), dependencyRequest)
+                .getArtifactResults();
 
             ObjectList<MavenDependency> dependencies = list();
             for (var artifactResult : artifactResults)
             {
                 var mavenArtifact = artifactResult.getArtifact();
                 var mavenArtifactDescriptor = mavenArtifact.getGroupId()
-                        + ":" + mavenArtifact.getArtifactId()
-                        + ":" + mavenArtifact.getVersion();
+                    + ":" + mavenArtifact.getArtifactId()
+                    + ":" + mavenArtifact.getVersion();
                 var mavenRepository = repository(artifactResult.getRepository().getId());
                 var fiascoDescriptor = parseArtifactDescriptor(this, mavenArtifactDescriptor);
                 if (mavenRepository != null && fiascoDescriptor != null)

@@ -22,10 +22,10 @@ public class PhaseIntegrationTest extends Phase
     public ObjectList<Phase> requiredPhases()
     {
         return list(new PhasePrepare(),
-                new PhaseCompile(),
-                new PhaseTest(),
-                new PhaseDocument(),
-                new PhasePackage());
+            new PhaseCompile(),
+            new PhaseTest(),
+            new PhaseDocument(),
+            new PhasePackage());
     }
 
     @Override

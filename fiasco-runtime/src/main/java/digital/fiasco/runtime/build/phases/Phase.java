@@ -12,8 +12,8 @@ import digital.fiasco.runtime.build.tools.builder.BuildListener;
  * @author Jonathan Locke
  */
 public abstract class Phase implements
-        Named,
-        Described
+    Named,
+    Described
 {
     /** The name of this phase */
     private final String name;

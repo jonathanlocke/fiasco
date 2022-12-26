@@ -47,10 +47,10 @@ public class Cleaner extends BaseTool
             paths.add(file.path().asString());
         }
         return format("""
-                Cleaner
-                  files:
-                $
-                """, paths.indented(4).join("\n"));
+            Cleaner
+              files:
+            $
+            """, paths.indented(4).join("\n"));
     }
 
     /**

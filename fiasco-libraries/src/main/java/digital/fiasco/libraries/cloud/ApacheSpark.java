@@ -1,21 +1,20 @@
 package digital.fiasco.libraries.cloud;
 
+import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-
 @SuppressWarnings("unused")
-public interface ApacheSpark
+public interface ApacheSpark extends LibraryGroups
 {
-    Library apache_spark_avro = library("org.apache.spark:spark-avro");
-    Library apache_spark_catalyst = library("org.apache.spark:spark-catalyst");
-    Library apache_spark_core = library("org.apache.spark:spark-core");
-    Library apache_spark_graphx = library("org.apache.spark:spark-graphx");
-    Library apache_spark_hive = library("org.apache.spark:spark-hive");
-    Library apache_spark_ml = library("org.apache.spark:spark-mllib");
-    Library apache_spark_repl = library("org.apache.spark:spark-repl");
-    Library apache_spark_sql = library("org.apache.spark:spark-sql");
-    Library apache_spark_streaming = library("org.apache.spark:spark-streaming");
-    Library apache_spark_tags = library("org.apache.spark:spark-tags");
-    Library apache_spark_yarn = library("org.apache.spark:spark-yarn");
+    Library apache_spark_avro      = apache_spark_group.library("spark-avro");
+    Library apache_spark_catalyst  = apache_spark_group.library("spark-catalyst");
+    Library apache_spark_core      = apache_spark_group.library("spark-core");
+    Library apache_spark_graphx    = apache_spark_group.library("spark-graphx");
+    Library apache_spark_hive      = apache_spark_group.library("spark-hive");
+    Library apache_spark_ml        = apache_spark_group.library("spark-mllib");
+    Library apache_spark_repl      = apache_spark_group.library("spark-repl");
+    Library apache_spark_sql       = apache_spark_group.library("spark-sql");
+    Library apache_spark_streaming = apache_spark_group.library("spark-streaming");
+    Library apache_spark_tags      = apache_spark_group.library("spark-tags");
+    Library apache_spark_yarn      = apache_spark_group.library("spark-yarn");
 }

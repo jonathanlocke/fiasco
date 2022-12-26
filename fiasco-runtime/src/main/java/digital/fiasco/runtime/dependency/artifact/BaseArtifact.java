@@ -149,7 +149,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     {
         return attachments.get(suffix);
     }
- 
+
     /**
      * Returns the list of all attached resources
      *
@@ -220,38 +220,38 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
             {
                 var descriptor = artifact.descriptor();
                 dependencies.add("""
-                                <dependency>
-                                  <groupId>$</groupId>
-                                  <artifactId>$</artifactId>
-                                  <version>$</version>
-                                </dependency>
-                                 """,
-                        descriptor.group(),
-                        descriptor.identifier(),
-                        descriptor.version());
+                        <dependency>
+                          <groupId>$</groupId>
+                          <artifactId>$</artifactId>
+                          <version>$</version>
+                        </dependency>
+                         """,
+                    descriptor.group(),
+                    descriptor.identifier(),
+                    descriptor.version());
             }
         }
 
         return format("""
-                        <project
-                          xmlns="http://maven.apache.org/POM/4.0.0"
-                          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-                         <modelVersion>4.0.0</modelVersion>
-                         <groupId>$</groupId>
-                         <artifactId>$</artifactId>
-                         <version>$</version>
-                         <dependencies>
-                         $
-                         </dependencies>
-                        </project>
-                          """,
-                descriptor.group(),
-                descriptor.identifier(),
-                descriptor.version(),
-                dependencies
-                        .indented(2)
-                        .join("\n"));
+                <project
+                  xmlns="http://maven.apache.org/POM/4.0.0"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                 <modelVersion>4.0.0</modelVersion>
+                 <groupId>$</groupId>
+                 <artifactId>$</artifactId>
+                 <version>$</version>
+                 <dependencies>
+                 $
+                 </dependencies>
+                </project>
+                  """,
+            descriptor.group(),
+            descriptor.identifier(),
+            descriptor.version(),
+            dependencies
+                .indented(2)
+                .join("\n"));
     }
 
     @Override

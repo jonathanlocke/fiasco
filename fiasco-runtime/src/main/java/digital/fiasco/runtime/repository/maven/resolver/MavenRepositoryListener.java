@@ -117,16 +117,16 @@ public class MavenRepositoryListener extends AbstractRepositoryListener implemen
     {
         var artifact = event.getArtifact();
         return artifact.getGroupId()
-                + ":" + artifact.getArtifactId()
-                + ":" + artifact.getVersion();
+            + ":" + artifact.getArtifactId()
+            + ":" + artifact.getVersion();
     }
 
     private String metadata(RepositoryEvent event)
     {
         var metadata = event.getMetadata();
         return metadata.getGroupId()
-                + ":" + metadata.getArtifactId()
-                + ":" + metadata.getVersion();
+            + ":" + metadata.getArtifactId()
+            + ":" + metadata.getVersion();
     }
 
     private String repository(RepositoryEvent event)

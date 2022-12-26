@@ -22,11 +22,11 @@ public class PhaseDeployPackages extends Phase
     public ObjectList<Phase> requiredPhases()
     {
         return list(new PhasePrepare(),
-                new PhaseCompile(),
-                new PhaseTest(),
-                new PhaseDocument(),
-                new PhasePackage(),
-                new PhaseInstall());
+            new PhaseCompile(),
+            new PhaseTest(),
+            new PhaseDocument(),
+            new PhasePackage(),
+            new PhaseInstall());
     }
 
     @Override

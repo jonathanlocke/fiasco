@@ -44,8 +44,8 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactType.LIBRARY;
  */
 @SuppressWarnings("unused")
 public class Library extends BaseArtifact<Library> implements
-        Dependency<Library>,
-        RegistryTrait
+    Dependency<Library>,
+    RegistryTrait
 {
     /**
      * Creates a list of libraries from the given variable-argument list of descriptors

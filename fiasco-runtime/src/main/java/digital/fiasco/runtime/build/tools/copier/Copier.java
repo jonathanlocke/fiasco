@@ -86,12 +86,12 @@ public class Copier extends BaseTool
     public String description()
     {
         return format("""
-                Copier
-                  from: $
-                  to: $
-                  includes: $
-                  excludes: $
-                """, source, to, includes, excludes);
+            Copier
+              from: $
+              to: $
+              includes: $
+              excludes: $
+            """, source, to, includes, excludes);
     }
 
     /**
@@ -190,12 +190,12 @@ public class Copier extends BaseTool
     protected void onRun()
     {
         information("Copying from $ to $",
-                source.relativeTo(rootFolder()),
-                to.relativeTo(rootFolder()));
+            source.relativeTo(rootFolder()),
+            to.relativeTo(rootFolder()));
 
         // For each source file in the 'from' folder that matches,
         var files = source.files(file -> (includes == null || includes.matches(file))
-                && (excludes == null || !excludes.matches(file)), traversal);
+            && (excludes == null || !excludes.matches(file)), traversal);
         progress.steps(files.count());
         progress.start("Copying " + files.size() + " files");
         for (var source : files)

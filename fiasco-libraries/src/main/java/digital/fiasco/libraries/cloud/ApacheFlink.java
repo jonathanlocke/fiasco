@@ -1,13 +1,12 @@
 package digital.fiasco.libraries.cloud;
 
+import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-
 @SuppressWarnings("unused")
-public interface ApacheFlink
+public interface ApacheFlink extends LibraryGroups
 {
-    Library apache_flink_core = library("org.apache.flink:flink-core");
-    Library apache_flink_streaming_java_2_12 = library("org.apache.flink:streaming-java_2.12");
-    Library apache_flink_connector_kafka_2_12 = library("org.apache.flink:connector-kafka_2.12");
+    Library apache_flink_core                 = apache_flink_group.library("flink-core");
+    Library apache_flink_streaming_java_2_12  = apache_flink_group.library("streaming-java_2.12");
+    Library apache_flink_connector_kafka_2_12 = apache_flink_group.library("connector-kafka_2.12");
 }

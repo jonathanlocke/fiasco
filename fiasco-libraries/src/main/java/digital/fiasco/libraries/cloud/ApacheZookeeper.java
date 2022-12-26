@@ -1,11 +1,10 @@
 package digital.fiasco.libraries.cloud;
 
+import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-
 @SuppressWarnings("unused")
-public interface ApacheZookeeper
+public interface ApacheZookeeper extends LibraryGroups
 {
-    Library apache_zookeeper = library("org.apache.zookeeper:zookeeper");
+    Library apache_zookeeper = apache_zookeeper_group.library("zookeeper");
 }

@@ -1,11 +1,10 @@
 package digital.fiasco.libraries.frameworks;
 
+import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-
-@SuppressWarnings({ "unused", "SpellCheckingInspection" })
-public interface Lombok
+@SuppressWarnings({ "unused" })
+public interface Lombok extends LibraryGroups
 {
-    Library lombok = library("org.projectlombok:lombok");
+    Library lombok = lombok_group.library("lombok");
 }

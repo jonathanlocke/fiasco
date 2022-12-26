@@ -195,13 +195,13 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
  */
 @SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused", "SwitchStatementWithTooFewBranches" })
 public abstract class BaseBuild extends Application implements
-        Build,
-        BuildAssociated,
-        BuildEnvironment,
-        BuildStructured,
-        BuildListener,
-        BuildRepositories,
-        ToolFactory
+    Build,
+    BuildAssociated,
+    BuildEnvironment,
+    BuildStructured,
+    BuildListener,
+    BuildRepositories,
+    ToolFactory
 {
     /** The primary artifact being built */
     private ArtifactDescriptor artifactDescriptor;
@@ -272,7 +272,7 @@ public abstract class BaseBuild extends Application implements
     public Build childBuild(String path)
     {
         return withRootFolder(rootFolder.folder(path))
-                .withArtifactIdentifier(pathTail(path, '/'));
+            .withArtifactIdentifier(pathTail(path, '/'));
     }
 
     /**
@@ -303,13 +303,13 @@ public abstract class BaseBuild extends Application implements
     public String description()
     {
         return """
-                Commands
-                                
-                  command               description
-                  -----------           ---------------------------------------------
-                  describe              describe the build rather than running it
-                                
-                """ + builder.description();
+            Commands
+                            
+              command               description
+              -----------           ---------------------------------------------
+              describe              describe the build rather than running it
+                            
+            """ + builder.description();
     }
 
     @Override
@@ -475,10 +475,10 @@ public abstract class BaseBuild extends Application implements
     protected ObjectList<ArgumentParser<?>> argumentParsers()
     {
         return list(argumentParser(String.class)
-                .oneOrMore()
-                .converter(new IdentityConverter(this))
-                .description("Commands and phases")
-                .build());
+            .oneOrMore()
+            .converter(new IdentityConverter(this))
+            .description("Commands and phases")
+            .build());
     }
 
     /**

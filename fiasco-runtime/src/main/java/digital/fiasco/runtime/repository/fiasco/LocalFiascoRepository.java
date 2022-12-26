@@ -98,9 +98,9 @@ public class LocalFiascoRepository extends BaseRepository
     public LocalFiascoRepository(@NotNull String name)
     {
         this(name, fiascoCacheFolder()
-                .folder(name)
-                .mkdirs()
-                .ensureExists());
+            .folder(name)
+            .mkdirs()
+            .ensureExists());
     }
 
     /**
@@ -125,9 +125,9 @@ public class LocalFiascoRepository extends BaseRepository
         {
             appendArtifactMetadata(artifact);
             visitArtifactAttachments(artifact, attachment ->
-                    attachment.content()
-                            .resource()
-                            .safeCopyTo(attachmentFile(attachment), OVERWRITE));
+                attachment.content()
+                    .resource()
+                    .safeCopyTo(attachmentFile(attachment), OVERWRITE));
         });
     }
 
@@ -160,9 +160,9 @@ public class LocalFiascoRepository extends BaseRepository
                 var artifact = attachment.artifact();
                 var content = attachment.content();
                 resolved.add(artifact.withAttachment(
-                        attachment.withContent(content
-                                .withResource(attachmentFile(attachment))
-                                .withSignatures(signatures(attachment)))));
+                    attachment.withContent(content
+                        .withResource(attachmentFile(attachment))
+                        .withSignatures(signatures(attachment)))));
             });
 
             return resolved;
@@ -211,7 +211,7 @@ public class LocalFiascoRepository extends BaseRepository
     private File attachmentFile(@NotNull ArtifactAttachment attachment)
     {
         return repositoryFolder(attachment.artifact())
-                .file(attachment.content().name() + attachment.suffix());
+            .file(attachment.content().name() + attachment.suffix());
     }
 
     /**

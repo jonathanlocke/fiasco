@@ -133,10 +133,10 @@ public class Librarian extends BaseTool
     public String description()
     {
         return format("""
-                Librarian
-                  repositories: $
-                  pinned versions: $
-                """, repositories, pinnedVersions);
+            Librarian
+              repositories: $
+              pinned versions: $
+            """, repositories, pinnedVersions);
     }
 
     /**
@@ -271,7 +271,7 @@ public class Librarian extends BaseTool
         var version = pinnedVersions.get(descriptor);
 
         return version == null
-                ? descriptor
-                : descriptor.withVersion(version);
+            ? descriptor
+            : descriptor.withVersion(version);
     }
 }

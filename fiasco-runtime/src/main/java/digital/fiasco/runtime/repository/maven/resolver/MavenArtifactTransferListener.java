@@ -57,10 +57,10 @@ public class MavenArtifactTransferListener extends AbstractTransferListener impl
             // then warn that the transfer is stalling
             var resource = event.getResource();
             warning("Slow transfer: Downloaded $ at $:\n$ => $",
-                    bytes(event.getTransferredBytes()).asString(USER_LABEL),
-                    rate.asBytesPerSecond(),
-                    resource.getRepositoryUrl(),
-                    resource.getResourceName());
+                bytes(event.getTransferredBytes()).asString(USER_LABEL),
+                rate.asBytesPerSecond(),
+                resource.getRepositoryUrl(),
+                resource.getResourceName());
         }
     }
 
@@ -74,13 +74,13 @@ public class MavenArtifactTransferListener extends AbstractTransferListener impl
         if (contentLength >= 0)
         {
             var type = event.getRequestType() == PUT
-                    ? "Uploaded"
-                    : "Downloaded";
+                ? "Uploaded"
+                : "Downloaded";
 
             trace("$: $ => $ ($)", type,
-                    resource.getRepositoryUrl(),
-                    resource.getResourceName(),
-                    rate(event).perSecond());
+                resource.getRepositoryUrl(),
+                resource.getResourceName(),
+                rate(event).perSecond());
         }
     }
 

@@ -22,7 +22,7 @@ public class PhaseTest extends Phase
     public ObjectList<Phase> requiredPhases()
     {
         return list(new PhasePrepare(),
-                new PhaseCompile());
+            new PhaseCompile());
     }
 
     @Override

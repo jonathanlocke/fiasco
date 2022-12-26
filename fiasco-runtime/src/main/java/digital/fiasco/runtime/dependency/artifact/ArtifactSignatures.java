@@ -7,8 +7,8 @@ package digital.fiasco.runtime.dependency.artifact;
  */
 @SuppressWarnings("unused")
 public record ArtifactSignatures(
-        String pgp,  // PGP signature text
-        String md5,  // MD5 hash
-        String sha1) // SHA-1 hash
+    String pgp,  // PGP signature text
+    String md5,  // MD5 hash
+    String sha1) // SHA-1 hash
 {
 }
