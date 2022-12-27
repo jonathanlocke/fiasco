@@ -7,6 +7,7 @@ import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.phases.Phase;
 import digital.fiasco.runtime.build.phases.PhaseList;
+import digital.fiasco.runtime.build.phases.Phased;
 import digital.fiasco.runtime.build.tools.builder.Builder;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
@@ -172,7 +173,7 @@ public interface Build extends
     BuildDependencies,
     BuildEnvironment,
     BuildArtifact,
-    BuildPhased
+    Phased
 {
     /**
      * Returns the child build at the given path

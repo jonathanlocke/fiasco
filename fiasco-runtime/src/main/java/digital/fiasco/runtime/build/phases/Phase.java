@@ -3,71 +3,88 @@ package digital.fiasco.runtime.build.phases;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.interfaces.string.Described;
-import digital.fiasco.runtime.build.tools.builder.BuildListener;
 
 /**
  * Base class for phases. A phase has a name, a description, and a set of dependent phases, accessed with
- * {@link #requiredPhases()}.
+ * {@link #dependsOnPhases()}. Code can be attached to a phase with:
+ *
+ * <p><b>Phase Actions</b></p>
+ *
+ * <ul>
+ *     <li>{@link #beforePhase(Runnable)}</li>
+ *     <li>{@link #onPhase(Runnable)}</li>
+ *     <li>{@link #afterPhase(Runnable)}</li>
+ * </ul>
  *
  * @author Jonathan Locke
  */
-public abstract class Phase implements
+@SuppressWarnings("unused")
+public interface Phase extends
     Named,
-    Described
+    Described,
+    Runnable
 {
-    /** The name of this phase */
-    private final String name;
-
     /**
-     * Creates a phase
+     * Runs the given code <i>after</i> this phase runs
      *
-     * @param name The name of the phase
+     * @param code The code to run
+     * @return This phase for chaining
      */
-    public Phase(String name)
-    {
-        this.name = name;
-    }
+    Phase afterPhase(Runnable code);
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean equals(Object object)
-    {
-        if (object instanceof Phase that)
-        {
-            return name().equals(that.name());
-        }
-        return false;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public int hashCode()
-    {
-        return name.hashCode();
-    }
-
-    /**
-     * Returns the name of this phase
-     */
-    @Override
-    public String name()
-    {
-        return name;
-    }
-
-    /**
-     * Returns the list of phases that must be run before this phase
-     */
-    public abstract ObjectList<Phase> requiredPhases();
-
-    /**
-     * Runs this phase of a build
+     * Runs the given code <i>before</i> this phase runs
      *
-     * @param listener The build listener to call
+     * @param code The code to run
+     * @return This phase for chaining
      */
-    public abstract void run(BuildListener listener);
+    Phase beforePhase(Runnable code);
+
+    /**
+     * Returns the list of phases that must complete before this phase can be run
+     */
+    ObjectList<Class<? extends Phase>> dependsOnPhases();
+
+    /**
+     * <p><b>Internal API</b></p>
+     *
+     * <p>
+     * Called after this phase runs
+     * </p>
+     */
+    void internalOnAfter();
+
+    /**
+     * <p><b>Internal API</b></p>
+     *
+     * <p>
+     * Called before this phase runs
+     * </p>
+     */
+    void internalOnBefore();
+
+    /**
+     * Runs the given code <i>when</i> this phase runs
+     *
+     * @param code The code to run
+     */
+    Phase onPhase(Runnable code);
+
+    /**
+     * <p><b>Internal API</b></p>
+     *
+     * <p>
+     * Called when this phase runs
+     * </p>
+     */
+    void internalOnRun();
+
+    /**
+     * Runs this phase
+     */
+    @Override
+    default void run()
+    {
+        internalOnRun();
+    }
 }

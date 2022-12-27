@@ -1,19 +1,15 @@
-package digital.fiasco.runtime.build;
-
-import digital.fiasco.runtime.build.phases.Phase;
-import digital.fiasco.runtime.build.phases.PhaseList;
+package digital.fiasco.runtime.build.phases;
 
 /**
  * Allows access to build phases
  *
- * <p><b>Build Phases</b></p>
+ * <p><b>Phases</b></p>
  *
  * <ul>
- *     <li>{@link #phases()}</li>
  *     <li>{@link #phase(String)}</li>
  * </ul>
  *
- * <p><b>Enable State</b></p>
+ * <p><b>Phase Enable State</b></p>
  *
  * <ul>
  *     <li>{@link #disable(Phase)}</li>
@@ -23,7 +19,7 @@ import digital.fiasco.runtime.build.phases.PhaseList;
  *
  * @author Joonathan Locke
  */
-public interface BuildPhased
+public interface Phased extends Iterable<Phase>
 {
     /**
      * Disables execution of the given phase
@@ -53,15 +49,5 @@ public interface BuildPhased
      * @param name The phase name to look up
      * @return The phase, or null if no phase can be found with the given name
      */
-    default Phase phase(String name)
-    {
-        return phases().phase(name);
-    }
-
-    /**
-     * Returns the list of build phases
-     *
-     * @return The phases
-     */
-    PhaseList phases();
+    Phase phase(String name);
 }

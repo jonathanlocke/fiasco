@@ -1,124 +1,177 @@
 package digital.fiasco.runtime.build.tools.builder;
 
-import com.telenav.kivakit.core.collections.list.ObjectList;
-import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.messaging.listeners.MessageList;
 import com.telenav.kivakit.core.messaging.messages.status.Problem;
 import com.telenav.kivakit.core.messaging.messages.status.Quibble;
 import com.telenav.kivakit.core.messaging.messages.status.Warning;
 import com.telenav.kivakit.core.value.count.Count;
-import com.telenav.kivakit.filesystem.File;
-import com.telenav.kivakit.filesystem.FileList;
 import digital.fiasco.runtime.build.Build;
-import digital.fiasco.runtime.build.BuildPhased;
+import digital.fiasco.runtime.build.phases.BasePhase;
 import digital.fiasco.runtime.build.phases.Phase;
-import digital.fiasco.runtime.build.phases.PhaseClean;
-import digital.fiasco.runtime.build.phases.PhaseCompile;
-import digital.fiasco.runtime.build.phases.PhaseDeployDocumentation;
-import digital.fiasco.runtime.build.phases.PhaseDeployPackages;
-import digital.fiasco.runtime.build.phases.PhaseDocument;
-import digital.fiasco.runtime.build.phases.PhaseEnd;
-import digital.fiasco.runtime.build.phases.PhaseInstall;
-import digital.fiasco.runtime.build.phases.PhaseIntegrationTest;
 import digital.fiasco.runtime.build.phases.PhaseList;
-import digital.fiasco.runtime.build.phases.PhasePackage;
-import digital.fiasco.runtime.build.phases.PhasePrepare;
-import digital.fiasco.runtime.build.phases.PhaseStart;
-import digital.fiasco.runtime.build.phases.PhaseTest;
+import digital.fiasco.runtime.build.phases.standard.StandardPhases;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.build.tools.ToolFactory;
 import digital.fiasco.runtime.build.tools.librarian.Librarian;
 
-import java.util.Collection;
-import java.util.List;
-
-import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
-import static com.telenav.kivakit.filesystem.FileList.fileList;
 import static digital.fiasco.runtime.build.BuildOption.DRY_RUN;
 
 /**
- * Builds a project in phases
+ * Builds a project by executing a series of phases. A {@link Build} may have multiple {@link Builder}s, to achieve a
+ * multi-project build or to achieve two different kinds of builds.
+ *
+ * <p><b>Building</b></p>
+ *
+ * <ul>
+ *     <li>{@link #build()}</li>
+ *     <li>{@link #build(Count)}</li>
+ * </ul>
+ *
+ * <p><b>Dependencies</b></p>
+ *
+ * <ul>
+ *     <li>{@link #librarian()}</li>
+ * </ul>
  *
  * <p><b>Build Phases</b></p>
  *
  * <p>
- * Build phases are executed in a pre-defined order, as below. Each phase is defined by a class that extends
- * {@link Phase}. Additional phases can be inserted into {@link #phases()} with
- * {@link PhaseList#addPhaseAfter(String, Phase)} and {@link PhaseList#addPhaseBefore(String, Phase)}.
+ * By default, phases are executed in a pre-defined order, as shown below. Each phase is defined by a class that implements
+ * {@link Phase} (and normally extends {@link BasePhase}). Additional phases can be inserted into the {@link #phases()} list with
+ * {@link PhaseList#addPhaseAfter(String, Phase)} and {@link PhaseList#addPhaseBefore(String, Phase)}. A specific
+ * phase can be replaced with a new definition with {@link PhaseList#replacePhase(String, Phase)}. Alternatively, an
+ * entirely new phase list can be installed with {@link #withPhases(PhaseList)}.
  * </p>
  *
  * <ul>
- *     <li>{@link #disable(Phase)}</li>
- *     <li>{@link #enable(Phase)}</li>
- *     <li>{@link #enabled(Phase)}</li>
- *     <li>{@link #phase(String)}</li>
  *     <li>{@link #phases()}</li>
+ *     <li>{@link #withPhases(PhaseList)}</li>
  * </ul>
+ *
+ * <p><b>Attaching Actions to Phases</b></p>
+ *
+ * <p>
+ * A phase can be retrieved by name with {@link #phase(String)} and an arbitrary {@link Runnable}
+ * can be attached to run before, during or after the phase executes.
+ * </p>
  *
  * <p>
  * Phases are enabled and disabled with {@link #enable(Phase)} and {@link #disable(Phase)}. The {@link #onRun()} method
  * of the application enables and disables any phase names that were passed from the command line. The phase name itself
- * enables the phase and any dependent phases (for example, "compile" enables the "build-start", "prepare" and "compile"
+ * enables the phase and any dependent phases (for example, "compile" enables the "start", "prepare" and "compile"
  * phases). If the phase name is preceded by a dash (for example, -test), the phase is disabled (but not its dependent
  * phases).
  * </p>
  *
+ * <ul>
+ *     <li>{@link #phase(String)}</li>
+ *     <li>{@link #isEnabled(Phase)}</li>
+ *     <li>{@link #enable(Phase)}</li>
+ *     <li>{@link #disable(Phase)}</li>
+ * </ul>
+ *
  * <ol>
- *     <li>start</li>
- *     <li>clean</li>
- *     <li>prepare</li>
- *     <li>compile</li>
- *     <li>test</li>
- *     <li>document</li>
- *     <li>package</li>
- *     <li>integration-test</li>
- *     <li>install</li>
- *     <li>deploy-packages</li>
- *     <li>deploy-documentation</li>
- *     <li>end</li>
+ *     <li>start - start of phases</li>
+ *     <li>clean - removes target files</li>
+ *     <li>prepare - prepares sources and resources for compilation</li>
+ *     <li>compile - compiles sources</li>
+ *     <li>test - runs unit tests</li>
+ *     <li>document - creates documentation</li>
+ *     <li>package - assembles targets into packages</li>
+ *     <li>integration-test - runs integration tests</li>
+ *     <li>install - installs packages in local repository</li>
+ *     <li>deploy-packages - deploys packages to remote repositories</li>
+ *     <li>deploy-documentation - deploys documentation</li>
+ *     <li>end - end of phases</li>
  * </ol>
  *
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused", "StringConcatenationInLoop", "UnusedReturnValue" })
-public class Builder extends BaseTool implements
-    ToolFactory,
-    BuildPhased
+public class Builder extends BaseTool implements ToolFactory
 {
     /** Phases in order of execution */
-    private final PhaseList phases = new PhaseList();
-
-    /** Listeners to call as the build proceeds */
-    private ObjectList<BuildListener> buildListeners = list();
-
-    /** Enable state of each phase */
-    private final ObjectMap<Phase, Boolean> phaseEnabled = new ObjectMap<>();
+    private PhaseList phases = new StandardPhases(this);
 
     /** The librarian to manage libraries */
-    private final Librarian librarian = listenTo(newLibrarian());
+    private Librarian librarian = listenTo(newLibrarian());
 
-    private FileList files = fileList();
-
+    /**
+     * Creates a builder for the given build
+     *
+     * @param build The associated build for this builder
+     */
     public Builder(Build build)
     {
         super(build);
-        installDefaultPhases();
     }
 
     /**
-     * Adds the given build listener to this build
+     * Creates a copy of the give builder
      *
-     * @param listener The listener to call with build events
+     * @param that The builder to copy
      */
-    public void addBuildListener(BuildListener listener)
+    public Builder(Builder that)
     {
-        buildListeners.add(listener);
+        super(that.associatedBuild());
+        this.phases = that.phases.copy();
+        this.librarian = that.librarian;
     }
 
-    public ObjectList<BuildListener> buildListeners()
+    /**
+     * Builds with one thread for each processor
+     *
+     * @return True if the build succeeded without any problems
+     */
+    public final boolean build()
     {
-        return buildListeners;
+        return build(processors());
+    }
+
+    /**
+     * Builds with the given number of worker threads
+     *
+     * @return True if the build succeeded without any problems
+     */
+    @SuppressWarnings("unchecked")
+    public final boolean build(Count threads)
+    {
+        // Listen to any problems broadcast by the build,
+        var issues = new MessageList(message -> !message.status().succeeded());
+        issues.listenTo(this);
+
+        // go through each phase in order,
+        for (var phase : phases)
+        {
+            // and if the phase is enabled,
+            if (phases.isEnabled(phase))
+            {
+                // notify that the phase has started,
+                phase.internalOnBefore();
+
+                // run the phase calling all listeners,
+                if (associatedBuild().isEnabled(DRY_RUN))
+                {
+                    announce(" \n$", bannerLine(phase.name()));
+                }
+                else
+                {
+                    announce(bannerLine(phase.name()));
+                }
+                phase.run();
+
+                // notify that the phase has ended,
+                phase.internalOnAfter();
+            }
+        }
+
+        // then collect statistics and display them,
+        var statistics = issues.statistics(Problem.class, Warning.class, Quibble.class);
+        information(statistics.titledBox("Build Results"));
+
+        // and return true if there are no problems (or worse).
+        return issues.countWorseThanOrEqualTo(Problem.class).isZero();
     }
 
     @Override
@@ -129,10 +182,7 @@ public class Builder extends BaseTool implements
 
     public Builder copy()
     {
-        var copy = new Builder(associatedBuild());
-        copy.files = files.copy();
-        this.buildListeners = buildListeners.copy();
-        return copy;
+        return new Builder(this);
     }
 
     /**
@@ -163,35 +213,33 @@ public class Builder extends BaseTool implements
     }
 
     /**
-     * Disables the given phase from execution during a build
+     * Disables execution of the given phase
      *
      * @param phase The phase to disable
      */
-    @Override
     public void disable(Phase phase)
     {
-        phaseEnabled.put(phase, false);
+        phases.disable(phase);
     }
 
     /**
-     * Enables the given phase for execution during a build
+     * Enables execution of the given phase
      *
-     * @param phase The phase to enable
+     * @param phase The phase to enables
      */
-    @Override
     public void enable(Phase phase)
     {
-        for (var at : phase.requiredPhases())
-        {
-            phaseEnabled.put(at, true);
-        }
-        phaseEnabled.put(phase, true);
+        phases.enable(phase);
     }
 
-    @Override
+    /**
+     * Returns true if the given phase is enabled for execution
+     *
+     * @param phase The phase
+     */
     public boolean isEnabled(Phase phase)
     {
-        return phaseEnabled.get(phase);
+        return phases.isEnabled(phase);
     }
 
     /**
@@ -206,6 +254,17 @@ public class Builder extends BaseTool implements
     }
 
     /**
+     * Returns the phase with the given name
+     *
+     * @param name The phase name
+     * @return The phase
+     */
+    public Phase phase(String name)
+    {
+        return phases.phase(name);
+    }
+
+    /**
      * Returns the list of phases in execution order for this build
      */
     @Override
@@ -215,85 +274,16 @@ public class Builder extends BaseTool implements
     }
 
     /**
-     * Builds with one thread for each processor
+     * Returns a copy of this builder with the given phases
      *
-     * @return True if the build succeeded without any problems
+     * @param phases The list of phases this builder should execute
+     * @return A copy of this builder with the given phases
      */
-    public final boolean runBuild()
-    {
-        return runBuild(processors());
-    }
-
-    /**
-     * Builds with the given number of worker threads
-     *
-     * @return True if the build succeeded without any problems
-     */
-    @SuppressWarnings("unchecked")
-    public final boolean runBuild(Count threads)
-    {
-        // Listen to any problems broadcast by the build,
-        var issues = new MessageList(message -> !message.status().succeeded());
-        issues.listenTo(this);
-
-        // go through each phase in order,
-        for (var phase : phases)
-        {
-            // and if the phase is enabled,
-            if (enabled(phase))
-            {
-                // notify that the phase has started,
-                var multicaster = new BuildMulticaster(associatedBuild());
-                multicaster.onPhaseStart(phase);
-
-                // run the phase calling all listeners,
-                if (associatedBuild().isEnabled(DRY_RUN))
-                {
-                    announce(" \n$", bannerLine(phase.name()));
-                }
-                else
-                {
-                    announce(bannerLine(phase.name()));
-                }
-                phase.run(multicaster);
-
-                // notify that the phase has ended,
-                multicaster.onPhaseEnd(phase);
-            }
-        }
-
-        // then collect statistics and display them,
-        var statistics = issues.statistics(Problem.class, Warning.class, Quibble.class);
-        information(statistics.titledBox("Build Results"));
-
-        // and return true if there are no problems (or worse).
-        return issues.countWorseThanOrEqualTo(Problem.class).isZero();
-    }
-
-    /**
-     * Records the list of files to remove
-     *
-     * @param files The files to remove
-     * @return This for chaining
-     */
-    public Builder withAdditionalFiles(Collection<File> files)
+    public Builder withPhases(PhaseList phases)
     {
         var copy = copy();
-        this.files = fileList(this.files).with(files);
-        return this;
-    }
-
-    /**
-     * Records the list of files to remove
-     *
-     * @param files The files to remove
-     * @return This for chaining
-     */
-    public Builder withFiles(List<File> files)
-    {
-        var copy = copy();
-        this.files = fileList(this.files.with(files));
-        return this;
+        copy.phases = phases;
+        return copy;
     }
 
     /**
@@ -302,49 +292,6 @@ public class Builder extends BaseTool implements
     @Override
     protected void onRun()
     {
-        information("Cleaning $ files", files.count());
-
-        files.forEach(file ->
-        {
-            file.delete();
-            var parent = file.parent();
-            if (parent.isEmpty())
-            {
-                parent.delete();
-            }
-        });
-    }
-
-    /**
-     * Returns true if the given phase is enabled
-     *
-     * @param phase The phase
-     * @return True if the phase is enabled
-     */
-    private boolean enabled(Phase phase)
-    {
-        return phaseEnabled.getOrDefault(phase, false);
-    }
-
-    /**
-     * Installs the default phases
-     */
-    private void installDefaultPhases()
-    {
-        phases.add(new PhaseStart());
-        phases.add(new PhaseClean());
-        phases.add(new PhasePrepare());
-        phases.add(new PhaseCompile());
-        phases.add(new PhaseTest());
-        phases.add(new PhaseDocument());
-        phases.add(new PhasePackage());
-        phases.add(new PhaseIntegrationTest());
-        phases.add(new PhaseInstall());
-        phases.add(new PhaseDeployPackages());
-        phases.add(new PhaseDeployDocumentation());
-        phases.add(new PhaseEnd());
-
-        enable(phase("start"));
-        enable(phase("end"));
+        build();
     }
 }

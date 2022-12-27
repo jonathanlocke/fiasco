@@ -26,7 +26,6 @@ import com.telenav.kivakit.serialization.gson.GsonSerializationProject;
 import digital.fiasco.runtime.build.phases.Phase;
 import digital.fiasco.runtime.build.phases.PhaseList;
 import digital.fiasco.runtime.build.tools.ToolFactory;
-import digital.fiasco.runtime.build.tools.builder.BuildListener;
 import digital.fiasco.runtime.build.tools.builder.Builder;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
@@ -199,7 +198,6 @@ public abstract class BaseBuild extends Application implements
     BuildAssociated,
     BuildEnvironment,
     BuildStructured,
-    BuildListener,
     BuildRepositories,
     ToolFactory
 {
@@ -278,6 +276,7 @@ public abstract class BaseBuild extends Application implements
     /**
      * Returns a copy of this build
      */
+    @Override
     public BaseBuild copy()
     {
         var copy = typeForClass(getClass()).newInstance();
@@ -381,7 +380,6 @@ public abstract class BaseBuild extends Application implements
     /**
      * Returns the list of phases in execution order for this build
      */
-    @Override
     public PhaseList phases()
     {
         return builder.phases();
@@ -512,7 +510,7 @@ public abstract class BaseBuild extends Application implements
                 }
             }
 
-            builder().runBuild();
+            builder().build();
         }
     }
 
