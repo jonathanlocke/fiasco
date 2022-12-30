@@ -4,9 +4,6 @@ import com.telenav.kivakit.commandline.CommandLine;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.language.trait.TryCatchTrait;
 import com.telenav.kivakit.core.messaging.listeners.MessageList;
-import com.telenav.kivakit.core.messaging.messages.status.Problem;
-import com.telenav.kivakit.core.messaging.messages.status.Quibble;
-import com.telenav.kivakit.core.messaging.messages.status.Warning;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.core.version.Version;
@@ -270,7 +267,6 @@ public class Builder extends BaseRepeater implements
      *
      * @return True if the build succeeded without any problems
      */
-    @SuppressWarnings("unchecked")
     public final BuildResult build(Count threads)
     {
         // Listen to any problems broadcast by the build,
@@ -302,11 +298,7 @@ public class Builder extends BaseRepeater implements
             }
         }
 
-        // then collect statistics and display them,
-        var statistics = issues.statistics(Problem.class, Warning.class, Quibble.class);
-        information(statistics.titledBox("Build Results"));
-
-        // and return true if there are no problems (or worse).
+        // and return the result of the build.
         return new BuildResult(issues);
     }
 

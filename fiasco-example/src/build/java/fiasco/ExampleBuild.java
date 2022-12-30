@@ -61,7 +61,7 @@ public class ExampleBuild extends BaseBuild implements Libraries
      * {@inheritDoc}
      */
     @Override
-    public void onRun()
+    public void onBuild()
     {
         var builder = newBuilder()
             .withArtifactDescriptor("digital.fiasco:example:1.0")
@@ -71,8 +71,9 @@ public class ExampleBuild extends BaseBuild implements Libraries
             .pinVersion(kryo, "4.3.1")
             .withRootFolder(currentFolder());
 
-        builder.build();
+        builder.build().showResult();
 
+        // Multi-project build
         var child = builder.childBuilder("example-child")
             .withDependencies(hamcrest_library.version("5.0"));
         child.build();

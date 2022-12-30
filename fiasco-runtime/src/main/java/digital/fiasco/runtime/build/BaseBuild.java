@@ -236,6 +236,14 @@ public abstract class BaseBuild extends Application implements
             .build());
     }
 
+    protected abstract void onBuild();
+
+    @Override
+    protected final void onRun()
+    {
+        onBuild();
+    }
+
     /**
      * {@inheritDoc}
      */
