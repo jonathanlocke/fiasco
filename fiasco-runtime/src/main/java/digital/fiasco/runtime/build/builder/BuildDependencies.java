@@ -1,6 +1,7 @@
-package digital.fiasco.runtime.build;
+package digital.fiasco.runtime.build.builder;
 
 import com.telenav.kivakit.core.version.Version;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 
@@ -43,7 +44,7 @@ public interface BuildDependencies
      * @param version The version to use
      * @return The build for method chaining
      */
-    Build pinVersion(Artifact<?> artifact, Version version);
+    Builder pinVersion(Artifact<?> artifact, Version version);
 
     /**
      * Globally pins all versions of the given artifact to the specified version
@@ -52,7 +53,7 @@ public interface BuildDependencies
      * @param version The version to use
      * @return The build for method chaining
      */
-    default Build pinVersion(Artifact<?> artifact, String version)
+    default Builder pinVersion(Artifact<?> artifact, String version)
     {
         return pinVersion(artifact, version(version));
     }
@@ -64,7 +65,7 @@ public interface BuildDependencies
      * @param rest Any further dependencies
      * @return The build for method chaining
      */
-    Build requires(Artifact<?> first, Artifact<?>... rest);
+    Builder requires(Artifact<?> first, Artifact<?>... rest);
 
     /**
      * Adds a list of build dependencies
@@ -72,5 +73,5 @@ public interface BuildDependencies
      * @param dependencies THe dependencies to add
      * @return The build for method chaining
      */
-    Build requires(DependencyList dependencies);
+    Builder requires(DependencyList dependencies);
 }

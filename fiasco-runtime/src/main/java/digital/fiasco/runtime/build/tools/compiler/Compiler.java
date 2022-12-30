@@ -2,7 +2,7 @@ package digital.fiasco.runtime.build.tools.compiler;
 
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.FileList;
-import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.tools.BaseTool;
 
 import javax.tools.Diagnostic;
@@ -76,13 +76,13 @@ public class Compiler extends BaseTool
     private Locale sourceLocale = Locale.getDefault();
 
     /**
-     * Create a new Java compiler associated with the given build
+     * Create a new Java compiler associated with the given builder
      *
-     * @param build The build
+     * @param builder The builder
      */
-    public Compiler(Build build)
+    public Compiler(Builder builder)
     {
-        super(build);
+        super(builder);
     }
 
     /**
@@ -92,7 +92,7 @@ public class Compiler extends BaseTool
      */
     public Compiler(Compiler that)
     {
-        super(that.associatedBuild());
+        super(that.associatedBuilder());
         this.sourceVersion = that.sourceVersion;
         this.targetVersion = that.targetVersion;
         this.sources = that.sources.copy();

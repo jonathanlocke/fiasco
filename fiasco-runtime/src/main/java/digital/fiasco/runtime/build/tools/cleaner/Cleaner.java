@@ -2,7 +2,7 @@ package digital.fiasco.runtime.build.tools.cleaner;
 
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.FileList;
-import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.tools.BaseTool;
 
 import java.util.Collection;
@@ -23,14 +23,14 @@ public class Cleaner extends BaseTool
     /** The files to be removed */
     private FileList files;
 
-    public Cleaner(Build build)
+    public Cleaner(Builder builder)
     {
-        super(build);
+        super(builder);
     }
 
     public Cleaner copy()
     {
-        var copy = new Cleaner(associatedBuild());
+        var copy = new Cleaner(associatedBuilder());
         copy.files = files.copy();
         return copy;
     }

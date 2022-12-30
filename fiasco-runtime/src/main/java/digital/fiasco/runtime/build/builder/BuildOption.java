@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.build;
+package digital.fiasco.runtime.build.builder;
 
 /**
  * Options for builds
@@ -8,5 +8,8 @@ package digital.fiasco.runtime.build;
 public enum BuildOption
 {
     /** Show what would be built without building it */
-    DRY_RUN
+    DESCRIBE,
+
+    /** Build with minimal output */
+    QUIET
 }

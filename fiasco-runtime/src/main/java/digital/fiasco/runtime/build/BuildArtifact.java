@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.build;
 
 import com.telenav.kivakit.core.version.Version;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import org.jetbrains.annotations.NotNull;
 
@@ -61,7 +62,7 @@ public interface BuildArtifact
      * @param descriptor The artifact descriptor
      * @return The copy
      */
-    Build withArtifactDescriptor(ArtifactDescriptor descriptor);
+    Builder withArtifactDescriptor(ArtifactDescriptor descriptor);
 
     /**
      * Returns a copy of this build with the given main artifact descriptor
@@ -69,7 +70,7 @@ public interface BuildArtifact
      * @param descriptor The artifact descriptor
      * @return The copy
      */
-    default Build withArtifactDescriptor(String descriptor)
+    default Builder withArtifactDescriptor(String descriptor)
     {
         return withArtifactDescriptor(ArtifactDescriptor.artifactDescriptor(descriptor));
     }
@@ -80,7 +81,7 @@ public interface BuildArtifact
      * @param identifier The artifact identifier
      * @return The copy
      */
-    default Build withArtifactIdentifier(String identifier)
+    default Builder withArtifactIdentifier(String identifier)
     {
         return withArtifactDescriptor(artifactDescriptor().withIdentifier(identifier));
     }
@@ -91,7 +92,7 @@ public interface BuildArtifact
      * @param version The artifact version
      * @return The copy
      */
-    default Build withArtifactVersion(Version version)
+    default Builder withArtifactVersion(Version version)
     {
         return withArtifactDescriptor(artifactDescriptor().withVersion(version));
     }
@@ -102,7 +103,7 @@ public interface BuildArtifact
      * @param version The artifact version
      * @return The copy
      */
-    default Build withArtifactVersion(String version)
+    default Builder withArtifactVersion(String version)
     {
         return withArtifactVersion(version(version));
     }

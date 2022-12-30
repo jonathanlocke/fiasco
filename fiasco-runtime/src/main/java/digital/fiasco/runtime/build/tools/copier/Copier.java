@@ -12,7 +12,7 @@ import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.filesystem.Folder.Traversal;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import com.telenav.kivakit.resource.ResourcePathed;
-import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.tools.BaseTool;
 
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
@@ -47,13 +47,13 @@ public class Copier extends BaseTool
     private Traversal traversal;
 
     /**
-     * Creates a copier associated with the given build
+     * Creates a copier associated with the given builder
      *
-     * @param build The build
+     * @param builder The builder
      */
-    public Copier(Build build)
+    public Copier(Builder builder)
     {
-        super(build);
+        super(builder);
     }
 
     /**
@@ -63,7 +63,7 @@ public class Copier extends BaseTool
      */
     public Copier(Copier that)
     {
-        super(that.associatedBuild());
+        super(that.associatedBuilder());
         this.to = that.to;
         this.source = that.source;
         this.includes = that.includes;

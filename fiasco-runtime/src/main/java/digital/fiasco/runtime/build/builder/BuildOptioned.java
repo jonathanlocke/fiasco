@@ -1,15 +1,7 @@
-package digital.fiasco.runtime.build;
-
-import digital.fiasco.runtime.build.tools.builder.Builder;
+package digital.fiasco.runtime.build.builder;
 
 /**
  * An object that can be built.
- *
- * <p><b>Build Tools</b></p>
- *
- * <ul>
- *     <li>{@link #builder()}</li>
- * </ul>
  *
  * <p><b>Build Options</b></p>
  *
@@ -22,20 +14,15 @@ import digital.fiasco.runtime.build.tools.builder.Builder;
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "UnusedReturnValue", "unused" })
-public interface Buildable
+public interface BuildOptioned
 {
-    /**
-     * Returns the {@link Builder} for this build
-     */
-    Builder builder();
-
     /**
      * Disables the given build option
      *
      * @param option The option
      * @return This build for method chaining
      */
-    Build disable(BuildOption option);
+    Builder disable(BuildOption option);
 
     /**
      * Enables the given build option
@@ -43,7 +30,7 @@ public interface Buildable
      * @param option The option
      * @return This build for method chaining
      */
-    Build enable(BuildOption option);
+    Builder enable(BuildOption option);
 
     /**
      * Returns true if the given option is enabled

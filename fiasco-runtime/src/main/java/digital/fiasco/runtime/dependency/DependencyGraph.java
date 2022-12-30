@@ -67,7 +67,7 @@ public class DependencyGraph
             if (Collections.disjoint(explored.asSet(), descendants.asSet()))
             {
                 // then add the explored descendants to the list of dependencies
-                explored = explored.with(descendants);
+                explored = explored.withAdditionalDependencies(descendants);
             }
             else
             {
@@ -77,6 +77,6 @@ public class DependencyGraph
         }
 
         // Finally, return the explored children with the root.
-        return explored.with(root);
+        return explored.withAdditionalDependencies(root);
     }
 }

@@ -4,8 +4,8 @@ import com.telenav.cactus.metadata.BuildName;
 import com.telenav.kivakit.conversion.core.time.TimeConverter;
 import com.telenav.kivakit.core.collections.list.StringList;
 import com.telenav.kivakit.core.string.Formatter;
-import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.BuildStructured;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.build.tools.ToolFactory;
 
@@ -50,13 +50,13 @@ public class BuildStamper extends BaseTool implements
     ToolFactory
 {
     /**
-     * Creates a build stamper associated with this build
+     * Creates a build stamper associated with this builder
      *
-     * @param build The build
+     * @param builder The builder
      */
-    public BuildStamper(Build build)
+    public BuildStamper(Builder builder)
     {
-        super(build);
+        super(builder);
     }
 
     /**
@@ -85,11 +85,11 @@ public class BuildStamper extends BaseTool implements
         information("Stamping build");
 
         targetClassesFolder()
-            .file(associatedBuild().artifactName() + "-project.properties")
+            .file(associatedBuilder().artifactName() + "-project.properties")
             .saveText(projectProperties().join("\n"));
 
         targetClassesFolder()
-            .file(associatedBuild().artifactName() + "-build.properties")
+            .file(associatedBuilder().artifactName() + "-build.properties")
             .saveText(buildProperties().join("\n"));
     }
 
@@ -121,7 +121,7 @@ public class BuildStamper extends BaseTool implements
      */
     private StringList projectProperties()
     {
-        var descriptor = associatedBuild().artifactDescriptor();
+        var descriptor = associatedBuilder().artifactDescriptor();
         return stringList("artifact.group = " + descriptor.group(),
             "artifact.name = " + descriptor.name(),
             "artifact.version = " + descriptor.version(),

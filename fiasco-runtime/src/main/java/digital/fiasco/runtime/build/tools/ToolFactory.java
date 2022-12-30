@@ -1,9 +1,10 @@
 package digital.fiasco.runtime.build.tools;
 
-import digital.fiasco.runtime.build.BuildAssociated;
+import com.telenav.kivakit.core.language.Classes;
+import com.telenav.kivakit.core.messaging.Repeater;
 import digital.fiasco.runtime.build.BuildStructured;
+import digital.fiasco.runtime.build.builder.BuilderAssociated;
 import digital.fiasco.runtime.build.tools.archiver.Archiver;
-import digital.fiasco.runtime.build.tools.builder.Builder;
 import digital.fiasco.runtime.build.tools.cleaner.Cleaner;
 import digital.fiasco.runtime.build.tools.compiler.Compiler;
 import digital.fiasco.runtime.build.tools.copier.Copier;
@@ -13,14 +14,13 @@ import digital.fiasco.runtime.build.tools.shader.Shader;
 import digital.fiasco.runtime.build.tools.stamper.BuildStamper;
 import digital.fiasco.runtime.build.tools.tester.Tester;
 
-import static com.telenav.kivakit.core.version.Version.version;
-
 /**
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 public interface ToolFactory extends
-    BuildAssociated,
+    Repeater,
+    BuilderAssociated,
     BuildStructured
 {
     /**
@@ -28,15 +28,7 @@ public interface ToolFactory extends
      */
     default Archiver newArchiver()
     {
-        return new Archiver(associatedBuild());
-    }
-
-    /**
-     * Creates a new {@link Builder} tool
-     */
-    default Builder newBuilder()
-    {
-        return new Builder(associatedBuild());
+        return newTool(Archiver.class);
     }
 
     /**
@@ -44,18 +36,15 @@ public interface ToolFactory extends
      */
     default Cleaner newCleaner()
     {
-        return new Cleaner(associatedBuild());
+        return newTool(Cleaner.class);
     }
 
     /**
-     * Creates a new {@link Compiler} tool, with default Java sources and source/target versions.
+     * Creates a new {@link Compiler} tool
      */
     default Compiler newCompiler()
     {
-        return new Compiler(associatedBuild())
-            .withSources(sourceMainJavaSources())
-            .withSourceVersion(version(17))
-            .withTargetVersion(version(17));
+        return newTool(Compiler.class);
     }
 
     /**
@@ -63,7 +52,7 @@ public interface ToolFactory extends
      */
     default Copier newCopier()
     {
-        return new Copier(associatedBuild());
+        return newTool(Copier.class);
     }
 
     /**
@@ -71,7 +60,7 @@ public interface ToolFactory extends
      */
     default Git newGit()
     {
-        return new Git(associatedBuild());
+        return newTool(Git.class);
     }
 
     /**
@@ -79,7 +68,7 @@ public interface ToolFactory extends
      */
     default Librarian newLibrarian()
     {
-        return new Librarian(associatedBuild());
+        return newTool(Librarian.class);
     }
 
     /**
@@ -87,7 +76,7 @@ public interface ToolFactory extends
      */
     default Shader newShader()
     {
-        return new Shader(associatedBuild());
+        return newTool(Shader.class);
     }
 
     /**
@@ -95,7 +84,7 @@ public interface ToolFactory extends
      */
     default BuildStamper newStamper()
     {
-        return new BuildStamper(associatedBuild());
+        return newTool(BuildStamper.class);
     }
 
     /**
@@ -103,6 +92,11 @@ public interface ToolFactory extends
      */
     default Tester newTester()
     {
-        return new Tester(associatedBuild());
+        return newTool(Tester.class);
+    }
+
+    default <T extends Tool> T newTool(Class<T> type)
+    {
+        return listenTo(Classes.newInstance(type, associatedBuilder()));
     }
 }

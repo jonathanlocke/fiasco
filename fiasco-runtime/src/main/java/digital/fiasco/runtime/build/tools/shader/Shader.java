@@ -1,13 +1,13 @@
 package digital.fiasco.runtime.build.tools.shader;
 
-import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.tools.BaseTool;
 
 public class Shader extends BaseTool
 {
-    public Shader(Build build)
+    public Shader(Builder builder)
     {
-        super(build);
+        super(builder);
     }
 
     @Override

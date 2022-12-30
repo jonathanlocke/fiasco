@@ -2,7 +2,7 @@ package digital.fiasco.runtime.build.tools.archiver;
 
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.FileList;
-import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.tools.BaseTool;
 
 import java.util.Collection;
@@ -26,13 +26,13 @@ public class Archiver extends BaseTool
     private File archiveFile;
 
     /**
-     * Creates an archiver associated with the given build
+     * Creates an archiver associated with the given builder
      *
-     * @param build The build
+     * @param builder The builder
      */
-    public Archiver(Build build)
+    public Archiver(Builder builder)
     {
-        super(build);
+        super(builder);
     }
 
     /**
@@ -42,7 +42,7 @@ public class Archiver extends BaseTool
      */
     public Archiver(Archiver that)
     {
-        super(that.associatedBuild());
+        super(that.associatedBuilder());
         this.files = that.files.copy();
         this.archiveFile = that.archiveFile;
     }

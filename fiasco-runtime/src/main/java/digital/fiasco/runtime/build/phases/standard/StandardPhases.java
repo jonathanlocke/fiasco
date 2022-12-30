@@ -1,11 +1,11 @@
 package digital.fiasco.runtime.build.phases.standard;
 
+import com.telenav.kivakit.component.ComponentMixin;
 import com.telenav.kivakit.filesystem.Folder;
-import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.phases.Phase;
 import digital.fiasco.runtime.build.phases.PhaseList;
 import digital.fiasco.runtime.build.tools.ToolFactory;
-import digital.fiasco.runtime.build.tools.builder.Builder;
 
 import static com.telenav.kivakit.interfaces.comparison.Matcher.matchAll;
 
@@ -35,7 +35,9 @@ import static com.telenav.kivakit.interfaces.comparison.Matcher.matchAll;
  *
  * @author Jonathan Locke
  */
-public class StandardPhases extends PhaseList implements ToolFactory
+public class StandardPhases extends PhaseList implements
+    ToolFactory,
+    ComponentMixin
 {
     /** The builder for this list of phases */
     private final Builder builder;
@@ -65,30 +67,38 @@ public class StandardPhases extends PhaseList implements ToolFactory
     }
 
     @Override
-    public Build associatedBuild()
+    public Builder associatedBuilder()
     {
-        return builder.associatedBuild();
+        return builder.associatedBuilder();
     }
 
     public void onClean()
     {
-        newCleaner().withFiles(targetFolder().nestedFiles(matchAll())).run();
+        newCleaner()
+            .withFiles(targetFolder()
+                .nestedFiles(matchAll()))
+            .run();
     }
 
     public void onCompile()
     {
-        newCompiler().withSources(sourceMainJavaSources()).run();
+        newCompiler()
+            .withSources(sourceMainJavaSources())
+            .run();
+
         newStamper().run();
     }
 
     public void onPrepare()
     {
-        newCopier().withSourceFolder(sourceMainResourcesFolder())
+        newCopier()
+            .withSourceFolder(sourceMainResourcesFolder())
             .withTargetFolder(targetClassesFolder())
             .with("**/*")
             .run();
 
-        newCopier().withSourceFolder(sourceTestResourcesFolder())
+        newCopier()
+            .withSourceFolder(sourceTestResourcesFolder())
             .withTargetFolder(targetTestClassesFolder())
             .with("**/*")
             .run();

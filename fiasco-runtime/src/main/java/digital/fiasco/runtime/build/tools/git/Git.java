@@ -9,7 +9,7 @@ package digital.fiasco.runtime.build.tools.git;
 
 import com.telenav.kivakit.core.collections.list.StringList;
 import com.telenav.kivakit.filesystem.Folder;
-import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.tools.BaseTool;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
@@ -62,13 +62,13 @@ public class Git extends BaseTool
     private String output;
 
     /**
-     * Creates a Git tool associated with the given build
+     * Creates a Git tool associated with the given builder
      *
-     * @param build The build
+     * @param builder The builder
      */
-    public Git(Build build)
+    public Git(Builder builder)
     {
-        super(build);
+        super(builder);
         folder = rootFolder();
     }
 
@@ -79,7 +79,7 @@ public class Git extends BaseTool
      */
     public Git(Git that)
     {
-        super(that.associatedBuild());
+        super(that.associatedBuilder());
         this.folder = that.folder;
         this.arguments = that.arguments.copy();
         this.output = that.output;

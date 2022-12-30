@@ -2,13 +2,12 @@ package digital.fiasco.runtime.build.tools;
 
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.filesystem.Folder;
-import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.phases.PhaseList;
-import digital.fiasco.runtime.build.tools.builder.Builder;
 import digital.fiasco.runtime.build.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.DependencyList;
 
-import static digital.fiasco.runtime.build.BuildOption.DRY_RUN;
+import static digital.fiasco.runtime.build.builder.BuildOption.DESCRIBE;
 
 /**
  * Base class for {@link Tool}s.
@@ -18,28 +17,27 @@ import static digital.fiasco.runtime.build.BuildOption.DRY_RUN;
 @SuppressWarnings("unused")
 public abstract class BaseTool extends BaseRepeater implements Tool
 {
-    private final Build build;
+    private final Builder builder;
 
-    public BaseTool(Build build)
+    public BaseTool(Builder builder)
     {
-        this.build = build;
-        associatedBuild().addListener(this);
+        this.builder = builder;
     }
 
     @Override
-    public Build associatedBuild()
+    public Builder associatedBuilder()
     {
-        return build;
+        return builder;
     }
 
     public Builder builder()
     {
-        return associatedBuild().builder();
+        return builder;
     }
 
     public DependencyList dependencies()
     {
-        return associatedBuild().dependencies();
+        return builder().dependencies();
     }
 
     public Librarian librarian()
@@ -55,13 +53,13 @@ public abstract class BaseTool extends BaseRepeater implements Tool
     @Override
     public Folder rootFolder()
     {
-        return associatedBuild().rootFolder();
+        return builder().rootFolder();
     }
 
     @Override
     public final void run()
     {
-        if (associatedBuild().isEnabled(DRY_RUN))
+        if (builder.isEnabled(DESCRIBE))
         {
             onDescribe();
         }

@@ -19,7 +19,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.ensure;
  *     <li>{@link #iterator()}</li>
  * </ul>
  *
- * <p><b>Phase Enable State</b></v></p>
+ * <p><b>Phase Enable State</b></p>
  *
  * <ul>
  *     <li>{@link #disable(Phase)}</li>

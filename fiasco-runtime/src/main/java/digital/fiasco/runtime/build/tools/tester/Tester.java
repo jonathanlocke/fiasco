@@ -7,7 +7,7 @@
 
 package digital.fiasco.runtime.build.tools.tester;
 
-import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.tools.BaseTool;
 
 /**
@@ -17,9 +17,9 @@ import digital.fiasco.runtime.build.tools.BaseTool;
  */
 public class Tester extends BaseTool
 {
-    public Tester(Build build)
+    public Tester(Builder builder)
     {
-        super(build);
+        super(builder);
     }
 
     @Override

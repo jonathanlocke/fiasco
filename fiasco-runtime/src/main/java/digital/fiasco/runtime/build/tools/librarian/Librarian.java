@@ -10,7 +10,7 @@ package digital.fiasco.runtime.build.tools.librarian;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.version.Version;
-import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.tools.BaseTool;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
@@ -64,9 +64,9 @@ public class Librarian extends BaseTool
     /** A map from group:artifact-id to version */
     private final ObjectMap<ArtifactDescriptor, Version> pinnedVersions = new ObjectMap<>();
 
-    public Librarian(Build build)
+    public Librarian(Builder builder)
     {
-        super(build);
+        super(builder);
 
         lookIn(new LocalFiascoRepository("user-repository"));
         lookIn(new CacheFiascoRepository("download-repository"));
@@ -94,7 +94,7 @@ public class Librarian extends BaseTool
                 if (resolved != null && artifact.excludes(resolved.descriptor()))
                 {
                     // add it to the dependencies list.
-                    dependencies = dependencies.with(resolved);
+                    dependencies = dependencies.withAdditionalDependencies(resolved);
                 }
             }
         }
@@ -112,7 +112,7 @@ public class Librarian extends BaseTool
                 if (resolved.first().excludes(resolved.first().descriptor()))
                 {
                     // add it to the dependencies.
-                    dependencies = dependencies.with(library(resolved.first()));
+                    dependencies = dependencies.withAdditionalDependencies(library(resolved.first()));
                     found = true;
                 }
             }

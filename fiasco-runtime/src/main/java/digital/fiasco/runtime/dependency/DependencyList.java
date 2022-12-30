@@ -49,8 +49,8 @@ import static com.telenav.kivakit.core.thread.Threads.shutdownAndAwaitTerminatio
  * <p><b>Functional</b></p>
  *
  * <ul>
- *     <li>{@link #with(Dependency, Dependency[])} - Returns a copy of this list with the given additional dependencies</li>
- *     <li>{@link #with(DependencyList)} - Returns a copy of this list with the given additional dependencies</li>
+ *     <li>{@link #withAdditionalDependencies(Dependency, Dependency[])} - Returns a copy of this list with the given additional dependencies</li>
+ *     <li>{@link #withAdditionalDependencies(DependencyList)} - Returns a copy of this list with the given additional dependencies</li>
  *     <li>{@link #without(Matcher)} - Returns a copy of this list without the given dependencies</li>
  *     <li>{@link #without(Collection) - Returns a copy of this list without the given dependencies}</li>
  * </ul>
@@ -253,7 +253,7 @@ public class DependencyList implements
      * @param dependencies A variable-argument list of dependencies to include
      * @return A copy of this list with the given dependencies added
      */
-    public final DependencyList with(Dependency<?> first, Dependency<?>... dependencies)
+    public final DependencyList withAdditionalDependencies(Dependency<?> first, Dependency<?>... dependencies)
     {
         var copy = copy();
         copy.dependencies.add(first);
@@ -266,9 +266,37 @@ public class DependencyList implements
      *
      * @return A copy of this list with the given dependencies added
      */
-    public DependencyList with(DependencyList dependencies)
+    public DependencyList withAdditionalDependencies(DependencyList dependencies)
     {
         var copy = copy();
+        copy.dependencies.addAll(dependencies.dependencies);
+        return copy;
+    }
+
+    /**
+     * Returns this list with the given dependencies
+     *
+     * @param dependencies A variable-argument list of dependencies to include
+     * @return A copy of this list with the given dependencies
+     */
+    public final DependencyList withDependencies(Dependency<?> first, Dependency<?>... dependencies)
+    {
+        var copy = copy();
+        copy.dependencies.clear();
+        copy.dependencies.add(first);
+        copy.dependencies.addAll(dependencies);
+        return copy;
+    }
+
+    /**
+     * Returns this list with the given dependencies
+     *
+     * @return A copy of this list with the given dependencies
+     */
+    public DependencyList withDependencies(DependencyList dependencies)
+    {
+        var copy = copy();
+        copy.dependencies.clear();
         copy.dependencies.addAll(dependencies.dependencies);
         return copy;
     }
