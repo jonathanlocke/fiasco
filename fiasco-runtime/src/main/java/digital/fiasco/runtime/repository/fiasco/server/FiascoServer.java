@@ -32,7 +32,7 @@ public class FiascoServer extends Application
     private final Repository repository = new CacheFiascoRepository("server-repository");
 
     @Override
-    protected void onRun()
+    public void onRun()
     {
         // Accept connections on the Fiasco server port (retrying 8 times before giving up).
         // When a socket connection occurs, handle the request.

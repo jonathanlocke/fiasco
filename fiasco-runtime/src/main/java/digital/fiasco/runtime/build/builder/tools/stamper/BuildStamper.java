@@ -80,7 +80,7 @@ public class BuildStamper extends BaseTool implements
      * {@inheritDoc}
      */
     @Override
-    protected void onRun()
+    public void onRun()
     {
         information("Stamping build");
 

@@ -254,7 +254,7 @@ public class Librarian extends BaseTool
     }
 
     @Override
-    protected void onRun()
+    public void onRun()
     {
         unsupported("Librarian does not need to be started");
     }

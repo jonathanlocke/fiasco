@@ -29,7 +29,7 @@ public class Tester extends BaseTool
     }
 
     @Override
-    protected void onRun()
+    public void onRun()
     {
     }
 }

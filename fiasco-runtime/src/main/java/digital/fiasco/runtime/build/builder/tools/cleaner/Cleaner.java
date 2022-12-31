@@ -83,7 +83,7 @@ public class Cleaner extends BaseTool
      * {@inheritDoc}
      */
     @Override
-    protected void onRun()
+    public void onRun()
     {
         information("Cleaning $ files", files.count());
 

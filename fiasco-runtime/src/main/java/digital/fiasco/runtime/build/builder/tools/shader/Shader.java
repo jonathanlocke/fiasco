@@ -17,7 +17,7 @@ public class Shader extends BaseTool
     }
 
     @Override
-    protected void onRun()
+    public void onRun()
     {
 
     }

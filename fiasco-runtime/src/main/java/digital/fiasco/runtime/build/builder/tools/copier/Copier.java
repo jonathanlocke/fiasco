@@ -187,7 +187,7 @@ public class Copier extends BaseTool
      * {@inheritDoc}
      */
     @Override
-    protected void onRun()
+    public void onRun()
     {
         information("Copying from $ to $",
             source.relativeTo(rootFolder()),

@@ -107,7 +107,7 @@ public class Archiver extends BaseTool
      * {@inheritDoc}
      */
     @Override
-    protected void onRun()
+    public void onRun()
     {
         try (var archive = zipArchive(this, archiveFile, WRITE))
         {

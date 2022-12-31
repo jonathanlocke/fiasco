@@ -232,7 +232,7 @@ public class Compiler extends BaseTool
      * {@inheritDoc}
      */
     @Override
-    protected void onRun()
+    public void onRun()
     {
         compile(sourceMainJavaSources());
     }

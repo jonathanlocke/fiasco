@@ -3,6 +3,7 @@ package digital.fiasco.runtime.build;
 import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.interfaces.string.Described;
+import digital.fiasco.runtime.build.builder.BuildAction;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
@@ -21,12 +22,12 @@ import digital.fiasco.runtime.build.metadata.BuildMetadata;
  *
  * <p>
  * Phases are enabled and disabled with {@link Builder#enable(Phase)} and {@link Builder#disable(Phase)}. Code can be
- * executed before, during or after a phase runs by calling {@link Builder#beforePhase(String, Runnable)},
- * {@link Builder#onPhase(String, Runnable)}, and {@link Builder#afterPhase(String, Runnable)}. The {@link BaseBuild}
- * application enables and disables any phase names that were passed from the command line. The phase name itself
- * enables the phase and any dependent phases (for example, "compile" enables the "build-start", "prepare" and "compile"
- * phases). If the phase name is preceded by a dash (for example, -test), the phase is disabled (but not its dependent
- * phases).
+ * executed before, during or after a phase runs by calling {@link Builder#beforePhase(String, BuildAction)},
+ * {@link Builder#onPhase(String, BuildAction)}, and {@link Builder#afterPhase(String, BuildAction)}. The
+ * {@link BaseBuild} application enables and disables any phase names that were passed from the command line. The phase
+ * name itself enables the phase and any dependent phases (for example, "compile" enables the "build-start", "prepare"
+ * and "compile" phases). If the phase name is preceded by a dash (for example, -test), the phase is disabled (but not
+ * its dependent phases).
  * </p>
  *
  * <ol>

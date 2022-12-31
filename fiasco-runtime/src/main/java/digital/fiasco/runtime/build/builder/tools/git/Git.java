@@ -169,7 +169,7 @@ public class Git extends BaseTool
      * {@inheritDoc}
      */
     @Override
-    protected void onRun()
+    public void onRun()
     {
         information(description());
         output = operatingSystem().execute(this,
