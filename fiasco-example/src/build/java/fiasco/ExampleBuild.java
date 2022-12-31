@@ -2,7 +2,7 @@ package fiasco;
 
 import digital.fiasco.libraries.Libraries;
 import digital.fiasco.runtime.build.BaseBuild;
-import digital.fiasco.runtime.build.BuildMetadata;
+import digital.fiasco.runtime.build.metadata.BuildMetadata;
 import digital.fiasco.runtime.build.metadata.Contributor;
 import digital.fiasco.runtime.build.metadata.Copyright;
 import digital.fiasco.runtime.build.metadata.Organization;
@@ -64,12 +64,15 @@ public class ExampleBuild extends BaseBuild implements Libraries
     public void onBuild()
     {
         var builder = newBuilder()
-            .withArtifactDescriptor("digital.fiasco:example:1.0")
+            .withTargetArtifactDescriptor("digital.fiasco:example:1.0")
             .requires(apache_ant, apache_commons_logging, kryo)
             .pinVersion(apache_ant, "1.0.3")
             .pinVersion(apache_commons_logging, "1.9.0")
             .pinVersion(kryo, "4.3.1")
-            .withRootFolder(currentFolder());
+            .withRootFolder(currentFolder())
+            .beforePhase("compile", () ->
+            {
+            });
 
         builder.build().showResult();
 

@@ -3,12 +3,21 @@ package digital.fiasco.runtime.build;
 import com.telenav.kivakit.filesystem.FileList;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.filesystem.Rooted;
+import com.telenav.kivakit.mixins.Mixin;
 import com.telenav.kivakit.resource.ResourceList;
+import digital.fiasco.runtime.build.builder.BuilderAssociated;
 
 import static com.telenav.kivakit.resource.ResourceGlob.glob;
 
 /**
  * Information about the folder structure of a build.
+ *
+ * <p><b>Root folder</b></p>
+ *
+ * <ul>
+ *     <li>{@link #rootFolder()}</li>
+ *     <li>{@link #withRootFolder(Folder)}</li>
+ * </ul>
  *
  * <p><b>Source Folders</b></p>
  *
@@ -40,7 +49,10 @@ import static com.telenav.kivakit.resource.ResourceGlob.glob;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public interface BuildStructured extends Rooted
+public interface BuildStructured extends
+    Rooted,
+    BuilderAssociated,
+    Mixin
 {
     /**
      * src

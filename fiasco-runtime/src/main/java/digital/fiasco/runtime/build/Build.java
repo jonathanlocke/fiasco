@@ -4,8 +4,9 @@ import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.builder.Builder;
-import digital.fiasco.runtime.build.phases.Phase;
-import digital.fiasco.runtime.build.phases.PhaseList;
+import digital.fiasco.runtime.build.builder.phases.Phase;
+import digital.fiasco.runtime.build.builder.phases.PhaseList;
+import digital.fiasco.runtime.build.metadata.BuildMetadata;
 
 /**
  * Defines a Fiasco build.
@@ -19,26 +20,28 @@ import digital.fiasco.runtime.build.phases.PhaseList;
  * </p>
  *
  * <p>
- * Phases are enabled and disabled with {@link Builder#enable(Phase)} and {@link Builder#disable(Phase)}. The onRun()
- * method of the build application enables and disables any phase names that were passed from the command line. The
- * phase name itself enables the phase and any dependent phases (for example, "compile" enables the "build-start",
- * "prepare" and "compile" phases). If the phase name is preceded by a dash (for example, -test), the phase is disabled
- * (but not its dependent phases).
+ * Phases are enabled and disabled with {@link Builder#enable(Phase)} and {@link Builder#disable(Phase)}. Code can be
+ * executed before, during or after a phase runs by calling {@link Builder#beforePhase(String, Runnable)},
+ * {@link Builder#onPhase(String, Runnable)}, and {@link Builder#afterPhase(String, Runnable)}. The {@link BaseBuild}
+ * application enables and disables any phase names that were passed from the command line. The phase name itself
+ * enables the phase and any dependent phases (for example, "compile" enables the "build-start", "prepare" and "compile"
+ * phases). If the phase name is preceded by a dash (for example, -test), the phase is disabled (but not its dependent
+ * phases).
  * </p>
  *
  * <ol>
- *     <li>start</li>
- *     <li>clean</li>
- *     <li>prepare</li>
- *     <li>compile</li>
- *     <li>test</li>
- *     <li>document</li>
- *     <li>package</li>
- *     <li>integration-test</li>
- *     <li>install</li>
- *     <li>deploy-packages</li>
- *     <li>deploy-documentation</li>
- *     <li>end</li>
+ *     <li>start - start of phases</li>
+ *     <li>clean - removes target files</li>
+ *     <li>prepare - prepares sources and resources for compilation</li>
+ *     <li>compile - compiles sources</li>
+ *     <li>test - runs unit tests</li>
+ *     <li>document - creates documentation</li>
+ *     <li>package - assembles targets into packages</li>
+ *     <li>integration-test - runs integration tests</li>
+ *     <li>install - installs packages in local repository</li>
+ *     <li>deploy-packages - deploys packages to remote repositories</li>
+ *     <li>deploy-documentation - deploys documentation</li>
+ *     <li>end - end of phases</li>
  * </ol>
  *
  * <p><b>Examples</b></p>
@@ -68,21 +71,71 @@ import digital.fiasco.runtime.build.phases.PhaseList;
  *     </tr>
  * </table>
  *
+ * <p><b>Building</b></p>
+ *
+ * <ul>
+ *     <li>{@link #newBuilder()}</li>
+ *     <li>{@link #onBuild()}</li>
+ * </ul>
+ *
+ * <p><b>Build Metadata</b></p>
+ *
+ * <ul>
+ *     <li>{@link #name()}</li>
+ *     <li>{@link #description()}</li>
+ *     <li>{@link #metadata()}</li>
+ * </ul>
+ *
+ * <p><b>Build Environment</b></p>
+ *
+ * <ul>
+ *     <li>{@link #isMac()}</li>
+ *     <li>{@link #isUnix()}</li>
+ *     <li>{@link #isWindows()}</li>
+ *     <li>{@link #operatingSystemType()}</li>
+ *     <li>{@link #environmentVariables()}</li>
+ *     <li>{@link #property(String)}</li>
+ *     <li>{@link #processorArchitecture()}</li>
+ *     <li>{@link #processors()}</li>
+ *     <li>{@link #javaHome()}</li>
+ *     <li>{@link #mavenHome()}</li>
+ * </ul>
+ *
+ * <p><b>Build Repositories</b></p>
+ *
+ * <ul>
+ *     <li>{@link BuildRepositories#MAVEN_CENTRAL}</li>
+ *     <li>{@link BuildRepositories#MAVEN_CENTRAL_STAGING}</li>
+ * </ul>
+ *
  * @author Jonathan Locke
+ * @see BuildEnvironment
+ * @see BuildRepositories
+ * @see Named
+ * @see Described
  */
 @SuppressWarnings("UnusedReturnValue")
 public interface Build extends
-    Repeater,
+    Named,
     Described,
-    Named
+    Repeater,
+    BuildEnvironment,
+    BuildRepositories
 {
-    /**
-     * Returns a copy of this build
-     */
-    Build copy();
-
     /**
      * Returns the metadata for this build
      */
     BuildMetadata metadata();
+
+    /**
+     * Creates a new builder with settings for this build
+     *
+     * @return The new builder
+     */
+    Builder newBuilder();
+
+    /**
+     * Called to execute the build
+     */
+    void onBuild();
 }

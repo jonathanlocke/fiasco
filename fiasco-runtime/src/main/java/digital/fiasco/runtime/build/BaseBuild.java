@@ -24,9 +24,9 @@ import com.telenav.kivakit.core.project.Project;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.serialization.gson.GsonSerializationProject;
 import digital.fiasco.runtime.build.builder.Builder;
-import digital.fiasco.runtime.build.builder.BuilderSettings;
-import digital.fiasco.runtime.build.phases.Phase;
-import digital.fiasco.runtime.build.phases.PhaseList;
+import digital.fiasco.runtime.build.builder.phases.Phase;
+import digital.fiasco.runtime.build.builder.phases.PhaseList;
+import digital.fiasco.runtime.build.metadata.BuildMetadata;
 
 import java.util.Set;
 
@@ -48,26 +48,27 @@ import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
  * </p>
  *
  * <p>
- * Phases are enabled and disabled with {@link Builder#enable(Phase)} and {@link Builder#disable(Phase)}. The
- * {@link #onRun()} method of the application enables and disables any phase names that were passed from the command
- * line. The phase name itself enables the phase and any dependent phases (for example, "compile" enables the
- * "build-start", "prepare" and "compile" phases). If the phase name is preceded by a dash (for example, -test), the
- * phase is disabled (but not its dependent phases).
- * </p>
+ * Phases are enabled and disabled with {@link Builder#enable(Phase)} and {@link Builder#disable(Phase)}. Code can be
+ * executed before, during or after a phase runs by calling {@link Builder#beforePhase(String, Runnable)},
+ * {@link Builder#onPhase(String, Runnable)}, and {@link Builder#afterPhase(String, Runnable)}. The {@link BaseBuild}
+ * application enables and disables any phase names that were passed from the command line. The phase name itself
+ * enables the phase and any dependent phases (for example, "compile" enables the "build-start", "prepare" and "compile"
+ * phases). If the phase name is preceded by a dash (for example, -test), the phase is disabled (but not its dependent
+ * phases).
  *
  * <ol>
- *     <li>start</li>
- *     <li>clean</li>
- *     <li>prepare</li>
- *     <li>compile</li>
- *     <li>test</li>
- *     <li>document</li>
- *     <li>package</li>
- *     <li>integration-test</li>
- *     <li>install</li>
- *     <li>deploy-packages</li>
- *     <li>deploy-documentation</li>
- *     <li>end</li>
+ *     <li>start - start of phases</li>
+ *     <li>clean - removes target files</li>
+ *     <li>prepare - prepares sources and resources for compilation</li>
+ *     <li>compile - compiles sources</li>
+ *     <li>test - runs unit tests</li>
+ *     <li>document - creates documentation</li>
+ *     <li>package - assembles targets into packages</li>
+ *     <li>integration-test - runs integration tests</li>
+ *     <li>install - installs packages in local repository</li>
+ *     <li>deploy-packages - deploys packages to remote repositories</li>
+ *     <li>deploy-documentation - deploys documentation</li>
+ *     <li>end - end of phases</li>
  * </ol>
  *
  * <p><b>Examples</b></p>
@@ -100,15 +101,16 @@ import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
  * <p><b>Building</b></p>
  *
  * <ul>
- *     <li>{@link #copy()}</li>
+ *     <li>{@link #newBuilder()}</li>
+ *     <li>{@link #onBuild()}</li>
  * </ul>
  *
  * <p><b>Build Metadata</b></p>
  *
  * <ul>
+ *     <li>{@link #name()}</li>
  *     <li>{@link #description()}</li>
  *     <li>{@link #metadata()}</li>
- *     <li>{@link #name()}</li>
  * </ul>
  *
  * <p><b>Build Environment</b></p>
@@ -129,22 +131,18 @@ import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused" })
-public abstract class BaseBuild extends Application implements
-    Build,
-    BuildAssociated,
-    BuildEnvironment,
-    BuildRepositories
+public abstract class BaseBuild extends Application implements Build
 {
     /** Metadata associated with this build */
     private BuildMetadata metadata;
 
-    /** Switch parser for --threads=[count] */
-    private final SwitchParser<Count> THREAD_COUNT = threadCountSwitchParser(this, Count._1024);
+    /** Switch parser for --threads=[count], with a maximum of 64 threads */
+    private final SwitchParser<Count> THREAD_COUNT = threadCountSwitchParser(this, Count._64);
 
     /**
      * Creates a build
      */
-    protected BaseBuild()
+    public BaseBuild()
     {
     }
 
@@ -156,23 +154,6 @@ public abstract class BaseBuild extends Application implements
     protected BaseBuild(BaseBuild that)
     {
         copyFrom(that);
-    }
-
-    @Override
-    public Build associatedBuild()
-    {
-        return this;
-    }
-
-    /**
-     * Returns a copy of this build
-     */
-    @Override
-    public BaseBuild copy()
-    {
-        var copy = typeForClass(getClass()).newInstance();
-        copy.copyFrom(this);
-        return copy;
     }
 
     /**
@@ -197,13 +178,21 @@ public abstract class BaseBuild extends Application implements
         return metadata;
     }
 
+    @Override
     public Builder newBuilder()
     {
-        var builder = listenTo(new Builder(this)
-            .withSettings(settings()));
-        builder.parseCommandLine(commandLine());
-        return builder;
+        var builder = listenTo(new Builder(this));
+        return builder
+            .withSettings(new BuildSettings(builder)
+                .withThreads(get(THREAD_COUNT)))
+            .parseCommandLine(commandLine());
     }
+
+    /**
+     * Called to execute the build
+     */
+    @Override
+    public abstract void onBuild();
 
     /**
      * {@inheritDoc}
@@ -212,15 +201,6 @@ public abstract class BaseBuild extends Application implements
     public Set<Project> projects()
     {
         return set(new GsonSerializationProject());
-    }
-
-    /**
-     * Returns the number of threads to build
-     */
-    public BuilderSettings settings()
-    {
-        return new BuilderSettings()
-            .withThreads(get(THREAD_COUNT));
     }
 
     /**
@@ -236,8 +216,9 @@ public abstract class BaseBuild extends Application implements
             .build());
     }
 
-    protected abstract void onBuild();
-
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected final void onRun()
     {
@@ -251,6 +232,16 @@ public abstract class BaseBuild extends Application implements
     protected ObjectSet<SwitchParser<?>> switchParsers()
     {
         return set(THREAD_COUNT);
+    }
+
+    /**
+     * Returns a copy of this build
+     */
+    private BaseBuild copy()
+    {
+        var copy = typeForClass(getClass()).newInstance();
+        copy.copyFrom(this);
+        return copy;
     }
 
     /**
