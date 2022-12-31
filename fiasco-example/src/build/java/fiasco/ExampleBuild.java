@@ -2,6 +2,7 @@ package fiasco;
 
 import digital.fiasco.libraries.Libraries;
 import digital.fiasco.runtime.build.BaseBuild;
+import digital.fiasco.runtime.build.builder.BuildResult;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
 import digital.fiasco.runtime.build.metadata.Contributor;
 import digital.fiasco.runtime.build.metadata.Copyright;
@@ -70,16 +71,18 @@ public class ExampleBuild extends BaseBuild implements Libraries
             .pinVersion(apache_commons_logging, "1.9.0")
             .pinVersion(kryo, "4.3.1")
             .withRootFolder(currentFolder())
-            .beforePhase("compile", () ->
+            .beforePhase("compile", it ->
             {
+                var cleaner = it.newCleaner();
+                cleaner.run();
             });
 
-        builder.build().showResult();
+        builder.build(BuildResult::showResult);
 
         // Multi-project build
         var child = builder.childBuilder("example-child")
             .withDependencies(hamcrest_library.version("5.0"));
-        child.build();
+        child.build(BuildResult::showResult);
     }
 }
 

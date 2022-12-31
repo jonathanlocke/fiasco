@@ -1,6 +1,8 @@
 package digital.fiasco.runtime.build.builder.phases;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
+import digital.fiasco.runtime.build.builder.Builder;
+import digital.fiasco.runtime.build.builder.BuildAction;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 
@@ -17,13 +19,13 @@ public abstract class BasePhase implements Phase
     private final String name;
 
     /** The code to run before the phase executes */
-    private final ObjectList<Runnable> runBefore = list();
+    private final ObjectList<BuildAction> runBefore = list();
 
     /** The code to run when the phase executes */
-    private final ObjectList<Runnable> run = list();
+    private final ObjectList<BuildAction> run = list();
 
     /** The code to run after the phase executes */
-    private final ObjectList<Runnable> runAfter = list();
+    private final ObjectList<BuildAction> runAfter = list();
 
     /**
      * Creates a phase
@@ -39,7 +41,7 @@ public abstract class BasePhase implements Phase
      * {@inheritDoc}
      */
     @Override
-    public Phase afterPhase(Runnable code)
+    public Phase afterPhase(BuildAction code)
     {
         runAfter.add(code);
         return this;
@@ -49,7 +51,7 @@ public abstract class BasePhase implements Phase
      * {@inheritDoc}
      */
     @Override
-    public Phase beforePhase(Runnable code)
+    public Phase beforePhase(BuildAction code)
     {
         runBefore.add(code);
         return this;
@@ -90,27 +92,27 @@ public abstract class BasePhase implements Phase
      * {@inheritDoc}
      */
     @Override
-    public final void internalOnAfter()
+    public final void internalOnAfter(Builder builder)
     {
-        runAfter.forEach(Runnable::run);
+        runAfter.forEach(it -> it.action(builder));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final void internalOnBefore()
+    public final void internalOnBefore(Builder builder)
     {
-        runBefore.forEach(Runnable::run);
+        runBefore.forEach(it -> it.action(builder));
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public final void internalOnRun()
+    public final void internalOnRun(Builder builder)
     {
-        run.forEach(Runnable::run);
+        run.forEach(it -> it.action(builder));
     }
 
     /**
@@ -126,7 +128,7 @@ public abstract class BasePhase implements Phase
      * {@inheritDoc}
      */
     @Override
-    public Phase onPhase(Runnable code)
+    public Phase onPhase(BuildAction code)
     {
         run.add(code);
         return this;

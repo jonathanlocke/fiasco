@@ -21,33 +21,57 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 /**
  * Settings used by {@link Builder} to modify the way that it builds.
  *
+ * <p><b>Properties</b></p>
+ *
+ * <ul>
+ *     <li>{@link #phases()}</li>
+ *     <li>{@link #rootFolder()}</li>
+ *     <li>{@link #threads()}</li>
+ *     <li>{@link #withPhases(PhaseList)}</li>
+ *     <li>{@link #withRootFolder(Folder)}</li>
+ *     <li>{@link #withThreads(Count)}</li>
+ * </ul>
+ *
  * <p><b>Build Options</b></p>
  *
  * <ul>
- *     <li>{@link #enable(BuildOption)}</li>
  *     <li>{@link #disable(BuildOption)}</li>
+ *     <li>{@link #enable(BuildOption)}</li>
  *     <li>{@link #isEnabled(BuildOption)}</li>
- *     <li>{@link #threads()}</li>
- *     <li>{@link #withThreads(Count)}</li>
  * </ul>
+ *
  * <p><b>Build Dependencies</b></p>
  *
  * <ul>
  *     <li>{@link #dependencies()}</li>
- *     <li>{@link #requires(DependencyList)}</li>
- *     <li>{@link #requires(Artifact, Artifact[])}</li>
+ *     <li>{@link #librarian()}</li>
  *     <li>{@link #pinVersion(Artifact, String)}</li>
  *     <li>{@link #pinVersion(Artifact, Version)}</li>
+ *     <li>{@link #requires(Artifact, Artifact[])}</li>
+ *     <li>{@link #requires(DependencyList)}</li>
+ *     <li>{@link #withAdditionalDependencies(Artifact, Artifact[])}</li>
+ *     <li>{@link #withAdditionalDependencies(DependencyList)}</li>
+ *     <li>{@link #withDependencies(Artifact, Artifact[])}</li>
+ *     <li>{@link #withDependencies(DependencyList)}</li>
  * </ul>
  *
- * <p><b>Phases</b></p>
+ * <p><b>Build Phases</b></p>
  *
  * <ul>
- *     <li>{@link #phase(String)}</li>
- *     <li>{@link #phases()}</li>
  *     <li>{@link #disable(Phase)}</li>
  *     <li>{@link #enable(Phase)}</li>
  *     <li>{@link #isEnabled(Phase)}</li>
+ *     <li>{@link #phase(String)}</li>
+ *     <li>{@link #phases()}</li>
+ *     <li>{@link #withPhases(PhaseList)}</li>
+ * </ul>
+ *
+ * <p><b>Build Profiles</b></p>
+ *
+ * <ul>
+ *     <li>{@link #enable(BuildProfile)}</li>
+ *     <li>{@link #isEnabled(BuildProfile)}</li>
+ *     <li>{@link #enabledProfiles()}</li>
  * </ul>
  *
  * <p><b>Artifact Descriptors</b></p>
@@ -58,6 +82,7 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
  *     <li>{@link #targetArtifactVersion()}</li>
  *     <li>{@link #withTargetArtifactDescriptor(String)}</li>
  *     <li>{@link #withTargetArtifactDescriptor(ArtifactDescriptor)}</li>
+ *     <li>{@link #withTargetArtifactIdentifier(String)}</li>
  *     <li>{@link #withTargetArtifactVersion(String)}</li>
  *     <li>{@link #withTargetArtifactVersion(Version)}</li>
  * </ul>
@@ -91,6 +116,9 @@ public class BuildSettings
     /** The librarian to manage libraries */
     private final Librarian librarian;
 
+    /** Set of profiles to enable for this build */
+    private ObjectSet<BuildProfile> enabledProfiles = set();
+
     public BuildSettings(Builder builder)
     {
         this.builder = builder;
@@ -114,6 +142,7 @@ public class BuildSettings
         this.targetArtifactDescriptor = that.targetArtifactDescriptor;
         this.dependencies = that.dependencies().copy();
         this.librarian = that.librarian;
+        this.enabledProfiles = that.enabledProfiles.copy();
     }
 
     /**
@@ -157,6 +186,18 @@ public class BuildSettings
     }
 
     /**
+     * Returns a copy of this settings object with the given profile disabled
+     *
+     * @param profile The profile to disable
+     * @return The copy of this settings object
+     */
+    public BuildSettings disable(BuildProfile profile)
+    {
+        enabledProfiles.remove(profile);
+        return this;
+    }
+
+    /**
      * Enables execution of the given phase
      *
      * @param phase The phase
@@ -179,6 +220,26 @@ public class BuildSettings
     }
 
     /**
+     * Returns a copy of this settings object with the given profile enabled
+     *
+     * @param profile The profile to enable
+     * @return The copy of this settings object
+     */
+    public BuildSettings enable(BuildProfile profile)
+    {
+        enabledProfiles.add(profile);
+        return this;
+    }
+
+    /**
+     * Returns the set of enabled profiles for this build
+     */
+    public ObjectSet<BuildProfile> enabledProfiles()
+    {
+        return enabledProfiles;
+    }
+
+    /**
      * Returns true if the given phase is enabled
      *
      * @param phase The phase
@@ -198,6 +259,17 @@ public class BuildSettings
     public boolean isEnabled(BuildOption option)
     {
         return enabledOptions.contains(option);
+    }
+
+    /**
+     * Returns true if the given profile is enabled
+     *
+     * @param profile The profile
+     * @return True if the profile is enabled
+     */
+    public boolean isEnabled(BuildProfile profile)
+    {
+        return enabledProfiles.contains(profile);
     }
 
     /**
@@ -240,7 +312,11 @@ public class BuildSettings
     }
 
     /**
-     * {@inheritDoc}
+     * Globally pins all versions of the given artifact to the specified version
+     *
+     * @param artifact The artifact
+     * @param version The version to use
+     * @return The build for method chaining
      */
     public BuildSettings pinVersion(Artifact<?> artifact, Version version)
     {

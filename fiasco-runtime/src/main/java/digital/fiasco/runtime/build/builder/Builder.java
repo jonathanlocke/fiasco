@@ -1,23 +1,27 @@
 package digital.fiasco.runtime.build.builder;
 
 import com.telenav.kivakit.commandline.CommandLine;
+import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.language.trait.TryCatchTrait;
 import com.telenav.kivakit.core.messaging.listeners.MessageList;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.Folder;
+import com.telenav.kivakit.interfaces.code.Callback;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.BuildEnvironment;
+import digital.fiasco.runtime.build.BuildOption;
+import digital.fiasco.runtime.build.BuildProfile;
+import digital.fiasco.runtime.build.BuildSettings;
 import digital.fiasco.runtime.build.BuildStructured;
 import digital.fiasco.runtime.build.builder.phases.BasePhase;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
+import digital.fiasco.runtime.build.builder.tools.Tool;
 import digital.fiasco.runtime.build.builder.tools.ToolFactory;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
-import digital.fiasco.runtime.build.BuildOption;
-import digital.fiasco.runtime.build.BuildSettings;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
@@ -29,57 +33,16 @@ import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
 
 /**
- * Builds a project by executing a series of phases. A {@link Build} may have multiple {@link Builder}s, to achieve a
- * multi-project build or to achieve two different kinds of builds.
- *
- * <p><b>Building</b></p>
- *
- * <ul>
- *     <li>{@link #build()}</li>
- *     <li>{@link #build(Count)}</li>
- * </ul>
- *
- * <p><b>Dependencies</b></p>
- *
- * <ul>
- *     <li>{@link #librarian()}</li>
- * </ul>
+ * <p>
+ * Builds a project by executing a series of {@link Phase}s in a defined order. A {@link Build} may use multiple
+ * {@link Builder}s, to perform a multi-project build or to achieve different kinds of builds.
+ * </p>
  *
  * <p><b>Build Phases</b></p>
  *
  * <p>
- * By default, phases are executed in a pre-defined order, as shown below. Each phase is defined by a class that implements
- * {@link Phase} (and normally extends {@link BasePhase}). Additional phases can be inserted into the {@link #phases()} list with
- * {@link PhaseList#addPhaseAfter(String, Phase)} and {@link PhaseList#addPhaseBefore(String, Phase)}. A specific
- * phase can be replaced with a new definition with {@link PhaseList#replacePhase(String, Phase)}. Alternatively, an
- * entirely new phase list can be installed with {@link #withPhases(PhaseList)}.
+ * By default, phases are executed in this order:
  * </p>
- *
- * <ul>
- *     <li>{@link #phases()}</li>
- *     <li>{@link #withPhases(PhaseList)}</li>
- * </ul>
- *
- * <p><b>Attaching Actions to Phases</b></p>
- *
- * <p>
- * A phase can be retrieved by name with {@link #phase(String)} and an arbitrary {@link Runnable}
- * can be attached to run before, during or after the phase executes.
- * </p>
- *
- * <p>
- * Phases are enabled and disabled with {@link #enable(Phase)} and {@link #disable(Phase)}. The {@link #parseCommandLine(CommandLine)}
- * method enables and disables any phases or build options that were passed in the command line. The phase name itself
- * enables the phase and any dependent phases (for example, "compile" enables the "start", "prepare" and "compile" phases).
- * If the phase name is preceded by a dash (for example, -test), the phase is disabled (but not its dependent phases).
- * </p>
- *
- * <ul>
- *     <li>{@link #phase(String)}</li>
- *     <li>{@link #isEnabled(Phase)}</li>
- *     <li>{@link #enable(Phase)}</li>
- *     <li>{@link #disable(Phase)}</li>
- * </ul>
  *
  * <ol>
  *     <li>start - start of phases</li>
@@ -96,42 +59,112 @@ import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
  *     <li>end - end of phases</li>
  * </ol>
  *
+ * <p>
+ * Each phase is defined by a class that implements {@link Phase} (and normally extends {@link BasePhase}). Additional
+ * phases can be inserted into the {@link #phases()} list with {@link PhaseList#addPhaseAfter(String, Phase)} and
+ * {@link PhaseList#addPhaseBefore(String, Phase)}. A specific phase can be replaced with a new definition with
+ * {@link PhaseList#replacePhase(String, Phase)}. Alternatively, an entirely new phase list can be installed with
+ * {@link #withPhases(PhaseList)}.
+ * </p>
+ *
+ * <ul>
+ *     <li>{@link #phases()}</li>
+ *     <li>{@link #withPhases(PhaseList)}</li>
+ * </ul>
+ *
+ * <p><b>Attaching Actions to Phases</b></p>
+ *
+ * <p>
+ * A phase can be retrieved by name with {@link #phase(String)} and an arbitrary {@link Runnable}
+ * can be attached to run before, during or after the phase executes with {@link #beforePhase(String, BuildAction)},
+ * {@link #onPhase(String, BuildAction)}, and {@link #afterPhase(String, BuildAction)}. This allows {@link Tool}s to
+ * be used at the right time to achieve different build effects.
+ * </p>
+ *
+ * <p>
+ * Phases are enabled and disabled with {@link #enable(Phase)} and {@link #disable(Phase)}. The {@link #parseCommandLine(CommandLine)}
+ * method enables and disables any phases or build options that were passed in the command line. The phase name itself
+ * enables the phase and any dependent phases (for example, "compile" enables the "start", "prepare" and "compile" phases).
+ * If the phase name is preceded by a dash (for example, -test), the phase is disabled (but not its dependent phases).
+ * </p>
+ *
  * <p><b>Building</b></p>
  *
  * <ul>
- *     <li>{@link #build()}</li>
- *     <li>{@link #build(Count)}</li>
- *     <li>{@link #disable(BuildOption)}</li>
- *     <li>{@link #enable(BuildOption)}</li>
- *     <li>{@link #isEnabled(BuildOption)}</li>
+ *     <li>{@link #build(Callback)}</li>
+ *     <li>{@link #childBuilder(String)}</li>
+ * </ul>
+ *
+ * <p><b>Properties</b></p>
+ *
+ * <ul>
+ *     <li>{@link #description()}</li>
+ *     <li>{@link #phases()}</li>
  *     <li>{@link #rootFolder()}</li>
+ *     <li>{@link #settings()}</li>
+ *     <li>{@link #threads()}</li>
+ *     <li>{@link #withPhases(PhaseList)}</li>
  *     <li>{@link #withRootFolder(Folder)}</li>
  *     <li>{@link #withSettings(BuildSettings)}</li>
- *     <li>{@link #withPhases(PhaseList)}</li>
  *     <li>{@link #withThreads(Count)}</li>
  * </ul>
  *
- * <p><b>Artifact</b></p>
+ * <p><b>Build Options</b></p>
+ *
+ * <ul>
+ *     <li>{@link #disable(BuildOption)}</li>
+ *     <li>{@link #enable(BuildOption)}</li>
+ *     <li>{@link #isEnabled(BuildOption)}</li>
+ * </ul>
+ *
+ * <p><b>Build Dependencies</b></p>
+ *
+ * <ul>
+ *     <li>{@link #dependencies()}</li>
+ *     <li>{@link #librarian()}</li>
+ *     <li>{@link #pinVersion(Artifact, String)}</li>
+ *     <li>{@link #pinVersion(Artifact, Version)}</li>
+ *     <li>{@link #requires(Artifact, Artifact[])}</li>
+ *     <li>{@link #requires(DependencyList)}</li>
+ *     <li>{@link #withAdditionalDependencies(Artifact, Artifact[])}</li>
+ *     <li>{@link #withAdditionalDependencies(DependencyList)}</li>
+ *     <li>{@link #withDependencies(Artifact, Artifact[])}</li>
+ *     <li>{@link #withDependencies(DependencyList)}</li>
+ * </ul>
+ *
+ * <p><b>Build Phases</b></p>
+ *
+ * <ul>
+ *     <li>{@link #afterPhase(String, BuildAction)}</li>
+ *     <li>{@link #beforePhase(String, BuildAction)}</li>
+ *     <li>{@link #disable(Phase)}</li>
+ *     <li>{@link #enable(Phase)}</li>
+ *     <li>{@link #isEnabled(Phase)}</li>
+ *     <li>{@link #onPhase(String, BuildAction)}</li>
+ *     <li>{@link #phase(String)}</li>
+ *     <li>{@link #phases()}</li>
+ *     <li>{@link #withPhases(PhaseList)}</li>
+ * </ul>
+ *
+ * <p><b>Build Profiles</b></p>
+ *
+ * <ul>
+ *     <li>{@link #enable(BuildProfile)}</li>
+ *     <li>{@link #isEnabled(BuildProfile)}</li>
+ *     <li>{@link #enabledProfiles()}</li>
+ * </ul>
+ *
+ * <p><b>Artifact Descriptors</b></p>
  *
  * <ul>
  *     <li>{@link #targetArtifactDescriptor()}</li>
  *     <li>{@link #targetArtifactName()}</li>
  *     <li>{@link #targetArtifactVersion()}</li>
- *     <li>{@link #withTargetArtifactIdentifier(String)}</li>
- *     <li>{@link #withTargetArtifactDescriptor(ArtifactDescriptor)}</li>
  *     <li>{@link #withTargetArtifactDescriptor(String)}</li>
+ *     <li>{@link #withTargetArtifactDescriptor(ArtifactDescriptor)}</li>
+ *     <li>{@link #withTargetArtifactIdentifier(String)}</li>
  *     <li>{@link #withTargetArtifactVersion(String)}</li>
  *     <li>{@link #withTargetArtifactVersion(Version)}</li>
- * </ul>
- *
- * <p><b>Dependencies</b></p>
- *
- * <ul>
- *     <li>{@link #dependencies()}</li>
- *     <li>{@link #pinVersion(Artifact, String)}</li>
- *     <li>{@link #pinVersion(Artifact, Version)}</li>
- *     <li>{@link #requires(Artifact, Artifact...)}</li>
- *     <li>{@link #requires(DependencyList)}</li>
  * </ul>
  *
  * <p><b>Build Structure</b></p>
@@ -164,6 +197,28 @@ import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
  *     <li>{@link #processors()}</li>
  *     <li>{@link #javaHome()}</li>
  *     <li>{@link #mavenHome()}</li>
+ * </ul>
+ *
+ * <p><b>Build Tools</b></p>
+ *
+ * <ul>
+ *     <li>{@link #newArchiver()}</li>
+ *     <li>{@link #newCleaner()}</li>
+ *     <li>{@link #newCompiler()}</li>
+ *     <li>{@link #newCopier()}</li>
+ *     <li>{@link #newGit()}</li>
+ *     <li>{@link #newLibrarian()}</li>
+ *     <li>{@link #newShader()}</li>
+ *     <li>{@link #newStamper()}</li>
+ *     <li>{@link #newTester()}</li>
+ *     <li>{@link #newTool(Class)}</li>
+ * </ul>
+ *
+ * <p><b>Miscellaneous</b></p>
+ *
+ * <ul>
+ *     <li>{@link #copy()}</li>
+ *     <li>{@link #parseCommandLine(CommandLine)}</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -211,7 +266,7 @@ public class Builder extends BaseRepeater implements
      * @param code The code to run
      * @return This builder, for chaining
      */
-    public Builder afterPhase(String name, Runnable code)
+    public Builder afterPhase(String name, BuildAction code)
     {
         phase(name).afterPhase(code);
         return this;
@@ -233,28 +288,18 @@ public class Builder extends BaseRepeater implements
      * @param code The code to run
      * @return This builder, for chaining
      */
-    public Builder beforePhase(String name, Runnable code)
+    public Builder beforePhase(String name, BuildAction code)
     {
         phase(name).beforePhase(code);
         return this;
     }
 
     /**
-     * Builds with one thread for each processor
+     * Runs this builder.
      *
-     * @return True if the build succeeded without any problems
+     * @param result Callback to call with the result when the build finishes
      */
-    public final BuildResult build()
-    {
-        return build(settings.threads());
-    }
-
-    /**
-     * Builds with the given number of worker threads
-     *
-     * @return True if the build succeeded without any problems
-     */
-    public final BuildResult build(Count threads)
+    public final void build(Callback<BuildResult> result)
     {
         // Listen to any problems broadcast by the build,
         var issues = new MessageList(message -> !message.status().succeeded());
@@ -267,7 +312,7 @@ public class Builder extends BaseRepeater implements
             if (settings.isEnabled(phase))
             {
                 // notify that the phase has started,
-                phase.internalOnBefore();
+                phase.internalOnBefore(this);
 
                 // run the phase calling all listeners,
                 if (isEnabled(DESCRIBE))
@@ -278,15 +323,15 @@ public class Builder extends BaseRepeater implements
                 {
                     announce(bannerLine(phase.name()));
                 }
-                phase.run();
+                phase.internalOnRun(this);
 
                 // notify that the phase has ended,
-                phase.internalOnAfter();
+                phase.internalOnAfter(this);
             }
         }
 
         // and return the result of the build.
-        return new BuildResult(issues);
+        result.call(new BuildResult(issues));
     }
 
     /**
@@ -390,6 +435,26 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
+     * Enables the given build profile
+     *
+     * @param profile The profile
+     * @return This build for method chaining
+     */
+    public Builder enable(BuildProfile profile)
+    {
+        settings.enable(profile);
+        return this;
+    }
+
+    /**
+     * Returns the set of enabled build profiles
+     */
+    public ObjectSet<BuildProfile> enabledProfiles()
+    {
+        return settings.enabledProfiles();
+    }
+
+    /**
      * Returns true if the given phase is enabled for execution
      *
      * @param phase The phase
@@ -411,6 +476,17 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
+     * Returns true if the given profile is enabled
+     *
+     * @param profile The profile
+     * @return True if the profile is enabled
+     */
+    public boolean isEnabled(BuildProfile profile)
+    {
+        return settings.isEnabled(profile);
+    }
+
+    /**
      * Returns the librarian for this builder
      *
      * @return The librarian
@@ -427,7 +503,7 @@ public class Builder extends BaseRepeater implements
      * @param code The code to run
      * @return This builder, for chaining
      */
-    public Builder onPhase(String name, Runnable code)
+    public Builder onPhase(String name, BuildAction code)
     {
         phase(name).onPhase(code);
         return this;
@@ -459,13 +535,29 @@ public class Builder extends BaseRepeater implements
             }
             else
             {
-                if (enable)
+                var phase = phase(value);
+                if (phase != null)
                 {
-                    settings.enable(phase(value));
+                    if (enable)
+                    {
+                        settings.enable(phase(value));
+                    }
+                    else
+                    {
+                        settings.disable(phase(value));
+                    }
                 }
                 else
                 {
-                    settings.disable(phase(value));
+                    var profile = new BuildProfile(value);
+                    if (enable)
+                    {
+                        settings.enable(profile);
+                    }
+                    else
+                    {
+                        settings.disable(profile);
+                    }
                 }
             }
         }
@@ -544,6 +636,14 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
+     * Returns the settings for this builder
+     */
+    public BuildSettings settings()
+    {
+        return settings;
+    }
+
+    /**
      * Returns the artifact descriptor for this build
      */
     public ArtifactDescriptor targetArtifactDescriptor()
@@ -568,6 +668,14 @@ public class Builder extends BaseRepeater implements
     public Version targetArtifactVersion()
     {
         return targetArtifactDescriptor().version();
+    }
+
+    /**
+     * Returns the number of threads used to build
+     */
+    public Count threads()
+    {
+        return settings.threads();
     }
 
     public Builder withAdditionalDependencies(DependencyList dependencies)
