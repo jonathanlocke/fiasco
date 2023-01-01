@@ -17,9 +17,6 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.repository.fiasco.CacheFiascoRepository;
-import digital.fiasco.runtime.repository.fiasco.LocalFiascoRepository;
-import digital.fiasco.runtime.repository.maven.MavenRepository;
 
 import java.util.Collection;
 
@@ -29,7 +26,6 @@ import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.core.version.Version.version;
-import static com.telenav.kivakit.resource.Uris.uri;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
@@ -68,9 +64,9 @@ public class Librarian extends BaseTool
     {
         super(builder);
 
-        lookIn(new LocalFiascoRepository("user-repository"));
-        lookIn(new CacheFiascoRepository("download-repository"));
-        lookIn(new MavenRepository("maven-central", uri("https://repo1.maven.org/maven2/")));
+        //lookIn(new LocalFiascoRepository("user-repository"));
+        //lookIn(new CacheFiascoRepository("download-repository"));
+        //lookIn(new MavenRepository("maven-central", uri("https://repo1.maven.org/maven2/")));
     }
 
     /**
@@ -80,7 +76,7 @@ public class Librarian extends BaseTool
      * @param artifact The artifact
      * @return The artifact and all of its dependencies
      */
-    public DependencyList dependencies(Artifact<?> artifact)
+    public DependencyList dependencies(Artifact artifact)
     {
         DependencyList dependencies = dependencyList();
 
@@ -145,7 +141,7 @@ public class Librarian extends BaseTool
      * @param target The repository to deploy to
      * @param artifact The library to install
      */
-    public Librarian install(Repository target, Artifact<?> artifact)
+    public Librarian install(Repository target, Artifact artifact)
     {
         var resolved = target.resolveArtifacts(list(artifact.descriptor()));
         target.installArtifact(resolved.first());
@@ -162,11 +158,17 @@ public class Librarian extends BaseTool
         repositories.add(repository);
     }
 
+    @Override
+    public void onRun()
+    {
+        unsupported("Librarian does not need to be started");
+    }
+
     /**
      * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
      * descriptor will be assigned the version.
      *
-     * @param descriptor The group and artifact identifier (but without a version)
+     * @param descriptor The group and artifact (but no version)
      * @param version The version to enforce for the descriptor
      */
     public Librarian pinVersion(ArtifactDescriptor descriptor, Version version)
@@ -183,7 +185,7 @@ public class Librarian extends BaseTool
      * @param artifact The group and artifact identifier (which can be lacking a version)
      * @param version The version to enforce for the descriptor
      */
-    public Librarian pinVersion(Artifact<?> artifact, Version version)
+    public Librarian pinVersion(Artifact artifact, Version version)
     {
         var descriptor = artifact.descriptor();
         pinnedVersions.put(descriptor, version);
@@ -197,7 +199,7 @@ public class Librarian extends BaseTool
      * @param artifact The artifact to pin
      * @param version The version to enforce for the descriptor
      */
-    public Librarian pinVersion(Artifact<?> artifact, String version)
+    public Librarian pinVersion(Artifact artifact, String version)
     {
         pinVersion(artifact.descriptor(), version(version));
         return this;
@@ -207,7 +209,7 @@ public class Librarian extends BaseTool
      * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
      * descriptor will be assigned the version.
      *
-     * @param descriptor The group and artifact identifier (but without a version)
+     * @param descriptor The group and artifact (but no version)
      * @param version The version to enforce for the descriptor
      */
     public Librarian pinVersion(String descriptor, String version)
@@ -230,7 +232,7 @@ public class Librarian extends BaseTool
      * @param descriptor The descriptor
      * @return The library
      */
-    public Artifact<?> resolve(ArtifactDescriptor descriptor)
+    public Artifact resolve(ArtifactDescriptor descriptor)
     {
         return resolve(list(descriptor)).first();
     }
@@ -241,22 +243,16 @@ public class Librarian extends BaseTool
      * @param descriptors The descriptor
      * @return The library
      */
-    public ObjectList<Artifact<?>> resolve(Collection<ArtifactDescriptor> descriptors)
+    public ObjectList<Artifact> resolve(Collection<ArtifactDescriptor> descriptors)
     {
         // Go through each repository,
-        ObjectList<Artifact<?>> artifacts = list();
+        ObjectList<Artifact> artifacts = list();
         for (var at : repositories())
         {
             // and if we can resolve the artifact,
             artifacts.addAll(at.resolveArtifacts(descriptors));
         }
         return artifacts;
-    }
-
-    @Override
-    public void onRun()
-    {
-        unsupported("Librarian does not need to be started");
     }
 
     /**

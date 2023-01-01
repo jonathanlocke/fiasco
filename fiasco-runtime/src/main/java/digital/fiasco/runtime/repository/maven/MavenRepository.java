@@ -99,7 +99,7 @@ public class MavenRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public void installArtifact(Artifact<?> artifact)
+    public void installArtifact(Artifact artifact)
     {
         lock().write(() ->
         {
@@ -127,9 +127,9 @@ public class MavenRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public ObjectList<Artifact<?>> resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
+    public ObjectList<Artifact> resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
     {
-        ObjectList<Artifact<?>> resolved = list();
+        ObjectList<Artifact> resolved = list();
 
         return lock().read(() ->
         {
@@ -153,7 +153,7 @@ public class MavenRepository extends BaseRepository
                         .map(MavenDependency::descriptor);
 
                     var artifacts = resolveArtifacts(dependencyDescriptors);
-                    var dependencies = dependencyList((Dependency<?>) artifacts);
+                    var dependencies = dependencyList((Dependency) artifacts);
 
                     // If the artifact has source code,
                     if (source != null)
@@ -184,7 +184,7 @@ public class MavenRepository extends BaseRepository
      * @param suffix The suffix to add to the filename
      * @return The filename
      */
-    private FileName mavenFileName(Artifact<?> artifact, String suffix)
+    private FileName mavenFileName(Artifact artifact, String suffix)
     {
         var descriptor = artifact.descriptor();
         return parseFileName(throwingListener(), descriptor.group()
@@ -198,7 +198,7 @@ public class MavenRepository extends BaseRepository
      * @param artifact The artifact
      * @return The folder within the root folder for the descriptor
      */
-    private ResourceFolder<?> mavenFolder(ResourceFolder<?> root, Artifact<?> artifact)
+    private ResourceFolder<?> mavenFolder(ResourceFolder<?> root, Artifact artifact)
     {
         return root.folder(mavenPath(artifact).join("/"));
     }
@@ -210,12 +210,12 @@ public class MavenRepository extends BaseRepository
      *
      * @return The resource path
      */
-    private ResourcePath mavenPath(Artifact<?> artifact)
+    private ResourcePath mavenPath(Artifact artifact)
     {
         var descriptor = artifact.descriptor();
         var groupPath = descriptor.group().name().replaceAll("\\.", "/");
         return parseResourcePath(throwingListener(), groupPath
-            + "/" + descriptor.identifier()
+            + "/" + descriptor.artifact()
             + "/" + descriptor.version());
     }
 
@@ -323,7 +323,7 @@ public class MavenRepository extends BaseRepository
      *
      * @param artifact The artifact metadata
      */
-    private void mavenWritePom(Artifact<?> artifact)
+    private void mavenWritePom(Artifact artifact)
     {
         // If we can write to the folder,
         if (rootFolder instanceof Folder target)

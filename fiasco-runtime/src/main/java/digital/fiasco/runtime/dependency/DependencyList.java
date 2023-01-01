@@ -67,8 +67,8 @@ import static com.telenav.kivakit.core.thread.Threads.shutdownAndAwaitTerminatio
  */
 @SuppressWarnings("unused")
 public class DependencyList implements
-    Iterable<Dependency<?>>,
-    Matcher<Dependency<?>>
+    Iterable<Dependency>,
+    Matcher<Dependency>
 {
     /**
      * Creates a list of dependencies
@@ -76,7 +76,7 @@ public class DependencyList implements
      * @param dependencies The dependencies to add
      * @return The dependency list
      */
-    public static DependencyList dependencyList(Dependency<?>... dependencies)
+    public static DependencyList dependencyList(Dependency... dependencies)
     {
         return new DependencyList(list(dependencies));
     }
@@ -87,27 +87,27 @@ public class DependencyList implements
      * @param dependencies The dependencies to add
      * @return The dependency list
      */
-    public static DependencyList dependencyList(Collection<Dependency<?>> dependencies)
+    public static DependencyList dependencyList(Collection<Dependency> dependencies)
     {
         return new DependencyList(dependencies);
     }
 
     /** The underlying dependencies */
-    private final ObjectList<Dependency<?>> dependencies = list();
+    private final ObjectList<Dependency> dependencies = list();
 
     protected DependencyList()
     {
     }
 
-    protected DependencyList(Collection<Dependency<?>> dependencies)
+    protected DependencyList(Collection<Dependency> dependencies)
     {
         this.dependencies.addAll(dependencies);
     }
 
-    public ObjectList<Artifact<?>> asArtifactList()
+    public ObjectList<Artifact> asArtifactList()
     {
-        var artifacts = new ObjectList<Artifact<?>>();
-        dependencies.forEach(at -> artifacts.add((Artifact<?>) at));
+        var artifacts = new ObjectList<Artifact>();
+        dependencies.forEach(at -> artifacts.add((Artifact) at));
         return artifacts;
     }
 
@@ -116,7 +116,7 @@ public class DependencyList implements
      *
      * @return The list
      */
-    public ObjectList<Dependency<?>> asList()
+    public ObjectList<Dependency> asList()
     {
         return dependencies.copy();
     }
@@ -126,7 +126,7 @@ public class DependencyList implements
      *
      * @return The list
      */
-    public ObjectSet<Dependency<?>> asSet()
+    public ObjectSet<Dependency> asSet()
     {
         return set(dependencies.copy());
     }
@@ -146,7 +146,7 @@ public class DependencyList implements
      */
     @NotNull
     @Override
-    public Iterator<Dependency<?>> iterator()
+    public Iterator<Dependency> iterator()
     {
         return dependencies.iterator();
     }
@@ -155,7 +155,7 @@ public class DependencyList implements
      * {@inheritDoc}
      */
     @Override
-    public boolean matches(Dependency<?> dependency)
+    public boolean matches(Dependency dependency)
     {
         return dependencies.contains(dependency);
     }
@@ -166,7 +166,7 @@ public class DependencyList implements
      * @param listener The listener to call with any messages from processing
      * @param callback The callback to process each dependency
      */
-    public void process(Listener listener, Callback<Dependency<?>> callback)
+    public void process(Listener listener, Callback<Dependency> callback)
     {
         process(listener, Count._1, callback);
     }
@@ -179,7 +179,7 @@ public class DependencyList implements
      * @param threads The number of threads to use
      * @param callback The callback to process each dependency
      */
-    public void process(Listener listener, Count threads, Callback<Dependency<?>> callback)
+    public void process(Listener listener, Count threads, Callback<Dependency> callback)
     {
         // If there is only one thread requested,
         if (threads.equals(Count._1))
@@ -196,14 +196,14 @@ public class DependencyList implements
             var queue = queue();
 
             // and submit jobs for each thread
-            var completed = new ConcurrentHashSet<Dependency<?>>();
+            var completed = new ConcurrentHashSet<Dependency>();
             var monitor = new Monitor();
             threads.loop(() -> executor.submit(() ->
             {
                 // While the queue has dependencies to process,
                 while (!queue.isEmpty())
                 {
-                    Dependency<?> dependency = null;
+                    Dependency dependency = null;
                     try
                     {
                         // take the next dependency from the queue
@@ -242,7 +242,7 @@ public class DependencyList implements
      *
      * @return A blocking queue of dependencies
      */
-    public LinkedBlockingDeque<Dependency<?>> queue()
+    public LinkedBlockingDeque<Dependency> queue()
     {
         return new LinkedBlockingDeque<>(dependencies);
     }
@@ -253,7 +253,7 @@ public class DependencyList implements
      * @param dependencies A variable-argument list of dependencies to include
      * @return A copy of this list with the given dependencies added
      */
-    public final DependencyList withAdditionalDependencies(Dependency<?> first, Dependency<?>... dependencies)
+    public final DependencyList withAdditionalDependencies(Dependency first, Dependency... dependencies)
     {
         var copy = copy();
         copy.dependencies.add(first);
@@ -279,7 +279,7 @@ public class DependencyList implements
      * @param dependencies A variable-argument list of dependencies to include
      * @return A copy of this list with the given dependencies
      */
-    public final DependencyList withDependencies(Dependency<?> first, Dependency<?>... dependencies)
+    public final DependencyList withDependencies(Dependency first, Dependency... dependencies)
     {
         var copy = copy();
         copy.dependencies.clear();
@@ -307,7 +307,7 @@ public class DependencyList implements
      * @param exclusions The dependencies to exclude
      * @return The dependency list
      */
-    public DependencyList without(Collection<Dependency<?>> exclusions)
+    public DependencyList without(Collection<Dependency> exclusions)
     {
         var copy = copy();
         copy.dependencies.removeAll(exclusions);
@@ -320,7 +320,7 @@ public class DependencyList implements
      * @param pattern The pattern to match
      * @return A copy of this list without the specified dependencies
      */
-    public DependencyList without(Matcher<Dependency<?>> pattern)
+    public DependencyList without(Matcher<Dependency> pattern)
     {
         var copy = copy();
         copy.dependencies.removeIf(pattern::matches);

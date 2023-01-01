@@ -72,14 +72,14 @@ public class CacheFiascoRepository extends LocalFiascoRepository
      * @param artifact The artifact to install
      */
     @Override
-    public void installArtifact(final Artifact<?> artifact)
+    public void installArtifact(final Artifact artifact)
     {
         lock().write(() ->
         {
             try
             {
                 // Append each attachment to the attachments file,
-                var updated = new MutableValue<Artifact<?>>(artifact);
+                var updated = new MutableValue<Artifact>(artifact);
                 visitArtifactAttachments(artifact, attachment ->
                     updated.set(updated.get()
                         .withAttachment(appendAttachment(attachment))));
@@ -101,11 +101,11 @@ public class CacheFiascoRepository extends LocalFiascoRepository
      * @return The artifacts
      */
     @Override
-    public ObjectList<Artifact<?>> resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
+    public ObjectList<Artifact> resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
     {
         return lock().read(() ->
         {
-            ObjectList<Artifact<?>> resolved = list();
+            ObjectList<Artifact> resolved = list();
 
             // For each artifact attachment,
             visitArtifactAttachments(descriptors, attachment ->

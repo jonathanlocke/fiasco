@@ -119,7 +119,7 @@ public class LocalFiascoRepository extends BaseRepository
      * @param artifact The artifact to install
      */
     @Override
-    public void installArtifact(Artifact<?> artifact)
+    public void installArtifact(Artifact artifact)
     {
         lock().write(() ->
         {
@@ -147,11 +147,11 @@ public class LocalFiascoRepository extends BaseRepository
      * @return The artifacts
      */
     @Override
-    public ObjectList<Artifact<?>> resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
+    public ObjectList<Artifact> resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
     {
         return lock().read(() ->
         {
-            ObjectList<Artifact<?>> resolved = list();
+            ObjectList<Artifact> resolved = list();
 
             // Visit each artifact attachment of each artifact,
             visitArtifactAttachments(descriptors, attachment ->
@@ -182,7 +182,7 @@ public class LocalFiascoRepository extends BaseRepository
      *
      * @param artifact The artifact to add
      */
-    protected void appendArtifactMetadata(Artifact<?> artifact)
+    protected void appendArtifactMetadata(Artifact artifact)
     {
         // Get JSON for artifact metadata,
         var text = artifact.toJson();
@@ -244,7 +244,7 @@ public class LocalFiascoRepository extends BaseRepository
      * @param algorithm The signing algorithm
      * @return The signature
      */
-    private String readSignature(Artifact<?> artifact, ArtifactContent content, String algorithm)
+    private String readSignature(Artifact artifact, ArtifactContent content, String algorithm)
     {
         return repositoryFolder(artifact).file(content.name() + "." + algorithm).readText();
     }
@@ -257,10 +257,10 @@ public class LocalFiascoRepository extends BaseRepository
      * @param artifact The artifact
      * @return The folder
      */
-    private Folder repositoryFolder(Artifact<?> artifact)
+    private Folder repositoryFolder(Artifact artifact)
     {
         var descriptor = artifact.descriptor();
-        return rootFolder.folder(descriptor.group().name().replaceAll("\\.", "/") + "/" + descriptor.identifier() + "-" + descriptor.version());
+        return rootFolder.folder(descriptor.group().name().replaceAll("\\.", "/") + "/" + descriptor.artifact() + "-" + descriptor.version());
     }
 
     /**

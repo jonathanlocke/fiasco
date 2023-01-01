@@ -1,8 +1,9 @@
 package fiasco;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import digital.fiasco.libraries.Libraries;
 import digital.fiasco.runtime.build.BaseBuild;
-import digital.fiasco.runtime.build.builder.BuildResult;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
 import digital.fiasco.runtime.build.metadata.Contributor;
 import digital.fiasco.runtime.build.metadata.Copyright;
@@ -41,7 +42,6 @@ public class ExampleBuild extends BaseBuild implements Libraries
             .withUrl(url("https://fiasco.digital"));
 
         return new BuildMetadata()
-            .withArtifactDescriptor("digital.fiasco:fiasco-example:1.0")
             .withLicense(APACHE_LICENSE)
             .withOrganization(fiasco)
             .withCopyright(new Copyright("Copyright 2022-2023, Jonathan Locke. All Rights Reserved.", year(2022), year(2023)))
@@ -62,27 +62,27 @@ public class ExampleBuild extends BaseBuild implements Libraries
      * {@inheritDoc}
      */
     @Override
-    public void onBuild()
+    public ObjectList<Builder> onBuild(Builder rootBuilder)
     {
-        var builder = newBuilder()
-            .withTargetArtifactDescriptor("digital.fiasco:example:1.0")
-            .requires(apache_ant, apache_commons_logging, kryo)
-            .pinVersion(apache_ant, "1.0.3")
-            .pinVersion(apache_commons_logging, "1.9.0")
-            .pinVersion(kryo, "4.3.1")
-            .withRootFolder(currentFolder())
-            .beforePhase("compile", it ->
-            {
-                var cleaner = it.newCleaner();
-                cleaner.run();
-            });
+        return list
+            (
+                rootBuilder
+                    .withTargetArtifactDescriptor("digital.fiasco:example:1.0")
+                    .requires(apache_ant, apache_commons_logging, kryo)
+                    .pinVersion(apache_ant, "1.0.3")
+                    .pinVersion(apache_commons_logging, "1.9.0")
+                    .pinVersion(kryo, "4.3.1")
+                    .withRootFolder(currentFolder())
+                    .beforePhase("compile", it ->
+                    {
+                        var cleaner = it.newCleaner();
+                        cleaner.run();
+                    }),
 
-        builder.build(BuildResult::showResult);
-
-        // Multi-project build
-        var child = builder.childBuilder("example-child")
-            .withDependencies(hamcrest_library.version("5.0"));
-        child.build(BuildResult::showResult);
+                rootBuilder
+                    .deriveBuilder("example-child")
+                    .requires(hamcrest_library.version("5.0"))
+            );
     }
 }
 

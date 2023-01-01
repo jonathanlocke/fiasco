@@ -45,7 +45,7 @@ public interface Repository extends Repeater, Named
      * @param artifact The cache entry metadata to append to metadata.txt in JSON format
      * @throws IllegalStateException Thrown if the artifact cannot be installed in this repository
      */
-    void installArtifact(Artifact<?> artifact);
+    void installArtifact(Artifact artifact);
 
     /**
      * Returns true if this is a remote repository
@@ -59,7 +59,7 @@ public interface Repository extends Repeater, Named
      * @return The resolved artifacts
      * @throws IllegalArgumentException Thrown if any descriptor cannot be resolved
      */
-    ObjectList<Artifact<?>> resolveArtifacts(Collection<ArtifactDescriptor> descriptors);
+    ObjectList<Artifact> resolveArtifacts(Collection<ArtifactDescriptor> descriptors);
 
     /**
      * Returns the URI of this repository

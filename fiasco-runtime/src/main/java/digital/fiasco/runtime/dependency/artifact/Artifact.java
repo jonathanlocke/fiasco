@@ -17,7 +17,7 @@ import static com.telenav.kivakit.core.version.Version.parseVersion;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONTENT_SUFFIX;
 
 /**
- * Represents an artifact, either an {@link ArtifactType#ASSET}, or an {@link ArtifactType#LIBRARY}.
+ * Represents an artifact, either an {@link Asset} or a {@link Library}
  *
  * <p><b>Repository</b></p>
  *
@@ -29,12 +29,10 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONT
  *
  * <ul>
  *     <li>{@link #descriptor()}</li>
- *     <li>{@link #type()}</li>
  *     <li>{@link #version(String)}</li>
  *     <li>{@link #version(Version)}</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)}</li>
- *     <li>{@link #withIdentifier(String)}</li>
- *     <li>{@link #withType(ArtifactType)}</li>
+ *     <li>{@link #withArtifactIdentifier(String)}</li>
  *     <li>{@link #withVersion(Version)}</li>
  * </ul>
  *
@@ -68,8 +66,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONT
  *     <li>{@link #withContent(ArtifactContent)}</li>
  *     <li>{@link #withDependencies(DependencyList)} - Returns this artifact with the given dependencies</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
- *     <li>{@link #withIdentifier(String)} - Returns this artifact with the given identifier</li>
- *     <li>{@link #withType(ArtifactType)} - Returns this artifact with the given type</li>
+ *     <li>{@link #withArtifactIdentifier(String)} - Returns this artifact with the given identifier</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #withoutDependencies(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
  *     <li>{@link #withoutDependencies(String...)} - Returns this artifact without the given dependencies</li>
@@ -93,14 +90,19 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONT
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public interface Artifact<A extends Artifact<A>> extends Dependency<A>
+public interface Artifact extends Dependency
 {
-    @SuppressWarnings("unchecked")
-    static <A extends Artifact<A>> A artifactFromJson(String json)
+    /**
+     * Returns an artifact for a given JSON string
+     *
+     * @param json The JSON
+     * @return The artifact
+     */
+    static Artifact artifactFromJson(String json)
     {
         var serialized = new StringResource(json);
         var serializer = new GsonObjectSerializer();
-        return (A) serializer.readObject(serialized, BaseArtifact.class).object();
+        return serializer.readObject(serialized, BaseArtifact.class).object();
     }
 
     /**
@@ -133,7 +135,7 @@ public interface Artifact<A extends Artifact<A>> extends Dependency<A>
      *
      * @return The new artifact
      */
-    A copy();
+    Artifact copy();
 
     /**
      * Returns the list of dependencies for this artifact
@@ -185,16 +187,9 @@ public interface Artifact<A extends Artifact<A>> extends Dependency<A>
     }
 
     /**
-     * Returns the type of this artifact
-     *
-     * @return The artifact type
-     */
-    ArtifactType type();
-
-    /**
      * Convenience method for {@link #withVersion(Version)}
      */
-    default A version(Version version)
+    default Artifact version(Version version)
     {
         return withVersion(version);
     }
@@ -202,9 +197,20 @@ public interface Artifact<A extends Artifact<A>> extends Dependency<A>
     /**
      * Convenience method for {@link #withVersion(Version)}
      */
-    default A version(String version)
+    default Artifact version(String version)
     {
         return withVersion(parseVersion(version));
+    }
+
+    /**
+     * Returns a copy of this artifact with the given identifier
+     *
+     * @param artifact The new artifact identifier
+     * @return The new artifact
+     */
+    default Artifact withArtifactIdentifier(String artifact)
+    {
+        return withDescriptor(descriptor().withArtifactIdentifier(artifact));
     }
 
     /**
@@ -212,14 +218,14 @@ public interface Artifact<A extends Artifact<A>> extends Dependency<A>
      *
      * @param attachment The content to attach
      */
-    A withAttachment(ArtifactAttachment attachment);
+    Artifact withAttachment(ArtifactAttachment attachment);
 
     /**
      * Returns primary content attachment for this asset
      *
      * @return The content
      */
-    default A withContent(ArtifactContent content)
+    default Artifact withContent(ArtifactContent content)
     {
         var copy = copy();
         copy.withAttachment(new ArtifactAttachment(this, CONTENT_SUFFIX, content));
@@ -232,7 +238,7 @@ public interface Artifact<A extends Artifact<A>> extends Dependency<A>
      * @param dependencies The new dependencies
      * @return The new artifact
      */
-    A withDependencies(DependencyList dependencies);
+    Artifact withDependencies(DependencyList dependencies);
 
     /**
      * Returns a copy of this artifact with the given descriptor
@@ -240,26 +246,7 @@ public interface Artifact<A extends Artifact<A>> extends Dependency<A>
      * @param descriptor The new descriptor
      * @return The new artifact
      */
-    A withDescriptor(ArtifactDescriptor descriptor);
-
-    /**
-     * Returns a copy of this artifact with the given identifier
-     *
-     * @param identifier The new identifier
-     * @return The new artifact
-     */
-    default A withIdentifier(String identifier)
-    {
-        return withDescriptor(descriptor().withIdentifier(identifier));
-    }
-
-    /**
-     * Returns a copy of this artifact with the given artifact type
-     *
-     * @param type The new artifact type
-     * @return The new artifact
-     */
-    A withType(ArtifactType type);
+    Artifact withDescriptor(ArtifactDescriptor descriptor);
 
     /**
      * Returns a copy of this artifact with the given version
@@ -267,7 +254,7 @@ public interface Artifact<A extends Artifact<A>> extends Dependency<A>
      * @param version The new version
      * @return The new artifact
      */
-    default A withVersion(Version version)
+    default Artifact withVersion(Version version)
     {
         return withDescriptor(descriptor().withVersion(version));
     }
@@ -278,7 +265,7 @@ public interface Artifact<A extends Artifact<A>> extends Dependency<A>
      * @param exclude The descriptors to exclude
      * @return The new artifact
      */
-    default A withoutDependencies(ArtifactDescriptor... exclude)
+    default Artifact withoutDependencies(ArtifactDescriptor... exclude)
     {
         return withoutDependencies(library -> arrayContains(exclude, library));
     }
@@ -289,7 +276,7 @@ public interface Artifact<A extends Artifact<A>> extends Dependency<A>
      * @param exclude The descriptors to exclude
      * @return The new artifact
      */
-    default A withoutDependencies(String... exclude)
+    default Artifact withoutDependencies(String... exclude)
     {
         var descriptors = list(exclude).map(ArtifactDescriptor::artifactDescriptor);
         return withoutDependencies(descriptors::contains);
@@ -301,5 +288,5 @@ public interface Artifact<A extends Artifact<A>> extends Dependency<A>
      * @param pattern The pattern to exclude
      * @return The new artifact
      */
-    A withoutDependencies(Matcher<ArtifactDescriptor> pattern);
+    Artifact withoutDependencies(Matcher<ArtifactDescriptor> pattern);
 }

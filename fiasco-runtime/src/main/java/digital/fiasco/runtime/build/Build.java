@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.build;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.interfaces.string.Described;
@@ -75,8 +76,7 @@ import digital.fiasco.runtime.build.metadata.BuildMetadata;
  * <p><b>Building</b></p>
  *
  * <ul>
- *     <li>{@link #newBuilder()}</li>
- *     <li>{@link #onBuild()}</li>
+ *     <li>{@link #onBuild(Builder)}</li>
  * </ul>
  *
  * <p><b>Build Metadata</b></p>
@@ -129,14 +129,10 @@ public interface Build extends
     BuildMetadata metadata();
 
     /**
-     * Creates a new builder with settings for this build
+     * Called to configure the build to be executed
      *
-     * @return The new builder
+     * @param rootBuilder The root builder for the build, from which child builders can be derived
+     * @return A list of builders to execute
      */
-    Builder newBuilder();
-
-    /**
-     * Called to execute the build
-     */
-    void onBuild();
+    ObjectList<Builder> onBuild(Builder rootBuilder);
 }

@@ -12,11 +12,17 @@ import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactGroup;
+import digital.fiasco.runtime.dependency.artifact.ArtifactIdentifier;
 import org.jetbrains.annotations.NotNull;
+
+import java.util.function.Function;
 
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
 
 /**
  * Settings used by {@link Builder} to modify the way that it builds.
@@ -78,11 +84,12 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
  *
  * <ul>
  *     <li>{@link #targetArtifactDescriptor()}</li>
- *     <li>{@link #targetArtifactName()}</li>
- *     <li>{@link #targetArtifactVersion()}</li>
  *     <li>{@link #withTargetArtifactDescriptor(String)}</li>
  *     <li>{@link #withTargetArtifactDescriptor(ArtifactDescriptor)}</li>
- *     <li>{@link #withTargetArtifactIdentifier(String)}</li>
+ *     <li>{@link #withTargetArtifactGroup(String)}</li>
+ *     <li>{@link #withTargetArtifactGroup(ArtifactGroup)}</li>
+ *     <li>{@link #withTargetArtifact(String)}</li>
+ *     <li>{@link #withTargetArtifact(ArtifactIdentifier)}</li>
  *     <li>{@link #withTargetArtifactVersion(String)}</li>
  *     <li>{@link #withTargetArtifactVersion(Version)}</li>
  * </ul>
@@ -306,7 +313,7 @@ public class BuildSettings
      * @param version The version to use
      * @return The build for method chaining
      */
-    public BuildSettings pinVersion(Artifact<?> artifact, String version)
+    public BuildSettings pinVersion(Artifact artifact, String version)
     {
         return pinVersion(artifact, version(version));
     }
@@ -318,7 +325,7 @@ public class BuildSettings
      * @param version The version to use
      * @return The build for method chaining
      */
-    public BuildSettings pinVersion(Artifact<?> artifact, Version version)
+    public BuildSettings pinVersion(Artifact artifact, Version version)
     {
         librarian().pinVersion(artifact, version);
         return this;
@@ -331,7 +338,7 @@ public class BuildSettings
      * @param rest Any further dependencies
      * @return The build for method chaining
      */
-    public BuildSettings requires(Artifact<?> first, Artifact<?>... rest)
+    public BuildSettings requires(Artifact first, Artifact... rest)
     {
         dependencies = dependencies.withAdditionalDependencies(first, rest);
         return this;
@@ -365,25 +372,6 @@ public class BuildSettings
     }
 
     /**
-     * Returns the name of this artifact
-     *
-     * @return The artifact name
-     */
-    @NotNull
-    public String targetArtifactName()
-    {
-        return targetArtifactDescriptor.name();
-    }
-
-    /**
-     * Returns the artifact descriptor for this build
-     */
-    public Version targetArtifactVersion()
-    {
-        return targetArtifactDescriptor().version();
-    }
-
-    /**
      * Returns the number of threads to use when building
      *
      * @return The thread count
@@ -393,32 +381,58 @@ public class BuildSettings
         return threads;
     }
 
-    public BuildSettings withAdditionalDependencies(Artifact<?> first, Artifact<?>... rest)
+    /**
+     * Returns a copy of this object with the given dependencies added
+     *
+     * @param first The first dependency
+     * @param rest The rest of the dependencies
+     * @return The copy
+     */
+    public BuildSettings withAdditionalDependencies(Artifact first, Artifact... rest)
     {
         var copy = copy();
         copy.dependencies = dependencies.withAdditionalDependencies(first, rest);
-        return this;
+        return copy;
     }
 
+    /**
+     * Returns a copy of this object with the given dependencies added
+     *
+     * @param dependencies The dependencies
+     * @return The copy
+     */
     public BuildSettings withAdditionalDependencies(DependencyList dependencies)
     {
         var copy = copy();
         copy.dependencies = dependencies.withAdditionalDependencies(dependencies);
-        return this;
+        return copy;
     }
 
-    public BuildSettings withDependencies(Artifact<?> first, Artifact<?>... rest)
+    /**
+     * Returns a copy of this object with the given dependencies
+     *
+     * @param first The first dependency
+     * @param rest The rest of the dependencies
+     * @return The copy
+     */
+    public BuildSettings withDependencies(Artifact first, Artifact... rest)
     {
         var copy = copy();
         copy.dependencies = dependencies.withDependencies(first, rest);
-        return this;
+        return copy;
     }
 
+    /**
+     * Returns a copy of this object with the given dependencies
+     *
+     * @param dependencies The dependencies
+     * @return The copy
+     */
     public BuildSettings withDependencies(DependencyList dependencies)
     {
         var copy = copy();
         copy.dependencies = dependencies.withDependencies(dependencies);
-        return this;
+        return copy;
     }
 
     /**
@@ -448,18 +462,52 @@ public class BuildSettings
     }
 
     /**
-     * Returns a copy of this build with the given main artifact descriptor
+     * Returns a copy of this settings object with the given artifact
+     *
+     * @param artifact The artifact identifier
+     * @return The copy
+     */
+    public BuildSettings withTargetArtifact(String artifact)
+    {
+        return withTargetArtifact(new ArtifactIdentifier(artifact));
+    }
+
+    /**
+     * Returns a copy of this settings object with the given artifact
+     *
+     * @param artifact The artifact
+     * @return The copy
+     */
+    public BuildSettings withTargetArtifact(ArtifactIdentifier artifact)
+    {
+        return withTargetArtifactDescriptor(descriptor -> descriptor.withArtifactIdentifier(artifact));
+    }
+
+    /**
+     * Returns a copy of this settings object with the given main artifact descriptor
      *
      * @param descriptor The artifact descriptor
      * @return The copy
      */
     public BuildSettings withTargetArtifactDescriptor(String descriptor)
     {
-        return withTargetArtifactDescriptor(ArtifactDescriptor.artifactDescriptor(descriptor));
+        return withTargetArtifactDescriptor(artifactDescriptor(descriptor));
     }
 
     /**
-     * Returns a copy of this build with the given artifact descriptor
+     * Applies the given tranformation function to the {@link #targetArtifactDescriptor()}, returning a copy of this
+     * settings object with the transformed descriptor.
+     *
+     * @param function The function to apply
+     * @return The copy
+     */
+    public BuildSettings withTargetArtifactDescriptor(Function<ArtifactDescriptor, ArtifactDescriptor> function)
+    {
+        return withTargetArtifactDescriptor(function.apply(targetArtifactDescriptor()));
+    }
+
+    /**
+     * Returns a copy of this settings object with the given artifact descriptor
      *
      * @param descriptor The artifact descriptor
      * @return The copy
@@ -472,18 +520,29 @@ public class BuildSettings
     }
 
     /**
-     * Returns a copy of this build with the given artifact identifier
+     * Returns a copy of this settings object with the given artifact group
      *
-     * @param identifier The artifact identifier
+     * @param group The artifact group
      * @return The copy
      */
-    public BuildSettings withTargetArtifactIdentifier(String identifier)
+    public BuildSettings withTargetArtifactGroup(String group)
     {
-        return withTargetArtifactDescriptor(targetArtifactDescriptor().withIdentifier(identifier));
+        return withTargetArtifactGroup(group(group));
     }
 
     /**
-     * Returns a copy of this build with the given main artifact version
+     * Returns a copy of this settings object with the given artifact group
+     *
+     * @param group The artifact group
+     * @return The copy
+     */
+    public BuildSettings withTargetArtifactGroup(ArtifactGroup group)
+    {
+        return withTargetArtifactDescriptor(descriptor -> descriptor.withGroup(group));
+    }
+
+    /**
+     * Returns a copy of this settings object with the given main artifact version
      *
      * @param version The artifact version
      * @return The copy
@@ -494,14 +553,14 @@ public class BuildSettings
     }
 
     /**
-     * Returns a copy of this build with the given main artifact version
+     * Returns a copy of this settings object with the given main artifact version
      *
      * @param version The artifact version
      * @return The copy
      */
     public BuildSettings withTargetArtifactVersion(Version version)
     {
-        return withTargetArtifactDescriptor(targetArtifactDescriptor().withVersion(version));
+        return withTargetArtifactDescriptor(descriptor -> descriptor.withVersion(version));
     }
 
     /**

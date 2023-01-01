@@ -17,18 +17,18 @@ public class DependencyGraph
     /**
      * @return The dependency graph formed by traversing dependencies starting at the given root
      */
-    public static DependencyGraph dependencyGraph(Dependency<?> root)
+    public static DependencyGraph dependencyGraph(Dependency root)
     {
         return new DependencyGraph(root);
     }
 
     /** The root of this dependency graph */
-    private final Dependency<?> root;
+    private final Dependency root;
 
     /** The dependencies of this graph in depth-first-order */
     private final DependencyList depthFirst;
 
-    private DependencyGraph(Dependency<?> root)
+    private DependencyGraph(Dependency root)
     {
         this.root = root;
         depthFirst = depthFirst(root);
@@ -45,7 +45,7 @@ public class DependencyGraph
     /**
      * @return The root node of this dependency graph
      */
-    public Dependency<?> root()
+    public Dependency root()
     {
         return root;
     }
@@ -53,7 +53,7 @@ public class DependencyGraph
     /**
      * @return List of dependencies in depth-first order
      */
-    private DependencyList depthFirst(Dependency<?> root)
+    private DependencyList depthFirst(Dependency root)
     {
         DependencyList explored = dependencyList();
 

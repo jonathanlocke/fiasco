@@ -84,12 +84,14 @@ public class BuildStamper extends BaseTool implements
     {
         information("Stamping build");
 
+        var name = associatedBuilder().targetArtifactDescriptor().name().replaceAll("\\.", "-");
+
         targetClassesFolder()
-            .file(associatedBuilder().targetArtifactName() + "-project.properties")
+            .file(name + "-project.properties")
             .saveText(projectProperties().join("\n"));
 
         targetClassesFolder()
-            .file(associatedBuilder().targetArtifactName() + "-build.properties")
+            .file(name + "-build.properties")
             .saveText(buildProperties().join("\n"));
     }
 

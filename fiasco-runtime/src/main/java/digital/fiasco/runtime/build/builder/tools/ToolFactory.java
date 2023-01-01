@@ -3,15 +3,16 @@ package digital.fiasco.runtime.build.builder.tools;
 import com.telenav.kivakit.core.language.Classes;
 import com.telenav.kivakit.core.messaging.Repeater;
 import digital.fiasco.runtime.build.BuildStructured;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.BuilderAssociated;
+import digital.fiasco.runtime.build.builder.tools.archiver.Archiver;
+import digital.fiasco.runtime.build.builder.tools.cleaner.Cleaner;
 import digital.fiasco.runtime.build.builder.tools.compiler.Compiler;
 import digital.fiasco.runtime.build.builder.tools.copier.Copier;
+import digital.fiasco.runtime.build.builder.tools.git.Git;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.build.builder.tools.shader.Shader;
 import digital.fiasco.runtime.build.builder.tools.stamper.BuildStamper;
-import digital.fiasco.runtime.build.builder.tools.archiver.Archiver;
-import digital.fiasco.runtime.build.builder.tools.cleaner.Cleaner;
-import digital.fiasco.runtime.build.builder.tools.git.Git;
 import digital.fiasco.runtime.build.builder.tools.tester.Tester;
 
 /**
@@ -97,6 +98,6 @@ public interface ToolFactory extends
 
     default <T extends Tool> T newTool(Class<T> type)
     {
-        return listenTo(Classes.newInstance(type, associatedBuilder()));
+        return listenTo(Classes.newInstance(type, Builder.class, associatedBuilder()));
     }
 }

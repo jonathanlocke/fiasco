@@ -22,15 +22,22 @@ import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.build.builder.tools.Tool;
 import digital.fiasco.runtime.build.builder.tools.ToolFactory;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
+import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import org.jetbrains.annotations.NotNull;
+import digital.fiasco.runtime.dependency.artifact.ArtifactGroup;
+import digital.fiasco.runtime.dependency.artifact.ArtifactIdentifier;
+import digital.fiasco.runtime.repository.Repository;
 
+import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
 import static com.telenav.kivakit.core.string.Paths.pathTail;
 import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
+import static digital.fiasco.runtime.build.BuildOption.HELP;
+import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
 
 /**
  * <p>
@@ -92,7 +99,7 @@ import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
  *
  * <ul>
  *     <li>{@link #build(Callback)}</li>
- *     <li>{@link #childBuilder(String)}</li>
+ *     <li>{@link #deriveBuilder(String)}</li>
  * </ul>
  *
  * <p><b>Properties</b></p>
@@ -158,11 +165,12 @@ import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
  *
  * <ul>
  *     <li>{@link #targetArtifactDescriptor()}</li>
- *     <li>{@link #targetArtifactName()}</li>
- *     <li>{@link #targetArtifactVersion()}</li>
  *     <li>{@link #withTargetArtifactDescriptor(String)}</li>
  *     <li>{@link #withTargetArtifactDescriptor(ArtifactDescriptor)}</li>
+ *     <li>{@link #withTargetArtifactGroup(String)}</li>
+ *     <li>{@link #withTargetArtifactGroup(ArtifactGroup)}</li>
  *     <li>{@link #withTargetArtifactIdentifier(String)}</li>
+ *     <li>{@link #withTargetArtifactIdentifier(ArtifactIdentifier)}</li>
  *     <li>{@link #withTargetArtifactVersion(String)}</li>
  *     <li>{@link #withTargetArtifactVersion(Version)}</li>
  * </ul>
@@ -223,14 +231,15 @@ import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
  *
  * @author Jonathan Locke
  */
-@SuppressWarnings({ "unused", "StringConcatenationInLoop", "UnusedReturnValue" })
+@SuppressWarnings({ "unused", "UnusedReturnValue" })
 public class Builder extends BaseRepeater implements
     Described,
     BuildStructured,
     BuilderAssociated,
     BuildEnvironment,
     ToolFactory,
-    TryCatchTrait
+    TryCatchTrait,
+    Dependency
 {
     /** The associated build */
     private final Build build;
@@ -299,7 +308,7 @@ public class Builder extends BaseRepeater implements
      *
      * @param result Callback to call with the result when the build finishes
      */
-    public final void build(Callback<BuildResult> result)
+    public final Builder build(Callback<BuildResult> result)
     {
         // Listen to any problems broadcast by the build,
         var issues = new MessageList(message -> !message.status().succeeded());
@@ -332,17 +341,7 @@ public class Builder extends BaseRepeater implements
 
         // and return the result of the build.
         result.call(new BuildResult(issues));
-    }
-
-    /**
-     * Returns the child build at the given path
-     *
-     * @param path The path to the child build
-     */
-    public Builder childBuilder(String path)
-    {
-        return withRootFolder(rootFolder().folder(path))
-            .withTargetArtifactIdentifier(pathTail(path, '/'));
+        return this;
     }
 
     /**
@@ -358,9 +357,25 @@ public class Builder extends BaseRepeater implements
      *
      * @return The libraries to compile against
      */
+    @Override
     public DependencyList dependencies()
     {
         return settings.dependencies();
+    }
+
+    /**
+     * Returns a child builder at the given path with an empty dependency list. If the target artifact descriptor for a
+     * builder "x" is "apache.stuff:double-stuff:1.5.0", then x.childBuilder("stuff-utilities") will return a new
+     * builder with the target artifact descriptor "apache.stuff:stuff-utilities:1.5.0". The root folder will be
+     * [root-folder]/stuff-utilities and there will be no dependencies.
+     *
+     * @param path The path to the child build
+     */
+    public Builder deriveBuilder(String path)
+    {
+        return withRootFolder(rootFolder().folder(path))
+            .withDependencies(dependencyList())
+            .withTargetArtifactIdentifier(pathTail(path, '/'));
     }
 
     /**
@@ -369,25 +384,32 @@ public class Builder extends BaseRepeater implements
     @Override
     public String description()
     {
-        var description = """
+        var description = stringList();
+        description.add("""
             Commands
                             
               command               description
-              -----------           ---------------------------------------------
-              describe              describe the build rather than running it
-                            
+              -----------           ---------------------------------------------""");
+
+        for (var option : BuildOption.values())
+        {
+            description.add(String.format("  %-22s%s\n", option.name().toLowerCase(), option.help()));
+        }
+
+        description.add("""
+                    
             Phases (those preceded by a dash will be disabled)
                         
               phase                 description
               -----------           ---------------------------------------------
-            """;
+            """);
 
         for (var phase : settings.phases())
         {
-            description += String.format("  %-22s%s\n", phase.name(), phase.description());
+            description.add(String.format("  %-22s%s\n", phase.name(), phase.description()));
         }
 
-        return description;
+        return description.titledBox("Fiasco Help");
     }
 
     /**
@@ -561,6 +583,12 @@ public class Builder extends BaseRepeater implements
                 }
             }
         }
+
+        if (settings.isEnabled(HELP))
+        {
+            information(description());
+        }
+
         return this;
     }
 
@@ -590,36 +618,51 @@ public class Builder extends BaseRepeater implements
      * @param version The version to use
      * @return The build for method chaining
      */
-    public Builder pinVersion(Artifact<?> artifact, String version)
+    public Builder pinVersion(Artifact artifact, String version)
     {
         settings = settings.pinVersion(artifact, version(version));
         return this;
     }
 
     /**
-     * {@inheritDoc}
+     * Globally pins all versions of the given artifact to the specified version
+     *
+     * @param artifact The artifact
+     * @param version The version to use
+     * @return The build for method chaining
      */
-    public Builder pinVersion(Artifact<?> artifact, Version version)
+    public Builder pinVersion(Artifact artifact, Version version)
     {
         settings = settings.pinVersion(artifact, version);
         return this;
     }
 
     /**
-     * Adds one or more build dependencies
+     * There is no repository for a {@link Builder} dependency
+     *
+     * @return Always null
+     */
+    @Override
+    public Repository repository()
+    {
+        return null;
+    }
+
+    /**
+     * Adds one or more build dependencies to this builder
      *
      * @param first The first dependency
      * @param rest Any further dependencies
      * @return The build for method chaining
      */
-    public Builder requires(Artifact<?> first, Artifact<?>... rest)
+    public Builder requires(Artifact first, Artifact... rest)
     {
         settings = settings.requires(first, rest);
         return this;
     }
 
     /**
-     * Adds the given dependencies to this build
+     * Adds the given dependencies to this builder
      *
      * @param dependencies The dependencies to add
      */
@@ -644,30 +687,11 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Returns the artifact descriptor for this build
+     * Returns the artifact descriptor for this builder
      */
     public ArtifactDescriptor targetArtifactDescriptor()
     {
         return settings.targetArtifactDescriptor();
-    }
-
-    /**
-     * Returns the name of this artifact
-     *
-     * @return The artifact name
-     */
-    @NotNull
-    public String targetArtifactName()
-    {
-        return settings.targetArtifactName();
-    }
-
-    /**
-     * Returns the artifact descriptor for this build
-     */
-    public Version targetArtifactVersion()
-    {
-        return targetArtifactDescriptor().version();
     }
 
     /**
@@ -678,28 +702,58 @@ public class Builder extends BaseRepeater implements
         return settings.threads();
     }
 
+    /**
+     * Returns a copy of this object with the given dependencies added
+     *
+     * @param dependencies The dependencies
+     * @return The copy
+     */
     public Builder withAdditionalDependencies(DependencyList dependencies)
     {
-        settings = settings.withAdditionalDependencies(dependencies);
-        return this;
+        var copy = copy();
+        copy.settings = settings.withAdditionalDependencies(dependencies);
+        return copy;
     }
 
-    public Builder withAdditionalDependencies(Artifact<?> first, Artifact<?>... rest)
+    /**
+     * Returns a copy of this object with the given dependencies added
+     *
+     * @param first The first dependency
+     * @param rest The rest of the dependencies
+     * @return The copy
+     */
+    public Builder withAdditionalDependencies(Artifact first, Artifact... rest)
     {
-        settings = settings.withAdditionalDependencies(first, rest);
-        return this;
+        var copy = copy();
+        copy.settings = settings.withAdditionalDependencies(first, rest);
+        return copy;
     }
 
-    public Builder withDependencies(Artifact<?> first, Artifact<?>... rest)
+    /**
+     * Returns a copy of this object with the given dependencies
+     *
+     * @param first The first dependency
+     * @param rest The rest of the dependencies
+     * @return The copy
+     */
+    public Builder withDependencies(Artifact first, Artifact... rest)
     {
-        settings = settings.withDependencies(first, rest);
-        return this;
+        var copy = copy();
+        copy.settings = settings.withDependencies(first, rest);
+        return copy;
     }
 
+    /**
+     * Returns a copy of this object with the given dependencies
+     *
+     * @param dependencies The dependencies
+     * @return The copy
+     */
     public Builder withDependencies(DependencyList dependencies)
     {
-        settings = settings.withDependencies(dependencies);
-        return this;
+        var copy = copy();
+        copy.settings = settings.withDependencies(dependencies);
+        return copy;
     }
 
     /**
@@ -721,8 +775,9 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withRootFolder(Folder rootFolder)
     {
-        settings = settings.withRootFolder(rootFolder);
-        return this;
+        var copy = copy();
+        copy.settings = settings.withRootFolder(rootFolder);
+        return copy;
     }
 
     /**
@@ -739,42 +794,77 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Returns a copy of this build with the given main artifact descriptor
+     * Returns a copy of this builder with the given main artifact descriptor
      *
      * @param descriptor The artifact descriptor
      * @return The copy
      */
     public Builder withTargetArtifactDescriptor(String descriptor)
     {
-        settings = settings.withTargetArtifactDescriptor(ArtifactDescriptor.artifactDescriptor(descriptor));
-        return this;
+        var copy = copy();
+        copy.settings = settings.withTargetArtifactDescriptor(ArtifactDescriptor.artifactDescriptor(descriptor));
+        return copy;
     }
 
     /**
-     * Returns a copy of this build with the given artifact descriptor
+     * Returns a copy of this builder with the given artifact descriptor
      *
      * @param descriptor The artifact descriptor
      * @return The copy
      */
     public Builder withTargetArtifactDescriptor(ArtifactDescriptor descriptor)
     {
-        settings = settings.withTargetArtifactDescriptor(descriptor);
-        return this;
+        var copy = copy();
+        copy.settings = settings.withTargetArtifactDescriptor(descriptor);
+        return copy;
     }
 
     /**
-     * Returns a copy of this build with the given artifact identifier
+     * Returns a copy of this builder with the given artifact group
      *
-     * @param identifier The artifact identifier
+     * @param group The artifact group
      * @return The copy
      */
-    public Builder withTargetArtifactIdentifier(String identifier)
+    public Builder withTargetArtifactGroup(ArtifactGroup group)
     {
-        return withTargetArtifactDescriptor(targetArtifactDescriptor().withIdentifier(identifier));
+        return withTargetArtifactDescriptor(targetArtifactDescriptor().withGroup(group));
     }
 
     /**
-     * Returns a copy of this build with the given main artifact version
+     * Returns a copy of this builder with the given artifact group
+     *
+     * @param group The artifact group
+     * @return The copy
+     */
+    public Builder withTargetArtifactGroup(String group)
+    {
+        return withTargetArtifactGroup(group(group));
+    }
+
+    /**
+     * Returns a copy of this builder with the given artifact identifier
+     *
+     * @param artifact The artifact identifier
+     * @return The copy
+     */
+    public Builder withTargetArtifactIdentifier(ArtifactIdentifier artifact)
+    {
+        return withTargetArtifactDescriptor(targetArtifactDescriptor().withArtifactIdentifier(artifact));
+    }
+
+    /**
+     * Returns a copy of this builder with the given artifact identifier
+     *
+     * @param artifact The artifact identifier
+     * @return The copy
+     */
+    public Builder withTargetArtifactIdentifier(String artifact)
+    {
+        return withTargetArtifactIdentifier(new ArtifactIdentifier(artifact));
+    }
+
+    /**
+     * Returns a copy of this builder with the given artifact version
      *
      * @param version The artifact version
      * @return The copy
@@ -785,7 +875,7 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Returns a copy of this build with the given main artifact version
+     * Returns a copy of this builder with the given artifact version
      *
      * @param version The artifact version
      * @return The copy

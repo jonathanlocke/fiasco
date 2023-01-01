@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
  * @param suffix The attachment name suffix
  * @param content The attached content
  */
-public record ArtifactAttachment(@NotNull Artifact<?> artifact,
+public record ArtifactAttachment(@NotNull Artifact artifact,
                                  @NotNull String suffix,
                                  ArtifactContent content)
 {
@@ -22,7 +22,7 @@ public record ArtifactAttachment(@NotNull Artifact<?> artifact,
     /** Suffix for sources attachment */
     public static final String SOURCES_SUFFIX = "-sources.jar";
 
-    public ArtifactAttachment(Artifact<?> artifact, String suffix)
+    public ArtifactAttachment(Artifact artifact, String suffix)
     {
         this(artifact, suffix, null);
     }

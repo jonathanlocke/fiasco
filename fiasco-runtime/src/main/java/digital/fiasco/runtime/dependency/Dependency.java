@@ -14,7 +14,7 @@ import static digital.fiasco.runtime.dependency.DependencyGraph.dependencyGraph;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public interface Dependency<D extends Dependency<D>> extends Named
+public interface Dependency extends Named
 {
     /**
      * @return The objects that this depends on

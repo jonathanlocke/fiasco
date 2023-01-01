@@ -103,7 +103,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     private final URI uri;
 
     /** The cached artifact entries */
-    private final ObjectMap<ArtifactDescriptor, Artifact<?>> artifacts = new ObjectMap<>();
+    private final ObjectMap<ArtifactDescriptor, Artifact> artifacts = new ObjectMap<>();
 
     /** Cache lock (filesystem locking not yet supported) */
     private final ReadWriteLock lock = new ReadWriteLock();
@@ -160,7 +160,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     /**
      * Returns the map from descriptor to artifact
      */
-    protected ObjectMap<ArtifactDescriptor, Artifact<?>> artifacts()
+    protected ObjectMap<ArtifactDescriptor, Artifact> artifacts()
     {
         return artifacts;
     }
@@ -173,7 +173,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
         return lock;
     }
 
-    protected void visitArtifactAttachments(@NotNull Artifact<?> artifact,
+    protected void visitArtifactAttachments(@NotNull Artifact artifact,
                                             @NotNull ArtifactAttachmentVisitor visitor)
     {
         for (var attachment : artifact.attachments().values())

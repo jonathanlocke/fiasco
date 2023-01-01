@@ -18,19 +18,19 @@ public record ArtifactGroup(String name) implements Named
     }
 
     /**
-     * Returns an artifact descriptor for this group with the given identifier
+     * Returns an artifact descriptor for the given artifact in this group
      *
-     * @param identifier The identifier
+     * @param artifact The identifier
      * @return The artifact descriptor
      */
-    public ArtifactDescriptor descriptor(ArtifactIdentifier identifier)
+    public ArtifactDescriptor descriptor(ArtifactIdentifier artifact)
     {
-        return new ArtifactDescriptor(this, identifier, null);
+        return new ArtifactDescriptor(this, artifact, null);
     }
 
-    public Library library(String identifier)
+    public Library library(String artifact)
     {
-        return Library.library(artifactDescriptor(name + ":" + identifier));
+        return Library.library(artifactDescriptor(name + ":" + artifact));
     }
 
     @Override

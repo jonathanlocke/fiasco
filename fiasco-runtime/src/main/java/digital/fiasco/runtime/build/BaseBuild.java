@@ -103,7 +103,7 @@ import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
  *
  * <ul>
  *     <li>{@link #newBuilder()}</li>
- *     <li>{@link #onBuild()}</li>
+ *     <li>{@link #onBuild(Builder)}</li>
  * </ul>
  *
  * <p><b>Build Metadata</b></p>
@@ -179,21 +179,11 @@ public abstract class BaseBuild extends Application implements Build
         return metadata;
     }
 
-    @Override
-    public Builder newBuilder()
-    {
-        var builder = listenTo(new Builder(this));
-        return builder
-            .withSettings(new BuildSettings(builder)
-                .withThreads(get(THREAD_COUNT)))
-            .parseCommandLine(commandLine());
-    }
-
     /**
-     * Called to execute the build
+     * {@inheritDoc}
      */
     @Override
-    public abstract void onBuild();
+    public abstract ObjectList<Builder> onBuild(Builder rootBuilder);
 
     /**
      * {@inheritDoc}
@@ -213,7 +203,7 @@ public abstract class BaseBuild extends Application implements Build
         return list(argumentParser(String.class)
             .oneOrMore()
             .converter(new IdentityConverter(this))
-            .description("Commands and phases")
+            .description("Build options and phases")
             .build());
     }
 
@@ -223,7 +213,9 @@ public abstract class BaseBuild extends Application implements Build
     @Override
     protected final void onRun()
     {
-        onBuild();
+        var builders = onBuild(listenTo(newBuilder()));
+        var rootBuilder = builders.get(0);
+        var dependencies = rootBuilder.graph();
     }
 
     /**
@@ -253,5 +245,14 @@ public abstract class BaseBuild extends Application implements Build
     private void copyFrom(BaseBuild that)
     {
         this.metadata = that.metadata;
+    }
+
+    private Builder newBuilder()
+    {
+        var builder = new Builder(this);
+        return builder
+            .withSettings(new BuildSettings(builder)
+                .withThreads(get(THREAD_COUNT)))
+            .parseCommandLine(commandLine());
     }
 }

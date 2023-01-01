@@ -23,8 +23,7 @@ import digital.fiasco.runtime.build.builder.Builder;
 @SuppressWarnings("unused")
 public interface Phase extends
     Named,
-    Described,
-    Runnable
+    Described
 {
     /**
      * Runs the given code <i>after</i> this phase runs

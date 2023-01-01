@@ -6,12 +6,13 @@ import com.telenav.kivakit.interfaces.naming.Named;
 
 import java.util.regex.Pattern;
 
+import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
 
 /**
  * An identifier that uniquely identifies an artifact, including its group, artifact identifier and version. Artifact
- * descriptors take the text form group:identifier:version.
+ * descriptors take the text form <b>group:artifact:version</b>.
  *
  * <p><b>Creation</b></p>
  *
@@ -25,7 +26,7 @@ import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
  * <ul>
  *     <li>{@link #name()} - The full name of this descriptor (group:identifier:version)</li>
  *     <li>{@link #group()} - The artifact group, like <i>com.telenav.kivakit</i></li>
- *     <li>{@link #identifier()} - The artifact identifier, like <i>kivakit-application</i></li>
+ *     <li>{@link #artifact()} - The artifact identifier, like <i>kivakit-application</i></li>
  *     <li>{@link #version()} - The artifact version, like <i>1.8.0</i></li>
  * </ul>
  *
@@ -38,9 +39,11 @@ import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
  * <p><b>Functional</b></p>
  *
  * <ul>
+ *     <li>{@link #withGroup(String)}</li>
  *     <li>{@link #withGroup(ArtifactGroup)}</li>
- *     <li>{@link #withIdentifier(String)}</li>
- *     <li>{@link #withIdentifier(ArtifactIdentifier)}</li>
+ *     <li>{@link #withArtifactIdentifier(String)}</li>
+ *     <li>{@link #withArtifactIdentifier(ArtifactIdentifier)}</li>
+ *     <li>{@link #withVersion(String)}</li>
  *     <li>{@link #withVersion(Version)}</li>
  * </ul>
  *
@@ -48,7 +51,7 @@ import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
  */
 @SuppressWarnings("unused")
 public record ArtifactDescriptor(ArtifactGroup group,
-                                 ArtifactIdentifier identifier,
+                                 ArtifactIdentifier artifact,
                                  Version version) implements Named
 {
     /** A lenient pattern for artifact descriptors */
@@ -83,10 +86,17 @@ public record ArtifactDescriptor(ArtifactGroup group,
         var matcher = DESCRIPTOR_PATTERN.matcher(text);
         if (matcher.matches())
         {
-            var group = new ArtifactGroup(matcher.group("group"));
-            var identifier = new ArtifactIdentifier(matcher.group("identifier"));
-            var version = Version.version(matcher.group("version"), LENIENT);
-            return new ArtifactDescriptor(group, identifier, version);
+            var group = matcher.group("group");
+            var identifier = matcher.group("identifier");
+            var version = matcher.group("version");
+            ensureNotNull(group);
+            return new ArtifactDescriptor(new ArtifactGroup(group),
+                identifier != null
+                    ? new ArtifactIdentifier(identifier)
+                    : null,
+                version != null
+                    ? Version.version(version, LENIENT)
+                    : null);
         }
         listener.problem("Unable to parse artifact descriptor: $", text);
         return null;
@@ -99,7 +109,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     public boolean isValid()
     {
-        return group != null && identifier != null && version != null;
+        return group != null && artifact != null && version != null;
     }
 
     /**
@@ -109,7 +119,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
     public String name()
     {
         return group
-            + (identifier == null ? "" : ":" + identifier)
+            + (artifact == null ? "" : ":" + artifact)
             + (version == null ? "" : ":" + version);
     }
 
@@ -120,6 +130,28 @@ public record ArtifactDescriptor(ArtifactGroup group,
     }
 
     /**
+     * Returns a copy of this descriptor with the given identifier
+     *
+     * @param artifact The identifier
+     * @return The copy
+     */
+    public ArtifactDescriptor withArtifactIdentifier(ArtifactIdentifier artifact)
+    {
+        return new ArtifactDescriptor(group, artifact, version);
+    }
+
+    /**
+     * Returns a copy of this descriptor with the given identifier
+     *
+     * @param artifact The identifier
+     * @return The copy
+     */
+    public ArtifactDescriptor withArtifactIdentifier(String artifact)
+    {
+        return withArtifactIdentifier(new ArtifactIdentifier(artifact));
+    }
+
+    /**
      * Returns a copy of this descriptor with the given group
      *
      * @param group The group
@@ -127,29 +159,29 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     public ArtifactDescriptor withGroup(ArtifactGroup group)
     {
-        return new ArtifactDescriptor(group, identifier, version);
+        return new ArtifactDescriptor(group, artifact, version);
     }
 
     /**
-     * Returns a copy of this descriptor with the given identifier
+     * Returns a copy of this descriptor with the given group
      *
-     * @param identifier The identifier
+     * @param group The group
      * @return The copy
      */
-    public ArtifactDescriptor withIdentifier(ArtifactIdentifier identifier)
+    public ArtifactDescriptor withGroup(String group)
     {
-        return new ArtifactDescriptor(group, identifier, version);
+        return withGroup(ArtifactGroup.group(group));
     }
 
     /**
-     * Returns a copy of this descriptor with the given identifier
+     * Returns a copy of this descriptor with the given version
      *
-     * @param identifier The identifier
-     * @return The copy
+     * @param version The version
+     * @return The descriptor
      */
-    public ArtifactDescriptor withIdentifier(String identifier)
+    public ArtifactDescriptor withVersion(String version)
     {
-        return withIdentifier(new ArtifactIdentifier(identifier));
+        return withVersion(Version.version(version));
     }
 
     /**
@@ -160,6 +192,6 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     public ArtifactDescriptor withVersion(Version version)
     {
-        return new ArtifactDescriptor(group, identifier, version);
+        return new ArtifactDescriptor(group, artifact, version);
     }
 }

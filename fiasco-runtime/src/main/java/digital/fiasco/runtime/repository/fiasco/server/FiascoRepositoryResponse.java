@@ -49,12 +49,12 @@ public class FiascoRepositoryResponse
     }
 
     /** The list of artifact content metadata */
-    private transient final ObjectList<Artifact<?>> artifacts = list();
+    private transient final ObjectList<Artifact> artifacts = list();
 
     /**
      * Returns the artifacts that have been added to this response
      */
-    public ObjectList<Artifact<?>> artifacts()
+    public ObjectList<Artifact> artifacts()
     {
         return artifacts;
     }
@@ -75,7 +75,7 @@ public class FiascoRepositoryResponse
      *
      * @param artifact The artifact to add
      */
-    FiascoRepositoryResponse add(Artifact<?> artifact)
+    FiascoRepositoryResponse add(Artifact artifact)
     {
         artifacts.add(artifact);
         return this;
@@ -86,7 +86,7 @@ public class FiascoRepositoryResponse
      *
      * @param artifacts The artifacts to add
      */
-    void addAll(Collection<Artifact<?>> artifacts)
+    void addAll(Collection<Artifact> artifacts)
     {
         artifacts.forEach(this::add);
     }

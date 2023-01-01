@@ -9,11 +9,14 @@ import digital.fiasco.runtime.repository.Repository;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
+import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
+import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONTENT_SUFFIX;
 
 /**
- * Represents an artifact, either an {@link ArtifactType#ASSET}, or an {@link ArtifactType#LIBRARY}.
+ * Represents an artifact, either an {@link Asset} or a {@link Library}
  *
  * <p><b>Repository</b></p>
  *
@@ -25,12 +28,10 @@ import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
  *
  * <ul>
  *     <li>{@link #descriptor()}</li>
- *     <li>{@link #type()}</li>
  *     <li>{@link #version(String)}</li>
  *     <li>{@link #version(Version)}</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)}</li>
- *     <li>{@link #withIdentifier(String)}</li>
- *     <li>{@link #withType(ArtifactType)}</li>
+ *     <li>{@link #withArtifactIdentifier(String)}</li>
  *     <li>{@link #withVersion(Version)}</li>
  * </ul>
  *
@@ -64,8 +65,7 @@ import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
  *     <li>{@link #withContent(ArtifactContent)}</li>
  *     <li>{@link #withDependencies(DependencyList)} - Returns this artifact with the given dependencies</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
- *     <li>{@link #withIdentifier(String)} - Returns this artifact with the given identifier</li>
- *     <li>{@link #withType(ArtifactType)} - Returns this artifact with the given type</li>
+ *     <li>{@link #withArtifactIdentifier(String)} - Returns this artifact with the given identifier</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #withoutDependencies(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
  *     <li>{@link #withoutDependencies(String...)} - Returns this artifact without the given dependencies</li>
@@ -89,7 +89,7 @@ import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifact<A>
+public abstract class BaseArtifact implements Artifact
 {
     /** The repository where this artifact is hosted */
     private Repository repository;
@@ -97,11 +97,8 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     /** The descriptor for this artifact */
     protected ArtifactDescriptor descriptor;
 
-    /** The type of artifact, either an asset or a library */
-    protected ArtifactType type;
-
     /** List of dependent artifacts */
-    protected DependencyList dependencies;
+    protected DependencyList dependencies = dependencyList();
 
     /** Dependency exclusions for this artifact */
     private ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptAll());
@@ -124,11 +121,10 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
      *
      * @param that The artifact to copy
      */
-    protected BaseArtifact(A that)
+    protected BaseArtifact(BaseArtifact that)
     {
         this.repository = that.repository();
         this.descriptor = that.descriptor();
-        this.type = that.type();
         this.dependencies = that.dependencies().copy();
         this.exclusions = that.exclusions().copy();
         this.attachments = that.attachments().copy();
@@ -216,7 +212,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
         var dependencies = stringList();
         for (var at : dependencies())
         {
-            if (at instanceof Artifact<?> artifact)
+            if (at instanceof Artifact artifact)
             {
                 var descriptor = artifact.descriptor();
                 dependencies.add("""
@@ -227,7 +223,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
                         </dependency>
                          """,
                     descriptor.group(),
-                    descriptor.identifier(),
+                    descriptor.artifact(),
                     descriptor.version());
             }
         }
@@ -247,7 +243,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
                 </project>
                   """,
             descriptor.group(),
-            descriptor.identifier(),
+            descriptor.artifact(),
             descriptor.version(),
             dependencies
                 .indented(2)
@@ -270,12 +266,15 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a copy of this artifact with the given identifier
+     *
+     * @param artifact The new artifact identifier
+     * @return The new artifact
      */
     @Override
-    public final ArtifactType type()
+    public Artifact withArtifactIdentifier(String artifact)
     {
-        return type;
+        return withDescriptor(descriptor().withArtifactIdentifier(artifact));
     }
 
     /**
@@ -284,10 +283,23 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
      * @param attachment The content to attach
      */
     @Override
-    public A withAttachment(ArtifactAttachment attachment)
+    public Artifact withAttachment(ArtifactAttachment attachment)
     {
         var copy = copy();
         copy.attachments().put(attachment.suffix(), attachment);
+        return copy;
+    }
+
+    /**
+     * Returns primary content attachment for this asset
+     *
+     * @return The content
+     */
+    @Override
+    public Artifact withContent(ArtifactContent content)
+    {
+        var copy = copy();
+        copy.withAttachment(new ArtifactAttachment(this, CONTENT_SUFFIX, content));
         return copy;
     }
 
@@ -298,9 +310,9 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
      * @return The new artifact
      */
     @Override
-    public A withDependencies(DependencyList dependencies)
+    public Artifact withDependencies(DependencyList dependencies)
     {
-        var copy = copy();
+        var copy = (BaseArtifact) copy();
         copy.dependencies = dependencies.copy();
         return copy;
     }
@@ -312,25 +324,23 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
      * @return The new artifact
      */
     @Override
-    public A withDescriptor(ArtifactDescriptor descriptor)
+    public Artifact withDescriptor(ArtifactDescriptor descriptor)
     {
-        var copy = copy();
+        var copy = (BaseArtifact) copy();
         copy.descriptor = descriptor;
         return copy;
     }
 
     /**
-     * Returns a copy of this artifact with the given artifact type
+     * Returns a copy of this artifact with the given version
      *
-     * @param type The new artifact type
+     * @param version The new version
      * @return The new artifact
      */
     @Override
-    public A withType(ArtifactType type)
+    public Artifact withVersion(Version version)
     {
-        var copy = copy();
-        copy.type = type;
-        return copy;
+        return withDescriptor(descriptor().withVersion(version));
     }
 
     /**
@@ -340,10 +350,35 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
      * @return The new artifact
      */
     @Override
-    public A withoutDependencies(Matcher<ArtifactDescriptor> pattern)
+    public Artifact withoutDependencies(Matcher<ArtifactDescriptor> pattern)
     {
-        var copy = copy();
-        ((BaseArtifact<?>) copy).exclusions.add(pattern);
+        var copy = (BaseArtifact) copy();
+        copy.exclusions.add(pattern);
         return copy;
+    }
+
+    /**
+     * Returns a copy of this artifact that excludes the given descriptors from its dependencies
+     *
+     * @param exclude The descriptors to exclude
+     * @return The new artifact
+     */
+    @Override
+    public Artifact withoutDependencies(ArtifactDescriptor... exclude)
+    {
+        return withoutDependencies(library -> arrayContains(exclude, library));
+    }
+
+    /**
+     * Returns a copy of this artifact that excludes the given descriptors from its dependencies
+     *
+     * @param exclude The descriptors to exclude
+     * @return The new artifact
+     */
+    @Override
+    public Artifact withoutDependencies(String... exclude)
+    {
+        var descriptors = list(exclude).map(ArtifactDescriptor::artifactDescriptor);
+        return withoutDependencies(descriptors::contains);
     }
 }
