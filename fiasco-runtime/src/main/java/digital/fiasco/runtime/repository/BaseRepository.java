@@ -1,10 +1,10 @@
 package digital.fiasco.runtime.repository;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.core.thread.locks.ReadWriteLock;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.repository.fiasco.CacheFiascoRepository;
 import digital.fiasco.runtime.repository.fiasco.LocalFiascoRepository;
@@ -12,11 +12,12 @@ import digital.fiasco.runtime.repository.fiasco.RemoteFiascoRepository;
 import digital.fiasco.runtime.repository.fiasco.server.FiascoClient;
 import digital.fiasco.runtime.repository.fiasco.server.FiascoServer;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
-import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 import java.util.Collection;
 import java.util.Objects;
+
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 
 /**
  * Base class for repositories of artifacts and their metadata. Subclasses include:
@@ -91,11 +92,6 @@ import java.util.Objects;
  */
 public abstract class BaseRepository extends BaseRepeater implements Repository
 {
-    protected interface ArtifactAttachmentVisitor
-    {
-        void visit(ArtifactAttachment attachment);
-    }
-
     /** The name of this repository */
     private final String name;
 
@@ -173,28 +169,8 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
         return lock;
     }
 
-    protected void visitArtifactAttachments(@NotNull Artifact artifact,
-                                            @NotNull ArtifactAttachmentVisitor visitor)
+    protected ObjectList<Artifact> resolve(Iterable<ArtifactDescriptor> descriptors)
     {
-        for (var attachment : artifact.attachments().values())
-        {
-            visitor.visit(attachment);
-        }
-    }
-
-    protected void visitArtifactAttachments(@NotNull Collection<ArtifactDescriptor> descriptors,
-                                            @NotNull ArtifactAttachmentVisitor visitor)
-    {
-        descriptors.forEach(at ->
-        {
-            // get the artifact,
-            var artifact = artifacts.get(at);
-
-            // go through its content attachments,
-            for (var attachment : artifact.attachments().values())
-            {
-                visitor.visit(attachment);
-            }
-        });
+        return list(descriptors).map(artifacts::get);
     }
 }

@@ -32,7 +32,7 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  *
  * @author Jonathan Locke
  */
-@SuppressWarnings("UnusedReturnValue")
+@SuppressWarnings({ "UnusedReturnValue", "unused" })
 public class FiascoRepositoryResponse
 {
     /**
@@ -49,7 +49,7 @@ public class FiascoRepositoryResponse
     }
 
     /** The list of artifact content metadata */
-    private transient final ObjectList<Artifact> artifacts = list();
+    private transient ObjectList<Artifact> artifacts = list();
 
     /**
      * Returns the artifacts that have been added to this response
@@ -64,21 +64,9 @@ public class FiascoRepositoryResponse
      */
     public String toJson()
     {
-        var serializer = new GsonObjectSerializer();
         var serialized = new StringOutputResource();
-        serializer.writeObject(serialized, new SerializableObject<>(this));
+        new GsonObjectSerializer().writeObject(serialized, new SerializableObject<>(this));
         return serialized.string();
-    }
-
-    /**
-     * Adds the given artifact to this response
-     *
-     * @param artifact The artifact to add
-     */
-    FiascoRepositoryResponse add(Artifact artifact)
-    {
-        artifacts.add(artifact);
-        return this;
     }
 
     /**
@@ -86,8 +74,22 @@ public class FiascoRepositoryResponse
      *
      * @param artifacts The artifacts to add
      */
-    void addAll(Collection<Artifact> artifacts)
+    FiascoRepositoryResponse with(Collection<Artifact> artifacts)
     {
-        artifacts.forEach(this::add);
+        var copy = new FiascoRepositoryResponse();
+        copy.artifacts = this.artifacts.with(artifacts);
+        return copy;
+    }
+
+    /**
+     * Adds the given artifact to this response
+     *
+     * @param artifact The artifact to add
+     */
+    FiascoRepositoryResponse with(Artifact... artifact)
+    {
+        var copy = new FiascoRepositoryResponse();
+        copy.artifacts = artifacts.with(artifact);
+        return copy;
     }
 }

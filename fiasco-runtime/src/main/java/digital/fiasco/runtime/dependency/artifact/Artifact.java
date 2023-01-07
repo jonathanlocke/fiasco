@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.dependency.artifact;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
@@ -14,6 +15,8 @@ import digital.fiasco.runtime.repository.Repository;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.core.version.Version.parseVersion;
+import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
+import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_VERSION;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONTENT_SUFFIX;
 
 /**
@@ -50,7 +53,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONT
  * <p><b>Attachments</b></p>
  *
  * <ul>
- *     <li>{@link #attachments()}</li>
+ *     <li>{@link #attachmentMap()}</li>
  *     <li>{@link #attachment(String)}</li>
  *     <li>{@link #withAttachment(ArtifactAttachment)}</li>
  * </ul>
@@ -102,7 +105,7 @@ public interface Artifact extends Dependency
     {
         var serialized = new StringResource(json);
         var serializer = new GsonObjectSerializer();
-        return serializer.readObject(serialized, BaseArtifact.class).object();
+        return (Artifact) serializer.readObject(serialized, METADATA_OBJECT_TYPE, METADATA_OBJECT_VERSION).object();
     }
 
     /**
@@ -114,11 +117,16 @@ public interface Artifact extends Dependency
     ArtifactAttachment attachment(String suffix);
 
     /**
-     * Returns the list of all attached resources
+     * Returns a map from descriptor to artifact attachment of all attached resources
      *
      * @return The attachments
      */
-    ObjectMap<String, ArtifactAttachment> attachments();
+    ObjectMap<String, ArtifactAttachment> attachmentMap();
+
+    default ObjectList<ArtifactAttachment> attachments()
+    {
+        return list(attachmentMap().values());
+    }
 
     /**
      * Returns primary content attachment for this asset
@@ -182,7 +190,7 @@ public interface Artifact extends Dependency
     {
         var serializer = new GsonObjectSerializer();
         var serialized = new StringOutputResource();
-        serializer.writeObject(serialized, new SerializableObject<>(this));
+        serializer.writeObject(serialized, new SerializableObject<>(this), METADATA_OBJECT_TYPE, METADATA_OBJECT_VERSION);
         return serialized.string();
     }
 

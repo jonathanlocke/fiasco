@@ -12,7 +12,6 @@ import digital.fiasco.runtime.repository.fiasco.server.FiascoServer;
 import java.net.URI;
 import java.util.Collection;
 
-import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 
 /**
@@ -71,24 +70,18 @@ public class RemoteFiascoRepository extends BaseRepository
     }
 
     /**
-     * Gets the artifacts for the given artifact descriptors
+     * Resolves artifacts for the given artifact descriptors
      *
      * @param descriptors The artifact descriptors
-     * @return The artifacts
+     * @return The resolved artifacts
      */
     @Override
     public synchronized ObjectList<Artifact> resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
     {
-        // Create list of resolved artifacts,
-        ObjectList<Artifact> resolved = list();
-
-        // compose request for descriptors,
-        var request = new FiascoRepositoryRequest();
-        request.addAll(descriptors);
-
-        // make request to server
-        var response = new FiascoClient().request(this, request);
-        resolved.addAll(response.artifacts());
-        return resolved;
+        // Return resolved artifacts for the given descriptors
+        return new FiascoClient()
+            .request(this, new FiascoRepositoryRequest()
+                .with(descriptors))
+            .artifacts();
     }
 }

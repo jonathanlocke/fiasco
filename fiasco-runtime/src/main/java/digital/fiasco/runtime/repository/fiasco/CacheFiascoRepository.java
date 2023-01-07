@@ -1,18 +1,14 @@
 package digital.fiasco.runtime.repository.fiasco;
 
-import com.telenav.kivakit.core.collections.list.ObjectList;
-import com.telenav.kivakit.core.value.mutable.MutableValue;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.resource.resources.ResourceSection;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 
 import java.util.Collection;
 
-import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.resource.WriteMode.APPEND;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
@@ -53,7 +49,7 @@ import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
 public class CacheFiascoRepository extends LocalFiascoRepository
 {
     /** The binary file containing artifacts, laid out end-to-end */
-    private final File attachmentsFile = cacheFile("attachments.binary");
+    private final File artifactContentFile = repositoryRootFile("artifact-content.binary");
 
     public CacheFiascoRepository(String name, Folder rootFolder)
     {
@@ -72,20 +68,21 @@ public class CacheFiascoRepository extends LocalFiascoRepository
      * @param artifact The artifact to install
      */
     @Override
-    public void installArtifact(final Artifact artifact)
+    public void installArtifact(Artifact artifact)
     {
         lock().write(() ->
         {
             try
             {
                 // Append each attachment to the attachments file,
-                var updated = new MutableValue<>(artifact);
-                visitArtifactAttachments(artifact, attachment ->
-                    updated.set(updated.get()
-                        .withAttachment(appendAttachment(attachment))));
+                var source = artifact;
+                for (var attachment : source.attachments())
+                {
+                    source = source.withAttachment(saveAttachment(attachment));
+                }
 
                 // then append the updated metadata.
-                appendArtifactMetadata(updated.get());
+                super.saveArtifactMetadata(source);
             }
             catch (Exception e)
             {
@@ -95,58 +92,49 @@ public class CacheFiascoRepository extends LocalFiascoRepository
     }
 
     /**
-     * Gets the artifacts for the given artifact descriptors
+     * Resolves an artifact's attachments by reading their content
      *
-     * @param descriptors The artifact descriptors
-     * @return The artifacts
+     * @param artifact The artifact
+     * @return The artifact with attachments populated with content
      */
     @Override
-    public ObjectList<Artifact> resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
+    protected Artifact loadArtifactContent(Artifact artifact)
     {
-        return lock().read(() ->
+        for (var attachment : artifact.attachments())
         {
-            ObjectList<Artifact> resolved = list();
+            var content = attachment.content();
+            var start = content.offset();
+            var end = start + content.size().asBytes();
 
-            // For each artifact attachment,
-            visitArtifactAttachments(descriptors, attachment ->
-            {
-                // get the section of the attachments file for the attachment,
-                var content = attachment.content();
-                var start = content.offset();
-                var end = start + content.size().asBytes();
-                var resource = new ResourceSection(attachmentsFile, start, end);
-
-                // and resolve the artifact content.
-                resolved.add(attachment.artifact().withAttachment(
-                    attachment.withContent(content.withResource(resource))));
-            });
-
-            return resolved;
-        });
+            artifact = artifact.withAttachment(attachment
+                .withContent(attachment.content()
+                    .withResource(new ResourceSection(artifactContentFile, start, end))));
+        }
+        return artifact;
     }
 
     /**
-     * Saves the given content into the content file, returning the given {@link ArtifactContent} with the offset, size,
-     * and last modified time populated.
+     * Saves the given content attachment into the omnibus content file, returning the given {@link ArtifactContent}
+     * with the offset, size, and last modified time populated.
      *
      * @param attachment The artifact attachment to append to the attachments file
      * @throws IllegalStateException Thrown if the content cannot be attached
      */
-    private ArtifactAttachment appendAttachment(ArtifactAttachment attachment)
+    private ArtifactAttachment saveAttachment(ArtifactAttachment attachment)
     {
         var content = attachment.content();
 
         try
         {
             // Get the start of this content in the attachments file,
-            var start = attachmentsFile.sizeInBytes().asLong();
+            var start = artifactContentFile.sizeInBytes().asLong();
 
             // get the size of the content and its time of last modification
             var size = content.resource().sizeInBytes();
             var lastModified = content.lastModified();
 
             // append the content to the attachments file,
-            content.resource().copyTo(attachmentsFile, APPEND);
+            content.resource().copyTo(artifactContentFile, APPEND);
 
             // and return the artifact with its new content information.
             return attachment.withContent(content

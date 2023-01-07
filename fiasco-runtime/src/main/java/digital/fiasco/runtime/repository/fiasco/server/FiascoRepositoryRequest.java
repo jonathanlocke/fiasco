@@ -11,6 +11,7 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import java.io.InputStream;
 import java.util.Collection;
 
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 
 /**
@@ -21,7 +22,7 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
  * <p><b>Descriptors</b></p>
  *
  * <ul>
- *     <li>{@link #add(ArtifactDescriptor)}</li>
+ *     <li>{@link #with(ArtifactDescriptor)}</li>
  *     <li>{@link #addAll(Collection)}</li>
  *     <li>{@link #descriptors()}</li>
  * </ul>
@@ -45,35 +46,13 @@ public class FiascoRepositoryRequest
      */
     public static FiascoRepositoryRequest requestFromJson(String json)
     {
-        var serialized = new StringResource(json);
-        var serializer = new GsonObjectSerializer();
-        return serializer.readObject(serialized, FiascoRepositoryRequest.class).object();
+        return new GsonObjectSerializer()
+            .readObject(new StringResource(json), FiascoRepositoryRequest.class)
+            .object();
     }
 
     /** The artifacts to retrieve */
     private final StringList descriptors = stringList();
-
-    /**
-     * Adds an artifact to retrieve
-     *
-     * @param descriptor The artifact descriptor
-     * @return This request for chaining
-     */
-    public FiascoRepositoryRequest add(ArtifactDescriptor descriptor)
-    {
-        descriptors.add(descriptor.name());
-        return this;
-    }
-
-    /**
-     * Adds the give list of descriptors to this request
-     *
-     * @param descriptors The descriptors to add
-     */
-    public void addAll(Collection<ArtifactDescriptor> descriptors)
-    {
-        descriptors.forEach(this::add);
-    }
 
     /**
      * Returns the artifact descriptors for this request
@@ -92,5 +71,29 @@ public class FiascoRepositoryRequest
         var serialized = new StringOutputResource();
         serializer.writeObject(serialized, new SerializableObject<>(this));
         return serialized.string();
+    }
+
+    /**
+     * Returns a copy of this request with the given artifact descriptors added
+     *
+     * @param descriptors The descriptors to add
+     * @return A copy of this request with the given desriptors added
+     */
+    public FiascoRepositoryRequest with(Iterable<ArtifactDescriptor> descriptors)
+    {
+        var request = new FiascoRepositoryRequest();
+        descriptors.forEach(descriptor -> request.descriptors.add(descriptor.name()));
+        return request;
+    }
+
+    /**
+     * Returns a copy of this request with the given artifact descriptors added
+     *
+     * @param descriptors The artifact descriptors
+     * @return A copy of this request with the given desriptors added
+     */
+    public FiascoRepositoryRequest with(ArtifactDescriptor... descriptors)
+    {
+        return with(list(descriptors));
     }
 }

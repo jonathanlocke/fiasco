@@ -49,7 +49,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONT
  * <p><b>Attachments</b></p>
  *
  * <ul>
- *     <li>{@link #attachments()}</li>
+ *     <li>{@link #attachmentMap()}</li>
  *     <li>{@link #attachment(String)}</li>
  *     <li>{@link #withAttachment(ArtifactAttachment)}</li>
  * </ul>
@@ -127,7 +127,7 @@ public abstract class BaseArtifact implements Artifact
         this.descriptor = that.descriptor();
         this.dependencies = that.dependencies().copy();
         this.exclusions = that.exclusions().copy();
-        this.attachments = that.attachments().copy();
+        this.attachments = that.attachmentMap().copy();
     }
 
     protected BaseArtifact()
@@ -152,7 +152,7 @@ public abstract class BaseArtifact implements Artifact
      * @return The attachments
      */
     @Override
-    public final ObjectMap<String, ArtifactAttachment> attachments()
+    public final ObjectMap<String, ArtifactAttachment> attachmentMap()
     {
         return attachments;
     }
@@ -286,7 +286,7 @@ public abstract class BaseArtifact implements Artifact
     public Artifact withAttachment(ArtifactAttachment attachment)
     {
         var copy = copy();
-        copy.attachments().put(attachment.suffix(), attachment);
+        copy.attachmentMap().put(attachment.suffix(), attachment);
         return copy;
     }
 
