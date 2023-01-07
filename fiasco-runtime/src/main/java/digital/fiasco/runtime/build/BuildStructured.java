@@ -16,7 +16,6 @@ import static com.telenav.kivakit.resource.ResourceGlob.glob;
  *
  * <ul>
  *     <li>{@link #rootFolder()}</li>
- *     <li>{@link #withRootFolder(Folder)}</li>
  * </ul>
  *
  * <p><b>Source Folders</b></p>

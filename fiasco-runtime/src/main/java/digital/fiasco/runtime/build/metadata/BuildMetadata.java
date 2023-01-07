@@ -2,60 +2,103 @@ package digital.fiasco.runtime.build.metadata;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.string.FormatProperty;
-import digital.fiasco.runtime.dependency.artifact.Artifact;
+import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 
 /**
  * The metadata for a build.
  *
+ * @param artifactDescriptor The type of artifact that is built
  * @param description A description of the project being built
- * @param artifactType The type of artifact that is built
- * @param organization The organization responsible for the artifact
- * @param copyright Any copyright
- * @param license Any license
+ * @param copyrights Any copyright
+ * @param licenses Any license
  * @param resources Locations of resources for developers
+ * @param organizations The organization responsible for the artifact
  * @param contributors The project contributors
  */
 @SuppressWarnings("unused")
-public record BuildMetadata(@FormatProperty String description,
-                            @FormatProperty Class<? extends Artifact> artifactType,
-                            @FormatProperty Organization organization,
-                            @FormatProperty Copyright copyright,
-                            @FormatProperty License license,
-                            @FormatProperty Resources resources,
+public record BuildMetadata(@FormatProperty ArtifactDescriptor artifactDescriptor,
+                            @FormatProperty String description,
+                            @FormatProperty ObjectList<Copyright> copyrights,
+                            @FormatProperty ObjectList<License> licenses,
+                            @FormatProperty ObjectList<ProjectResource> resources,
+                            @FormatProperty ObjectList<MailingList> mailingLists,
+                            @FormatProperty ObjectList<Organization> organizations,
                             @FormatProperty ObjectList<Contributor> contributors)
 {
-    public BuildMetadata()
+    public static BuildMetadata buildMetadata()
     {
-        this(null, null, null, null, null, null, null);
+        return new BuildMetadata(null, null, list(), list(), list(), list(), list(), list());
     }
 
-    public BuildMetadata withContributors(ObjectList<Contributor> contributors)
+    public BuildMetadata withArtifactDescriptor(String artifactDescriptor)
     {
-        return new BuildMetadata(description, artifactType, organization, copyright, license, resources, contributors);
+        return withArtifactDescriptor(ArtifactDescriptor.artifactDescriptor(artifactDescriptor));
+    }
+
+    public BuildMetadata withArtifactDescriptor(ArtifactDescriptor artifactDescriptor)
+    {
+        return new BuildMetadata(artifactDescriptor, description, copyrights, licenses, resources, mailingLists, organizations, contributors);
+    }
+
+    public BuildMetadata withContributor(Contributor contributor)
+    {
+        return withContributors(contributor);
+    }
+
+    public BuildMetadata withContributors(Contributor... contributors)
+    {
+        return new BuildMetadata(artifactDescriptor, description, copyrights, licenses, resources, mailingLists, organizations, this.contributors.with(contributors));
     }
 
     public BuildMetadata withCopyright(Copyright copyright)
     {
-        return new BuildMetadata(description, artifactType, organization, copyright, license, resources, contributors);
+        return withCopyrights(copyright);
+    }
+
+    public BuildMetadata withCopyrights(Copyright... copyrights)
+    {
+        return new BuildMetadata(artifactDescriptor, description, this.copyrights.with(copyrights), licenses, resources, mailingLists, organizations, contributors);
     }
 
     public BuildMetadata withDescription(String description)
     {
-        return new BuildMetadata(description, artifactType, organization, copyright, license, resources, contributors);
+        return new BuildMetadata(artifactDescriptor, description, copyrights, licenses, resources, mailingLists, organizations, contributors);
     }
 
     public BuildMetadata withLicense(License license)
     {
-        return new BuildMetadata(description, artifactType, organization, copyright, license, resources, contributors);
+        return withLicenses(license);
+    }
+
+    public BuildMetadata withLicenses(License... licenses)
+    {
+        return new BuildMetadata(artifactDescriptor, description, copyrights, this.licenses.with(licenses), resources, mailingLists, organizations, contributors);
+    }
+
+    public BuildMetadata withMailingLists(MailingList... mailingLists)
+    {
+        return new BuildMetadata(artifactDescriptor, description, copyrights, licenses, resources, this.mailingLists.with(mailingLists), organizations, contributors);
     }
 
     public BuildMetadata withOrganization(Organization organization)
     {
-        return new BuildMetadata(description, artifactType, organization, copyright, license, resources, contributors);
+        return withOrganizations(organization);
     }
 
-    public BuildMetadata withResources(Resources resources)
+    public BuildMetadata withOrganizations(Organization... organizations)
     {
-        return new BuildMetadata(description, artifactType, organization, copyright, license, resources, contributors);
+        return new BuildMetadata(artifactDescriptor, description, copyrights, licenses, resources, mailingLists, this.organizations.with(organizations), contributors);
+    }
+
+    public BuildMetadata withProjectResource(ProjectResource resource)
+    {
+        return new BuildMetadata(artifactDescriptor, description, copyrights, licenses, resources, mailingLists, organizations, contributors);
+    }
+
+    public BuildMetadata withProjectResources(ProjectResource... resources)
+    {
+        return new BuildMetadata(artifactDescriptor, description, copyrights, licenses, this.resources.with(resources), mailingLists, organizations, contributors);
     }
 }

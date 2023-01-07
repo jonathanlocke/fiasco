@@ -20,6 +20,7 @@ import java.util.function.Function;
 
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.version.Version.version;
+import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
@@ -55,8 +56,6 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
  *     <li>{@link #pinVersion(Artifact, Version)}</li>
  *     <li>{@link #requires(Artifact, Artifact[])}</li>
  *     <li>{@link #requires(DependencyList)}</li>
- *     <li>{@link #withAdditionalDependencies(Artifact, Artifact[])}</li>
- *     <li>{@link #withAdditionalDependencies(DependencyList)}</li>
  *     <li>{@link #withDependencies(Artifact, Artifact[])}</li>
  *     <li>{@link #withDependencies(DependencyList)}</li>
  * </ul>
@@ -132,6 +131,7 @@ public class BuildSettings
         this.phases = new StandardPhases(builder);
         this.dependencies = dependencyList();
         this.librarian = builder.newLibrarian();
+        this.rootFolder = currentFolder();
     }
 
     /**
@@ -340,7 +340,7 @@ public class BuildSettings
      */
     public BuildSettings requires(Artifact first, Artifact... rest)
     {
-        dependencies = dependencies.withAdditionalDependencies(first, rest);
+        dependencies = dependencies.with(first, rest);
         return this;
     }
 
@@ -351,7 +351,7 @@ public class BuildSettings
      */
     public BuildSettings requires(DependencyList dependencies)
     {
-        this.dependencies = this.dependencies.withAdditionalDependencies(dependencies);
+        this.dependencies = this.dependencies.with(dependencies);
         return this;
     }
 
@@ -382,33 +382,6 @@ public class BuildSettings
     }
 
     /**
-     * Returns a copy of this object with the given dependencies added
-     *
-     * @param first The first dependency
-     * @param rest The rest of the dependencies
-     * @return The copy
-     */
-    public BuildSettings withAdditionalDependencies(Artifact first, Artifact... rest)
-    {
-        var copy = copy();
-        copy.dependencies = dependencies.withAdditionalDependencies(first, rest);
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this object with the given dependencies added
-     *
-     * @param dependencies The dependencies
-     * @return The copy
-     */
-    public BuildSettings withAdditionalDependencies(DependencyList dependencies)
-    {
-        var copy = copy();
-        copy.dependencies = dependencies.withAdditionalDependencies(dependencies);
-        return copy;
-    }
-
-    /**
      * Returns a copy of this object with the given dependencies
      *
      * @param first The first dependency
@@ -418,7 +391,7 @@ public class BuildSettings
     public BuildSettings withDependencies(Artifact first, Artifact... rest)
     {
         var copy = copy();
-        copy.dependencies = dependencies.withDependencies(first, rest);
+        copy.dependencies = dependencies.with(first, rest);
         return copy;
     }
 
@@ -431,7 +404,7 @@ public class BuildSettings
     public BuildSettings withDependencies(DependencyList dependencies)
     {
         var copy = copy();
-        copy.dependencies = dependencies.withDependencies(dependencies);
+        copy.dependencies = dependencies.with(dependencies);
         return copy;
     }
 

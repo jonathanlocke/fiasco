@@ -5,7 +5,7 @@ package digital.fiasco.runtime.build.metadata;
  *
  * @author Jonathan Locke
  */
-public enum Role
+public enum ProjectRole
 {
     ORIGINATOR,
     ARCHITECT,

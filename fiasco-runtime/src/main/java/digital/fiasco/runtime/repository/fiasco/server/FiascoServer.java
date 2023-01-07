@@ -26,7 +26,7 @@ import static com.telenav.kivakit.resource.WriteMode.STREAM;
 public class FiascoServer extends Application
 {
     /** The well-known Fiasco server port */
-    public static int FIASCO_PORT = 25_555;
+    public static final int FIASCO_PORT = 25_555;
 
     /** The server's repository */
     private final Repository repository = new CacheFiascoRepository("server-repository");
@@ -59,7 +59,6 @@ public class FiascoServer extends Application
                     response.addAll(repository.resolveArtifacts(request.descriptors()));
 
                     // push the header to the requester.
-                    @SuppressWarnings("resource")
                     var printWriter = out.writer().printWriter();
                     printWriter.println(response.toJson());
                     printWriter.flush();

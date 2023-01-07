@@ -18,9 +18,14 @@ public record Contributor(@FormatProperty String name,
                           @FormatProperty String email,
                           @FormatProperty Organization organization,
                           @FormatProperty ZoneId timeZone,
-                          @FormatProperty ObjectList<Role> roles) implements Named
+                          @FormatProperty ObjectList<ProjectRole> roles) implements Named
 {
-    public Contributor(String name)
+    public static Contributor contributor(String name)
+    {
+        return new Contributor(name);
+    }
+
+    private Contributor(String name)
     {
         this(name, null, null, null, null, null);
     }
@@ -51,14 +56,14 @@ public record Contributor(@FormatProperty String name,
         return new Contributor(name, nickname, email, organization, timeZone, roles.copy());
     }
 
-    public Contributor withRole(Role role)
+    public Contributor withRole(ProjectRole role)
     {
         var copy = new Contributor(name, nickname, email, organization, timeZone, roles.copy());
         copy.roles.add(role);
         return copy;
     }
 
-    public Contributor withRoles(Role... roles)
+    public Contributor withRoles(ProjectRole... roles)
     {
         var copy = new Contributor(name, nickname, email, organization, timeZone, this.roles.copy());
         copy.roles.addAll(roles);

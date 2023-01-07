@@ -36,7 +36,7 @@ import static com.telenav.kivakit.core.string.Paths.pathTail;
 import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
 import static digital.fiasco.runtime.build.BuildOption.HELP;
-import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
 
 /**
@@ -133,10 +133,6 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
  *     <li>{@link #pinVersion(Artifact, Version)}</li>
  *     <li>{@link #requires(Artifact, Artifact[])}</li>
  *     <li>{@link #requires(DependencyList)}</li>
- *     <li>{@link #withAdditionalDependencies(Artifact, Artifact[])}</li>
- *     <li>{@link #withAdditionalDependencies(DependencyList)}</li>
- *     <li>{@link #withDependencies(Artifact, Artifact[])}</li>
- *     <li>{@link #withDependencies(DependencyList)}</li>
  * </ul>
  *
  * <p><b>Build Phases</b></p>
@@ -374,7 +370,6 @@ public class Builder extends BaseRepeater implements
     public Builder deriveBuilder(String path)
     {
         return withRootFolder(rootFolder().folder(path))
-            .withDependencies(dependencyList())
             .withTargetArtifactIdentifier(pathTail(path, '/'));
     }
 
@@ -668,7 +663,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder requires(DependencyList dependencies)
     {
-        settings = settings.withAdditionalDependencies(dependencies);
+        settings = settings.withDependencies(dependencies);
         return this;
     }
 
@@ -700,60 +695,6 @@ public class Builder extends BaseRepeater implements
     public Count threads()
     {
         return settings.threads();
-    }
-
-    /**
-     * Returns a copy of this object with the given dependencies added
-     *
-     * @param dependencies The dependencies
-     * @return The copy
-     */
-    public Builder withAdditionalDependencies(DependencyList dependencies)
-    {
-        var copy = copy();
-        copy.settings = settings.withAdditionalDependencies(dependencies);
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this object with the given dependencies added
-     *
-     * @param first The first dependency
-     * @param rest The rest of the dependencies
-     * @return The copy
-     */
-    public Builder withAdditionalDependencies(Artifact first, Artifact... rest)
-    {
-        var copy = copy();
-        copy.settings = settings.withAdditionalDependencies(first, rest);
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this object with the given dependencies
-     *
-     * @param first The first dependency
-     * @param rest The rest of the dependencies
-     * @return The copy
-     */
-    public Builder withDependencies(Artifact first, Artifact... rest)
-    {
-        var copy = copy();
-        copy.settings = settings.withDependencies(first, rest);
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this object with the given dependencies
-     *
-     * @param dependencies The dependencies
-     * @return The copy
-     */
-    public Builder withDependencies(DependencyList dependencies)
-    {
-        var copy = copy();
-        copy.settings = settings.withDependencies(dependencies);
-        return copy;
     }
 
     /**
@@ -802,7 +743,7 @@ public class Builder extends BaseRepeater implements
     public Builder withTargetArtifactDescriptor(String descriptor)
     {
         var copy = copy();
-        copy.settings = settings.withTargetArtifactDescriptor(ArtifactDescriptor.artifactDescriptor(descriptor));
+        copy.settings = settings.withTargetArtifactDescriptor(artifactDescriptor(descriptor));
         return copy;
     }
 

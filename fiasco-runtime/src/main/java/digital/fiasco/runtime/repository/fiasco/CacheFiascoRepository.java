@@ -79,7 +79,7 @@ public class CacheFiascoRepository extends LocalFiascoRepository
             try
             {
                 // Append each attachment to the attachments file,
-                var updated = new MutableValue<Artifact>(artifact);
+                var updated = new MutableValue<>(artifact);
                 visitArtifactAttachments(artifact, attachment ->
                     updated.set(updated.get()
                         .withAttachment(appendAttachment(attachment))));

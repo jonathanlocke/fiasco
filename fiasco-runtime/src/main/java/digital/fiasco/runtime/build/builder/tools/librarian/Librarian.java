@@ -90,7 +90,7 @@ public class Librarian extends BaseTool
                 if (resolved != null && artifact.excludes(resolved.descriptor()))
                 {
                     // add it to the dependencies list.
-                    dependencies = dependencies.withAdditionalDependencies(resolved);
+                    dependencies = dependencies.with(resolved);
                 }
             }
         }
@@ -108,7 +108,7 @@ public class Librarian extends BaseTool
                 if (resolved.first().excludes(resolved.first().descriptor()))
                 {
                     // add it to the dependencies.
-                    dependencies = dependencies.withAdditionalDependencies(library(resolved.first()));
+                    dependencies = dependencies.with(library(resolved.first()));
                     found = true;
                 }
             }

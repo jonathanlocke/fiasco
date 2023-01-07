@@ -214,8 +214,11 @@ public abstract class BaseBuild extends Application implements Build
     protected final void onRun()
     {
         var builders = onBuild(listenTo(newBuilder()));
-        var rootBuilder = builders.get(0);
+        var rootBuilder = builders
+            .get(0)
+            .withTargetArtifactDescriptor(metadata.artifactDescriptor());
         var dependencies = rootBuilder.graph();
+        onBuild(rootBuilder);
     }
 
     /**
