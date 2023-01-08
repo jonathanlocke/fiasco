@@ -87,7 +87,7 @@ public class Librarian extends BaseTool
             for (var resolved : dependencies(dependency).asArtifactList())
             {
                 // and if it is not excluded by the library,
-                if (resolved != null && artifact.excludes(resolved.descriptor()))
+                if (resolved != null && artifact.excludes(resolved.artifactDescriptor()))
                 {
                     // add it to the dependencies list.
                     dependencies = dependencies.with(resolved);
@@ -100,12 +100,12 @@ public class Librarian extends BaseTool
         for (var repository : repositories)
         {
             // resolve the library's descriptor to an artifact,
-            var descriptor = resolveArtifactVersion(artifact.descriptor());
+            var descriptor = resolveArtifactVersion(artifact.artifactDescriptor());
             var resolved = repository.resolveArtifacts(list(descriptor));
             if (resolved != null)
             {
                 // and if it isn't excluded,
-                if (resolved.first().excludes(resolved.first().descriptor()))
+                if (resolved.first().excludes(resolved.first().artifactDescriptor()))
                 {
                     // add it to the dependencies.
                     dependencies = dependencies.with(library(resolved.first()));
@@ -143,7 +143,7 @@ public class Librarian extends BaseTool
      */
     public Librarian install(Repository target, Artifact artifact)
     {
-        var resolved = target.resolveArtifacts(list(artifact.descriptor()));
+        var resolved = target.resolveArtifacts(list(artifact.artifactDescriptor()));
         target.installArtifact(resolved.first());
         return this;
     }
@@ -187,7 +187,7 @@ public class Librarian extends BaseTool
      */
     public Librarian pinVersion(Artifact artifact, Version version)
     {
-        var descriptor = artifact.descriptor();
+        var descriptor = artifact.artifactDescriptor();
         pinnedVersions.put(descriptor, version);
         return this;
     }
@@ -201,7 +201,7 @@ public class Librarian extends BaseTool
      */
     public Librarian pinVersion(Artifact artifact, String version)
     {
-        pinVersion(artifact.descriptor(), version(version));
+        pinVersion(artifact.artifactDescriptor(), version(version));
         return this;
     }
 

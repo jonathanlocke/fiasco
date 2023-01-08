@@ -31,7 +31,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONT
  * <p><b>Identity</b></p>
  *
  * <ul>
- *     <li>{@link #descriptor()}</li>
+ *     <li>{@link #artifactDescriptor()}</li>
  *     <li>{@link #version(String)}</li>
  *     <li>{@link #version(Version)}</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)}</li>
@@ -158,7 +158,7 @@ public interface Artifact extends Dependency
      *
      * @return The artifact descriptor
      */
-    ArtifactDescriptor descriptor();
+    ArtifactDescriptor artifactDescriptor();
 
     /**
      * Returns true if this artifact excludes the given artifact
@@ -218,7 +218,7 @@ public interface Artifact extends Dependency
      */
     default Artifact withArtifactIdentifier(String artifact)
     {
-        return withDescriptor(descriptor().withArtifactIdentifier(artifact));
+        return withDescriptor(artifactDescriptor().withArtifactIdentifier(artifact));
     }
 
     /**
@@ -264,7 +264,7 @@ public interface Artifact extends Dependency
      */
     default Artifact withVersion(Version version)
     {
-        return withDescriptor(descriptor().withVersion(version));
+        return withDescriptor(artifactDescriptor().withVersion(version));
     }
 
     /**

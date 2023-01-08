@@ -235,7 +235,7 @@ public class LocalFiascoRepository extends BaseRepository
                 var entry = artifactFromJson(at);
 
                 // and put the entry into the entries map.
-                artifacts().put(entry.descriptor(), entry);
+                artifacts().put(entry.artifactDescriptor(), entry);
             }
         });
     }
@@ -279,7 +279,7 @@ public class LocalFiascoRepository extends BaseRepository
      */
     private Folder repositoryFolder(Artifact artifact)
     {
-        var descriptor = artifact.descriptor();
+        var descriptor = artifact.artifactDescriptor();
         return rootFolder.folder(descriptor.group().name().replaceAll("\\.", "/") + "/" + descriptor.artifact() + "-" + descriptor.version());
     }
 }

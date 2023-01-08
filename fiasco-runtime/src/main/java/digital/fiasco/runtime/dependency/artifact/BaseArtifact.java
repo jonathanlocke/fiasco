@@ -27,7 +27,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONT
  * <p><b>Identity</b></p>
  *
  * <ul>
- *     <li>{@link #descriptor()}</li>
+ *     <li>{@link #artifactDescriptor()}</li>
  *     <li>{@link #version(String)}</li>
  *     <li>{@link #version(Version)}</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)}</li>
@@ -124,7 +124,7 @@ public abstract class BaseArtifact implements Artifact
     protected BaseArtifact(BaseArtifact that)
     {
         this.repository = that.repository();
-        this.descriptor = that.descriptor();
+        this.descriptor = that.artifactDescriptor();
         this.dependencies = that.dependencies().copy();
         this.exclusions = that.exclusions().copy();
         this.attachments = that.attachmentMap().copy();
@@ -170,7 +170,7 @@ public abstract class BaseArtifact implements Artifact
      * {@inheritDoc}
      */
     @Override
-    public final ArtifactDescriptor descriptor()
+    public final ArtifactDescriptor artifactDescriptor()
     {
         return descriptor;
     }
@@ -214,7 +214,7 @@ public abstract class BaseArtifact implements Artifact
         {
             if (at instanceof Artifact artifact)
             {
-                var descriptor = artifact.descriptor();
+                var descriptor = artifact.artifactDescriptor();
                 dependencies.add("""
                         <dependency>
                           <groupId>$</groupId>
@@ -274,7 +274,7 @@ public abstract class BaseArtifact implements Artifact
     @Override
     public Artifact withArtifactIdentifier(String artifact)
     {
-        return withDescriptor(descriptor().withArtifactIdentifier(artifact));
+        return withDescriptor(artifactDescriptor().withArtifactIdentifier(artifact));
     }
 
     /**
@@ -340,7 +340,7 @@ public abstract class BaseArtifact implements Artifact
     @Override
     public Artifact withVersion(Version version)
     {
-        return withDescriptor(descriptor().withVersion(version));
+        return withDescriptor(artifactDescriptor().withVersion(version));
     }
 
     /**

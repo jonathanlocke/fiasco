@@ -103,7 +103,7 @@ public class MavenRepository extends BaseRepository
     {
         lock().write(() ->
         {
-            var descriptor = artifact.descriptor();
+            var descriptor = artifact.artifactDescriptor();
             mavenWriteContent(artifact.attachment(CONTENT_SUFFIX));
             if (artifact instanceof Library library)
             {
@@ -186,7 +186,7 @@ public class MavenRepository extends BaseRepository
      */
     private FileName mavenFileName(Artifact artifact, String suffix)
     {
-        var descriptor = artifact.descriptor();
+        var descriptor = artifact.artifactDescriptor();
         return parseFileName(throwingListener(), descriptor.group()
             + "-" + descriptor.version() + suffix);
     }
@@ -212,7 +212,7 @@ public class MavenRepository extends BaseRepository
      */
     private ResourcePath mavenPath(Artifact artifact)
     {
-        var descriptor = artifact.descriptor();
+        var descriptor = artifact.artifactDescriptor();
         var groupPath = descriptor.group().name().replaceAll("\\.", "/");
         return parseResourcePath(throwingListener(), groupPath
             + "/" + descriptor.artifact()

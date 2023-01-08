@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.build.builder;
+package digital.fiasco.runtime.dependency;
 
 import com.telenav.kivakit.core.messaging.listeners.MessageList;
 import com.telenav.kivakit.core.messaging.messages.status.Problem;
@@ -17,14 +17,23 @@ import static com.telenav.kivakit.core.os.Console.console;
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unchecked", "unused", "ClassCanBeRecord" })
-public class BuildResult
+public class DependencyProcessingResult
 {
+    public static DependencyProcessingResult dependencyProcessingResult(Dependency dependency, MessageList issues)
+    {
+        return new DependencyProcessingResult(dependency, issues);
+    }
+
+    /** The dependency that was processed */
+    private final Dependency dependency;
+
     /** The list of issues encountered during the build */
     private final MessageList issues;
 
-    public BuildResult(MessageList issues)
+    private DependencyProcessingResult(Dependency dependency, MessageList issues)
     {
         this.issues = issues;
+        this.dependency = dependency;
     }
 
     /**

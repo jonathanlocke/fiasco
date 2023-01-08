@@ -17,7 +17,6 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONTENT_SUFFIX;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
 
 /**
  * An asset is an artifact having only a single content attachment
@@ -67,7 +66,7 @@ public class Asset extends BaseArtifact implements RegistryTrait
      */
     public static Asset asset(Artifact artifact)
     {
-        return asset(artifact.descriptor());
+        return asset(artifact.artifactDescriptor());
     }
 
     /**
@@ -121,7 +120,7 @@ public class Asset extends BaseArtifact implements RegistryTrait
     @Override
     public Artifact withArtifactIdentifier(String artifact)
     {
-        return withDescriptor(descriptor().withArtifactIdentifier(artifact));
+        return withDescriptor(artifactDescriptor().withArtifactIdentifier(artifact));
     }
 
     /**

@@ -20,6 +20,7 @@ import com.telenav.kivakit.commandline.SwitchParser;
 import com.telenav.kivakit.conversion.core.language.IdentityConverter;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
+import com.telenav.kivakit.core.messaging.listeners.MessageList;
 import com.telenav.kivakit.core.project.Project;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.serialization.gson.GsonSerializationProject;
@@ -28,6 +29,10 @@ import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
+import digital.fiasco.runtime.dependency.Dependency;
+import digital.fiasco.runtime.dependency.DependencyProcessingResult;
+import digital.fiasco.runtime.dependency.DependencyProcessor;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
 
@@ -36,6 +41,8 @@ import static com.telenav.kivakit.commandline.SwitchParsers.threadCountSwitchPar
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
+import static digital.fiasco.runtime.dependency.DependencyProcessingResult.dependencyProcessingResult;
+import static digital.fiasco.runtime.dependency.DependencyTree.dependencyTree;
 
 /**
  * Base {@link Application} for Fiasco command-line builds.
@@ -213,12 +220,11 @@ public abstract class BaseBuild extends Application implements Build
     @Override
     protected final void onRun()
     {
-        var builders = onBuild(listenTo(newBuilder()));
-        var rootBuilder = builders
-            .get(0)
-            .withTargetArtifactDescriptor(metadata.artifactDescriptor());
-        var dependencies = rootBuilder.graph();
-        onBuild(rootBuilder);
+        // Create the root builder,
+        var rootBuilder = listenTo(newBuilder()
+            .withArtifactDescriptor(metadata.artifactDescriptor()));
+
+        var results = build(rootBuilder, rootBuilder.settings());
     }
 
     /**
@@ -228,6 +234,36 @@ public abstract class BaseBuild extends Application implements Build
     protected ObjectSet<SwitchParser<?>> switchParsers()
     {
         return set(THREAD_COUNT);
+    }
+
+    /**
+     * Performs a build of the dependency tree with the given root builder
+     *
+     * @param rootBuilder The root builder
+     * @return List of results
+     */
+    private ObjectList<DependencyProcessingResult> build(Builder rootBuilder)
+    {
+        // Call the build subclass to configure the root builder and create any child builders,
+        var builders = onBuild(rootBuilder);
+
+        // get the dependency tree from the root builder,
+        var dependencyTree = dependencyTree(rootBuilder);
+
+        // then process the dependency.
+        var settings = rootBuilder.settings();
+        return listenTo(new DependencyProcessor(dependencyTree))
+            .process(settings.threads(), at ->
+            {
+                if (at instanceof Builder builder)
+                {
+                    return builder.build();
+                }
+                else
+                {
+                    return resolve(settings, at);
+                }
+            });
     }
 
     /**
@@ -257,5 +293,20 @@ public abstract class BaseBuild extends Application implements Build
             .withSettings(new BuildSettings(builder)
                 .withThreads(get(THREAD_COUNT)))
             .parseCommandLine(commandLine());
+    }
+
+    @NotNull
+    private DependencyProcessingResult resolve(BuildSettings settings, Dependency dependency)
+    {
+        var issues = new MessageList();
+        try
+        {
+            settings.librarian().resolve(dependency.artifactDescriptor());
+        }
+        catch (Exception e)
+        {
+            issues.problem(e, "Unable to resolve: $", dependency);
+        }
+        return dependencyProcessingResult(dependency, issues);
     }
 }

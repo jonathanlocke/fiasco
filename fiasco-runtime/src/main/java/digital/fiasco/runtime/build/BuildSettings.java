@@ -22,7 +22,6 @@ import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
 
 /**
@@ -82,15 +81,15 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
  * <p><b>Artifact Descriptors</b></p>
  *
  * <ul>
- *     <li>{@link #targetArtifactDescriptor()}</li>
- *     <li>{@link #withTargetArtifactDescriptor(String)}</li>
- *     <li>{@link #withTargetArtifactDescriptor(ArtifactDescriptor)}</li>
- *     <li>{@link #withTargetArtifactGroup(String)}</li>
- *     <li>{@link #withTargetArtifactGroup(ArtifactGroup)}</li>
- *     <li>{@link #withTargetArtifact(String)}</li>
- *     <li>{@link #withTargetArtifact(ArtifactIdentifier)}</li>
- *     <li>{@link #withTargetArtifactVersion(String)}</li>
- *     <li>{@link #withTargetArtifactVersion(Version)}</li>
+ *     <li>{@link #artifactDescriptor()}</li>
+ *     <li>{@link #withArtifactDescriptor(String)}</li>
+ *     <li>{@link #withArtifactDescriptor(ArtifactDescriptor)}</li>
+ *     <li>{@link #withArtifactGroup(String)}</li>
+ *     <li>{@link #withArtifactGroup(ArtifactGroup)}</li>
+ *     <li>{@link #withArtifact(String)}</li>
+ *     <li>{@link #withArtifact(ArtifactIdentifier)}</li>
+ *     <li>{@link #withArtifactVersion(String)}</li>
+ *     <li>{@link #withArtifactVersion(Version)}</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -114,7 +113,7 @@ public class BuildSettings
     private Folder rootFolder;
 
     /** The primary artifact being built */
-    private ArtifactDescriptor targetArtifactDescriptor;
+    private ArtifactDescriptor artifactDescriptor;
 
     /** Libraries to compile with */
     private DependencyList dependencies;
@@ -146,10 +145,18 @@ public class BuildSettings
         this.phases = that.phases.copy();
         this.threads = that.threads;
         this.enabledOptions = that.enabledOptions.copy();
-        this.targetArtifactDescriptor = that.targetArtifactDescriptor;
+        this.artifactDescriptor = that.artifactDescriptor;
         this.dependencies = that.dependencies().copy();
         this.librarian = that.librarian;
         this.enabledProfiles = that.enabledProfiles.copy();
+    }
+
+    /**
+     * Returns the artifact descriptor for this build
+     */
+    public ArtifactDescriptor artifactDescriptor()
+    {
+        return artifactDescriptor;
     }
 
     /**
@@ -361,7 +368,7 @@ public class BuildSettings
     public BuildSettings requires(DependencyList dependencies)
     {
         var copy = copy();
-        copy.dependencies = dependencies.with(dependencies);
+        copy.dependencies = this.dependencies.with(dependencies);
         return copy;
     }
 
@@ -374,14 +381,6 @@ public class BuildSettings
     }
 
     /**
-     * Returns the artifact descriptor for this build
-     */
-    public ArtifactDescriptor targetArtifactDescriptor()
-    {
-        return targetArtifactDescriptor;
-    }
-
-    /**
      * Returns the number of threads to use when building
      *
      * @return The thread count
@@ -389,6 +388,108 @@ public class BuildSettings
     public Count threads()
     {
         return threads;
+    }
+
+    /**
+     * Returns a copy of this settings object with the given artifact
+     *
+     * @param artifact The artifact identifier
+     * @return The copy
+     */
+    public BuildSettings withArtifact(String artifact)
+    {
+        return withArtifact(new ArtifactIdentifier(artifact));
+    }
+
+    /**
+     * Returns a copy of this settings object with the given artifact
+     *
+     * @param artifact The artifact
+     * @return The copy
+     */
+    public BuildSettings withArtifact(ArtifactIdentifier artifact)
+    {
+        return withArtifactDescriptor(descriptor -> descriptor.withArtifactIdentifier(artifact));
+    }
+
+    /**
+     * Returns a copy of this settings object with the given main artifact descriptor
+     *
+     * @param descriptor The artifact descriptor
+     * @return The copy
+     */
+    public BuildSettings withArtifactDescriptor(String descriptor)
+    {
+        return withArtifactDescriptor(ArtifactDescriptor.artifactDescriptor(descriptor));
+    }
+
+    /**
+     * Applies the given tranformation function to the {@link #artifactDescriptor()}, returning a copy of this settings
+     * object with the transformed descriptor.
+     *
+     * @param function The function to apply
+     * @return The copy
+     */
+    public BuildSettings withArtifactDescriptor(Function<ArtifactDescriptor, ArtifactDescriptor> function)
+    {
+        return withArtifactDescriptor(function.apply(artifactDescriptor()));
+    }
+
+    /**
+     * Returns a copy of this settings object with the given artifact descriptor
+     *
+     * @param descriptor The artifact descriptor
+     * @return The copy
+     */
+    public BuildSettings withArtifactDescriptor(ArtifactDescriptor descriptor)
+    {
+        var copy = copy();
+        copy.artifactDescriptor = descriptor;
+        return copy;
+    }
+
+    /**
+     * Returns a copy of this settings object with the given artifact group
+     *
+     * @param group The artifact group
+     * @return The copy
+     */
+    public BuildSettings withArtifactGroup(String group)
+    {
+        return withArtifactGroup(group(group));
+    }
+
+    /**
+     * Returns a copy of this settings object with the given artifact group
+     *
+     * @param group The artifact group
+     * @return The copy
+     */
+    public BuildSettings withArtifactGroup(ArtifactGroup group)
+    {
+        return withArtifactDescriptor(descriptor -> descriptor.withGroup(group));
+    }
+
+    /**
+     * Returns a copy of this settings object with the given main artifact version
+     *
+     * @param version The artifact version
+     * @return The copy
+     */
+    public BuildSettings withArtifactVersion(String version)
+    {
+        return withArtifactVersion(version(version));
+    }
+
+    /**
+     * Returns a copy of this settings object with the given main artifact version
+     *
+     * @param version The artifact version
+     * @return The copy
+     */
+    public BuildSettings withArtifactVersion(Version version)
+    {
+        return withArtifactDescriptor(descriptor -> descriptor.withVersion(version));
     }
 
     /**
@@ -414,7 +515,7 @@ public class BuildSettings
     public BuildSettings withDependencies(DependencyList dependencies)
     {
         var copy = copy();
-        copy.dependencies = dependencies.with(dependencies);
+        copy.dependencies = this.dependencies.with(dependencies);
         return copy;
     }
 
@@ -442,108 +543,6 @@ public class BuildSettings
         var copy = copy();
         copy.rootFolder = rootFolder;
         return copy;
-    }
-
-    /**
-     * Returns a copy of this settings object with the given artifact
-     *
-     * @param artifact The artifact identifier
-     * @return The copy
-     */
-    public BuildSettings withTargetArtifact(String artifact)
-    {
-        return withTargetArtifact(new ArtifactIdentifier(artifact));
-    }
-
-    /**
-     * Returns a copy of this settings object with the given artifact
-     *
-     * @param artifact The artifact
-     * @return The copy
-     */
-    public BuildSettings withTargetArtifact(ArtifactIdentifier artifact)
-    {
-        return withTargetArtifactDescriptor(descriptor -> descriptor.withArtifactIdentifier(artifact));
-    }
-
-    /**
-     * Returns a copy of this settings object with the given main artifact descriptor
-     *
-     * @param descriptor The artifact descriptor
-     * @return The copy
-     */
-    public BuildSettings withTargetArtifactDescriptor(String descriptor)
-    {
-        return withTargetArtifactDescriptor(artifactDescriptor(descriptor));
-    }
-
-    /**
-     * Applies the given tranformation function to the {@link #targetArtifactDescriptor()}, returning a copy of this
-     * settings object with the transformed descriptor.
-     *
-     * @param function The function to apply
-     * @return The copy
-     */
-    public BuildSettings withTargetArtifactDescriptor(Function<ArtifactDescriptor, ArtifactDescriptor> function)
-    {
-        return withTargetArtifactDescriptor(function.apply(targetArtifactDescriptor()));
-    }
-
-    /**
-     * Returns a copy of this settings object with the given artifact descriptor
-     *
-     * @param descriptor The artifact descriptor
-     * @return The copy
-     */
-    public BuildSettings withTargetArtifactDescriptor(ArtifactDescriptor descriptor)
-    {
-        var copy = copy();
-        copy.targetArtifactDescriptor = descriptor;
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this settings object with the given artifact group
-     *
-     * @param group The artifact group
-     * @return The copy
-     */
-    public BuildSettings withTargetArtifactGroup(String group)
-    {
-        return withTargetArtifactGroup(group(group));
-    }
-
-    /**
-     * Returns a copy of this settings object with the given artifact group
-     *
-     * @param group The artifact group
-     * @return The copy
-     */
-    public BuildSettings withTargetArtifactGroup(ArtifactGroup group)
-    {
-        return withTargetArtifactDescriptor(descriptor -> descriptor.withGroup(group));
-    }
-
-    /**
-     * Returns a copy of this settings object with the given main artifact version
-     *
-     * @param version The artifact version
-     * @return The copy
-     */
-    public BuildSettings withTargetArtifactVersion(String version)
-    {
-        return withTargetArtifactVersion(version(version));
-    }
-
-    /**
-     * Returns a copy of this settings object with the given main artifact version
-     *
-     * @param version The artifact version
-     * @return The copy
-     */
-    public BuildSettings withTargetArtifactVersion(Version version)
-    {
-        return withTargetArtifactDescriptor(descriptor -> descriptor.withVersion(version));
     }
 
     /**

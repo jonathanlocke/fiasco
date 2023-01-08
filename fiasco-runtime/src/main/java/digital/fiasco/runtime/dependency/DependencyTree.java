@@ -1,25 +1,28 @@
 package digital.fiasco.runtime.dependency;
 
+import com.telenav.kivakit.core.messaging.messages.MessageException;
+
 import java.util.Collections;
 
 import static com.telenav.kivakit.core.ensure.Ensure.fail;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 
 /**
- * Graph of dependencies created by traversing dependencies from a root. If the dependency graph is cyclic, terminal
- * failure will be reported via validation.
+ * Tree of dependencies created by traversing dependencies in depth-first order from the root, resulting in a list of
+ * dependencies where the leaves are first and the root is last. If the dependency graph is cyclic, a
+ * {@link MessageException} will be thrown.
  *
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class DependencyGraph
+public class DependencyTree
 {
     /**
      * @return The dependency graph formed by traversing dependencies starting at the given root
      */
-    public static DependencyGraph dependencyGraph(Dependency root)
+    public static DependencyTree dependencyTree(Dependency root)
     {
-        return new DependencyGraph(root);
+        return new DependencyTree(root);
     }
 
     /** The root of this dependency graph */
@@ -28,7 +31,7 @@ public class DependencyGraph
     /** The dependencies of this graph in depth-first-order */
     private final DependencyList depthFirst;
 
-    private DependencyGraph(Dependency root)
+    private DependencyTree(Dependency root)
     {
         this.root = root;
         depthFirst = depthFirst(root);
@@ -55,7 +58,7 @@ public class DependencyGraph
      */
     private DependencyList depthFirst(Dependency root)
     {
-        DependencyList explored = dependencyList();
+        var explored = dependencyList();
 
         // Go through each child of the root
         for (var child : root.dependencies())

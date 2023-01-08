@@ -20,7 +20,6 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONTENT_SUFFIX;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.JAVADOC_SUFFIX;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.SOURCES_SUFFIX;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
 
 /**
  * A library is an artifact with source code and Javadoc JAR attachments.
@@ -102,7 +101,7 @@ public class Library extends BaseArtifact implements RegistryTrait
      */
     public static Library library(Artifact artifact)
     {
-        return new Library(artifact.descriptor());
+        return new Library(artifact.artifactDescriptor());
     }
 
     protected Library(ArtifactDescriptor descriptor)
@@ -171,7 +170,7 @@ public class Library extends BaseArtifact implements RegistryTrait
     @Override
     public Artifact withArtifactIdentifier(String artifact)
     {
-        return withDescriptor(descriptor().withArtifactIdentifier(artifact));
+        return withDescriptor(artifactDescriptor().withArtifactIdentifier(artifact));
     }
 
     /**
@@ -257,7 +256,7 @@ public class Library extends BaseArtifact implements RegistryTrait
     @Override
     public Library withVersion(Version version)
     {
-        return withDescriptor(descriptor().withVersion(version));
+        return withDescriptor(artifactDescriptor().withVersion(version));
     }
 
     /**
