@@ -18,7 +18,7 @@ public class ResolvedArtifacts
     private final ObjectSet<Artifact> resolved = new ObjectSet<>();
 
     /** A monitor that is signaled when artifacts are resolved */
-    private final Monitor added = new Monitor();
+    private final Monitor updated = new Monitor();
 
     /**
      * Marks the given artifacts as resolved
@@ -27,10 +27,10 @@ public class ResolvedArtifacts
      */
     public void markResolved(DependencyList<Artifact> artifacts)
     {
-        synchronized (added)
+        synchronized (updated)
         {
             this.resolved.addAll(artifacts);
-            added.signal();
+            updated.signal();
         }
     }
 
@@ -41,11 +41,11 @@ public class ResolvedArtifacts
      */
     public synchronized void waitFor(DependencyList<Artifact> required)
     {
-        synchronized (added)
+        synchronized (updated)
         {
             while (!resolved.containsAll(required.asSet()))
             {
-                added.await();
+                updated.await();
             }
         }
     }
