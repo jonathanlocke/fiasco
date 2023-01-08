@@ -31,7 +31,7 @@ import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
 import digital.fiasco.runtime.dependency.Dependency;
-import digital.fiasco.runtime.dependency.processing.TaskExecutor;
+import digital.fiasco.runtime.dependency.processing.DependencyProcessor;
 import digital.fiasco.runtime.dependency.processing.Task;
 import digital.fiasco.runtime.dependency.processing.TaskResult;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
@@ -294,8 +294,8 @@ public abstract class BaseBuild extends Application implements Build
 
         // then process the dependency.
         var settings = rootBuilder.settings();
-        return listenTo(new TaskExecutor(dependencyTree))
-            .execute(settings.threads(), dependency ->
+        return listenTo(new DependencyProcessor(dependencyTree))
+            .process(settings.threads(), dependency ->
             {
                 if (dependency instanceof Builder builder)
                 {

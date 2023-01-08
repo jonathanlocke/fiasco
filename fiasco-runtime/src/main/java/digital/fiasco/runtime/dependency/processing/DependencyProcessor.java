@@ -24,7 +24,7 @@ import static java.util.stream.Collectors.toList;
  *
  * @author Jonathan Locke
  */
-public class TaskExecutor extends BaseComponent implements TryTrait
+public class DependencyProcessor extends BaseComponent implements TryTrait
 {
     /** The dependency tree to process */
     private final DependencyTree dependencyTree;
@@ -34,7 +34,7 @@ public class TaskExecutor extends BaseComponent implements TryTrait
      *
      * @param dependencyTree The tree to process
      */
-    public TaskExecutor(DependencyTree dependencyTree)
+    public DependencyProcessor(DependencyTree dependencyTree)
     {
         this.dependencyTree = dependencyTree;
     }
@@ -47,7 +47,7 @@ public class TaskExecutor extends BaseComponent implements TryTrait
      * @param taskFactory The factory to create a task for a dependency
      * @return Returns a list of build results
      */
-    public ObjectList<TaskResult> execute(Count threads,
+    public ObjectList<TaskResult> process(Count threads,
                                           Function<Dependency, Task> taskFactory)
     {
         var results = new ObjectList<TaskResult>();
