@@ -24,11 +24,11 @@ import digital.fiasco.runtime.build.builder.tools.ToolFactory;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.DependencyList;
+import digital.fiasco.runtime.dependency.processing.TaskResult;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactGroup;
 import digital.fiasco.runtime.dependency.artifact.ArtifactIdentifier;
-import digital.fiasco.runtime.dependency.DependencyProcessingResult;
 import digital.fiasco.runtime.repository.Repository;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
@@ -37,8 +37,8 @@ import static com.telenav.kivakit.core.string.Paths.pathTail;
 import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
 import static digital.fiasco.runtime.build.BuildOption.HELP;
+import static digital.fiasco.runtime.dependency.processing.TaskResult.taskResult;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
-import static digital.fiasco.runtime.dependency.DependencyProcessingResult.dependencyProcessingResult;
 
 /**
  * <p>
@@ -317,7 +317,7 @@ public class Builder extends BaseRepeater implements
      *
      * @return Returns the build result
      */
-    public final DependencyProcessingResult build()
+    public final TaskResult build()
     {
         // Listen to any problems broadcast by the build,
         var issues = new MessageList(Message::isFailure);
@@ -349,7 +349,7 @@ public class Builder extends BaseRepeater implements
         }
 
         // and return the result of the build.
-        return dependencyProcessingResult(this, issues);
+        return taskResult(this, issues);
     }
 
     /**
@@ -535,6 +535,12 @@ public class Builder extends BaseRepeater implements
     public Librarian librarian()
     {
         return settings.librarian();
+    }
+
+    @Override
+    public String name()
+    {
+        return artifactDescriptor().name();
     }
 
     /**

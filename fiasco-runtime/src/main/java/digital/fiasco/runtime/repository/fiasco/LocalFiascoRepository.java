@@ -48,7 +48,7 @@ import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJs
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(Collection)} - Gets the {@link Artifact} for the given descriptor</li>
+ *     <li>{@link Repository#resolveArtifacts(Collection)} - Gets the {@link Artifact} for the given descriptor</li>
  * </ul>
  *
  * <p><b>Adding and Removing Artifacts</b></p>

@@ -73,7 +73,7 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(Collection)} - Gets the {@link Artifact} for the given descriptor, including content attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(Collection)} - Gets the {@link Artifact} for the given descriptor, including content attachments</li>
  * </ul>
  *
  * <p><b>Adding and Removing Artifacts</b></p>

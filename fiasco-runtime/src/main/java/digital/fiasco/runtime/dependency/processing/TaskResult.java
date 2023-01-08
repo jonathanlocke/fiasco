@@ -1,10 +1,11 @@
-package digital.fiasco.runtime.dependency;
+package digital.fiasco.runtime.dependency.processing;
 
 import com.telenav.kivakit.core.messaging.listeners.MessageList;
 import com.telenav.kivakit.core.messaging.messages.status.Problem;
 import com.telenav.kivakit.core.messaging.messages.status.Quibble;
 import com.telenav.kivakit.core.messaging.messages.status.Warning;
 import com.telenav.kivakit.core.value.count.Count;
+import digital.fiasco.runtime.dependency.Dependency;
 
 import static com.telenav.kivakit.core.os.Console.console;
 
@@ -16,12 +17,19 @@ import static com.telenav.kivakit.core.os.Console.console;
  *
  * @author Jonathan Locke
  */
-@SuppressWarnings({ "unchecked", "unused", "ClassCanBeRecord" })
-public class DependencyProcessingResult
+@SuppressWarnings({ "unchecked", "unused" })
+public class TaskResult
 {
-    public static DependencyProcessingResult dependencyProcessingResult(Dependency dependency, MessageList issues)
+    /**
+     * Creates a result for the processing of the given dependency
+     *
+     * @param dependency The dependency
+     * @param issues Any issues that occurred while processing the dependency
+     * @return The result
+     */
+    public static TaskResult taskResult(Dependency dependency, MessageList issues)
     {
-        return new DependencyProcessingResult(dependency, issues);
+        return new TaskResult(dependency, issues);
     }
 
     /** The dependency that was processed */
@@ -30,10 +38,15 @@ public class DependencyProcessingResult
     /** The list of issues encountered during the build */
     private final MessageList issues;
 
-    private DependencyProcessingResult(Dependency dependency, MessageList issues)
+    private TaskResult(Dependency dependency, MessageList issues)
     {
         this.issues = issues;
         this.dependency = dependency;
+    }
+
+    public Dependency dependency()
+    {
+        return dependency;
     }
 
     /**

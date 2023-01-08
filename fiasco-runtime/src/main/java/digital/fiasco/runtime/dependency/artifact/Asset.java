@@ -44,7 +44,7 @@ public class Asset extends BaseArtifact implements RegistryTrait
      */
     public static Asset asset(String artifactDescriptor)
     {
-        return asset(artifactDescriptor(artifactDescriptor));
+        return asset(ArtifactDescriptor.artifactDescriptor(artifactDescriptor));
     }
 
     /**

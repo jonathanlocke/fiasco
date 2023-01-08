@@ -50,7 +50,7 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(Collection)} - Gets the {@link Artifact}s for the given descriptors</li>
+ *     <li>{@link digital.fiasco.runtime.repository.Repository#resolveArtifacts(Collection)} - Gets the {@link Artifact}s for the given descriptors</li>
  * </ul>
  *
  * <p><b>Adding and Removing Artifacts</b></p>

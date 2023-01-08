@@ -28,10 +28,13 @@ import digital.fiasco.runtime.build.builder.BuildAction;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
+import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
 import digital.fiasco.runtime.dependency.Dependency;
-import digital.fiasco.runtime.dependency.DependencyProcessingResult;
-import digital.fiasco.runtime.dependency.DependencyProcessor;
+import digital.fiasco.runtime.dependency.processing.TaskExecutor;
+import digital.fiasco.runtime.dependency.processing.Task;
+import digital.fiasco.runtime.dependency.processing.TaskResult;
+import digital.fiasco.runtime.dependency.artifact.Artifact;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Set;
@@ -40,9 +43,10 @@ import static com.telenav.kivakit.commandline.ArgumentParser.argumentParser;
 import static com.telenav.kivakit.commandline.SwitchParsers.threadCountSwitchParser;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
+import static com.telenav.kivakit.core.ensure.Ensure.fail;
 import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
-import static digital.fiasco.runtime.dependency.DependencyProcessingResult.dependencyProcessingResult;
 import static digital.fiasco.runtime.dependency.DependencyTree.dependencyTree;
+import static digital.fiasco.runtime.dependency.processing.TaskResult.taskResult;
 
 /**
  * Base {@link Application} for Fiasco command-line builds.
@@ -141,6 +145,39 @@ import static digital.fiasco.runtime.dependency.DependencyTree.dependencyTree;
 @SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused" })
 public abstract class BaseBuild extends Application implements Build
 {
+    private record BuildTask(Builder builder) implements Task
+    {
+        @Override
+        public TaskResult call()
+        {
+            return builder.build();
+        }
+
+        @Override
+        public String name()
+        {
+            return builder.name();
+        }
+    }
+
+    private record ResolveArtifactTask(Librarian librarian, Artifact artifact) implements Task
+    {
+        @Override
+        public TaskResult call()
+        {
+            var issues = new MessageList();
+            issues.capture(() -> librarian.resolve(artifact.artifactDescriptor()),
+                "Unable to resolve artifact: $", artifact);
+            return taskResult(artifact, issues);
+        }
+
+        @Override
+        public String name()
+        {
+            return artifact.name();
+        }
+    }
+
     /** Metadata associated with this build */
     private BuildMetadata metadata;
 
@@ -224,7 +261,12 @@ public abstract class BaseBuild extends Application implements Build
         var rootBuilder = listenTo(newBuilder()
             .withArtifactDescriptor(metadata.artifactDescriptor()));
 
-        var results = build(rootBuilder, rootBuilder.settings());
+        var results = build(rootBuilder);
+
+        for (var result : results)
+        {
+            result.showResult();
+        }
     }
 
     /**
@@ -242,7 +284,7 @@ public abstract class BaseBuild extends Application implements Build
      * @param rootBuilder The root builder
      * @return List of results
      */
-    private ObjectList<DependencyProcessingResult> build(Builder rootBuilder)
+    private ObjectList<TaskResult> build(Builder rootBuilder)
     {
         // Call the build subclass to configure the root builder and create any child builders,
         var builders = onBuild(rootBuilder);
@@ -252,17 +294,18 @@ public abstract class BaseBuild extends Application implements Build
 
         // then process the dependency.
         var settings = rootBuilder.settings();
-        return listenTo(new DependencyProcessor(dependencyTree))
-            .process(settings.threads(), at ->
+        return listenTo(new TaskExecutor(dependencyTree))
+            .execute(settings.threads(), dependency ->
             {
-                if (at instanceof Builder builder)
+                if (dependency instanceof Builder builder)
                 {
-                    return builder.build();
+                    return new BuildTask(builder);
                 }
-                else
+                if (dependency instanceof Artifact artifact)
                 {
-                    return resolve(settings, at);
+                    return new ResolveArtifactTask(settings.librarian(), artifact);
                 }
+                return fail("Unknown dependency type");
             });
     }
 
@@ -296,7 +339,7 @@ public abstract class BaseBuild extends Application implements Build
     }
 
     @NotNull
-    private DependencyProcessingResult resolve(BuildSettings settings, Dependency dependency)
+    private TaskResult resolve(BuildSettings settings, Dependency dependency)
     {
         var issues = new MessageList();
         try
@@ -307,6 +350,6 @@ public abstract class BaseBuild extends Application implements Build
         {
             issues.problem(e, "Unable to resolve: $", dependency);
         }
-        return dependencyProcessingResult(dependency, issues);
+        return taskResult(dependency, issues);
     }
 }

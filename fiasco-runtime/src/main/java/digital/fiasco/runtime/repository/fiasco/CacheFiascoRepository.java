@@ -33,7 +33,7 @@ import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(Collection)} - Gets the {@link Artifact} for the given descriptor, including its content attachments</li>
+ *     <li>{@link digital.fiasco.runtime.repository.Repository#resolveArtifacts(Collection)} - Gets the {@link Artifact} for the given descriptor, including its content attachments</li>
  * </ul>
  *
  * <p><b>Adding and Removing Artifacts</b></p>

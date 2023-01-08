@@ -79,7 +79,7 @@ public class Library extends BaseArtifact implements RegistryTrait
      */
     public static Library library(String artifactDescriptor)
     {
-        return new Library(artifactDescriptor(artifactDescriptor));
+        return new Library(ArtifactDescriptor.artifactDescriptor(artifactDescriptor));
     }
 
     /**

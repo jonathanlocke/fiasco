@@ -1,11 +1,13 @@
 package digital.fiasco.runtime.dependency;
 
 import com.telenav.kivakit.interfaces.naming.Named;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.repository.Repository;
 
 /**
- * A dependency has a list of {@link #dependencies()}, which must be resolved for it to function.
+ * A dependency is an artifact (optionally in some repository) that has a list of {@link #dependencies()}, which must be
+ * resolved for it to function.
  *
  * @author Jonathan Locke
  */
@@ -13,19 +15,20 @@ import digital.fiasco.runtime.repository.Repository;
 public interface Dependency extends Named
 {
     /**
-     * @return The objects that this depends on
-     */
-    DependencyList dependencies();
-
-    /**
      * The artifact descriptor for this dependency
      */
     ArtifactDescriptor artifactDescriptor();
 
     /**
-     * Returns the repository where this dependency was found
+     * @return The objects that this depends on
+     */
+    DependencyList dependencies();
+
+    /**
+     * Returns the repository where this dependency was found. If this dependency is a {@link Builder}, the returned
+     * repository will be null.
      *
-     * @return The hosting repository
+     * @return The repository hosting this dependency, or null if the dependency is a {@link Builder}
      */
     Repository repository();
 }
