@@ -1,6 +1,5 @@
 package digital.fiasco.runtime.build.tasks;
 
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.thread.Monitor;
 import digital.fiasco.runtime.dependency.DependencyList;
@@ -9,7 +8,7 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 /**
  * Holds a set of artifacts resolved from repositories by background threads. When a new set of artifacts is resolved,
  * they are marked as resolved by calling {@link #markResolved(DependencyList)}. A task that can't proceed until its
- * artifact dependencies are all resolved can wait for that condition by calling {@link #waitFor(ObjectSet)}.
+ * artifact dependencies are all resolved can wait for that condition by calling {@link #waitFor(DependencyList)}.
  *
  * @author Jonathan Locke
  */
@@ -40,7 +39,7 @@ public class ResolvedArtifacts
      *
      * @param required The artifacts that are required
      */
-    public synchronized void waitFor(ObjectList<Artifact> required)
+    public synchronized void waitFor(DependencyList<Artifact> required)
     {
         synchronized (added)
         {
