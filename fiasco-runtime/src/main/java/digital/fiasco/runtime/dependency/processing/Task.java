@@ -9,6 +9,6 @@ import java.util.concurrent.Callable;
  *
  * @author Jonathan Locke
  */
-public interface Task extends Callable<TaskResult>, Named
+public interface Task<T> extends Callable<TaskResult<T>>, Named
 {
 }

@@ -55,8 +55,6 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
  *     <li>{@link #pinVersion(Artifact, Version)}</li>
  *     <li>{@link #requires(Artifact, Artifact[])}</li>
  *     <li>{@link #requires(DependencyList)}</li>
- *     <li>{@link #withDependencies(Artifact, Artifact[])}</li>
- *     <li>{@link #withDependencies(DependencyList)}</li>
  * </ul>
  *
  * <p><b>Build Phases</b></p>
@@ -116,7 +114,7 @@ public class BuildSettings
     private ArtifactDescriptor artifactDescriptor;
 
     /** Libraries to compile with */
-    private DependencyList dependencies;
+    private DependencyList<Artifact> dependencies;
 
     /** The librarian to manage libraries */
     private final Librarian librarian;
@@ -172,7 +170,7 @@ public class BuildSettings
      *
      * @return The libraries to compile against
      */
-    public DependencyList dependencies()
+    public DependencyList<Artifact> dependencies()
     {
         return dependencies;
     }
@@ -365,7 +363,7 @@ public class BuildSettings
      *
      * @param dependencies The dependencies to add
      */
-    public BuildSettings requires(DependencyList dependencies)
+    public BuildSettings requires(DependencyList<Artifact> dependencies)
     {
         var copy = copy();
         copy.dependencies = this.dependencies.with(dependencies);
@@ -490,33 +488,6 @@ public class BuildSettings
     public BuildSettings withArtifactVersion(Version version)
     {
         return withArtifactDescriptor(descriptor -> descriptor.withVersion(version));
-    }
-
-    /**
-     * Returns a copy of this object with the given dependencies
-     *
-     * @param first The first dependency
-     * @param rest The rest of the dependencies
-     * @return The copy
-     */
-    public BuildSettings withDependencies(Artifact first, Artifact... rest)
-    {
-        var copy = copy();
-        copy.dependencies = dependencies.with(first, rest);
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this object with the given dependencies
-     *
-     * @param dependencies The dependencies
-     * @return The copy
-     */
-    public BuildSettings withDependencies(DependencyList dependencies)
-    {
-        var copy = copy();
-        copy.dependencies = this.dependencies.with(dependencies);
-        return copy;
     }
 
     /**

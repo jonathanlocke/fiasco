@@ -20,7 +20,6 @@ import com.telenav.kivakit.commandline.SwitchParser;
 import com.telenav.kivakit.conversion.core.language.IdentityConverter;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
-import com.telenav.kivakit.core.messaging.listeners.MessageList;
 import com.telenav.kivakit.core.project.Project;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.serialization.gson.GsonSerializationProject;
@@ -28,14 +27,17 @@ import digital.fiasco.runtime.build.builder.BuildAction;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
-import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
+import digital.fiasco.runtime.build.tasks.ArtifactResolverTask;
+import digital.fiasco.runtime.build.tasks.BuilderTask;
+import digital.fiasco.runtime.build.tasks.ResolvedArtifacts;
 import digital.fiasco.runtime.dependency.Dependency;
-import digital.fiasco.runtime.dependency.processing.DependencyProcessor;
-import digital.fiasco.runtime.dependency.processing.Task;
-import digital.fiasco.runtime.dependency.processing.TaskResult;
+import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import org.jetbrains.annotations.NotNull;
+import digital.fiasco.runtime.dependency.processing.Task;
+import digital.fiasco.runtime.dependency.processing.TaskExecutor;
+import digital.fiasco.runtime.dependency.processing.TaskList;
+import digital.fiasco.runtime.dependency.processing.TaskResult;
 
 import java.util.Set;
 
@@ -43,10 +45,8 @@ import static com.telenav.kivakit.commandline.ArgumentParser.argumentParser;
 import static com.telenav.kivakit.commandline.SwitchParsers.threadCountSwitchParser;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
-import static com.telenav.kivakit.core.ensure.Ensure.fail;
 import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
 import static digital.fiasco.runtime.dependency.DependencyTree.dependencyTree;
-import static digital.fiasco.runtime.dependency.processing.TaskResult.taskResult;
 
 /**
  * Base {@link Application} for Fiasco command-line builds.
@@ -145,38 +145,6 @@ import static digital.fiasco.runtime.dependency.processing.TaskResult.taskResult
 @SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused" })
 public abstract class BaseBuild extends Application implements Build
 {
-    private record BuildTask(Builder builder) implements Task
-    {
-        @Override
-        public TaskResult call()
-        {
-            return builder.build();
-        }
-
-        @Override
-        public String name()
-        {
-            return builder.name();
-        }
-    }
-
-    private record ResolveArtifactTask(Librarian librarian, Artifact artifact) implements Task
-    {
-        @Override
-        public TaskResult call()
-        {
-            var issues = new MessageList();
-            issues.capture(() -> librarian.resolve(artifact.artifactDescriptor()),
-                "Unable to resolve artifact: $", artifact);
-            return taskResult(artifact, issues);
-        }
-
-        @Override
-        public String name()
-        {
-            return artifact.name();
-        }
-    }
 
     /** Metadata associated with this build */
     private BuildMetadata metadata;
@@ -261,12 +229,11 @@ public abstract class BaseBuild extends Application implements Build
         var rootBuilder = listenTo(newBuilder()
             .withArtifactDescriptor(metadata.artifactDescriptor()));
 
+        // resolve artifacts and run builders,
         var results = build(rootBuilder);
 
-        for (var result : results)
-        {
-            result.showResult();
-        }
+        // then show the results.
+        results.matching(at -> at.issues().hasProblems()).forEach(TaskResult::showResult);
     }
 
     /**
@@ -284,29 +251,20 @@ public abstract class BaseBuild extends Application implements Build
      * @param rootBuilder The root builder
      * @return List of results
      */
-    private ObjectList<TaskResult> build(Builder rootBuilder)
+    private ObjectList<TaskResult<Builder>> build(Builder rootBuilder)
     {
-        // Call the build subclass to configure the root builder and create any child builders,
+        // Get build settings,
+        var settings = rootBuilder.settings();
+
+        // configure the root builder and create any child builders,
         var builders = onBuild(rootBuilder);
 
-        // get the dependency tree from the root builder,
-        var dependencyTree = dependencyTree(rootBuilder);
+        // start resolving artifacts in parallel groups and marking them as resolved,
+        var resolved = new ResolvedArtifacts();
+        resolveArtifacts(settings, rootBuilder, resolved);
 
-        // then process the dependency.
-        var settings = rootBuilder.settings();
-        return listenTo(new DependencyProcessor(dependencyTree))
-            .process(settings.threads(), dependency ->
-            {
-                if (dependency instanceof Builder builder)
-                {
-                    return new BuildTask(builder);
-                }
-                if (dependency instanceof Artifact artifact)
-                {
-                    return new ResolveArtifactTask(settings.librarian(), artifact);
-                }
-                return fail("Unknown dependency type");
-            });
+        // start running builders in parallel groups as soon as their required artifacts are resolved.
+        return executeBuilders(settings, rootBuilder, resolved);
     }
 
     /**
@@ -329,6 +287,36 @@ public abstract class BaseBuild extends Application implements Build
         this.metadata = that.metadata;
     }
 
+    /**
+     * Executes all builders from the root in parallel groups.
+     */
+    private ObjectList<TaskResult<Builder>> executeBuilders(BuildSettings settings,
+                                                            Builder rootBuilder,
+                                                            ResolvedArtifacts resolved)
+    {
+        var executor = listenTo(new TaskExecutor());
+        var results = new ObjectList<TaskResult<Builder>>();
+
+        // For each group of builders that can be executed in parallel,
+        for (var group : dependencyTree(rootBuilder, Builder.class).grouped())
+        {
+            // turn them into a list of tasks to run,
+            var tasks = new TaskList<Builder>();
+            for (var builder : group)
+            {
+                resolved.waitFor(builder.dependencies(Artifact.class));
+
+                var task = new BuilderTask(builder, resolved);
+                tasks.add(task);
+            }
+
+            // then execute the tasks.
+            results.addAll(executor.process(settings.threads(), tasks));
+        }
+
+        return results;
+    }
+
     private Builder newBuilder()
     {
         var builder = new Builder(this);
@@ -338,18 +326,22 @@ public abstract class BaseBuild extends Application implements Build
             .parseCommandLine(commandLine());
     }
 
-    @NotNull
-    private TaskResult resolve(BuildSettings settings, Dependency dependency)
+    /**
+     * Resolves artifacts in parallel groups, marking them as resolved when completed.
+     *
+     * @param settings The build settings, to obtain the number of threads to use, and the librarian to resolve
+     * artifacts
+     * @param root The root of the builder tree
+     * @param resolved The set of resolved artifacts to update
+     */
+    private void resolveArtifacts(BuildSettings settings, Dependency root, ResolvedArtifacts resolved)
     {
-        var issues = new MessageList();
-        try
+        var executor = listenTo(new TaskExecutor());
+        for (var group : dependencyTree(root, Artifact.class).grouped())
         {
-            settings.librarian().resolve(dependency.artifactDescriptor());
+            var task = (Task<DependencyList<Artifact>>) new ArtifactResolverTask(settings.librarian(), group, resolved);
+            var results = executor.process(settings.threads(), new TaskList<>(list(task)));
+            results.matching(at -> at.issues().hasProblems()).forEach(TaskResult::showResult);
         }
-        catch (Exception e)
-        {
-            issues.problem(e, "Unable to resolve: $", dependency);
-        }
-        return taskResult(dependency, issues);
     }
 }

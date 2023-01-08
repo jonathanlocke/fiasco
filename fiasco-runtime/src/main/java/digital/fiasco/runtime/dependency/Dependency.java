@@ -22,7 +22,26 @@ public interface Dependency extends Named
     /**
      * @return The objects that this depends on
      */
-    DependencyList dependencies();
+    DependencyList<?> dependencies();
+
+    /**
+     * Gets all dependencies of the given type
+     *
+     * @return The dependencies
+     */
+    default <T extends Dependency> DependencyList<T> dependencies(Class<T> type)
+    {
+        var dependencies = new DependencyList<T>();
+        for (var at : dependencies())
+        {
+            if (type.isAssignableFrom(at.getClass()))
+            {
+                //noinspection unchecked
+                dependencies.add((T) at);
+            }
+        }
+        return dependencies;
+    }
 
     /**
      * Returns the repository where this dependency was found. If this dependency is a {@link Builder}, the returned

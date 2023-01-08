@@ -4,6 +4,7 @@ import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
+import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -40,7 +41,7 @@ import java.util.Iterator;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class DependencyList extends ObjectList<Dependency>
+public class DependencyList<T extends Dependency> extends ObjectList<T>
 {
     /**
      * Creates a list of dependencies
@@ -48,9 +49,10 @@ public class DependencyList extends ObjectList<Dependency>
      * @param dependencies The dependencies to add
      * @return The dependency list
      */
-    public static DependencyList dependencyList(Dependency... dependencies)
+    @SafeVarargs
+    public static <T extends Dependency> DependencyList<T> dependencyList(T... dependencies)
     {
-        return new DependencyList(list(dependencies));
+        return new DependencyList<>(list(dependencies));
     }
 
     /**
@@ -59,21 +61,26 @@ public class DependencyList extends ObjectList<Dependency>
      * @param dependencies The dependencies to add
      * @return The dependency list
      */
-    public static DependencyList dependencyList(Collection<Dependency> dependencies)
+    public static <T extends Dependency> DependencyList<T> dependencyList(Collection<T> dependencies)
     {
-        return new DependencyList(dependencies);
+        return new DependencyList<>(dependencies);
     }
 
     /** The underlying dependencies */
-    private ObjectList<Dependency> dependencies = list();
+    private ObjectList<T> dependencies = list();
 
-    protected DependencyList()
+    public DependencyList()
     {
     }
 
-    protected DependencyList(Collection<Dependency> dependencies)
+    protected DependencyList(Collection<T> dependencies)
     {
         this.dependencies.addAll(dependencies);
+    }
+
+    public ObjectList<ArtifactDescriptor> artifactDescriptors()
+    {
+        return map(Dependency::artifactDescriptor);
     }
 
     public ObjectList<Artifact> asArtifactList()
@@ -89,7 +96,7 @@ public class DependencyList extends ObjectList<Dependency>
      * @return The list
      */
     @Override
-    public ObjectList<Dependency> asList()
+    public ObjectList<T> asList()
     {
         return dependencies.copy();
     }
@@ -100,7 +107,7 @@ public class DependencyList extends ObjectList<Dependency>
      * @return The list
      */
     @Override
-    public ObjectSet<Dependency> asSet()
+    public ObjectSet<T> asSet()
     {
         return new ObjectSet<>(dependencies.copy());
     }
@@ -111,9 +118,9 @@ public class DependencyList extends ObjectList<Dependency>
      * @return The copy
      */
     @Override
-    public DependencyList copy()
+    public DependencyList<T> copy()
     {
-        return new DependencyList(dependencies.copy());
+        return new DependencyList<>(dependencies.copy());
     }
 
     /**
@@ -121,15 +128,15 @@ public class DependencyList extends ObjectList<Dependency>
      */
     @NotNull
     @Override
-    public Iterator<Dependency> iterator()
+    public Iterator<T> iterator()
     {
         return dependencies.iterator();
     }
 
     @Override
-    public DependencyList matching(Matcher<Dependency> matcher)
+    public DependencyList<T> matching(Matcher<T> matcher)
     {
-        var matching = new DependencyList();
+        var matching = new DependencyList<T>();
         matching.dependencies = matching.dependencies.matching(matcher);
         return matching;
     }
@@ -140,7 +147,8 @@ public class DependencyList extends ObjectList<Dependency>
      * @param dependencies A variable-argument list of dependencies to include
      * @return A copy of this list with the given dependencies
      */
-    public final DependencyList with(Dependency first, Dependency... dependencies)
+    @SafeVarargs
+    public final DependencyList<T> with(T first, T... dependencies)
     {
         var copy = copy();
         copy.dependencies.add(first);
@@ -149,7 +157,7 @@ public class DependencyList extends ObjectList<Dependency>
     }
 
     @Override
-    public DependencyList with(Dependency value)
+    public DependencyList<T> with(T value)
     {
         var copy = copy();
         copy.dependencies = dependencies.with(value);
@@ -161,7 +169,7 @@ public class DependencyList extends ObjectList<Dependency>
      *
      * @return A copy of this list with the given dependencies
      */
-    public DependencyList with(DependencyList dependencies)
+    public DependencyList<T> with(DependencyList<T> dependencies)
     {
         var copy = copy();
         copy.dependencies.addAll(dependencies.dependencies);
@@ -174,7 +182,7 @@ public class DependencyList extends ObjectList<Dependency>
      * @return A copy of this list with the given dependencies
      */
     @Override
-    public DependencyList with(Iterable<Dependency> dependencies)
+    public DependencyList<T> with(Iterable<T> dependencies)
     {
         var copy = copy();
         copy.dependencies.addAll(dependencies);
@@ -187,7 +195,7 @@ public class DependencyList extends ObjectList<Dependency>
      * @param exclusions The dependencies to exclude
      * @return The dependency list
      */
-    public DependencyList without(Collection<Dependency> exclusions)
+    public DependencyList<T> without(Collection<T> exclusions)
     {
         var copy = copy();
         copy.dependencies.removeAll(exclusions);
@@ -201,7 +209,7 @@ public class DependencyList extends ObjectList<Dependency>
      * @return A copy of this list without the specified dependencies
      */
     @Override
-    public DependencyList without(Matcher<Dependency> pattern)
+    public DependencyList<T> without(Matcher<T> pattern)
     {
         var copy = copy();
         copy.dependencies.removeIf(pattern::matches);

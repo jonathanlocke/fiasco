@@ -5,48 +5,43 @@ import com.telenav.kivakit.core.messaging.messages.status.Problem;
 import com.telenav.kivakit.core.messaging.messages.status.Quibble;
 import com.telenav.kivakit.core.messaging.messages.status.Warning;
 import com.telenav.kivakit.core.value.count.Count;
-import digital.fiasco.runtime.dependency.Dependency;
 
+import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.os.Console.console;
 
 /**
- * Holds the result of a build. Any warning or problem messages are contained in the {@link MessageList} returned by
- * {@link #issues()}. The number of problems and warnings can be retrieved with {@link #problems()} and
+ * Holds the result of a task execution. Any warning or problem messages are contained in the {@link MessageList}
+ * returned by {@link #issues()}. The number of problems and warnings can be retrieved with {@link #problems()} and
  * {@link #warnings()}, respectively. Statistics for the result can be retrieved by calling {@link #toString()}, or
  * shown on the console with {@link #showResult()}.
  *
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unchecked", "unused" })
-public class TaskResult
+public class TaskResult<T>
 {
     /**
-     * Creates a result for the processing of the given dependency
+     * Creates a result for the processing of some object
      *
-     * @param dependency The dependency
+     * @param object The object
      * @param issues Any issues that occurred while processing the dependency
      * @return The result
      */
-    public static TaskResult taskResult(Dependency dependency, MessageList issues)
+    public static <T> TaskResult<T> taskResult(T object, MessageList issues)
     {
-        return new TaskResult(dependency, issues);
+        return new TaskResult<>(object, issues);
     }
 
     /** The dependency that was processed */
-    private final Dependency dependency;
+    private final T object;
 
     /** The list of issues encountered during the build */
     private final MessageList issues;
 
-    private TaskResult(Dependency dependency, MessageList issues)
+    private TaskResult(T object, MessageList issues)
     {
         this.issues = issues;
-        this.dependency = dependency;
-    }
-
-    public Dependency dependency()
-    {
-        return dependency;
+        this.object = object;
     }
 
     /**
@@ -55,6 +50,11 @@ public class TaskResult
     public MessageList issues()
     {
         return issues;
+    }
+
+    public T object()
+    {
+        return object;
     }
 
     /**
@@ -76,8 +76,11 @@ public class TaskResult
     @Override
     public String toString()
     {
-        var statistics = issues.statistics(Problem.class, Warning.class, Quibble.class);
-        return statistics.titledBox("Build Results");
+        return stringList()
+            .appending(object.toString())
+            .appending(issues.statistics(Problem.class, Warning.class, Quibble.class))
+            .appending(issues.formatted())
+            .titledBox("Task Failed");
     }
 
     /**

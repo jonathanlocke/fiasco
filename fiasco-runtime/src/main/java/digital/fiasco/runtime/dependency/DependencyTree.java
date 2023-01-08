@@ -1,11 +1,12 @@
 package digital.fiasco.runtime.dependency;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.messages.MessageException;
-
-import java.util.Collections;
+import digital.fiasco.runtime.dependency.processing.DependencyGrouper;
 
 import static com.telenav.kivakit.core.ensure.Ensure.fail;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static java.util.Collections.disjoint;
 
 /**
  * Tree of dependencies created by traversing dependencies in depth-first order from the root, resulting in a list of
@@ -15,34 +16,48 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class DependencyTree
+public class DependencyTree<T extends Dependency>
 {
     /**
      * @return The dependency graph formed by traversing dependencies starting at the given root
      */
-    public static DependencyTree dependencyTree(Dependency root)
+    public static <T extends Dependency> DependencyTree<T> dependencyTree(Dependency root, Class<T> type)
     {
-        return new DependencyTree(root);
+        return new DependencyTree<>(root, type);
     }
 
     /** The root of this dependency graph */
     private final Dependency root;
 
-    /** The dependencies of this graph in depth-first-order */
-    private final DependencyList depthFirst;
+    /** The type of dependencies in this tree */
+    private final Class<T> type;
 
-    private DependencyTree(Dependency root)
+    /** The dependencies of this graph in depth-first-order */
+    private final DependencyList<T> depthFirst;
+
+    private DependencyTree(Dependency root, Class<T> type)
     {
         this.root = root;
+        this.type = type;
         depthFirst = depthFirst(root);
     }
 
     /**
      * @return The dependencies in this graph in depth-first order
      */
-    public DependencyList depthFirst()
+    public DependencyList<T> depthFirst()
     {
         return depthFirst;
+    }
+
+    /**
+     * Returns the elements of this dependency tree organized into groups for parallel execution
+     *
+     * @return A list of dependency groups
+     */
+    public ObjectList<DependencyList<T>> grouped()
+    {
+        return new DependencyGrouper<T>().group(this, type);
     }
 
     /**
@@ -56,18 +71,18 @@ public class DependencyTree
     /**
      * @return List of dependencies in depth-first order
      */
-    private DependencyList depthFirst(Dependency root)
+    private DependencyList<T> depthFirst(Dependency root)
     {
-        var explored = dependencyList();
+        DependencyList<T> explored = dependencyList();
 
         // Go through each child of the root
-        for (var child : root.dependencies())
+        for (var child : root.dependencies(type))
         {
             // and explore it (in a depth-first traversal)
             var descendants = depthFirst(child);
 
             // and if none of the explored values has already been explored
-            if (Collections.disjoint(explored.asSet(), descendants.asSet()))
+            if (disjoint(explored.asSet(), descendants.asSet()))
             {
                 // then add the explored descendants to the list of dependencies
                 explored = explored.with(descendants);
@@ -80,6 +95,11 @@ public class DependencyTree
         }
 
         // Finally, return the explored children with the root.
-        return explored.with(root);
+        if (type.isAssignableFrom(root.getClass()))
+        {
+            //noinspection unchecked
+            return explored.with((T) root);
+        }
+        return explored;
     }
 }
