@@ -175,9 +175,11 @@ public class BuildSettings
      *
      * @param phase The phase
      */
-    public void disable(Phase phase)
+    public BuildSettings disable(Phase phase)
     {
-        phases.disable(phase);
+        var copy = copy();
+        copy.phases.disable(phase);
+        return copy;
     }
 
     /**
@@ -188,8 +190,9 @@ public class BuildSettings
      */
     public BuildSettings disable(BuildOption option)
     {
-        enabledOptions.remove(option);
-        return this;
+        var copy = copy();
+        copy.enabledOptions.remove(option);
+        return copy;
     }
 
     /**
@@ -200,8 +203,9 @@ public class BuildSettings
      */
     public BuildSettings disable(BuildProfile profile)
     {
-        enabledProfiles.remove(profile);
-        return this;
+        var copy = copy();
+        copy.enabledProfiles.remove(profile);
+        return copy;
     }
 
     /**
@@ -209,41 +213,45 @@ public class BuildSettings
      *
      * @param phase The phase
      */
-    public void enable(Phase phase)
+    public BuildSettings enable(Phase phase)
     {
-        phases.enable(phase);
+        var copy = copy();
+        copy.phases.enable(phase);
+        return copy;
     }
 
     /**
      * Enables the given build option
      *
      * @param option The option
-     * @return This build for method chaining
+     * @return A copy of this object with the given option enabled
      */
     public BuildSettings enable(BuildOption option)
     {
-        enabledOptions.add(option);
-        return this;
+        var copy = copy();
+        copy.enabledOptions.add(option);
+        return copy;
     }
 
     /**
      * Returns a copy of this settings object with the given profile enabled
      *
      * @param profile The profile to enable
-     * @return The copy of this settings object
+     * @return The copy of this settings object with the given build profile enabled
      */
     public BuildSettings enable(BuildProfile profile)
     {
-        enabledProfiles.add(profile);
-        return this;
+        var copy = copy();
+        copy.enabledProfiles.add(profile);
+        return copy;
     }
 
     /**
-     * Returns the set of enabled profiles for this build
+     * Returns a copy of the set of enabled profiles for this build
      */
     public ObjectSet<BuildProfile> enabledProfiles()
     {
-        return enabledProfiles;
+        return enabledProfiles.copy();
     }
 
     /**
@@ -332,7 +340,7 @@ public class BuildSettings
     }
 
     /**
-     * Adds one or more build dependencies
+     * Returns a copy of this build settings object with more build dependencies added
      *
      * @param first The first dependency
      * @param rest Any further dependencies
@@ -340,19 +348,21 @@ public class BuildSettings
      */
     public BuildSettings requires(Artifact first, Artifact... rest)
     {
-        dependencies = dependencies.with(first, rest);
-        return this;
+        var copy = copy();
+        copy.dependencies = dependencies.with(first, rest);
+        return copy;
     }
 
     /**
-     * Adds the given dependencies to this build
+     * Returns a copy of this build settings object with more build dependencies added
      *
      * @param dependencies The dependencies to add
      */
     public BuildSettings requires(DependencyList dependencies)
     {
-        this.dependencies = this.dependencies.with(dependencies);
-        return this;
+        var copy = copy();
+        copy.dependencies = dependencies.with(dependencies);
+        return copy;
     }
 
     /**

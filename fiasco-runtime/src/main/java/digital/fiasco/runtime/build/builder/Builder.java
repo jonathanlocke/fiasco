@@ -414,7 +414,7 @@ public class Builder extends BaseRepeater implements
      */
     public void disable(Phase phase)
     {
-        settings.disable(phase);
+        settings = settings.disable(phase);
     }
 
     /**
@@ -425,7 +425,19 @@ public class Builder extends BaseRepeater implements
      */
     public Builder disable(BuildOption option)
     {
-        settings.disable(option);
+        settings = settings.disable(option);
+        return this;
+    }
+
+    /**
+     * Disables the given build profile
+     *
+     * @param profile The profile
+     * @return This build for method chaining
+     */
+    public Builder disable(BuildProfile profile)
+    {
+        settings = settings.disable(profile);
         return this;
     }
 
@@ -436,7 +448,7 @@ public class Builder extends BaseRepeater implements
      */
     public void enable(Phase phase)
     {
-        settings.enable(phase);
+        settings = settings.enable(phase);
     }
 
     /**
@@ -447,7 +459,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder enable(BuildOption option)
     {
-        settings.enable(option);
+        settings = settings.enable(option);
         return this;
     }
 
@@ -615,7 +627,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder pinVersion(Artifact artifact, String version)
     {
-        settings = settings.pinVersion(artifact, version(version));
+        settings.pinVersion(artifact, version(version));
         return this;
     }
 
@@ -628,7 +640,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder pinVersion(Artifact artifact, Version version)
     {
-        settings = settings.pinVersion(artifact, version);
+        settings.pinVersion(artifact, version);
         return this;
     }
 
