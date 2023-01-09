@@ -5,16 +5,16 @@ import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.core.thread.locks.ReadWriteLock;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
+import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.repository.fiasco.CacheFiascoRepository;
-import digital.fiasco.runtime.repository.fiasco.LocalFiascoRepository;
-import digital.fiasco.runtime.repository.fiasco.RemoteFiascoRepository;
+import digital.fiasco.runtime.repository.fiasco.CacheRepository;
+import digital.fiasco.runtime.repository.fiasco.LocalRepository;
+import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
 import digital.fiasco.runtime.repository.fiasco.server.FiascoClient;
 import digital.fiasco.runtime.repository.fiasco.server.FiascoServer;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
 
 import java.net.URI;
-import java.util.Collection;
 import java.util.Objects;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
@@ -23,16 +23,16 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  * Base class for repositories of artifacts and their metadata. Subclasses include:
  *
  * <ul>
- *     <li>{@link CacheFiascoRepository} - High performance artifact store</li>
- *     <li>{@link LocalFiascoRepository} - Stores artifacts on the local filesystem</li>
+ *     <li>{@link CacheRepository} - High performance artifact store</li>
+ *     <li>{@link LocalRepository} - Stores artifacts on the local filesystem</li>
  *     <li>{@link MavenRepository} - A remote or local maven repository</li>
- *     <li>{@link RemoteFiascoRepository} - Fiasco repository at a remote URI</li>
+ *     <li>{@link RemoteRepository} - Fiasco repository at a remote URI</li>
  * </ul>
  *
  * <p><b>Local Repositories</b></p>
  *
  * <p>
- * {@link LocalFiascoRepository} is used to store artifacts and metadata on the local filesystem. Artifact
+ * {@link LocalRepository} is used to store artifacts and metadata on the local filesystem. Artifact
  * metadata is stored in a human-readable, append-only text file called <i>artifacts.txt</i>, which allows it to be searched
  * with grep or viewed in a text editor. The artifact content attachments are stored on the filesystem in a hierarchical
  * format similar to a Maven repository. For access to Maven repositories, see {@link MavenRepository}.
@@ -47,8 +47,8 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  * <p><b>Cache Repositories</b></p>
  *
  * <p>
- * {@link CacheFiascoRepository} is used to store artifacts and their metadata in a single file to allow
- * high-performance, random access. As with a {@link LocalFiascoRepository}, metadata is stored in a single append-only
+ * {@link CacheRepository} is used to store artifacts and their metadata in a single file to allow
+ * high-performance, random access. As with a {@link LocalRepository}, metadata is stored in a single append-only
  * text file, but artifact content attachments are stored end-to-end in a single file, <i>attachments.binary</i>. This
  * repository is used as a download cache to avoid unnecessary downloads when a user wipes out their local repository, causing
  * it to repopulate. Instead of repopulating from Maven Central or another remote repository, the artifacts in this
@@ -60,7 +60,7 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  * <p><b>Remote Repositories</b></p>
  *
  * <p>
- * {@link RemoteFiascoRepository} is used to access remote Fiasco repositories served by a {@link FiascoServer}.
+ * {@link RemoteRepository} is used to access remote Fiasco repositories served by a {@link FiascoServer}.
  * Internally, this repository used {@link FiascoClient} to communicate with the server.
  * </p>
  *
@@ -73,21 +73,20 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link Repository#resolveArtifacts(Collection)} - Gets the {@link Artifact} for the given descriptor, including content attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(ObjectList)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
- * <p><b>Adding and Removing Artifacts</b></p>
+ * <p><b>Installing Artifacts</b></p>
  *
  * <ul>
- *     <li>{@link #installArtifact(Artifact)} - Adds the given artifact with the given attached resources</li>
- *     <li>{@link #clearArtifacts()} - Removes all data from this repository</li>
+ *     <li>{@link #installArtifact(Artifact)} - Installs the given artifact in this repository, along with its attached resources</li>
  * </ul>
  *
  * @author Jonathan Locke
  * @author Jonathan Locke
- * @see CacheFiascoRepository
- * @see LocalFiascoRepository
- * @see RemoteFiascoRepository
+ * @see CacheRepository
+ * @see LocalRepository
+ * @see RemoteRepository
  * @see MavenRepository
  */
 public abstract class BaseRepository extends BaseRepeater implements Repository
@@ -111,6 +110,17 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     {
         this.name = name;
         this.uri = uri;
+    }
+
+    /**
+     * Returns true if this repository contains the given artifact
+     *
+     * @param artifact The artifact
+     * @return True if it is in this repository
+     */
+    public boolean contains(Artifact artifact)
+    {
+        return artifacts.containsValue(artifact);
     }
 
     /**

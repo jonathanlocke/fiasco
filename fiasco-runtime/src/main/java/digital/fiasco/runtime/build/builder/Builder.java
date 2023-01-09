@@ -366,7 +366,7 @@ public class Builder extends BaseRepeater implements
      * @return The libraries to compile against
      */
     @Override
-    public DependencyList dependencies()
+    public DependencyList<?> dependencies()
     {
         return settings.dependencies();
     }
@@ -691,9 +691,9 @@ public class Builder extends BaseRepeater implements
      *
      * @param dependencies The dependencies to add
      */
-    public Builder requires(DependencyList dependencies)
+    public Builder requires(DependencyList<Artifact> dependencies)
     {
-        settings = settings.withDependencies(dependencies);
+        settings = settings.requires(dependencies);
         return this;
     }
 

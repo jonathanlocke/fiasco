@@ -13,58 +13,57 @@ import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
 
-import java.util.Collection;
-
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
-import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static com.telenav.kivakit.resource.WriteMode.APPEND;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
 import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJson;
 
 /**
- * A high performance repository of artifacts and their metadata.
+ * A repository of artifacts and their metadata on the local filesystem.
  *
  * <p>
- * This repository is used to store artifacts and metadata on the local filesystem for Fiasco users. Artifact metadata
- * is in a human-readable text file called <i>artifacts.txt</i> at the root of the repository, and can be searched with
- * grep or viewed in a text editor. Artifact content attachments are stored in a folder hierarchy.
+ * All artifact metadata is stored in a single human-readable text file called <i>artifacts.txt</i> at the root of the
+ * repository. This file is loaded into memory for fast resolution of artifacts. Artifact content attachments are stored
+ * in a Maven-like folder hierarchy based on the artifact descriptor. For example, the artifact attachments for
+ * <i>com.telenav.kivakit:kivakit-application:1.11.0</i> would be stored in
+ * <i>com/telenav/kivakit/kivakit-application/1.11.0</i>.
  * </p>
  *
  * <p><b>Artifact Metadata</b></p>
  *
  * <p>
- * Artifact metadata is stored in an append-only file, <i>artifacts.txt</i>. The metadata for each artifact in this file
- * is separated with <i>========</i> bars. Since the metadata is relatively small, it is loaded into memory, where it
- * can be used to quickly locate artifact content attachment files (library, Javadoc, and source code JARs).
+ * The artifact metadata stored in <i>artifacts.txt</i> is in JSON format, separated by <i>========</i> bars. Since the
+ * metadata in this file is relatively small, it is loaded into a memory index, where it can be used to quickly locate
+ * artifact metadata and content attachments, including library, Javadoc, and source code JARs.
  * </p>
  *
  * <p><b>Properties</b></p>
  *
  * <ul>
+ *     <li>{@link #name()}</li>
  *     <li>{@link #uri()}</li>
  * </ul>
  *
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link Repository#resolveArtifacts(Collection)} - Gets the {@link Artifact} for the given descriptor</li>
+ *     <li>{@link Repository#resolveArtifacts(ObjectList)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
- * <p><b>Adding and Removing Artifacts</b></p>
+ * <p><b>Installing Artifacts</b></p>
  *
  * <ul>
- *     <li>{@link #installArtifact(Artifact)} - Adds the given artifact with the given attached resources</li>
- *     <li>{@link #clearArtifacts()} - Removes all data from this repository</li>
+ *     <li>{@link #installArtifact(Artifact)} - Installs the given artifact in this repository, along with its attached resources</li>
  * </ul>
  *
  * @author Jonathan Locke
  * @see BaseRepository
  * @see Repository
- * @see CacheFiascoRepository
+ * @see CacheRepository
  */
 @SuppressWarnings({ "unused", "SameParameterValue" })
-public class LocalFiascoRepository extends BaseRepository
+public class LocalRepository extends BaseRepository
 {
     /** Separator to use between artifact entries in the artifacts.txt file */
     private final String ARTIFACT_SEPARATOR = "\n========\n";
@@ -75,13 +74,16 @@ public class LocalFiascoRepository extends BaseRepository
     /** The file for storing all artifact metadata in JSON format */
     private final File metadataFile;
 
+    /** The append-only download cache repository */
+    private final CacheRepository downloads = new CacheRepository("download-cache-repository");
+
     /**
      * Creates a local Fiasco repository in the given folder
      *
      * @param name The name of the repository
      * @param rootFolder The root folder of the repository
      */
-    public LocalFiascoRepository(@NotNull String name, @NotNull Folder rootFolder)
+    public LocalRepository(@NotNull String name, @NotNull Folder rootFolder)
     {
         super(name, rootFolder.uri());
         this.rootFolder = rootFolder;
@@ -94,21 +96,12 @@ public class LocalFiascoRepository extends BaseRepository
      *
      * @param name The name of the repository
      */
-    public LocalFiascoRepository(@NotNull String name)
+    public LocalRepository(@NotNull String name)
     {
         this(name, fiascoCacheFolder()
             .folder(name)
             .mkdirs()
             .ensureExists());
-    }
-
-    /**
-     * Removes all data from this repository
-     */
-    @Override
-    public void clearArtifacts()
-    {
-        lock().write(() -> ensure(rootFolder.delete()));
     }
 
     /**
@@ -131,28 +124,31 @@ public class LocalFiascoRepository extends BaseRepository
     }
 
     /**
-     * {@inheritDoc}
-     */
-    @Override
-    public boolean isRemote()
-    {
-        return false;
-    }
-
-    /**
      * Gets the artifacts for the given artifact descriptors
      *
      * @param descriptors The artifact descriptors
      * @return The artifacts
      */
     @Override
-    public final ObjectList<Artifact> resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
+    public final ObjectList<Artifact> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
     {
         return lock().read(() ->
         {
+            // Find the artifacts that are in this repository,
+            var resolvedArtifacts = resolve(descriptors);
+            var resolvedDescriptors = resolvedArtifacts.map(Artifact::artifactDescriptor);
+
+            // and those that are not.
+            var unresolvedDescriptors = descriptors.without(resolvedDescriptors::contains);
+
+            // Install and resolve any unresolved artifacts that are in the downloads cache.
+            var downloadedArtifacts = downloads.resolveArtifacts(unresolvedDescriptors);
+            downloadedArtifacts.forEach(this::installArtifact);
+            resolvedArtifacts.addAll(downloadedArtifacts);
+
+            // Return the resolved artifacts with their content attached.
             ObjectList<Artifact> resolved = list();
-            resolve(descriptors).forEach(artifact ->
-                resolved.add(loadArtifactContent(artifact)));
+            resolvedArtifacts.forEach(artifact -> resolved.add(loadArtifactContent(artifact)));
             return resolved;
         });
     }

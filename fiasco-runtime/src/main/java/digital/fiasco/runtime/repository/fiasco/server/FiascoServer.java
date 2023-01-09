@@ -9,7 +9,7 @@ import com.telenav.kivakit.resource.resources.InputResource;
 import com.telenav.kivakit.resource.resources.OutputResource;
 import com.telenav.kivakit.resource.writing.WritableResource;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.repository.fiasco.CacheFiascoRepository;
+import digital.fiasco.runtime.repository.fiasco.CacheRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.Socket;
@@ -22,8 +22,9 @@ import static com.telenav.kivakit.resource.WriteMode.STREAM;
 import static digital.fiasco.runtime.repository.fiasco.server.FiascoRepositoryRequest.requestFromJson;
 
 /**
- * A server application that accepts JSON {@link FiascoRepositoryRequest}s and produces
- * {@link FiascoRepositoryResponse}s followed by content data. {@link FiascoServer}s run on port {@link #FIASCO_PORT}.
+ * A server application that accepts JSON-encoded {@link FiascoRepositoryRequest}s and produces
+ * {@link FiascoRepositoryResponse}s. Following the response JSON is the binary content for each resolved artifact.
+ * {@link FiascoServer}s run on port {@link #FIASCO_PORT}.
  *
  * @author Jonathan Locke
  */
@@ -33,7 +34,7 @@ public class FiascoServer extends Application
     public static final int FIASCO_PORT = 25_555;
 
     /** The server's repository */
-    private final Repository repository = new CacheFiascoRepository("server-repository");
+    private final Repository repository = new CacheRepository("fiasco-server-repository");
 
     @Override
     public void onRun()

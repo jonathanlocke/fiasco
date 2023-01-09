@@ -9,7 +9,6 @@ import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 
 import java.io.InputStream;
-import java.util.Collection;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
@@ -22,9 +21,9 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
  * <p><b>Descriptors</b></p>
  *
  * <ul>
- *     <li>{@link #with(ArtifactDescriptor)}</li>
- *     <li>{@link #addAll(Collection)}</li>
  *     <li>{@link #descriptors()}</li>
+ *     <li>{@link #with(ArtifactDescriptor...)}</li>
+ *     <li>{@link #with(Iterable)}</li>
  * </ul>
  *
  * <p><b>Serialization</b></p>
@@ -71,6 +70,12 @@ public class FiascoRepositoryRequest
         var serialized = new StringOutputResource();
         serializer.writeObject(serialized, new SerializableObject<>(this));
         return serialized.string();
+    }
+
+    @Override
+    public String toString()
+    {
+        return descriptors.join(", ");
     }
 
     /**

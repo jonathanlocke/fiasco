@@ -15,10 +15,10 @@ import digital.fiasco.runtime.build.builder.tools.BaseTool;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.Repository;
-
-import java.util.Collection;
+import digital.fiasco.runtime.repository.fiasco.LocalRepository;
+import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
+import digital.fiasco.runtime.repository.maven.MavenRepository;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
@@ -26,12 +26,15 @@ import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.core.version.Version.version;
+import static com.telenav.kivakit.resource.Uris.uri;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
 /**
- * Manages {@link Library} artifacts and their dependencies. Searches a list of repositories added with
- * {@link #lookIn(Repository)} to resolve libraries and their dependencies.
+ * Manages {@link Artifact}s and their dependencies. Searches the list of repositories added to this librarian with
+ * {@link #lookIn(Repository)} to resolve artifacts. When artifacts are downloaded from a {@link RemoteRepository} or a
+ * remote {@link MavenRepository}, they are added to a download cache, which is first in the search order for
+ * artifacts.
  *
  * <p><b>Finding Libraries</b></p>
  *
@@ -41,12 +44,6 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
  *     <li>{@link #lookIn(Repository)} - Adds a repository to look in when resolving libraries</li>
  *     <li>{@link #repositories()} - The list of repositories to search</li>
  *     <li>{@link #pinVersion(ArtifactDescriptor, Version)} - Pins the given artifact to the specified version</li>
- * </ul>
- *
- * <p><b>Adding Libraries</b></p>
- *
- * <ul>
- *     <li>{@link #install(Repository, Artifact)} - Adds the given library and its attached content to the given repository</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -64,9 +61,8 @@ public class Librarian extends BaseTool
     {
         super(builder);
 
-        //lookIn(new LocalFiascoRepository("user-repository"));
-        //lookIn(new CacheFiascoRepository("download-repository"));
-        //lookIn(new MavenRepository("maven-central", uri("https://repo1.maven.org/maven2/")));
+        lookIn(new LocalRepository("repository"));
+        lookIn(new MavenRepository("maven-central", uri("https://repo1.maven.org/maven2/")));
     }
 
     /**
@@ -76,9 +72,9 @@ public class Librarian extends BaseTool
      * @param artifact The artifact
      * @return The artifact and all of its dependencies
      */
-    public DependencyList dependencies(Artifact artifact)
+    public DependencyList<Artifact> dependencies(Artifact artifact)
     {
-        DependencyList dependencies = dependencyList();
+        DependencyList<Artifact> dependencies = dependencyList();
 
         // Go through the library's dependencies,
         for (var dependency : artifact.dependencies().asArtifactList())
@@ -133,19 +129,6 @@ public class Librarian extends BaseTool
               repositories: $
               pinned versions: $
             """, repositories, pinnedVersions);
-    }
-
-    /**
-     * Installs the given library in the target repository
-     *
-     * @param target The repository to deploy to
-     * @param artifact The library to install
-     */
-    public Librarian install(Repository target, Artifact artifact)
-    {
-        var resolved = target.resolveArtifacts(list(artifact.artifactDescriptor()));
-        target.installArtifact(resolved.first());
-        return this;
     }
 
     /**
@@ -243,15 +226,20 @@ public class Librarian extends BaseTool
      * @param descriptors The descriptor
      * @return The library
      */
-    public ObjectList<Artifact> resolve(Collection<ArtifactDescriptor> descriptors)
+    public ObjectList<Artifact> resolve(ObjectList<ArtifactDescriptor> descriptors)
     {
-        // Go through each repository,
         ObjectList<Artifact> artifacts = list();
-        for (var at : repositories())
+
+        // Go through each repository,
+        for (var repository : repositories())
         {
-            // and if we can resolve the artifact,
-            artifacts.addAll(at.resolveArtifacts(descriptors));
+            // resolve as many descriptors as possible from the repository.
+            var resolved = repository.resolveArtifacts(descriptors);
+
+            // Add the resolved artifacts to the result.
+            artifacts.addAll(resolved);
         }
+
         return artifacts;
     }
 

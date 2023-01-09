@@ -9,6 +9,7 @@ import digital.fiasco.runtime.repository.Repository;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
+import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
@@ -98,7 +99,7 @@ public abstract class BaseArtifact implements Artifact
     protected ArtifactDescriptor descriptor;
 
     /** List of dependent artifacts */
-    protected DependencyList dependencies = dependencyList();
+    protected DependencyList<Artifact> dependencies = dependencyList();
 
     /** Dependency exclusions for this artifact */
     private ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptAll());
@@ -127,7 +128,7 @@ public abstract class BaseArtifact implements Artifact
         this.descriptor = that.artifactDescriptor();
         this.dependencies = that.dependencies().copy();
         this.exclusions = that.exclusions().copy();
-        this.attachments = that.attachmentMap().copy();
+        this.attachments = that.attachments.copy();
     }
 
     protected BaseArtifact()
@@ -135,10 +136,19 @@ public abstract class BaseArtifact implements Artifact
     }
 
     /**
-     * Returns the attached resource for the given artifact suffix, such as <i>.jar</i>
+     * {@inheritDoc}
+     */
+    @Override
+    public final ArtifactDescriptor artifactDescriptor()
+    {
+        return descriptor;
+    }
+
+    /**
+     * Returns the attached resource for the given suffix, such as <i>.jar</i> or <i>-sources.jar</i>.
      *
      * @param suffix The artifact suffix
-     * @return The attached resource
+     * @return Any attached resource with the given name, or null if there is none
      */
     @Override
     public ArtifactAttachment attachment(String suffix)
@@ -158,21 +168,37 @@ public abstract class BaseArtifact implements Artifact
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a list of artifacts without any excluded artifacts
+     *
+     * @return The artifacts
      */
     @Override
-    public final DependencyList dependencies()
+    public DependencyList<Artifact> dependencies()
     {
-        return dependencies;
+        var copy = dependencies.copy();
+        for (var exclusion : exclusions)
+        {
+            copy = copy.without(at -> exclusion.matches(at.artifactDescriptor()));
+        }
+        return copy;
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the named dependency of this artifact
+     *
+     * @param name The name of the dependency
+     * @return The dependency
      */
-    @Override
-    public final ArtifactDescriptor artifactDescriptor()
+    public Artifact dependency(String name)
     {
-        return descriptor;
+        for (var at : dependencies)
+        {
+            if (at.name().equals(name))
+            {
+                return at;
+            }
+        }
+        return illegalState("No dependency $ found", name);
     }
 
     /**
@@ -210,22 +236,19 @@ public abstract class BaseArtifact implements Artifact
     public String mavenPom()
     {
         var dependencies = stringList();
-        for (var at : dependencies())
+        for (var artifact : dependencies())
         {
-            if (at instanceof Artifact artifact)
-            {
-                var descriptor = artifact.artifactDescriptor();
-                dependencies.add("""
-                        <dependency>
-                          <groupId>$</groupId>
-                          <artifactId>$</artifactId>
-                          <version>$</version>
-                        </dependency>
-                         """,
-                    descriptor.group(),
-                    descriptor.artifact(),
-                    descriptor.version());
-            }
+            var descriptor = artifact.artifactDescriptor();
+            dependencies.add("""
+                    <dependency>
+                      <groupId>$</groupId>
+                      <artifactId>$</artifactId>
+                      <version>$</version>
+                    </dependency>
+                     """,
+                descriptor.group(),
+                descriptor.artifact(),
+                descriptor.version());
         }
 
         return format("""
@@ -290,6 +313,14 @@ public abstract class BaseArtifact implements Artifact
         return copy;
     }
 
+    @Override
+    public Artifact withAttachments(ObjectMap<String, ArtifactAttachment> attachments)
+    {
+        var copy = copy();
+        ((BaseArtifact) copy).attachments = attachments;
+        return copy;
+    }
+
     /**
      * Returns primary content attachment for this asset
      *
@@ -310,7 +341,7 @@ public abstract class BaseArtifact implements Artifact
      * @return The new artifact
      */
     @Override
-    public Artifact withDependencies(DependencyList dependencies)
+    public Artifact withDependencies(DependencyList<Artifact> dependencies)
     {
         var copy = (BaseArtifact) copy();
         copy.dependencies = dependencies.copy();

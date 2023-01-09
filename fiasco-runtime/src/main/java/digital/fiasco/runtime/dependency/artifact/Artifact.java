@@ -109,6 +109,14 @@ public interface Artifact extends Dependency
     }
 
     /**
+     * Returns the descriptor for this artifact
+     *
+     * @return The artifact descriptor
+     */
+    @Override
+    ArtifactDescriptor artifactDescriptor();
+
+    /**
      * Returns the attached resource for the given artifact suffix, such as <i>.jar</i>
      *
      * @param suffix The artifact suffix
@@ -151,14 +159,7 @@ public interface Artifact extends Dependency
      * @return The dependency list
      */
     @Override
-    DependencyList dependencies();
-
-    /**
-     * Returns the descriptor for this artifact
-     *
-     * @return The artifact descriptor
-     */
-    ArtifactDescriptor artifactDescriptor();
+    DependencyList<Artifact> dependencies();
 
     /**
      * Returns true if this artifact excludes the given artifact
@@ -222,11 +223,18 @@ public interface Artifact extends Dependency
     }
 
     /**
-     * Attaches the resource for the given artifact suffix, such as <i>.jar</i>
+     * Attaches the given artifact attachment to this artifact
      *
      * @param attachment The content to attach
      */
     Artifact withAttachment(ArtifactAttachment attachment);
+
+    /**
+     * Attaches the resource for the given artifact suffix, such as <i>.jar</i>
+     *
+     * @param attachments The content to attach
+     */
+    Artifact withAttachments(ObjectMap<String, ArtifactAttachment> attachments);
 
     /**
      * Returns primary content attachment for this asset
@@ -246,7 +254,7 @@ public interface Artifact extends Dependency
      * @param dependencies The new dependencies
      * @return The new artifact
      */
-    Artifact withDependencies(DependencyList dependencies);
+    Artifact withDependencies(DependencyList<Artifact> dependencies);
 
     /**
      * Returns a copy of this artifact with the given descriptor

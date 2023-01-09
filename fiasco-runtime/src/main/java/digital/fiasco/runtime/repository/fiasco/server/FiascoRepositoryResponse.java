@@ -1,8 +1,8 @@
 package digital.fiasco.runtime.repository.fiasco.server;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
+import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.StringOutputResource;
-import com.telenav.kivakit.resource.resources.StringResource;
 import com.telenav.kivakit.resource.serialization.SerializableObject;
 import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
@@ -21,12 +21,14 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  *
  * <ul>
  *     <li>{@link #artifacts()}</li>
+ *     <li>{@link #with(Artifact...)}</li>
+ *     <li>{@link #with(Collection)}</li>
  * </ul>
  *
  * <p><b>Serialization</b></p>
  *
  * <ul>
- *     <li>{@link #responseFromJson(String)}</li>
+ *     <li>{@link #responseFromJson(Resource)}</li>
  *     <li>{@link #toJson()}</li>
  * </ul>
  *
@@ -38,14 +40,13 @@ public class FiascoRepositoryResponse
     /**
      * Returns the response for the given JSON
      *
-     * @param json The JSON
+     * @param in The JSON to read
      * @return The response
      */
-    public static FiascoRepositoryResponse responseFromJson(String json)
+    public static FiascoRepositoryResponse responseFromJson(Resource in)
     {
-        var serialized = new StringResource(json);
         var serializer = new GsonObjectSerializer();
-        return serializer.readObject(serialized, FiascoRepositoryResponse.class).object();
+        return serializer.readObject(in, FiascoRepositoryResponse.class).object();
     }
 
     /** The list of artifact content metadata */
@@ -57,6 +58,28 @@ public class FiascoRepositoryResponse
     public ObjectList<Artifact> artifacts()
     {
         return artifacts;
+    }
+
+    /**
+     * Sets the artifacts for this response
+     *
+     * @param artifacts The artifacts
+     */
+    public void artifacts(ObjectList<Artifact> artifacts)
+    {
+        this.artifacts = artifacts;
+    }
+
+    /**
+     * Returns a shallow copy of this response
+     *
+     * @return The copy
+     */
+    public FiascoRepositoryResponse copy()
+    {
+        var copy = new FiascoRepositoryResponse();
+        copy.artifacts = artifacts.copy();
+        return copy;
     }
 
     /**
@@ -74,7 +97,7 @@ public class FiascoRepositoryResponse
      *
      * @param artifacts The artifacts to add
      */
-    FiascoRepositoryResponse with(Collection<Artifact> artifacts)
+    public FiascoRepositoryResponse with(Collection<Artifact> artifacts)
     {
         var copy = new FiascoRepositoryResponse();
         copy.artifacts = this.artifacts.with(artifacts);
@@ -86,7 +109,7 @@ public class FiascoRepositoryResponse
      *
      * @param artifact The artifact to add
      */
-    FiascoRepositoryResponse with(Artifact... artifact)
+    public FiascoRepositoryResponse with(Artifact... artifact)
     {
         var copy = new FiascoRepositoryResponse();
         copy.artifacts = artifacts.with(artifact);

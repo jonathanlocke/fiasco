@@ -21,7 +21,6 @@ import digital.fiasco.runtime.repository.maven.resolver.MavenResolver;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
-import java.util.Collection;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.fail;
@@ -50,15 +49,13 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link digital.fiasco.runtime.repository.Repository#resolveArtifacts(Collection)} - Gets the {@link Artifact}s for the given descriptors</li>
+ *     <li>{@link digital.fiasco.runtime.repository.Repository#resolveArtifacts(ObjectList)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
- * <p><b>Adding and Removing Artifacts</b></p>
+ * <p><b>Installing Artifacts</b></p>
  *
  * <ul>
- *     <li>{@link #installArtifact(Artifact)} - Adds the given artifact with the given attached resources to
- *     this repository (if allowed)</li>
- *     <li>{@link #clearArtifacts()} - Removes all data from this repository</li>
+ *     <li>{@link #installArtifact(Artifact)} - Installs the given artifact in this repository, along with its attached resources</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -87,18 +84,6 @@ public class MavenRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public void clearArtifacts()
-    {
-        lock().write(() ->
-        {
-            rootFolder.delete();
-        });
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
     public void installArtifact(Artifact artifact)
     {
         lock().write(() ->
@@ -114,20 +99,17 @@ public class MavenRepository extends BaseRepository
         });
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
     public boolean isRemote()
     {
-        return !(rootFolder instanceof Folder);
+        return !uri().getScheme().equals("file");
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
-    public ObjectList<Artifact> resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
+    public ObjectList<Artifact> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
     {
         ObjectList<Artifact> resolved = list();
 

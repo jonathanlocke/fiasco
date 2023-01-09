@@ -5,10 +5,10 @@ import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.resource.Resource;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
+import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 
 import java.net.URI;
-import java.util.Collection;
 
 /**
  * Interface to a repository that stores and resolves artifacts and their content attachments.
@@ -16,14 +16,13 @@ import java.util.Collection;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(Collection)} - Resolves a list of descriptors into a list of {@link Artifact}s, including content attachments</li>
+ *     <li>{@link #resolveArtifacts(ObjectList)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
- * <p><b>Adding and Removing Artifacts</b></p>
+ * <p><b>Installing Artifacts</b></p>
  *
  * <ul>
- *     <li>{@link #installArtifact(Artifact)} - Adds the given artifact and its content</li>
- *     <li>{@link #clearArtifacts()} - Removes all data from this repository</li>
+ *     <li>{@link #installArtifact(Artifact)} - Installs the given artifact in this repository, along with its attached resources</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -31,13 +30,6 @@ import java.util.Collection;
 @SuppressWarnings("unused")
 public interface Repository extends Repeater, Named
 {
-    /**
-     * Removes all artifacts from this repository
-     *
-     * @throws IllegalArgumentException Thrown if the repository cannot be cleared
-     */
-    void clearArtifacts();
-
     /**
      * Adds the given content {@link Resource}s to content.bin, and the {@link Artifact} metadata to metadata.txt in
      * JSON format.
@@ -48,9 +40,14 @@ public interface Repository extends Repeater, Named
     void installArtifact(Artifact artifact);
 
     /**
-     * Returns true if this is a remote repository
+     * Returns true if this repository is remote
+     *
+     * @return True if this is remote
      */
-    boolean isRemote();
+    default boolean isRemote()
+    {
+        return false;
+    }
 
     /**
      * Resolves each artifact descriptor to an {@link Artifact} complete with content attachments
@@ -59,7 +56,7 @@ public interface Repository extends Repeater, Named
      * @return The resolved artifacts
      * @throws IllegalArgumentException Thrown if any descriptor cannot be resolved
      */
-    ObjectList<Artifact> resolveArtifacts(Collection<ArtifactDescriptor> descriptors);
+    ObjectList<Artifact> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors);
 
     /**
      * Returns the URI of this repository

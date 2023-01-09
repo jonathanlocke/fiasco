@@ -1,26 +1,41 @@
 package digital.fiasco.runtime.repository.fiasco;
 
 import com.telenav.kivakit.filesystem.File;
-import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.resource.resources.ResourceSection;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
-
-import java.util.Collection;
+import digital.fiasco.runtime.repository.fiasco.server.FiascoServer;
 
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.resource.WriteMode.APPEND;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
 
 /**
- * A high performance repository of artifacts and their metadata.
+ * A high-performance repository of artifacts and their metadata.
+ *
+ * <p><b>Uses</b></p>
  *
  * <p>
- * An instance of this repository is used as a download cache to avoid unnecessary downloads when a user wipes out their
- * repository, causing it to repopulate. Instead of repopulating from Maven Central or another remote repository, the
- * artifacts in this cache can be used. Because downloaded artifacts are not mutable in Maven Central (and should not be
- * mutable in any other repository), it should rarely be necessary to remove the download repository.
+ * An instance of {@link CacheRepository} is used as an artifact cache to avoid unnecessary downloads when a user wipes
+ * out their {@link LocalRepository}, causing it to repopulate. Instead of repopulating from Maven Central or another
+ * remote repository, the artifacts in this repository can be used since artifacts and their metadata are never altered,
+ * only appended to their respective <i>artifacts.txt</i> and <i>artifact-content.binary</i>files. Because remote
+ * artifacts are guaranteed by Maven Central (and other remote repositories) to be immutable, it should rarely be
+ * necessary to remove a download cache repository.
+ * </p>
+ *
+ * <p>
+ * Another instance of this repository is used by {@link FiascoServer} to respond quickly to requests to resolve one or
+ * more artifact descriptors.
+ * </p>
+ *
+ * <p><b>Content Storage</b></p>
+ *
+ * <p>
+ * This class inherits metadata storage from {@link LocalRepository}, but instead of storing content in a folder tree,
+ * {@link CacheRepository} stores content end-to-end in a single, randomly-accessed binary file to increase performance.
+ * The metadata for an artifact includes the offset and size of each content attachment in the binary content file.
  * </p>
  *
  * <p><b>Properties</b></p>
@@ -33,32 +48,31 @@ import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link digital.fiasco.runtime.repository.Repository#resolveArtifacts(Collection)} - Gets the {@link Artifact} for the given descriptor, including its content attachments</li>
+ *     <li>{@link digital.fiasco.runtime.repository.Repository#resolveArtifacts(com.telenav.kivakit.core.collections.list.ObjectList)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
- * <p><b>Adding and Removing Artifacts</b></p>
+ * <p><b>Installing Artifacts</b></p>
  *
  * <ul>
  *     <li>{@link #installArtifact(Artifact)} - Adds the given artifact with the given attached resources</li>
- *     <li>{@link #clearArtifacts()} - Removes all data from this repository</li>
  * </ul>
  *
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class CacheFiascoRepository extends LocalFiascoRepository
+public class CacheRepository extends LocalRepository
 {
     /** The binary file containing artifacts, laid out end-to-end */
     private final File artifactContentFile = repositoryRootFile("artifact-content.binary");
 
-    public CacheFiascoRepository(String name, Folder rootFolder)
+    /**
+     * Creates a cache repository in the Fiasco cache folder
+     *
+     * @param name The name of the repository
+     */
+    public CacheRepository(String name)
     {
-        super(name, rootFolder);
-    }
-
-    public CacheFiascoRepository(String name)
-    {
-        this(name, fiascoCacheFolder().folder(name));
+        super(name, fiascoCacheFolder().folder(name));
     }
 
     /**
@@ -72,21 +86,25 @@ public class CacheFiascoRepository extends LocalFiascoRepository
     {
         lock().write(() ->
         {
-            try
+            // If we don't already have this artifact installed,
+            if (!contains(artifact))
             {
-                // Append each attachment to the attachments file,
-                var source = artifact;
-                for (var attachment : source.attachments())
+                try
                 {
-                    source = source.withAttachment(saveAttachment(attachment));
-                }
+                    // append each attachment to the attachments file,
+                    var source = artifact;
+                    for (var attachment : source.attachments())
+                    {
+                        source = source.withAttachment(saveAttachment(attachment));
+                    }
 
-                // then append the updated metadata.
-                super.saveArtifactMetadata(source);
-            }
-            catch (Exception e)
-            {
-                problem(e, "Unable to install artifact: $", artifact);
+                    // then append the updated metadata.
+                    super.saveArtifactMetadata(source);
+                }
+                catch (Exception e)
+                {
+                    problem(e, "Unable to install artifact: $", artifact);
+                }
             }
         });
     }
