@@ -132,6 +132,17 @@ public class Git extends BaseTool
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onRun()
+    {
+        information(description());
+        output = operatingSystem().execute(this,
+            folder.asJavaFile(), arguments.asStringArray());
+    }
+
+    /**
      * Returns the output from running this tool
      */
     public String output()
@@ -163,16 +174,5 @@ public class Git extends BaseTool
         var copy = copy();
         copy.folder = folder;
         return copy;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onRun()
-    {
-        information(description());
-        output = operatingSystem().execute(this,
-            folder.asJavaFile(), arguments.asStringArray());
     }
 }

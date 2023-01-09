@@ -1,10 +1,7 @@
-package digital.fiasco.runtime.dependency.processing;
+package digital.fiasco.runtime.dependency;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
-import digital.fiasco.runtime.dependency.Dependency;
-import digital.fiasco.runtime.dependency.DependencyList;
-import digital.fiasco.runtime.dependency.DependencyTree;
 
 /**
  * Plans for parallel processing of a dependency tree by repeatedly breaking the tree into groups of dependencies which

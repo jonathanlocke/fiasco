@@ -7,8 +7,8 @@ import digital.fiasco.runtime.dependency.processing.TaskResult;
 
 /**
  * A {@link Task} that runs a {@link Builder}, which can be executed in parallel with other builders. The task waits for
- * the set of artifacts required by the builder to be resolved by one or more {@link ArtifactResolverTask}s before running the
- * builder.
+ * the set of artifacts required by the builder to be resolved by one or more {@link ArtifactResolverTask}s before
+ * running the builder.
  *
  * @param builder The builder to run
  * @param resolved The artifacts that must be resolved before running

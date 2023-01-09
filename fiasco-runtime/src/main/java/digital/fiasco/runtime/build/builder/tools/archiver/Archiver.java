@@ -65,6 +65,18 @@ public class Archiver extends BaseTool
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onRun()
+    {
+        try (var archive = zipArchive(this, archiveFile, WRITE))
+        {
+            archive.add(files);
+        }
+    }
+
+    /**
      * Returns a copy of this archiver with the given files
      *
      * @param files The files to add to the archive
@@ -101,17 +113,5 @@ public class Archiver extends BaseTool
         var copy = copy();
         copy.files = fileList(files);
         return copy;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onRun()
-    {
-        try (var archive = zipArchive(this, archiveFile, WRITE))
-        {
-            archive.add(files);
-        }
     }
 }

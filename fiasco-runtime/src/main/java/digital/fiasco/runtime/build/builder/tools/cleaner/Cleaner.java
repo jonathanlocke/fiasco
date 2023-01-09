@@ -54,6 +54,25 @@ public class Cleaner extends BaseTool
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onRun()
+    {
+        information("Cleaning $ files", files.count());
+
+        files.forEach(file ->
+        {
+            file.delete();
+            var parent = file.parent();
+            if (parent.isEmpty())
+            {
+                parent.delete();
+            }
+        });
+    }
+
+    /**
      * Records the list of files to remove
      *
      * @param files The files to remove
@@ -77,24 +96,5 @@ public class Cleaner extends BaseTool
         var copy = copy();
         this.files = fileList(this.files.with(files));
         return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onRun()
-    {
-        information("Cleaning $ files", files.count());
-
-        files.forEach(file ->
-        {
-            file.delete();
-            var parent = file.parent();
-            if (parent.isEmpty())
-            {
-                parent.delete();
-            }
-        });
     }
 }

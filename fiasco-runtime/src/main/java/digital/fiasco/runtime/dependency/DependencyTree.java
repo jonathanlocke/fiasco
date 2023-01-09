@@ -2,7 +2,6 @@ package digital.fiasco.runtime.dependency;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.messages.MessageException;
-import digital.fiasco.runtime.dependency.processing.DependencyGrouper;
 
 import static com.telenav.kivakit.core.ensure.Ensure.fail;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;

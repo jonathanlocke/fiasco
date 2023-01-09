@@ -95,6 +95,39 @@ public class Copier extends BaseTool
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onRun()
+    {
+        information("Copying from $ to $",
+            source.relativeTo(rootFolder()),
+            to.relativeTo(rootFolder()));
+
+        // For each source file in the 'from' folder that matches,
+        var files = source.files(file -> (includes == null || includes.matches(file))
+            && (excludes == null || !excludes.matches(file)), traversal);
+        progress.steps(files.count());
+        progress.start("Copying " + files.size() + " files");
+        for (var source : files)
+        {
+            // find the path relative to the root,
+            var relative = source.relativeTo(this.source);
+
+            // construct a file with the same path relative to the 'to' folder,
+            var destination = to.file(relative);
+
+            // create any parent folders that might be required
+            destination.parent().mkdirs();
+
+            // and copy the source file to the destination location
+            source.safeCopyTo(destination, OVERWRITE, progress);
+            progress.next();
+        }
+        progress.end(files.size() + " files copied");
+    }
+
+    /**
      * Returns a copy of this copier that includes resources matching the given glob
      *
      * @param glob The glob pattern
@@ -181,38 +214,5 @@ public class Copier extends BaseTool
         var copy = copy();
         copy.excludes = (Matcher<ResourcePathed>) excludes.or(matcher);
         return copy;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onRun()
-    {
-        information("Copying from $ to $",
-            source.relativeTo(rootFolder()),
-            to.relativeTo(rootFolder()));
-
-        // For each source file in the 'from' folder that matches,
-        var files = source.files(file -> (includes == null || includes.matches(file))
-            && (excludes == null || !excludes.matches(file)), traversal);
-        progress.steps(files.count());
-        progress.start("Copying " + files.size() + " files");
-        for (var source : files)
-        {
-            // find the path relative to the root,
-            var relative = source.relativeTo(this.source);
-
-            // construct a file with the same path relative to the 'to' folder,
-            var destination = to.file(relative);
-
-            // create any parent folders that might be required
-            destination.parent().mkdirs();
-
-            // and copy the source file to the destination location
-            source.safeCopyTo(destination, OVERWRITE, progress);
-            progress.next();
-        }
-        progress.end(files.size() + " files copied");
     }
 }

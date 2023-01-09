@@ -132,6 +132,15 @@ public class Compiler extends BaseTool
     }
 
     /**
+     * {@inheritDoc}
+     */
+    @Override
+    public void onRun()
+    {
+        compile(sourceMainJavaSources());
+    }
+
+    /**
      * Returns the source code locale
      */
     public Locale sourceLocale()
@@ -226,15 +235,6 @@ public class Compiler extends BaseTool
         var copy = copy();
         copy.targetVersion = version;
         return copy;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public void onRun()
-    {
-        compile(sourceMainJavaSources());
     }
 
     /**
