@@ -3,6 +3,7 @@ package digital.fiasco.runtime.dependency;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
+import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import org.jetbrains.annotations.NotNull;
 
@@ -79,6 +80,16 @@ public class DependencyList<T extends Dependency> extends ObjectList<T>
     public ObjectList<ArtifactDescriptor> artifactDescriptors()
     {
         return map(Dependency::artifactDescriptor);
+    }
+
+    public DependencyList<Artifact<?>> asArtifactList()
+    {
+        var wildcard = new DependencyList<Artifact<?>>();
+        for (var at : this)
+        {
+            wildcard.add((Artifact<?>) at);
+        }
+        return wildcard;
     }
 
     /**

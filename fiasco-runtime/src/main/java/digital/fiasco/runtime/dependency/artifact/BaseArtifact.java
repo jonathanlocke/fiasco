@@ -90,7 +90,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONT
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public abstract class BaseArtifact<T extends Artifact<T>> implements Artifact<T>
+public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifact<T>
 {
     /** The repository where this artifact is hosted */
     private Repository repository;
@@ -99,10 +99,10 @@ public abstract class BaseArtifact<T extends Artifact<T>> implements Artifact<T>
     protected ArtifactDescriptor descriptor;
 
     /** List of dependent artifacts */
-    protected DependencyList<T> dependencies = dependencyList();
+    protected DependencyList<Artifact<?>> dependencies = dependencyList();
 
     /** Dependency exclusions for this artifact */
-    private ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptAll());
+    protected ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptAll());
 
     /** The content attachments by suffix */
     private ObjectMap<String, ArtifactAttachment> attachments = new ObjectMap<>();
@@ -167,13 +167,16 @@ public abstract class BaseArtifact<T extends Artifact<T>> implements Artifact<T>
         return attachments;
     }
 
+    @Override
+    public abstract T copy();
+
     /**
      * Returns a list of artifacts without any excluded artifacts
      *
      * @return The artifacts
      */
     @Override
-    public DependencyList<T> dependencies()
+    public DependencyList<Artifact<?>> dependencies()
     {
         var copy = dependencies.copy();
         for (var exclusion : exclusions)
@@ -195,7 +198,8 @@ public abstract class BaseArtifact<T extends Artifact<T>> implements Artifact<T>
         {
             if (at.name().equals(name))
             {
-                return at;
+                // noinspection unchecked
+                return (T) at;
             }
         }
         return illegalState("No dependency $ found", name);
@@ -317,7 +321,7 @@ public abstract class BaseArtifact<T extends Artifact<T>> implements Artifact<T>
     public T withAttachments(ObjectMap<String, ArtifactAttachment> attachments)
     {
         var copy = copy();
-        ((BaseArtifact<?>) copy).attachments = attachments;
+        ((BaseArtifact<T>) copy).attachments = attachments;
         return copy;
     }
 
@@ -341,7 +345,7 @@ public abstract class BaseArtifact<T extends Artifact<T>> implements Artifact<T>
      * @return The new artifact
      */
     @Override
-    public T withDependencies(DependencyList<T> dependencies)
+    public T withDependencies(DependencyList<Artifact<?>> dependencies)
     {
         var copy = copy();
         copy.dependencies = dependencies.copy();
@@ -384,7 +388,7 @@ public abstract class BaseArtifact<T extends Artifact<T>> implements Artifact<T>
     public T withoutDependencies(Matcher<ArtifactDescriptor> pattern)
     {
         var copy = copy();
-        copy.exclusions().add(pattern);
+        copy.exclusions.add(pattern);
         return copy;
     }
 

@@ -8,7 +8,7 @@ import com.telenav.kivakit.resource.FileName;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.ResourceFolder;
 import com.telenav.kivakit.resource.ResourcePath;
-import digital.fiasco.runtime.dependency.Dependency;
+import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
@@ -22,13 +22,11 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 
-import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.fail;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static com.telenav.kivakit.resource.FileName.parseFileName;
 import static com.telenav.kivakit.resource.ResourcePath.parseResourcePath;
 import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
-import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONTENT_SUFFIX;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.JAVADOC_SUFFIX;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.SOURCES_SUFFIX;
@@ -109,12 +107,12 @@ public class MavenRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public ObjectList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
+    public DependencyList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
     {
-        ObjectList<Artifact<?>> resolved = list();
-
         return lock().read(() ->
         {
+            DependencyList<Artifact<?>> resolved = new DependencyList<>();
+
             // Go through each descriptor,
             for (var descriptor : descriptors)
             {
@@ -134,15 +132,14 @@ public class MavenRepository extends BaseRepository
                         .resolveDependencies(descriptor)
                         .map(MavenDependency::descriptor);
 
-                    var artifacts = resolveArtifacts(dependencyDescriptors);
-                    var dependencies = dependencyList(artifacts);
+                    var resolvedArtifacts = resolveArtifacts(dependencyDescriptors);
 
                     // If the artifact has source code,
                     if (source != null)
                     {
                         // return it as a library,
                         resolved.add(library(descriptor)
-                            .withDependencies(dependencies)
+                            .withDependencies(resolvedArtifacts)
                             .withContent(jar)
                             .withJavadoc(javadoc)
                             .withSource(source));
@@ -151,7 +148,7 @@ public class MavenRepository extends BaseRepository
                     {
                         // otherwise, return it as an asset.
                         resolved.add(asset(descriptor)
-                            .withDependencies(dependencies)
+                            .withDependencies(resolvedArtifacts)
                             .withContent(jar));
                     }
                 }

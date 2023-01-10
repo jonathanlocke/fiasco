@@ -32,9 +32,7 @@ import digital.fiasco.runtime.build.tasks.ArtifactResolverTask;
 import digital.fiasco.runtime.build.tasks.BuilderTask;
 import digital.fiasco.runtime.build.tasks.ResolvedArtifacts;
 import digital.fiasco.runtime.dependency.Dependency;
-import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.processing.Task;
 import digital.fiasco.runtime.dependency.processing.TaskExecutor;
 import digital.fiasco.runtime.dependency.processing.TaskList;
 import digital.fiasco.runtime.dependency.processing.TaskResult;
@@ -318,7 +316,7 @@ public abstract class BaseBuild extends Application implements Build
             for (var builder : group)
             {
                 resolved.waitFor(builder.artifactDependencies());
-                resolved.waitFor(builder.libraryDependencies());
+                resolved.waitFor(builder.libraryDependencies().asArtifactList());
 
                 var task = new BuilderTask(builder, resolved);
                 tasks.add(task);
@@ -355,8 +353,7 @@ public abstract class BaseBuild extends Application implements Build
         var grouped = dependencyTree(root, Artifact.class).grouped();
         for (var group : grouped)
         {
-            var cast = (DependencyList<Artifact<?>>)group;
-            var task = (Task<DependencyList<Artifact<?>>>) new ArtifactResolverTask(settings.librarian(), cast, resolved);
+            var task = new ArtifactResolverTask(settings.librarian(), group.asArtifactList(), resolved);
             var results = executor.process(settings.artifactResolverThreads(), new TaskList<>(list(task)));
             results.matching(at -> at.issues().hasProblems()).forEach(TaskResult::showResult);
         }

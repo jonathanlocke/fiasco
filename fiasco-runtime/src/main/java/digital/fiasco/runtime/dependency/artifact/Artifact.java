@@ -160,7 +160,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @return The dependency list
      */
     @Override
-    DependencyList<T> dependencies();
+    DependencyList<Artifact<?>> dependencies();
 
     /**
      * Returns true if this artifact excludes the given artifact
@@ -255,7 +255,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param dependencies The new dependencies
      * @return The new artifact
      */
-    T withDependencies(DependencyList<T> dependencies);
+    T withDependencies(DependencyList<Artifact<?>> dependencies);
 
     /**
      * Returns a copy of this artifact with the given descriptor

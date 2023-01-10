@@ -71,9 +71,9 @@ public class Librarian extends BaseTool
      * @param artifact The artifact
      * @return The artifact and all of its dependencies
      */
-    public <T extends Artifact<T>> DependencyList<T> dependencies(Artifact<T> artifact)
+    public DependencyList<Artifact<?>> dependencies(Artifact<?> artifact)
     {
-        DependencyList<T> dependencies = dependencyList();
+        DependencyList<Artifact<?>> dependencies = dependencyList();
 
         // Go through the library's dependencies,
         for (var dependency : artifact.dependencies())
@@ -103,8 +103,7 @@ public class Librarian extends BaseTool
                 if (resolved.first().excludes(resolved.first().artifactDescriptor()))
                 {
                     // add it to the dependencies.
-                    // noinspection unchecked
-                    dependencies = dependencies.with((T) resolved.first());
+                    dependencies = dependencies.with(resolved.first());
                     found = true;
                 }
             }
