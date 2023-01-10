@@ -50,14 +50,14 @@ public class FiascoRepositoryResponse
     }
 
     /** The list of artifact content metadata */
-    private transient ObjectList<Artifact> artifacts = list();
+    private transient ObjectList<Artifact<?>> artifacts = list();
 
     /**
      * Returns the artifacts that have been added to this response
      */
-    public ObjectList<Artifact> artifacts()
+    public ObjectList<Artifact<?>> artifacts()
     {
-        return artifacts;
+        return artifacts.copy();
     }
 
     /**
@@ -65,7 +65,7 @@ public class FiascoRepositoryResponse
      *
      * @param artifacts The artifacts
      */
-    public void artifacts(ObjectList<Artifact> artifacts)
+    public void artifacts(ObjectList<Artifact<?>> artifacts)
     {
         this.artifacts = artifacts;
     }
@@ -97,7 +97,7 @@ public class FiascoRepositoryResponse
      *
      * @param artifacts The artifacts to add
      */
-    public FiascoRepositoryResponse with(Collection<Artifact> artifacts)
+    public FiascoRepositoryResponse with(Collection<Artifact<?>> artifacts)
     {
         var copy = new FiascoRepositoryResponse();
         copy.artifacts = this.artifacts.with(artifacts);
@@ -109,7 +109,7 @@ public class FiascoRepositoryResponse
      *
      * @param artifact The artifact to add
      */
-    public FiascoRepositoryResponse with(Artifact... artifact)
+    public final FiascoRepositoryResponse with(Artifact<?>... artifact)
     {
         var copy = new FiascoRepositoryResponse();
         copy.artifacts = artifacts.with(artifact);

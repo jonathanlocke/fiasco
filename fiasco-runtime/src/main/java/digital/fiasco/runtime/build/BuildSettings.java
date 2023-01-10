@@ -32,10 +32,10 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
  * <ul>
  *     <li>{@link #phases()}</li>
  *     <li>{@link #rootFolder()}</li>
- *     <li>{@link #threads()}</li>
+ *     <li>{@link #builderThreads()}</li>
  *     <li>{@link #withPhases(PhaseList)}</li>
  *     <li>{@link #withRootFolder(Folder)}</li>
- *     <li>{@link #withThreads(Count)}</li>
+ *     <li>{@link #withBuilderThreads(Count)}</li>
  * </ul>
  *
  * <p><b>Build Options</b></p>
@@ -99,7 +99,10 @@ public class BuildSettings
     private final Builder builder;
 
     /** The number of threads to use when building */
-    private Count threads;
+    private Count builderThreads;
+
+    /** The number of threads to use when building */
+    private Count artifactResolverThreads;
 
     /** The set of enabled build options */
     private ObjectSet<BuildOption> enabledOptions = set();
@@ -114,7 +117,7 @@ public class BuildSettings
     private ArtifactDescriptor artifactDescriptor;
 
     /** Libraries to compile with */
-    private DependencyList<Artifact> dependencies;
+    private DependencyList<Artifact<?>> dependencies;
 
     /** The librarian to manage libraries */
     private final Librarian librarian;
@@ -141,7 +144,8 @@ public class BuildSettings
         this.builder = that.builder;
         this.rootFolder = that.rootFolder;
         this.phases = that.phases.copy();
-        this.threads = that.threads;
+        this.artifactResolverThreads = that.artifactResolverThreads;
+        this.builderThreads = that.builderThreads;
         this.enabledOptions = that.enabledOptions.copy();
         this.artifactDescriptor = that.artifactDescriptor;
         this.dependencies = that.dependencies().copy();
@@ -158,6 +162,25 @@ public class BuildSettings
     }
 
     /**
+     * Returns the number of threads that should be used to resolve artifacts. This is particularly important for remote
+     * repositories.
+     */
+    public Count artifactResolverThreads()
+    {
+        return artifactResolverThreads;
+    }
+
+    /**
+     * Returns the number of threads to use when building
+     *
+     * @return The thread count
+     */
+    public Count builderThreads()
+    {
+        return builderThreads;
+    }
+
+    /**
      * Returns a copy of this object
      */
     public BuildSettings copy()
@@ -170,7 +193,7 @@ public class BuildSettings
      *
      * @return The libraries to compile against
      */
-    public DependencyList<Artifact> dependencies()
+    public DependencyList<Artifact<?>> dependencies()
     {
         return dependencies;
     }
@@ -326,7 +349,7 @@ public class BuildSettings
      * @param version The version to use
      * @return The build for method chaining
      */
-    public BuildSettings pinVersion(Artifact artifact, String version)
+    public BuildSettings pinVersion(Artifact<?> artifact, String version)
     {
         return pinVersion(artifact, version(version));
     }
@@ -338,7 +361,7 @@ public class BuildSettings
      * @param version The version to use
      * @return The build for method chaining
      */
-    public BuildSettings pinVersion(Artifact artifact, Version version)
+    public BuildSettings pinVersion(Artifact<?> artifact, Version version)
     {
         librarian().pinVersion(artifact, version);
         return this;
@@ -351,7 +374,7 @@ public class BuildSettings
      * @param rest Any further dependencies
      * @return The build for method chaining
      */
-    public BuildSettings requires(Artifact first, Artifact... rest)
+    public BuildSettings requires(Artifact<?> first, Artifact<?>... rest)
     {
         var copy = copy();
         copy.dependencies = dependencies.with(first, rest);
@@ -363,7 +386,7 @@ public class BuildSettings
      *
      * @param dependencies The dependencies to add
      */
-    public BuildSettings requires(DependencyList<Artifact> dependencies)
+    public BuildSettings requires(DependencyList<Artifact<?>> dependencies)
     {
         var copy = copy();
         copy.dependencies = this.dependencies.with(dependencies);
@@ -376,16 +399,6 @@ public class BuildSettings
     public Folder rootFolder()
     {
         return rootFolder;
-    }
-
-    /**
-     * Returns the number of threads to use when building
-     *
-     * @return The thread count
-     */
-    public Count threads()
-    {
-        return threads;
     }
 
     /**
@@ -469,6 +482,19 @@ public class BuildSettings
     }
 
     /**
+     * Returns a copy of this settings object with the given thread count
+     *
+     * @param threads The number of threads
+     * @return The copy of this settings object
+     */
+    public BuildSettings withArtifactResolverThreads(Count threads)
+    {
+        var copy = copy();
+        copy.artifactResolverThreads = threads;
+        return copy;
+    }
+
+    /**
      * Returns a copy of this settings object with the given main artifact version
      *
      * @param version The artifact version
@@ -488,6 +514,19 @@ public class BuildSettings
     public BuildSettings withArtifactVersion(Version version)
     {
         return withArtifactDescriptor(descriptor -> descriptor.withVersion(version));
+    }
+
+    /**
+     * Returns a copy of this settings object with the given thread count
+     *
+     * @param threads The number of threads
+     * @return The copy of this settings object
+     */
+    public BuildSettings withBuilderThreads(Count threads)
+    {
+        var copy = copy();
+        copy.builderThreads = threads;
+        return copy;
     }
 
     /**
@@ -513,19 +552,6 @@ public class BuildSettings
     {
         var copy = copy();
         copy.rootFolder = rootFolder;
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this settings object with the given thread count
-     *
-     * @param threads The number of threads
-     * @return The copy of this settings object
-     */
-    public BuildSettings withThreads(Count threads)
-    {
-        var copy = copy();
-        copy.threads = threads;
         return copy;
     }
 }

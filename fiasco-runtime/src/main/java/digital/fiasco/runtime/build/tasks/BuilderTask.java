@@ -21,7 +21,7 @@ public record BuilderTask(Builder builder,
     public TaskResult<Builder> call()
     {
         // Wait for all artifact dependencies to be resolved,
-        resolved.waitFor(builder.dependencies(Artifact.class));
+        resolved.waitFor(builder.artifactDependencies());
 
         // then run the builder.
         return builder.build();

@@ -111,7 +111,7 @@ public class LocalRepository extends BaseRepository
      * @param artifact The artifact to install
      */
     @Override
-    public void installArtifact(Artifact artifact)
+    public void installArtifact(Artifact<?> artifact)
     {
         lock().write(() ->
         {
@@ -130,7 +130,7 @@ public class LocalRepository extends BaseRepository
      * @return The artifacts
      */
     @Override
-    public final ObjectList<Artifact> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
+    public final ObjectList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
     {
         return lock().read(() ->
         {
@@ -147,7 +147,7 @@ public class LocalRepository extends BaseRepository
             resolvedArtifacts.addAll(downloadedArtifacts);
 
             // Return the resolved artifacts with their content attached.
-            ObjectList<Artifact> resolved = list();
+            ObjectList<Artifact<?>> resolved = list();
             resolvedArtifacts.forEach(artifact -> resolved.add(loadArtifactContent(artifact)));
             return resolved;
         });
@@ -159,7 +159,7 @@ public class LocalRepository extends BaseRepository
      * @param artifact The artifact
      * @return The artifact with attachments populated with content
      */
-    protected Artifact loadArtifactContent(Artifact artifact)
+    protected Artifact<?> loadArtifactContent(Artifact<?> artifact)
     {
         for (var attachment : artifact.attachments())
         {
@@ -187,7 +187,7 @@ public class LocalRepository extends BaseRepository
      *
      * @param artifact The artifact to add
      */
-    protected void saveArtifactMetadata(Artifact artifact)
+    protected void saveArtifactMetadata(Artifact<?> artifact)
     {
         // Get JSON for artifact metadata,
         var text = artifact.toJson();
@@ -244,7 +244,7 @@ public class LocalRepository extends BaseRepository
      * @param algorithm The signing algorithm
      * @return The signature
      */
-    private String readSignature(Artifact artifact, ArtifactContent content, String algorithm)
+    private String readSignature(Artifact<?> artifact, ArtifactContent content, String algorithm)
     {
         return repositoryFolder(artifact).file(content.name() + "." + algorithm).readText();
     }
@@ -273,7 +273,7 @@ public class LocalRepository extends BaseRepository
      * @param artifact The artifact
      * @return The folder
      */
-    private Folder repositoryFolder(Artifact artifact)
+    private Folder repositoryFolder(Artifact<?> artifact)
     {
         var descriptor = artifact.artifactDescriptor();
         return rootFolder.folder(descriptor.group().name().replaceAll("\\.", "/") + "/" + descriptor.artifact() + "-" + descriptor.version());

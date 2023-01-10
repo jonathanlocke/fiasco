@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.repository.fiasco.server;
 
 import com.telenav.kivakit.application.Application;
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.progress.ProgressReporter;
 import com.telenav.kivakit.core.thread.KivaKitThread;
 import com.telenav.kivakit.network.socket.server.ConnectionListener;
@@ -8,6 +9,8 @@ import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.InputResource;
 import com.telenav.kivakit.resource.resources.OutputResource;
 import com.telenav.kivakit.resource.writing.WritableResource;
+import digital.fiasco.runtime.dependency.artifact.Artifact;
+import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.fiasco.CacheRepository;
 import org.jetbrains.annotations.NotNull;
@@ -23,8 +26,18 @@ import static digital.fiasco.runtime.repository.fiasco.server.FiascoRepositoryRe
 
 /**
  * A server application that accepts JSON-encoded {@link FiascoRepositoryRequest}s and produces
- * {@link FiascoRepositoryResponse}s. Following the response JSON is the binary content for each resolved artifact.
- * {@link FiascoServer}s run on port {@link #FIASCO_PORT}.
+ * {@link FiascoRepositoryResponse}s. The JSON-encoded response header includes all content metadata, including content
+ * signatures and sizes. Following the response JSON is the binary content for each resolved artifact. The content size
+ * for each requested artifact is used to ensure that the correct data for each content attachment is read from the
+ * binary portion of the response. {@link FiascoServer}s run on port {@link #FIASCO_PORT}.
+ *
+ * <p><b>Performance</b></p>
+ *
+ * <p>
+ * {@link FiascoServer} allows {@link FiascoClient} to request the resolution of multiple {@link ArtifactDescriptor}s at
+ * once. The response includes all metadata and binary content associated with the requested artifacts. By comparison,
+ * Apache Maven repositories require multiple requests to resolve a single artifact.
+ * </p>
  *
  * @author Jonathan Locke
  */
@@ -95,8 +108,9 @@ public class FiascoServer extends Application
     @NotNull
     private FiascoRepositoryResponse response(FiascoRepositoryRequest request)
     {
+        ObjectList<Artifact<?>> resolved = repository.resolveArtifacts(request.descriptors());
         return new FiascoRepositoryResponse()
-            .with(repository.resolveArtifacts(request.descriptors()));
+            .with();
     }
 
     /**

@@ -50,7 +50,7 @@ public abstract class BaseTool extends BaseRepeater implements Tool
      * @return The dependency list
      */
     @Override
-    public DependencyList dependencies()
+    public DependencyList<?> dependencies()
     {
         return builder.dependencies();
     }

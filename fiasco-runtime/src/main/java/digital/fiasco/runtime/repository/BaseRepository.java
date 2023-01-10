@@ -33,15 +33,16 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  *
  * <p>
  * {@link LocalRepository} is used to store artifacts and metadata on the local filesystem. Artifact
- * metadata is stored in a human-readable, append-only text file called <i>artifacts.txt</i>, which allows it to be searched
- * with grep or viewed in a text editor. The artifact content attachments are stored on the filesystem in a hierarchical
- * format similar to a Maven repository. For access to Maven repositories, see {@link MavenRepository}.
+ * metadata is stored in JSON format in an append-only text file called <i>artifacts.txt</i>, which allows
+ * it to be searched with grep or viewed in a text editor. The artifact content attachments are stored
+ * on the filesystem in a hierarchical format similar to a Maven repository.
  * </p>
  *
  * <p><b>Maven Repositories</b></p>
  *
  * <p>
- * {@link MavenRepository} is used to access local or remote repositories in Apache Maven format.
+ * {@link MavenRepository} is used to access local or remote Apache Maven repositories. Support for
+ * Maven POM files is limited since only basic metadata and dependencies are required by Fiasco.
  * </p>
  *
  * <p><b>Cache Repositories</b></p>
@@ -49,19 +50,28 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  * <p>
  * {@link CacheRepository} is used to store artifacts and their metadata in a single file to allow
  * high-performance, random access. As with a {@link LocalRepository}, metadata is stored in a single append-only
- * text file, but artifact content attachments are stored end-to-end in a single file, <i>attachments.binary</i>. This
- * repository is used as a download cache to avoid unnecessary downloads when a user wipes out their local repository, causing
- * it to repopulate. Instead of repopulating from Maven Central or another remote repository, the artifacts in this
- * cache can be used. Because downloaded artifacts are not mutable in Maven Central (and should not be mutable in any
- * other repository), it should rarely be necessary to remove the download repository. A cache repository is also used
- * by {@link digital.fiasco.runtime.repository.fiasco.server.FiascoServer} to enable quick response times to requests for artifacts.
+ * text file, but artifact content attachments are stored end-to-end in a single file, <i>attachments.binary</i>.
+ * </p>
+ *
+ * <p>
+ * An instance of {@link CacheRepository} is used as an artifact cache to avoid unnecessary downloads when a user wipes
+ * out their {@link LocalRepository}, causing it to repopulate. Instead of repopulating from Maven Central or another
+ * remote repository, the artifacts in this repository can be used since artifacts and their metadata are never altered,
+ * only appended to their respective <i>artifacts.txt</i> and <i>artifact-content.binary</i>files. Because remote
+ * artifacts are guaranteed by Maven Central (and other remote repositories) to be immutable, it should rarely be
+ * necessary to remove a download cache repository.
+ * </p>
+ *
+ * <p>
+ * Another instance of {@link CacheRepository} is used by {@link FiascoServer} to respond quickly to requests to
+ * resolve one or more artifact descriptors.
  * </p>
  *
  * <p><b>Remote Repositories</b></p>
  *
  * <p>
- * {@link RemoteRepository} is used to access remote Fiasco repositories served by a {@link FiascoServer}.
- * Internally, this repository used {@link FiascoClient} to communicate with the server.
+ * {@link RemoteRepository} is used to access a remote Fiasco repository served by a {@link FiascoServer}.
+ * Internally, this repository uses {@link FiascoClient} to communicate with the server.
  * </p>
  *
  * <p><b>Properties</b></p>
@@ -98,7 +108,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     private final URI uri;
 
     /** The cached artifact entries */
-    private final ObjectMap<ArtifactDescriptor, Artifact> artifacts = new ObjectMap<>();
+    private final ObjectMap<ArtifactDescriptor, Artifact<?>> artifacts = new ObjectMap<>();
 
     /** Cache lock (filesystem locking not yet supported) */
     private final ReadWriteLock lock = new ReadWriteLock();
@@ -118,7 +128,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
      * @param artifact The artifact
      * @return True if it is in this repository
      */
-    public boolean contains(Artifact artifact)
+    public boolean contains(Artifact<?> artifact)
     {
         return artifacts.containsValue(artifact);
     }
@@ -166,7 +176,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     /**
      * Returns the map from descriptor to artifact
      */
-    protected ObjectMap<ArtifactDescriptor, Artifact> artifacts()
+    protected ObjectMap<ArtifactDescriptor, Artifact<?>> artifacts()
     {
         return artifacts;
     }
@@ -179,7 +189,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
         return lock;
     }
 
-    protected ObjectList<Artifact> resolve(Iterable<ArtifactDescriptor> descriptors)
+    protected ObjectList<Artifact<?>> resolve(Iterable<ArtifactDescriptor> descriptors)
     {
         return list(descriptors).map(artifacts::get);
     }

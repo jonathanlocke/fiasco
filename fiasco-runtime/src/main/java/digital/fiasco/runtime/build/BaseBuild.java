@@ -42,10 +42,12 @@ import digital.fiasco.runtime.dependency.processing.TaskResult;
 import java.util.Set;
 
 import static com.telenav.kivakit.commandline.ArgumentParser.argumentParser;
-import static com.telenav.kivakit.commandline.SwitchParsers.threadCountSwitchParser;
+import static com.telenav.kivakit.commandline.SwitchParsers.countSwitchParser;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
+import static com.telenav.kivakit.core.value.count.Count._16;
+import static com.telenav.kivakit.core.vm.JavaVirtualMachine.javaVirtualMachine;
 import static digital.fiasco.runtime.dependency.DependencyTree.dependencyTree;
 
 /**
@@ -149,8 +151,17 @@ public abstract class BaseBuild extends Application implements Build
     /** Metadata associated with this build */
     private BuildMetadata metadata;
 
-    /** Switch parser for --threads=[count], with a maximum of 64 threads */
-    private final SwitchParser<Count> THREAD_COUNT = threadCountSwitchParser(this, Count._64);
+    /** Switch parser for -builder-threads=[count] */
+    private final SwitchParser<Count> BUILDER_THREADS = countSwitchParser(this, "builder-threads",
+        "The number of threads to use when building")
+        .defaultValue(javaVirtualMachine().processors().dividedBy(2))
+        .build();
+
+    /** Switch parser for -artifact-resolver-threads=[count] */
+    private final SwitchParser<Count> ARTIFACT_RESOLVER_THREADS = countSwitchParser(this, "artifact-resolver-threads",
+        "The number of threads to use when resolving artifacts")
+        .defaultValue(_16)
+        .build();
 
     /**
      * Creates a build
@@ -242,7 +253,9 @@ public abstract class BaseBuild extends Application implements Build
     @Override
     protected ObjectSet<SwitchParser<?>> switchParsers()
     {
-        return set(THREAD_COUNT);
+        return super.switchParsers().with(
+            BUILDER_THREADS,
+            ARTIFACT_RESOLVER_THREADS);
     }
 
     /**
@@ -304,14 +317,15 @@ public abstract class BaseBuild extends Application implements Build
             var tasks = new TaskList<Builder>();
             for (var builder : group)
             {
-                resolved.waitFor(builder.dependencies(Artifact.class));
+                resolved.waitFor(builder.artifactDependencies());
+                resolved.waitFor(builder.libraryDependencies());
 
                 var task = new BuilderTask(builder, resolved);
                 tasks.add(task);
             }
 
             // then execute the tasks.
-            results.addAll(executor.process(settings.threads(), tasks));
+            results.addAll(executor.process(settings.builderThreads(), tasks));
         }
 
         return results;
@@ -322,7 +336,8 @@ public abstract class BaseBuild extends Application implements Build
         var builder = new Builder(this);
         return builder
             .withSettings(new BuildSettings(builder)
-                .withThreads(get(THREAD_COUNT)))
+                .withBuilderThreads(get(BUILDER_THREADS))
+                .withArtifactResolverThreads(get(ARTIFACT_RESOLVER_THREADS)))
             .parseCommandLine(commandLine());
     }
 
@@ -337,10 +352,12 @@ public abstract class BaseBuild extends Application implements Build
     private void resolveArtifacts(BuildSettings settings, Dependency root, ResolvedArtifacts resolved)
     {
         var executor = listenTo(new TaskExecutor());
-        for (var group : dependencyTree(root, Artifact.class).grouped())
+        var grouped = dependencyTree(root, Artifact.class).grouped();
+        for (var group : grouped)
         {
-            var task = (Task<DependencyList<Artifact>>) new ArtifactResolverTask(settings.librarian(), group, resolved);
-            var results = executor.process(settings.threads(), new TaskList<>(list(task)));
+            var cast = (DependencyList<Artifact<?>>)group;
+            var task = (Task<DependencyList<Artifact<?>>>) new ArtifactResolverTask(settings.librarian(), cast, resolved);
+            var results = executor.process(settings.artifactResolverThreads(), new TaskList<>(list(task)));
             results.matching(at -> at.issues().hasProblems()).forEach(TaskResult::showResult);
         }
     }

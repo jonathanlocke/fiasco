@@ -15,7 +15,7 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 public class ResolvedArtifacts
 {
     /** The set of artifacts that have been resolved */
-    private final ObjectSet<Artifact> resolved = new ObjectSet<>();
+    private final ObjectSet<Artifact<?>> resolved = new ObjectSet<>();
 
     /** A monitor that is signaled when artifacts are resolved */
     private final Monitor updated = new Monitor();
@@ -25,7 +25,7 @@ public class ResolvedArtifacts
      *
      * @param artifacts The artifacts that were resolved
      */
-    public void markResolved(DependencyList<Artifact> artifacts)
+    public void markResolved(DependencyList<Artifact<?>> artifacts)
     {
         synchronized (updated)
         {
@@ -39,7 +39,7 @@ public class ResolvedArtifacts
      *
      * @param required The artifacts that are required
      */
-    public synchronized void waitFor(DependencyList<Artifact> required)
+    public void waitFor(DependencyList<Artifact<?>> required)
     {
         synchronized (updated)
         {

@@ -62,7 +62,7 @@ public class RemoteRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public void installArtifact(Artifact artifact)
+    public void installArtifact(Artifact<?> artifact)
     {
         unsupported("Cannot install artifacts in a remote Fiasco repository");
     }
@@ -77,12 +77,11 @@ public class RemoteRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public synchronized ObjectList<Artifact> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
+    public ObjectList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
     {
         // Return resolved artifacts for the given descriptors
         return new FiascoClient()
-            .request(this, new FiascoRepositoryRequest()
-                .with(descriptors))
+            .request(this, new FiascoRepositoryRequest().with(descriptors))
             .artifacts();
     }
 }

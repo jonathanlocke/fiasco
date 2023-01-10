@@ -93,7 +93,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONT
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public interface Artifact extends Dependency
+public interface Artifact<T extends Artifact<T>> extends Dependency
 {
     /**
      * Returns an artifact for a given JSON string
@@ -101,11 +101,12 @@ public interface Artifact extends Dependency
      * @param json The JSON
      * @return The artifact
      */
-    static Artifact artifactFromJson(String json)
+    static <T extends Artifact<T>> T artifactFromJson(String json)
     {
         var serialized = new StringResource(json);
         var serializer = new GsonObjectSerializer();
-        return (Artifact) serializer.readObject(serialized, METADATA_OBJECT_TYPE, METADATA_OBJECT_VERSION).object();
+        // noinspection unchecked
+        return (T) serializer.readObject(serialized, METADATA_OBJECT_TYPE, METADATA_OBJECT_VERSION).object();
     }
 
     /**
@@ -151,7 +152,7 @@ public interface Artifact extends Dependency
      *
      * @return The new artifact
      */
-    Artifact copy();
+    T copy();
 
     /**
      * Returns the list of dependencies for this artifact
@@ -159,7 +160,7 @@ public interface Artifact extends Dependency
      * @return The dependency list
      */
     @Override
-    DependencyList<Artifact> dependencies();
+    DependencyList<T> dependencies();
 
     /**
      * Returns true if this artifact excludes the given artifact
@@ -198,7 +199,7 @@ public interface Artifact extends Dependency
     /**
      * Convenience method for {@link #withVersion(Version)}
      */
-    default Artifact version(Version version)
+    default T version(Version version)
     {
         return withVersion(version);
     }
@@ -206,7 +207,7 @@ public interface Artifact extends Dependency
     /**
      * Convenience method for {@link #withVersion(Version)}
      */
-    default Artifact version(String version)
+    default T version(String version)
     {
         return withVersion(parseVersion(version));
     }
@@ -217,7 +218,7 @@ public interface Artifact extends Dependency
      * @param artifact The new artifact identifier
      * @return The new artifact
      */
-    default Artifact withArtifactIdentifier(String artifact)
+    default T withArtifactIdentifier(String artifact)
     {
         return withDescriptor(artifactDescriptor().withArtifactIdentifier(artifact));
     }
@@ -227,21 +228,21 @@ public interface Artifact extends Dependency
      *
      * @param attachment The content to attach
      */
-    Artifact withAttachment(ArtifactAttachment attachment);
+    T withAttachment(ArtifactAttachment attachment);
 
     /**
      * Attaches the resource for the given artifact suffix, such as <i>.jar</i>
      *
      * @param attachments The content to attach
      */
-    Artifact withAttachments(ObjectMap<String, ArtifactAttachment> attachments);
+    T withAttachments(ObjectMap<String, ArtifactAttachment> attachments);
 
     /**
      * Returns primary content attachment for this asset
      *
      * @return The content
      */
-    default Artifact withContent(ArtifactContent content)
+    default T withContent(ArtifactContent content)
     {
         var copy = copy();
         copy.withAttachment(new ArtifactAttachment(this, CONTENT_SUFFIX, content));
@@ -254,7 +255,7 @@ public interface Artifact extends Dependency
      * @param dependencies The new dependencies
      * @return The new artifact
      */
-    Artifact withDependencies(DependencyList<Artifact> dependencies);
+    T withDependencies(DependencyList<T> dependencies);
 
     /**
      * Returns a copy of this artifact with the given descriptor
@@ -262,7 +263,7 @@ public interface Artifact extends Dependency
      * @param descriptor The new descriptor
      * @return The new artifact
      */
-    Artifact withDescriptor(ArtifactDescriptor descriptor);
+    T withDescriptor(ArtifactDescriptor descriptor);
 
     /**
      * Returns a copy of this artifact with the given version
@@ -270,7 +271,7 @@ public interface Artifact extends Dependency
      * @param version The new version
      * @return The new artifact
      */
-    default Artifact withVersion(Version version)
+    default T withVersion(Version version)
     {
         return withDescriptor(artifactDescriptor().withVersion(version));
     }
@@ -281,7 +282,7 @@ public interface Artifact extends Dependency
      * @param exclude The descriptors to exclude
      * @return The new artifact
      */
-    default Artifact withoutDependencies(ArtifactDescriptor... exclude)
+    default T withoutDependencies(ArtifactDescriptor... exclude)
     {
         return withoutDependencies(library -> arrayContains(exclude, library));
     }
@@ -292,7 +293,7 @@ public interface Artifact extends Dependency
      * @param exclude The descriptors to exclude
      * @return The new artifact
      */
-    default Artifact withoutDependencies(String... exclude)
+    default T withoutDependencies(String... exclude)
     {
         var descriptors = list(exclude).map(ArtifactDescriptor::artifactDescriptor);
         return withoutDependencies(descriptors::contains);
@@ -304,5 +305,5 @@ public interface Artifact extends Dependency
      * @param pattern The pattern to exclude
      * @return The new artifact
      */
-    Artifact withoutDependencies(Matcher<ArtifactDescriptor> pattern);
+    T withoutDependencies(Matcher<ArtifactDescriptor> pattern);
 }

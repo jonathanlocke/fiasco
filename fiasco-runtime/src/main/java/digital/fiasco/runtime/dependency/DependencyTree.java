@@ -96,7 +96,7 @@ public class DependencyTree<T extends Dependency>
         // Finally, return the explored children with the root.
         if (type.isAssignableFrom(root.getClass()))
         {
-            //noinspection unchecked
+            // noinspection unchecked
             return explored.with((T) root);
         }
         return explored;

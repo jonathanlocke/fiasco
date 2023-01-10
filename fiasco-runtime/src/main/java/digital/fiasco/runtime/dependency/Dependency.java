@@ -2,7 +2,10 @@ package digital.fiasco.runtime.dependency;
 
 import com.telenav.kivakit.interfaces.naming.Named;
 import digital.fiasco.runtime.build.builder.Builder;
+import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.Asset;
+import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.Repository;
 
 /**
@@ -15,14 +18,45 @@ import digital.fiasco.runtime.repository.Repository;
 public interface Dependency extends Named
 {
     /**
+     * Gets all artifact dependencies
+     *
+     * @return The dependencies
+     */
+    default DependencyList<Artifact<?>> artifactDependencies()
+    {
+        var dependencies = new DependencyList<Artifact<?>>();
+        for (var at : dependencies())
+        {
+            if (at instanceof Artifact<?> asset)
+            {
+                dependencies.add(asset);
+            }
+        }
+        return dependencies;
+    }
+
+    /**
      * The artifact descriptor for this dependency
      */
     ArtifactDescriptor artifactDescriptor();
 
     /**
-     * @return The objects that this depends on
+     * Gets all asset dependencies
+     *
+     * @return The dependencies
      */
-    DependencyList<?> dependencies();
+    default DependencyList<Asset> assetDependencies()
+    {
+        var dependencies = new DependencyList<Asset>();
+        for (var at : dependencies())
+        {
+            if (at instanceof Asset asset)
+            {
+                dependencies.add(asset);
+            }
+        }
+        return dependencies;
+    }
 
     /**
      * Gets all dependencies of the given type
@@ -38,6 +72,29 @@ public interface Dependency extends Named
             {
                 //noinspection unchecked
                 dependencies.add((T) at);
+            }
+        }
+        return dependencies;
+    }
+
+    /**
+     * @return The objects that this depends on
+     */
+    DependencyList<?> dependencies();
+
+    /**
+     * Gets all library dependencies
+     *
+     * @return The dependencies
+     */
+    default DependencyList<Library> libraryDependencies()
+    {
+        var dependencies = new DependencyList<Library>();
+        for (var at : dependencies())
+        {
+            if (at instanceof Library asset)
+            {
+                dependencies.add(asset);
             }
         }
         return dependencies;

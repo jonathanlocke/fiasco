@@ -109,7 +109,7 @@ import static digital.fiasco.runtime.dependency.processing.TaskResult.taskResult
  *     <li>{@link #withPhases(PhaseList)}</li>
  *     <li>{@link #withRootFolder(Folder)}</li>
  *     <li>{@link #withSettings(BuildSettings)}</li>
- *     <li>{@link #withThreads(Count)}</li>
+ *     <li>{@link #withBuilderThreads(Count)}</li>
  * </ul>
  *
  * <p><b>Build Options</b></p>
@@ -643,7 +643,7 @@ public class Builder extends BaseRepeater implements
      * @param version The version to use
      * @return The build for method chaining
      */
-    public Builder pinVersion(Artifact artifact, String version)
+    public Builder pinVersion(Artifact<?> artifact, String version)
     {
         settings.pinVersion(artifact, version(version));
         return this;
@@ -656,7 +656,7 @@ public class Builder extends BaseRepeater implements
      * @param version The version to use
      * @return The build for method chaining
      */
-    public Builder pinVersion(Artifact artifact, Version version)
+    public Builder pinVersion(Artifact<?> artifact, Version version)
     {
         settings.pinVersion(artifact, version);
         return this;
@@ -680,7 +680,7 @@ public class Builder extends BaseRepeater implements
      * @param rest Any further dependencies
      * @return The build for method chaining
      */
-    public Builder requires(Artifact first, Artifact... rest)
+    public Builder requires(Artifact<?> first, Artifact<?>... rest)
     {
         settings = settings.requires(first, rest);
         return this;
@@ -691,7 +691,7 @@ public class Builder extends BaseRepeater implements
      *
      * @param dependencies The dependencies to add
      */
-    public Builder requires(DependencyList<Artifact> dependencies)
+    public Builder requires(DependencyList<Artifact<?>> dependencies)
     {
         settings = settings.requires(dependencies);
         return this;
@@ -716,7 +716,7 @@ public class Builder extends BaseRepeater implements
      */
     public Count threads()
     {
-        return settings.threads();
+        return settings.builderThreads();
     }
 
     /**
@@ -790,6 +790,17 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
+     * Returns a copy of this builder with the given thread count
+     *
+     * @param threads The number of threads this builder should use when building
+     * @return A copy of this builder with the given thread count
+     */
+    public Builder withArtifactResolverThreads(Count threads)
+    {
+        return withSettings(settings.withArtifactResolverThreads(threads));
+    }
+
+    /**
      * Returns a copy of this builder with the given artifact version
      *
      * @param version The artifact version
@@ -809,6 +820,17 @@ public class Builder extends BaseRepeater implements
     public Builder withArtifactVersion(Version version)
     {
         return withArtifactDescriptor(artifactDescriptor().withVersion(version));
+    }
+
+    /**
+     * Returns a copy of this builder with the given thread count
+     *
+     * @param threads The number of threads this builder should use when building
+     * @return A copy of this builder with the given thread count
+     */
+    public Builder withBuilderThreads(Count threads)
+    {
+        return withSettings(settings.withBuilderThreads(threads));
     }
 
     /**
@@ -846,16 +868,5 @@ public class Builder extends BaseRepeater implements
         var copy = copy();
         copy.settings = settings;
         return copy;
-    }
-
-    /**
-     * Returns a copy of this builder with the given thread count
-     *
-     * @param threads The number of threads this builder should use when building
-     * @return A copy of this builder with the given thread count
-     */
-    public Builder withThreads(Count threads)
-    {
-        return withSettings(settings.withThreads(threads));
     }
 }

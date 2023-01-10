@@ -90,7 +90,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONT
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public abstract class BaseArtifact implements Artifact
+public abstract class BaseArtifact<T extends Artifact<T>> implements Artifact<T>
 {
     /** The repository where this artifact is hosted */
     private Repository repository;
@@ -99,7 +99,7 @@ public abstract class BaseArtifact implements Artifact
     protected ArtifactDescriptor descriptor;
 
     /** List of dependent artifacts */
-    protected DependencyList<Artifact> dependencies = dependencyList();
+    protected DependencyList<T> dependencies = dependencyList();
 
     /** Dependency exclusions for this artifact */
     private ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptAll());
@@ -122,7 +122,7 @@ public abstract class BaseArtifact implements Artifact
      *
      * @param that The artifact to copy
      */
-    protected BaseArtifact(BaseArtifact that)
+    protected BaseArtifact(BaseArtifact<T> that)
     {
         this.repository = that.repository();
         this.descriptor = that.artifactDescriptor();
@@ -173,7 +173,7 @@ public abstract class BaseArtifact implements Artifact
      * @return The artifacts
      */
     @Override
-    public DependencyList<Artifact> dependencies()
+    public DependencyList<T> dependencies()
     {
         var copy = dependencies.copy();
         for (var exclusion : exclusions)
@@ -189,7 +189,7 @@ public abstract class BaseArtifact implements Artifact
      * @param name The name of the dependency
      * @return The dependency
      */
-    public Artifact dependency(String name)
+    public T dependency(String name)
     {
         for (var at : dependencies)
         {
@@ -295,7 +295,7 @@ public abstract class BaseArtifact implements Artifact
      * @return The new artifact
      */
     @Override
-    public Artifact withArtifactIdentifier(String artifact)
+    public T withArtifactIdentifier(String artifact)
     {
         return withDescriptor(artifactDescriptor().withArtifactIdentifier(artifact));
     }
@@ -306,7 +306,7 @@ public abstract class BaseArtifact implements Artifact
      * @param attachment The content to attach
      */
     @Override
-    public Artifact withAttachment(ArtifactAttachment attachment)
+    public T withAttachment(ArtifactAttachment attachment)
     {
         var copy = copy();
         copy.attachmentMap().put(attachment.suffix(), attachment);
@@ -314,10 +314,10 @@ public abstract class BaseArtifact implements Artifact
     }
 
     @Override
-    public Artifact withAttachments(ObjectMap<String, ArtifactAttachment> attachments)
+    public T withAttachments(ObjectMap<String, ArtifactAttachment> attachments)
     {
         var copy = copy();
-        ((BaseArtifact) copy).attachments = attachments;
+        ((BaseArtifact<?>) copy).attachments = attachments;
         return copy;
     }
 
@@ -327,7 +327,7 @@ public abstract class BaseArtifact implements Artifact
      * @return The content
      */
     @Override
-    public Artifact withContent(ArtifactContent content)
+    public T withContent(ArtifactContent content)
     {
         var copy = copy();
         copy.withAttachment(new ArtifactAttachment(this, CONTENT_SUFFIX, content));
@@ -341,9 +341,9 @@ public abstract class BaseArtifact implements Artifact
      * @return The new artifact
      */
     @Override
-    public Artifact withDependencies(DependencyList<Artifact> dependencies)
+    public T withDependencies(DependencyList<T> dependencies)
     {
-        var copy = (BaseArtifact) copy();
+        var copy = copy();
         copy.dependencies = dependencies.copy();
         return copy;
     }
@@ -355,9 +355,9 @@ public abstract class BaseArtifact implements Artifact
      * @return The new artifact
      */
     @Override
-    public Artifact withDescriptor(ArtifactDescriptor descriptor)
+    public T withDescriptor(ArtifactDescriptor descriptor)
     {
-        var copy = (BaseArtifact) copy();
+        var copy = copy();
         copy.descriptor = descriptor;
         return copy;
     }
@@ -369,7 +369,7 @@ public abstract class BaseArtifact implements Artifact
      * @return The new artifact
      */
     @Override
-    public Artifact withVersion(Version version)
+    public T withVersion(Version version)
     {
         return withDescriptor(artifactDescriptor().withVersion(version));
     }
@@ -381,10 +381,10 @@ public abstract class BaseArtifact implements Artifact
      * @return The new artifact
      */
     @Override
-    public Artifact withoutDependencies(Matcher<ArtifactDescriptor> pattern)
+    public T withoutDependencies(Matcher<ArtifactDescriptor> pattern)
     {
-        var copy = (BaseArtifact) copy();
-        copy.exclusions.add(pattern);
+        var copy = copy();
+        copy.exclusions().add(pattern);
         return copy;
     }
 
@@ -395,7 +395,7 @@ public abstract class BaseArtifact implements Artifact
      * @return The new artifact
      */
     @Override
-    public Artifact withoutDependencies(ArtifactDescriptor... exclude)
+    public T withoutDependencies(ArtifactDescriptor... exclude)
     {
         return withoutDependencies(library -> arrayContains(exclude, library));
     }
@@ -407,7 +407,7 @@ public abstract class BaseArtifact implements Artifact
      * @return The new artifact
      */
     @Override
-    public Artifact withoutDependencies(String... exclude)
+    public T withoutDependencies(String... exclude)
     {
         var descriptors = list(exclude).map(ArtifactDescriptor::artifactDescriptor);
         return withoutDependencies(descriptors::contains);

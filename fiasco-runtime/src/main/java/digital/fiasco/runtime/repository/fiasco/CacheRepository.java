@@ -82,7 +82,7 @@ public class CacheRepository extends LocalRepository
      * @param artifact The artifact to install
      */
     @Override
-    public void installArtifact(Artifact artifact)
+    public void installArtifact(Artifact<?> artifact)
     {
         lock().write(() ->
         {
@@ -116,7 +116,7 @@ public class CacheRepository extends LocalRepository
      * @return The artifact with attachments populated with content
      */
     @Override
-    protected Artifact loadArtifactContent(Artifact artifact)
+    protected Artifact<?> loadArtifactContent(Artifact<?> artifact)
     {
         for (var attachment : artifact.attachments())
         {

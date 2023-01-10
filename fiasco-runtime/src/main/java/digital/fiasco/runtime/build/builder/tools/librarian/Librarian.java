@@ -28,7 +28,6 @@ import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.resource.Uris.uri;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
 /**
  * Manages {@link Artifact}s and their dependencies. Searches the list of repositories added to this librarian with
@@ -72,15 +71,15 @@ public class Librarian extends BaseTool
      * @param artifact The artifact
      * @return The artifact and all of its dependencies
      */
-    public DependencyList<Artifact> dependencies(Artifact artifact)
+    public <T extends Artifact<T>> DependencyList<T> dependencies(Artifact<T> artifact)
     {
-        DependencyList<Artifact> dependencies = dependencyList();
+        DependencyList<T> dependencies = dependencyList();
 
         // Go through the library's dependencies,
-        for (var dependency : artifact.dependencies().asArtifactList())
+        for (var dependency : artifact.dependencies())
         {
             // resolve each dependency,
-            for (var resolved : dependencies(dependency).asArtifactList())
+            for (var resolved : dependencies(dependency))
             {
                 // and if it is not excluded by the library,
                 if (resolved != null && artifact.excludes(resolved.artifactDescriptor()))
@@ -104,7 +103,8 @@ public class Librarian extends BaseTool
                 if (resolved.first().excludes(resolved.first().artifactDescriptor()))
                 {
                     // add it to the dependencies.
-                    dependencies = dependencies.with(library(resolved.first()));
+                    // noinspection unchecked
+                    dependencies = dependencies.with((T) resolved.first());
                     found = true;
                 }
             }
@@ -168,7 +168,7 @@ public class Librarian extends BaseTool
      * @param artifact The group and artifact identifier (which can be lacking a version)
      * @param version The version to enforce for the descriptor
      */
-    public Librarian pinVersion(Artifact artifact, Version version)
+    public Librarian pinVersion(Artifact<?> artifact, Version version)
     {
         var descriptor = artifact.artifactDescriptor();
         pinnedVersions.put(descriptor, version);
@@ -182,7 +182,7 @@ public class Librarian extends BaseTool
      * @param artifact The artifact to pin
      * @param version The version to enforce for the descriptor
      */
-    public Librarian pinVersion(Artifact artifact, String version)
+    public Librarian pinVersion(Artifact<?> artifact, String version)
     {
         pinVersion(artifact.artifactDescriptor(), version(version));
         return this;
@@ -215,7 +215,7 @@ public class Librarian extends BaseTool
      * @param descriptor The descriptor
      * @return The library
      */
-    public Artifact resolve(ArtifactDescriptor descriptor)
+    public Artifact<?> resolve(ArtifactDescriptor descriptor)
     {
         return resolve(list(descriptor)).first();
     }
@@ -226,9 +226,9 @@ public class Librarian extends BaseTool
      * @param descriptors The descriptor
      * @return The library
      */
-    public ObjectList<Artifact> resolve(ObjectList<ArtifactDescriptor> descriptors)
+    public ObjectList<Artifact<?>> resolve(ObjectList<ArtifactDescriptor> descriptors)
     {
-        ObjectList<Artifact> artifacts = list();
+        ObjectList<Artifact<?>> artifacts = list();
 
         // Go through each repository,
         for (var repository : repositories())

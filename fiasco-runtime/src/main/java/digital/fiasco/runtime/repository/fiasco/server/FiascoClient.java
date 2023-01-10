@@ -12,7 +12,6 @@ import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
 
 import java.net.URI;
 
-import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureEqual;
 import static com.telenav.kivakit.resource.Uris.uri;
 import static digital.fiasco.runtime.repository.fiasco.server.FiascoRepositoryResponse.responseFromJson;
@@ -43,8 +42,8 @@ public class FiascoClient extends BaseComponent
             var response = responseFromJson(new InputResource(in));
 
             // Then, for each artifact,
-            var resolved = new ObjectList<Artifact>();
-            for (var artifact : list(response.artifacts()))
+            var resolved = new ObjectList<Artifact<?>>();
+            for (var artifact : response.artifacts())
             {
                 // and attachment,
                 var resolvedAttachments = new ObjectMap<String, ArtifactAttachment>();

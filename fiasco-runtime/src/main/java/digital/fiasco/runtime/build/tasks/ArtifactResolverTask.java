@@ -19,12 +19,12 @@ import static digital.fiasco.runtime.dependency.processing.TaskResult.taskResult
  * @param resolved The set of resolved artifacts to update
  */
 public record ArtifactResolverTask(Librarian librarian,
-                                   DependencyList<Artifact> artifacts,
+                                   DependencyList<Artifact<?>> artifacts,
                                    ResolvedArtifacts resolved)
-    implements Task<DependencyList<Artifact>>
+    implements Task<DependencyList<Artifact<?>>>
 {
     @Override
-    public TaskResult<DependencyList<Artifact>> call()
+    public TaskResult<DependencyList<Artifact<?>>> call()
     {
         // Get the list of descriptors to resolve,
         var descriptors = artifacts.artifactDescriptors();

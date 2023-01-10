@@ -3,7 +3,6 @@ package digital.fiasco.runtime.dependency;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
-import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import org.jetbrains.annotations.NotNull;
 
@@ -25,7 +24,6 @@ import java.util.Iterator;
  * <ul>
  *     <li>{@link #asList()}</li>
  *     <li>{@link #asSet()}</li>
- *     <li>{@link #asArtifactList()}</li>
  * </ul>
  *
  * <p><b>Functional</b></p>
@@ -81,13 +79,6 @@ public class DependencyList<T extends Dependency> extends ObjectList<T>
     public ObjectList<ArtifactDescriptor> artifactDescriptors()
     {
         return map(Dependency::artifactDescriptor);
-    }
-
-    public ObjectList<Artifact> asArtifactList()
-    {
-        var artifacts = new ObjectList<Artifact>();
-        dependencies.forEach(at -> artifacts.add((Artifact) at));
-        return artifacts;
     }
 
     /**

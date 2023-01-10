@@ -11,7 +11,7 @@ import com.telenav.kivakit.resource.Resource;
  * @param name The name of the artifact resource
  * @param signatures The signatures for this content
  * @param resource The resource containing the content
- * @param offset The offset of this content in a cache file, if any
+ * @param offset The offset of this content in a cache file (if any)
  * @param lastModified The time of last modification of the resource
  * @param size The size of the content
  */
