@@ -17,7 +17,8 @@ import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.core.version.Version.parseVersion;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_VERSION;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONTENT_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.CONTENT_SUFFIX;
 
 /**
  * Represents an artifact, either an {@link Asset} or a {@link Library}
@@ -53,8 +54,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONT
  * <p><b>Attachments</b></p>
  *
  * <ul>
- *     <li>{@link #attachmentMap()}</li>
- *     <li>{@link #attachment(String)}</li>
+ *     <li>{@link #attachment(AttachmentSuffix)}</li>
  *     <li>{@link #withAttachment(ArtifactAttachment)}</li>
  * </ul>
  *
@@ -123,19 +123,14 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param suffix The artifact suffix
      * @return The attached resource
      */
-    ArtifactAttachment attachment(String suffix);
+    ArtifactAttachment attachment(AttachmentSuffix suffix);
 
     /**
-     * Returns a map from descriptor to artifact attachment of all attached resources
+     * Returns a list of all attachments to this artifact
      *
      * @return The attachments
      */
-    ObjectMap<String, ArtifactAttachment> attachmentMap();
-
-    default ObjectList<ArtifactAttachment> attachments()
-    {
-        return list(attachmentMap().values());
-    }
+    ObjectList<ArtifactAttachment> attachments();
 
     /**
      * Returns primary content attachment for this asset
@@ -235,7 +230,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      *
      * @param attachments The content to attach
      */
-    T withAttachments(ObjectMap<String, ArtifactAttachment> attachments);
+    T withAttachments(ObjectMap<AttachmentSuffix, ArtifactAttachment> attachments);
 
     /**
      * Returns primary content attachment for this asset

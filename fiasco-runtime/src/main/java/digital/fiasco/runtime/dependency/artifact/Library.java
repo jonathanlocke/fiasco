@@ -12,8 +12,8 @@ import digital.fiasco.runtime.dependency.DependencyList;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.JAVADOC_SUFFIX;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.SOURCES_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.JAVADOC_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.SOURCES_SUFFIX;
 
 /**
  * A library is an artifact with source code and Javadoc JAR attachments.

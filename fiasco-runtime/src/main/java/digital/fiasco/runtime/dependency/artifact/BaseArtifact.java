@@ -14,7 +14,8 @@ import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONTENT_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.CONTENT_SUFFIX;
 
 /**
  * Represents an artifact, either an {@link Asset} or a {@link Library}
@@ -50,8 +51,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONT
  * <p><b>Attachments</b></p>
  *
  * <ul>
- *     <li>{@link #attachmentMap()}</li>
- *     <li>{@link #attachment(String)}</li>
+ *     <li>{@link #attachment(AttachmentSuffix)}</li>
  *     <li>{@link #withAttachment(ArtifactAttachment)}</li>
  * </ul>
  *
@@ -105,7 +105,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     protected ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptAll());
 
     /** The content attachments by suffix */
-    private ObjectMap<String, ArtifactAttachment> attachments = new ObjectMap<>();
+    private ObjectMap<AttachmentSuffix, ArtifactAttachment> suffixToAttachment = new ObjectMap<>();
 
     /**
      * Create artifact
@@ -128,7 +128,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
         this.descriptor = that.artifactDescriptor();
         this.dependencies = that.dependencies().copy();
         this.exclusions = that.exclusions().copy();
-        this.attachments = that.attachments.copy();
+        this.suffixToAttachment = that.suffixToAttachment.copy();
     }
 
     protected BaseArtifact()
@@ -151,20 +151,18 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return Any attached resource with the given name, or null if there is none
      */
     @Override
-    public ArtifactAttachment attachment(String suffix)
+    public ArtifactAttachment attachment(AttachmentSuffix suffix)
     {
-        return attachments.get(suffix);
+        return suffixToAttachment.get(suffix);
     }
 
     /**
-     * Returns the list of all attached resources
-     *
-     * @return The attachments
+     * {@inheritDoc}
      */
     @Override
-    public final ObjectMap<String, ArtifactAttachment> attachmentMap()
+    public ObjectList<ArtifactAttachment> attachments()
     {
-        return attachments;
+        return list(suffixToAttachment.values());
     }
 
     @Override
@@ -313,15 +311,15 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     public T withAttachment(ArtifactAttachment attachment)
     {
         var copy = copy();
-        copy.attachmentMap().put(attachment.suffix(), attachment);
+        ((BaseArtifact<T>) copy).suffixToAttachment.put(attachment.suffix(), attachment);
         return copy;
     }
 
     @Override
-    public T withAttachments(ObjectMap<String, ArtifactAttachment> attachments)
+    public T withAttachments(ObjectMap<AttachmentSuffix, ArtifactAttachment> attachments)
     {
         var copy = copy();
-        ((BaseArtifact<T>) copy).attachments = attachments;
+        ((BaseArtifact<T>) copy).suffixToAttachment = attachments;
         return copy;
     }
 

@@ -1,7 +1,6 @@
 package digital.fiasco.runtime.repository.fiasco.server;
 
 import com.telenav.kivakit.application.Application;
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.progress.ProgressReporter;
 import com.telenav.kivakit.core.thread.KivaKitThread;
 import com.telenav.kivakit.network.socket.server.ConnectionListener;
@@ -9,7 +8,6 @@ import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.InputResource;
 import com.telenav.kivakit.resource.resources.OutputResource;
 import com.telenav.kivakit.resource.writing.WritableResource;
-import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.fiasco.CacheRepository;
@@ -108,9 +106,8 @@ public class FiascoServer extends Application
     @NotNull
     private FiascoRepositoryResponse response(FiascoRepositoryRequest request)
     {
-        ObjectList<Artifact<?>> resolved = repository.resolveArtifacts(request.descriptors());
         return new FiascoRepositoryResponse()
-            .with();
+            .with(repository.resolveArtifacts(request.descriptors()));
     }
 
     /**

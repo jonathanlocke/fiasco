@@ -1,7 +1,6 @@
 package digital.fiasco.runtime.build.tasks;
 
 import digital.fiasco.runtime.build.builder.Builder;
-import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.processing.Task;
 import digital.fiasco.runtime.dependency.processing.TaskResult;
 

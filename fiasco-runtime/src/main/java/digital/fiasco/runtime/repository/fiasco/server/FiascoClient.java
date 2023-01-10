@@ -8,6 +8,7 @@ import com.telenav.kivakit.resource.resources.DataResource;
 import com.telenav.kivakit.resource.resources.InputResource;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
+import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix;
 import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
 
 import java.net.URI;
@@ -46,7 +47,7 @@ public class FiascoClient extends BaseComponent
             for (var artifact : response.artifacts())
             {
                 // and attachment,
-                var resolvedAttachments = new ObjectMap<String, ArtifactAttachment>();
+                var resolvedAttachments = new ObjectMap<AttachmentSuffix, ArtifactAttachment>();
                 for (var attachment : artifact.attachments())
                 {
                     // read the content data,

@@ -4,6 +4,7 @@ import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.network.http.HttpResourceFolder;
+import com.telenav.kivakit.resource.Extension;
 import com.telenav.kivakit.resource.FileName;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.ResourceFolder;
@@ -24,12 +25,16 @@ import java.net.URI;
 
 import static com.telenav.kivakit.core.ensure.Ensure.fail;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
+import static com.telenav.kivakit.resource.Extension.MD5;
+import static com.telenav.kivakit.resource.Extension.POM;
+import static com.telenav.kivakit.resource.Extension.SHA1;
 import static com.telenav.kivakit.resource.FileName.parseFileName;
 import static com.telenav.kivakit.resource.ResourcePath.parseResourcePath;
 import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.CONTENT_SUFFIX;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.JAVADOC_SUFFIX;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.SOURCES_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.CONTENT_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.JAVADOC_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.POM_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.SOURCES_SUFFIX;
 import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
@@ -207,13 +212,13 @@ public class MavenRepository extends BaseRepository
     private ArtifactContent mavenReadContent(ArtifactAttachment attachment)
     {
         var artifact = attachment.artifact();
-        var resource = mavenResource(rootFolder, attachment);
+        var resource = mavenResource(rootFolder, attachment, null);
         if (resource.exists())
         {
             var suffix = attachment.suffix();
-            var pgp = mavenResource(rootFolder, attachment.withSuffix(suffix + "pgp")).reader().readText();
-            var md5 = mavenResource(rootFolder, attachment.withSuffix(suffix + "md5")).reader().readText();
-            var sha1 = mavenResource(rootFolder, attachment.withSuffix(suffix + "sha1")).reader().readText();
+            var pgp = mavenResource(rootFolder, attachment.withSuffix(suffix), Extension.PGP).reader().readText();
+            var md5 = mavenResource(rootFolder, attachment.withSuffix(suffix), MD5).reader().readText();
+            var sha1 = mavenResource(rootFolder, attachment.withSuffix(suffix), SHA1).reader().readText();
             var signatures = new ArtifactSignatures(pgp, md5, sha1);
             return new ArtifactContent()
                 .withName(attachment.content().name())
@@ -233,11 +238,15 @@ public class MavenRepository extends BaseRepository
      * @return The file
      */
     private Resource mavenResource(ResourceFolder<?> target,
-                                   ArtifactAttachment attachment)
+                                   ArtifactAttachment attachment,
+                                   Extension signatureExtension)
     {
         var artifact = attachment.artifact();
         var folder = mavenFolder(target, artifact);
-        return folder.resource(mavenFileName(artifact, attachment.suffix()));
+        return folder.resource(mavenFileName(artifact, attachment.suffix().suffix() +
+            (signatureExtension == null
+                ? ""
+                : signatureExtension)));
     }
 
     /**
@@ -262,7 +271,7 @@ public class MavenRepository extends BaseRepository
             targetFolder = (Folder) mavenFolder(targetFolder, artifact);
 
             // and the target file in that folder,
-            var targetFile = (File) mavenResource(targetFolder, attachment);
+            var targetFile = (File) mavenResource(targetFolder, attachment, null);
 
             // and copy the content to that file.
             attachment.content().resource().safeCopyTo(targetFile, OVERWRITE);
@@ -272,9 +281,9 @@ public class MavenRepository extends BaseRepository
 
             // and write them to the folder.
             var suffix = attachment.suffix();
-            ((File) mavenResource(targetFolder, attachment.withSuffix(suffix + ".asc"))).saveText(signature.pgp());
-            ((File) mavenResource(targetFolder, attachment.withSuffix(suffix + ".md5"))).saveText(signature.md5());
-            ((File) mavenResource(targetFolder, attachment.withSuffix(suffix + ".sha1"))).saveText(signature.sha1());
+            ((File) mavenResource(targetFolder, attachment.withSuffix(suffix), Extension.ASC)).saveText(signature.pgp());
+            ((File) mavenResource(targetFolder, attachment.withSuffix(suffix), MD5)).saveText(signature.md5());
+            ((File) mavenResource(targetFolder, attachment.withSuffix(suffix), SHA1)).saveText(signature.sha1());
         }
     }
 
@@ -308,7 +317,7 @@ public class MavenRepository extends BaseRepository
         if (rootFolder instanceof Folder target)
         {
             // get the file to write to
-            var file = (File) mavenResource(target, new ArtifactAttachment(artifact, ".pom"));
+            var file = (File) mavenResource(target, new ArtifactAttachment(artifact, POM_SUFFIX), POM);
             file.saveText(artifact.mavenPom());
         }
         else

@@ -10,19 +10,32 @@ import org.jetbrains.annotations.NotNull;
  * @param content The attached content
  */
 public record ArtifactAttachment(@NotNull Artifact<?> artifact,
-                                 @NotNull String suffix,
+                                 @NotNull ArtifactAttachment.AttachmentSuffix suffix,
                                  ArtifactContent content)
 {
-    /** Suffix for javadoc attachment */
-    public static final String JAVADOC_SUFFIX = "-javadoc.jar";
+    public enum AttachmentSuffix
+    {
+        NO_SUFFIX(""),
+        JAVADOC_SUFFIX("-javadoc.jar"),
+        CONTENT_SUFFIX(".jar"),
+        POM_SUFFIX(".pom"),
+        SOURCES_SUFFIX("-sources.jar");
 
-    /** Suffix for jar attachment */
-    public static final String CONTENT_SUFFIX = ".jar";
+        private final String suffix;
 
-    /** Suffix for sources attachment */
-    public static final String SOURCES_SUFFIX = "-sources.jar";
+        AttachmentSuffix(String suffix)
+        {
 
-    public ArtifactAttachment(Artifact<?> artifact, String suffix)
+            this.suffix = suffix;
+        }
+
+        public String suffix()
+        {
+            return suffix;
+        }
+    }
+
+    public ArtifactAttachment(Artifact<?> artifact, AttachmentSuffix suffix)
     {
         this(artifact, suffix, null);
     }
@@ -32,7 +45,7 @@ public record ArtifactAttachment(@NotNull Artifact<?> artifact,
         return new ArtifactAttachment(artifact, suffix, content);
     }
 
-    public ArtifactAttachment withSuffix(String suffix)
+    public ArtifactAttachment withSuffix(AttachmentSuffix suffix)
     {
         return new ArtifactAttachment(artifact, suffix, content);
     }
