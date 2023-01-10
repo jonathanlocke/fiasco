@@ -190,14 +190,13 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @param name The name of the dependency
      * @return The dependency
      */
-    public T dependency(String name)
+    public Artifact<?> dependency(String name)
     {
         for (var at : dependencies)
         {
             if (at.name().equals(name))
             {
-                // noinspection unchecked
-                return (T) at;
+                return at;
             }
         }
         return illegalState("No dependency $ found", name);

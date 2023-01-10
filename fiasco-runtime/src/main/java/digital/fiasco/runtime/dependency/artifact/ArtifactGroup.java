@@ -17,6 +17,11 @@ public record ArtifactGroup(String name) implements Named
         return new ArtifactGroup(name);
     }
 
+    public Asset asset(String artifact)
+    {
+        return Asset.asset(artifactDescriptor(name + ":" + artifact));
+    }
+
     /**
      * Returns an artifact descriptor for the given artifact in this group
      *

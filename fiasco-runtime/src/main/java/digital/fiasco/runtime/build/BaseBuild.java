@@ -145,7 +145,6 @@ import static digital.fiasco.runtime.dependency.DependencyTree.dependencyTree;
 @SuppressWarnings({ "SameParameterValue", "UnusedReturnValue", "unused" })
 public abstract class BaseBuild extends Application implements Build
 {
-
     /** Metadata associated with this build */
     private BuildMetadata metadata;
 
