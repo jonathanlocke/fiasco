@@ -6,7 +6,7 @@ package digital.fiasco.runtime.dependency.artifact;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public record ArtifactSignatures(
+public record ArtifactContentSignatures(
     String pgp,  // PGP signature text
     String md5,  // MD5 hash
     String sha1) // SHA-1 hash

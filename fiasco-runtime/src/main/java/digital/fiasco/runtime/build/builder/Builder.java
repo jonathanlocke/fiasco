@@ -552,7 +552,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder onPhase(String name, BuildAction code)
     {
-        phase(name).onPhase(code);
+        phase(name).duringPhase(code);
         return this;
     }
 

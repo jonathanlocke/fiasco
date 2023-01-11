@@ -6,47 +6,26 @@ import org.jetbrains.annotations.NotNull;
  * Represents an artifact content attachment
  *
  * @param artifact The artifact that owns this attachment
- * @param suffix The attachment name suffix
+ * @param type The attachment name type
  * @param content The attached content
  */
 public record ArtifactAttachment(@NotNull Artifact<?> artifact,
-                                 @NotNull ArtifactAttachment.AttachmentSuffix suffix,
+                                 @NotNull ArtifactAttachmentType type,
                                  ArtifactContent content)
 {
-    public enum AttachmentSuffix
+
+    public ArtifactAttachment(Artifact<?> artifact, ArtifactAttachmentType type)
     {
-        NO_SUFFIX(""),
-        JAVADOC_SUFFIX("-javadoc.jar"),
-        CONTENT_SUFFIX(".jar"),
-        POM_SUFFIX(".pom"),
-        SOURCES_SUFFIX("-sources.jar");
-
-        private final String suffix;
-
-        AttachmentSuffix(String suffix)
-        {
-
-            this.suffix = suffix;
-        }
-
-        public String suffix()
-        {
-            return suffix;
-        }
-    }
-
-    public ArtifactAttachment(Artifact<?> artifact, AttachmentSuffix suffix)
-    {
-        this(artifact, suffix, null);
+        this(artifact, type, null);
     }
 
     public ArtifactAttachment withContent(ArtifactContent content)
     {
-        return new ArtifactAttachment(artifact, suffix, content);
+        return new ArtifactAttachment(artifact, type, content);
     }
 
-    public ArtifactAttachment withSuffix(AttachmentSuffix suffix)
+    public ArtifactAttachment withType(ArtifactAttachmentType type)
     {
-        return new ArtifactAttachment(artifact, suffix, content);
+        return new ArtifactAttachment(artifact, type, content);
     }
 }

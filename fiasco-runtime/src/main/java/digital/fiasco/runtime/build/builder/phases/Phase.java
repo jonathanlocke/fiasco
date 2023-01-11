@@ -14,7 +14,7 @@ import digital.fiasco.runtime.build.builder.Builder;
  *
  * <ul>
  *     <li>{@link #beforePhase(BuildAction)}</li>
- *     <li>{@link #onPhase(BuildAction)}</li>
+ *     <li>{@link #duringPhase(BuildAction)}</li>
  *     <li>{@link #afterPhase(BuildAction)}</li>
  * </ul>
  *
@@ -47,6 +47,13 @@ public interface Phase extends
     ObjectList<Class<? extends Phase>> dependsOnPhases();
 
     /**
+     * Runs the given code <i>when</i> this phase runs
+     *
+     * @param code The code to run
+     */
+    Phase duringPhase(BuildAction code);
+
+    /**
      * <p><b>Internal API</b></p>
      *
      * <p>
@@ -72,11 +79,4 @@ public interface Phase extends
      * </p>
      */
     void internalOnRun(Builder builder);
-
-    /**
-     * Runs the given code <i>when</i> this phase runs
-     *
-     * @param code The code to run
-     */
-    Phase onPhase(BuildAction code);
 }

@@ -13,6 +13,40 @@ import digital.fiasco.runtime.build.metadata.BuildMetadata;
 /**
  * Defines a Fiasco build.
  *
+ * <p>
+ * The {@link #onBuild(Builder)} method is called to obtain a list of configured {@link Builder}s to be executed to
+ * perform the build. Typically, each builder builds a single project. Multi-project builds are possible simply by
+ * returning more than one builder (child builders can be created with {@link Builder#deriveBuilder(String)}).
+ * Dependencies between builders and artifacts are used to determine the order of execution of builders and the order in
+ * which artifacts are resolved from repositories.
+ * </p>
+ *
+ * <p><b>Build Settings</b></p>
+ *
+ * <p>
+ * The {@link BuildSettings} class holds configuration information for the build. Some of this information is used to
+ * initialize the root builder passed to {@link #onBuild(Builder)}. Some build settings are switched on and off by the
+ * {@link BaseBuild} application's built-in switches:
+ * </p>
+ *
+ * <ul>
+ *     <li>-builder-threads=[count] - sets the number of threads to use for executing {@link Builder}s</li>
+ *     <li>-artifact-resolver-threads=[count] - sets the number of threads to use for resolving artifacts</li>
+ * </ul>
+ *
+ * <p>
+ * In addition, options, phases (below) and user-defined profiles can be enabled or disabled from the command line as well:
+ * </p>
+ *
+ * <i>Options</i>
+ *
+ * <ul>
+ *     <li>describe</li>
+ *     <li>quiet</li>
+ *     <li>debug</li>
+ *     <li>help</li>
+ * </ul>
+ *
  * <p><b>Build Phases</b></p>
  *
  * <p>
@@ -110,6 +144,9 @@ import digital.fiasco.runtime.build.metadata.BuildMetadata;
  * </ul>
  *
  * @author Jonathan Locke
+ * @see BuildSettings
+ * @see BuildOption
+ * @see BuildProfile
  * @see BuildEnvironment
  * @see BuildRepositories
  * @see Named

@@ -4,10 +4,12 @@ import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
+import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.StringOutputResource;
 import com.telenav.kivakit.resource.resources.StringResource;
 import com.telenav.kivakit.resource.serialization.SerializableObject;
 import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.repository.Repository;
@@ -17,16 +19,47 @@ import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.core.version.Version.parseVersion;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_VERSION;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.CONTENT_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 
 /**
- * Represents an artifact, either an {@link Asset} or a {@link Library}
+ * Defines an artifact, either an {@link Asset} or a {@link Library}. Libraries are artifacts that have a source and
+ * Javadoc content attachment as well as a JAR attachment.
  *
- * <p><b>Repository</b></p>
+ * <p><b>Artifact Descriptors</b></p>
+ *
+ * <p>
+ * Artifacts are referenced by {@link ArtifactDescriptor}s, which take the form [group:artifact:version], for example,
+ * "com.telenav.kivakit:kivakit-application:1.10.0". The descriptor for an artifact can be retrieved with
+ * {@link #artifactDescriptor()}.
+ * </p>
+ *
+ * <p><b>Artifact Content Attachments</b></p>
+ *
+ * <p>
+ * Each artifact has a set of {@link ArtifactAttachment}s, one for each {@link ArtifactAttachmentType}. The attachment
+ * for a particular type, like {@link ArtifactAttachmentType#JAVADOC_ATTACHMENT}, can be retrieved with
+ * {@link #attachment(ArtifactAttachmentType)}. The list of all attachments can be retrieved with
+ * {@link #attachments()}. Each attachment has {@link ArtifactContent}, which includes the content {@link Resource} and
+ * a set of {@link ArtifactContentSignatures} to allow verification of the accuracy of the content. The primary JAR
+ * content for an artifact can be retrieved with {@link #content()}
+ * </p>
+ *
+ * <p><b>Dependencies</b></p>
+ *
+ * <p>
+ * An artifact can have zero or more dependencies. The method {@link #dependencies()} returns a {@link DependencyList}
+ * of {@link Artifact}s (note that there are non-artifact dependencies, such as {@link Builder}s). Artifact dependencies
+ * can be filtered by excluding certain descriptors with {@link #excluding(String...)},
+ * {@link #excluding(ArtifactDescriptor...)}, or {@link #excluding(Matcher)}.
+ * </p>
+ *
+ * <p><b>Properties</b></p>
  *
  * <ul>
  *     <li>{@link #repository()}</li>
+ *     <li>{@link #mavenPom()}</li>
+ *     <li>{@link #attachments()}</li>
+ *     <li>{@link #content()}</li>
  * </ul>
  *
  * <p><b>Identity</b></p>
@@ -44,17 +77,18 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.Atta
  *
  * <ul>
  *     <li>{@link #dependencies()}</li>
- *     <li>{@link #excludes(ArtifactDescriptor)}</li>
+ *     <li>{@link #isExcluded(ArtifactDescriptor)}</li>
  *     <li>{@link #withDependencies(DependencyList)}</li>
- *     <li>{@link #withoutDependencies(ArtifactDescriptor...)}</li>
- *     <li>{@link #withoutDependencies(String...)}</li>
- *     <li>{@link #withoutDependencies(Matcher)}</li>
+ *     <li>{@link #excluding(ArtifactDescriptor...)}</li>
+ *     <li>{@link #excluding(String...)}</li>
+ *     <li>{@link #excluding(Matcher)}</li>
  * </ul>
  *
  * <p><b>Attachments</b></p>
  *
  * <ul>
- *     <li>{@link #attachment(AttachmentSuffix)}</li>
+ *     <li>{@link #attachments()}</li>
+ *     <li>{@link #attachment(ArtifactAttachmentType)}</li>
  *     <li>{@link #withAttachment(ArtifactAttachment)}</li>
  * </ul>
  *
@@ -71,9 +105,9 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.Atta
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
  *     <li>{@link #withArtifactIdentifier(String)} - Returns this artifact with the given identifier</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
- *     <li>{@link #withoutDependencies(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
- *     <li>{@link #withoutDependencies(String...)} - Returns this artifact without the given dependencies</li>
- *     <li>{@link #withoutDependencies(Matcher)} - Returns this artifact without the given dependencies</li>
+ *     <li>{@link #excluding(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
+ *     <li>{@link #excluding(String...)} - Returns this artifact without the given dependencies</li>
+ *     <li>{@link #excluding(Matcher)} - Returns this artifact without the given dependencies</li>
  * </ul>
  *
  *
@@ -118,12 +152,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     ArtifactDescriptor artifactDescriptor();
 
     /**
-     * Returns the attached resource for the given artifact suffix, such as <i>.jar</i>
+     * Returns the attached resource for the given artifact type, such as <i>.jar</i>
      *
-     * @param suffix The artifact suffix
+     * @param type The artifact type
      * @return The attached resource
      */
-    ArtifactAttachment attachment(AttachmentSuffix suffix);
+    ArtifactAttachment attachment(ArtifactAttachmentType type);
 
     /**
      * Returns a list of all attachments to this artifact
@@ -139,7 +173,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     default ArtifactContent content()
     {
-        return attachment(CONTENT_SUFFIX).content();
+        return attachment(JAR_ATTACHMENT).content();
     }
 
     /**
@@ -158,12 +192,43 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     DependencyList<Artifact<?>> dependencies();
 
     /**
+     * Returns a copy of this artifact that excludes the given descriptors from its dependencies
+     *
+     * @param exclude The descriptors to exclude
+     * @return The new artifact
+     */
+    default T excluding(ArtifactDescriptor... exclude)
+    {
+        return excluding(library -> arrayContains(exclude, library));
+    }
+
+    /**
+     * Returns a copy of this artifact that excludes the given descriptors from its dependencies
+     *
+     * @param exclude The descriptors to exclude
+     * @return The new artifact
+     */
+    default T excluding(String... exclude)
+    {
+        var descriptors = list(exclude).map(ArtifactDescriptor::artifactDescriptor);
+        return excluding(descriptors::contains);
+    }
+
+    /**
+     * Returns a copy of this artifact that excludes all descriptors matching the given pattern from its dependencies
+     *
+     * @param pattern The pattern to exclude
+     * @return The new artifact
+     */
+    T excluding(Matcher<ArtifactDescriptor> pattern);
+
+    /**
      * Returns true if this artifact excludes the given artifact
      *
      * @param descriptor The artifact descriptor
      * @return True if the descriptor is excluded
      */
-    boolean excludes(ArtifactDescriptor descriptor);
+    boolean isExcluded(ArtifactDescriptor descriptor);
 
     /**
      * Returns a skeletal Maven POM for this artifact
@@ -226,11 +291,11 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     T withAttachment(ArtifactAttachment attachment);
 
     /**
-     * Attaches the resource for the given artifact suffix, such as <i>.jar</i>
+     * Attaches the resource for the given artifact type, such as <i>.jar</i>
      *
      * @param attachments The content to attach
      */
-    T withAttachments(ObjectMap<AttachmentSuffix, ArtifactAttachment> attachments);
+    T withAttachments(ObjectMap<ArtifactAttachmentType, ArtifactAttachment> attachments);
 
     /**
      * Returns primary content attachment for this asset
@@ -240,7 +305,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     default T withContent(ArtifactContent content)
     {
         var copy = copy();
-        copy.withAttachment(new ArtifactAttachment(this, CONTENT_SUFFIX, content));
+        copy.withAttachment(new ArtifactAttachment(this, JAR_ATTACHMENT, content));
         return copy;
     }
 
@@ -270,35 +335,4 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     {
         return withDescriptor(artifactDescriptor().withVersion(version));
     }
-
-    /**
-     * Returns a copy of this artifact that excludes the given descriptors from its dependencies
-     *
-     * @param exclude The descriptors to exclude
-     * @return The new artifact
-     */
-    default T withoutDependencies(ArtifactDescriptor... exclude)
-    {
-        return withoutDependencies(library -> arrayContains(exclude, library));
-    }
-
-    /**
-     * Returns a copy of this artifact that excludes the given descriptors from its dependencies
-     *
-     * @param exclude The descriptors to exclude
-     * @return The new artifact
-     */
-    default T withoutDependencies(String... exclude)
-    {
-        var descriptors = list(exclude).map(ArtifactDescriptor::artifactDescriptor);
-        return withoutDependencies(descriptors::contains);
-    }
-
-    /**
-     * Returns a copy of this artifact that excludes all descriptors matching the given pattern from its dependencies
-     *
-     * @param pattern The pattern to exclude
-     * @return The new artifact
-     */
-    T withoutDependencies(Matcher<ArtifactDescriptor> pattern);
 }

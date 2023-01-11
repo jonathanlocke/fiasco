@@ -128,7 +128,7 @@ public abstract class BasePhase implements Phase
      * {@inheritDoc}
      */
     @Override
-    public Phase onPhase(BuildAction code)
+    public Phase duringPhase(BuildAction code)
     {
         run.add(code);
         return this;

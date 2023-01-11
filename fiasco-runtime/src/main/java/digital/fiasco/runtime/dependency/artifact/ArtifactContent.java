@@ -19,7 +19,7 @@ import com.telenav.kivakit.resource.Resource;
 public record ArtifactContent
     (
         @Expose String name,
-        @Expose ArtifactSignatures signatures,
+        @Expose ArtifactContentSignatures signatures,
         @Expose Resource resource,
         @Expose long offset,
         @Expose Time lastModified,
@@ -81,7 +81,7 @@ public record ArtifactContent
      * @param signatures The content's hash signatures
      * @return The new artifact content
      */
-    public ArtifactContent withSignatures(ArtifactSignatures signatures)
+    public ArtifactContent withSignatures(ArtifactContentSignatures signatures)
     {
         return new ArtifactContent(name, signatures, resource, offset, lastModified, size);
     }

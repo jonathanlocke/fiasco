@@ -50,9 +50,9 @@ public class StandardPhases extends PhaseList implements
         this.builder = builder;
 
         add(new PhaseStart());
-        add(new PhaseClean().onPhase(it -> onClean()));
-        add(new PhasePrepare().onPhase(it -> onPrepare()));
-        add(new PhaseCompile().onPhase(it -> onCompile()));
+        add(new PhaseClean().duringPhase(it -> onClean()));
+        add(new PhasePrepare().duringPhase(it -> onPrepare()));
+        add(new PhaseCompile().duringPhase(it -> onCompile()));
         add(new PhaseTest());
         add(new PhaseDocument());
         add(new PhasePackage());

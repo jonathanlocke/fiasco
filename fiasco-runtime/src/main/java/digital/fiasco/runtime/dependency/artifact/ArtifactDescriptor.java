@@ -30,6 +30,21 @@ import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
  *     <li>{@link #version()} - The artifact version, like <i>1.8.0</i></li>
  * </ul>
  *
+ * <p><b>Matching</b></p>
+ *
+ * <p>
+ * Both the artifact and version are optional, and can be omitted (but the colons cannot). When either the artifact or
+ * version is omitted (or both), the missing values act as wildcards when {@link #matches(ArtifactDescriptor)} is
+ * called. For example, "com.telenav.kivakit:kivakit-core:" matches all versions of kivakit-core, the descriptor
+ * "com.telenav.kivakit::" matches all versions of all kivakit artifacts, and the descriptor "com.telenav.kivakit::1.8"
+ * matches all kivakit 1.8.x artifact descriptors.
+ * </p>
+ *
+ * <ul>
+ *     <li>{@link #matches(ArtifactDescriptor)} - Returns true if the given descriptor matches this one, allowing for wildcard
+ *     matching if the artifact or version values are missing from either descriptor</li>
+ * </ul>
+ *
  * <p><b>Validity</b></p>
  *
  * <ul>
@@ -52,15 +67,15 @@ import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
 @SuppressWarnings("unused")
 public record ArtifactDescriptor(ArtifactGroup group,
                                  ArtifactIdentifier artifact,
-                                 Version version) implements Named
+                                 Version version) implements
+    Named
 {
-    /** A lenient pattern for artifact descriptors */
+    /**
+     * A lenient pattern for matching artifact descriptors.
+     */
     private static final Pattern DESCRIPTOR_PATTERN = Pattern.compile("(?<group>[A-Za-z0-9._-]+)"
-        + ":"
-        + "(?<identifier>[A-Za-z0-9._-]+)"
-        + "(:"
-        + "(?<version>[A-Za-z0-9._-]+)"
-        + ")?");
+        + ":(?<artifact>[A-Za-z0-9._-]+)?"
+        + ":(?<version>[A-Za-z0-9._-]+)?");
 
     /**
      * Returns the artifact descriptor for the given text
@@ -87,12 +102,12 @@ public record ArtifactDescriptor(ArtifactGroup group,
         if (matcher.matches())
         {
             var group = matcher.group("group");
-            var identifier = matcher.group("identifier");
+            var artifact = matcher.group("artifact");
             var version = matcher.group("version");
             ensureNotNull(group);
             return new ArtifactDescriptor(new ArtifactGroup(group),
-                identifier != null
-                    ? new ArtifactIdentifier(identifier)
+                artifact != null
+                    ? new ArtifactIdentifier(artifact)
                     : null,
                 version != null
                     ? Version.version(version, LENIENT)
@@ -100,6 +115,18 @@ public record ArtifactDescriptor(ArtifactGroup group,
         }
         listener.problem("Unable to parse artifact descriptor: $", text);
         return null;
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object instanceof ArtifactDescriptor that)
+        {
+            return group.equals(that.group)
+                && (artifact == null || that.artifact == null || artifact.equals(that.artifact))
+                && (version == null || that.version == null || version.equals(that.version));
+        }
+        return false;
     }
 
     /**
@@ -110,6 +137,23 @@ public record ArtifactDescriptor(ArtifactGroup group,
     public boolean isValid()
     {
         return group != null && artifact != null && version != null;
+    }
+
+    /**
+     * Returns true if this descriptor matches the given descriptor. If either descriptor is missing the artifact
+     * identifier, artifact identifiers are considered to match like a wildcard. The same goes for versions (which also
+     * do their own wildcard matches if the minor or patch version is omitted). For example,
+     * "com.telenav.kivakit:kivakit-core" will match "com.telenav.kivakit:kivakit-core:1.8.0". Similarly,
+     * "com.telenav.kivakit::1.8" will match "com.telenav.kivakit:kivakit-converter:1.8.7".
+     *
+     * @param that The version to match against
+     * @return True if this version matches the given version
+     */
+    public boolean matches(ArtifactDescriptor that)
+    {
+        return group.equals(that.group)
+            && (artifact == null || that.artifact == null || artifact.equals(that.artifact))
+            && (version == null || that.version == null || version.equals(that.version));
     }
 
     /**

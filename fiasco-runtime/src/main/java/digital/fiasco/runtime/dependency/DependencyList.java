@@ -20,9 +20,17 @@ import java.util.Iterator;
  *     <li>{@link #dependencyList(Collection)} - List factory method</li>
  * </ul>
  *
+ * <p><b>Filtering</b></p>
+ *
+ * <ul>
+ *     <li>{@link #matching(Matcher)}</li>
+ * </ul>
+ *
  * <p><b>Conversions</b></p>
  *
  * <ul>
+ *     <li>{@link #asArtifactList()}</li>
+ *     <li>{@link #asArtifactDescriptors()}</li>
  *     <li>{@link #asList()}</li>
  *     <li>{@link #asSet()}</li>
  * </ul>
@@ -30,11 +38,13 @@ import java.util.Iterator;
  * <p><b>Functional</b></p>
  *
  * <ul>
+ *     <li>{@link #copy()}</li>
  *     <li>{@link #with(DependencyList)}</li>
  *     <li>{@link #with(Iterable)}</li>
+ *     <li>{@link #with(Dependency)}</li>
  *     <li>{@link #with(Dependency, Dependency...)}</li>
- *     <li>{@link #without(Matcher)} - Returns a copy of this list without the given dependencies</li>
- *     <li>{@link #without(Collection) - Returns a copy of this list without the given dependencies}</li>
+ *     <li>{@link #without(Matcher)}</li>
+ *     <li>{@link #without(Collection)</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -68,7 +78,7 @@ public class DependencyList<T extends Dependency> extends ObjectList<T>
     /** The underlying dependencies */
     private ObjectList<T> dependencies = list();
 
-    public DependencyList()
+    protected DependencyList()
     {
     }
 
@@ -77,7 +87,7 @@ public class DependencyList<T extends Dependency> extends ObjectList<T>
         this.dependencies.addAll(dependencies);
     }
 
-    public ObjectList<ArtifactDescriptor> artifactDescriptors()
+    public ObjectList<ArtifactDescriptor> asArtifactDescriptors()
     {
         return map(Dependency::artifactDescriptor);
     }

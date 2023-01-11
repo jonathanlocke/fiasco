@@ -27,7 +27,7 @@ public record ArtifactResolverTask(Librarian librarian,
     public TaskResult<DependencyList<Artifact<?>>> call()
     {
         // Get the list of descriptors to resolve,
-        var descriptors = artifacts.artifactDescriptors();
+        var descriptors = artifacts.asArtifactDescriptors();
 
         // ask the librarian to resolve them,
         var issues = new MessageList();

@@ -2,6 +2,7 @@ package digital.fiasco.runtime.dependency;
 
 import com.telenav.kivakit.interfaces.naming.Named;
 import digital.fiasco.runtime.build.builder.Builder;
+import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.Asset;
@@ -9,10 +10,36 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.Repository;
 
 /**
- * A dependency is an artifact (optionally in some repository) that has a list of {@link #dependencies()}, which must be
- * resolved for it to function.
+ * A dependency is either a {@link Builder}, or an {@link Artifact} with an associated {@link #repository()}. An
+ * {@link Artifact} can be either an {@link Asset} or a {@link Library}. Each dependency can have its own list of
+ * {@link #dependencies()}, but circular dependencies are not allowed. Specific kinds of dependencies can be retrieved
+ * with the filter methods {@link #assetDependencies()}, {@link #libraryDependencies()}, and
+ * {@link #dependencies(Class)}.
+ *
+ * <p><b>Properties</b></p>
+ *
+ * <ul>
+ *     <li>{@link #artifactDescriptor()}</li>
+ *     <li>{@link #repository()}</li>
+ *     <li>{@link #dependencies()}</li>
+ * </ul>
+ *
+ * <p><b>Filtering</b></p>
+ *
+ * <ul>
+ *     <li>{@link #dependencies(Class)}</li>
+ *     <li>{@link #assetDependencies()}</li>
+ *     <li>{@link #libraryDependencies()}</li>
+ * </ul>
  *
  * @author Jonathan Locke
+ * @see DependencyList
+ * @see DependencyTree
+ * @see Builder
+ * @see Artifact
+ * @see Asset
+ * @see Library
+ * @see Librarian
  */
 @SuppressWarnings("unused")
 public interface Dependency extends Named

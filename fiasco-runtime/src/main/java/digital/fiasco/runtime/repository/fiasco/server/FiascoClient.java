@@ -8,7 +8,7 @@ import com.telenav.kivakit.resource.resources.DataResource;
 import com.telenav.kivakit.resource.resources.InputResource;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
-import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix;
+import digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType;
 import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
 
 import java.net.URI;
@@ -47,7 +47,7 @@ public class FiascoClient extends BaseComponent
             for (var artifact : response.artifacts())
             {
                 // and attachment,
-                var resolvedAttachments = new ObjectMap<AttachmentSuffix, ArtifactAttachment>();
+                var resolvedAttachments = new ObjectMap<ArtifactAttachmentType, ArtifactAttachment>();
                 for (var attachment : artifact.attachments())
                 {
                     // read the content data,
@@ -57,7 +57,7 @@ public class FiascoClient extends BaseComponent
                     ensureEqual(in.read(data), size);
 
                     // and resolve the attachment.
-                    resolvedAttachments.put(attachment.suffix(), attachment
+                    resolvedAttachments.put(attachment.type(), attachment
                         .withContent(content
                             .withResource(new DataResource(data))));
                 }

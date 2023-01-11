@@ -8,7 +8,7 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.ArtifactSignatures;
+import digital.fiasco.runtime.dependency.artifact.ArtifactContentSignatures;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
@@ -211,7 +211,7 @@ public class LocalRepository extends BaseRepository
     private File artifactAttachmentFile(@NotNull ArtifactAttachment attachment)
     {
         return repositoryFolder(attachment.artifact())
-            .file(attachment.content().name() + attachment.suffix());
+            .file(attachment.content().name() + attachment.type());
     }
 
     /**
@@ -250,19 +250,19 @@ public class LocalRepository extends BaseRepository
     }
 
     /**
-     * Returns the {@link ArtifactSignatures} for the given artifact and content attachment.
+     * Returns the {@link ArtifactContentSignatures} for the given artifact and content attachment.
      *
      * @param attachment The artifact attachment
      * @return The signatures
      */
-    private ArtifactSignatures readSignatures(ArtifactAttachment attachment)
+    private ArtifactContentSignatures readSignatures(ArtifactAttachment attachment)
     {
         var artifact = attachment.artifact();
         var content = attachment.content();
         var pgp = readSignature(artifact, content, "pgp");
         var md5 = readSignature(artifact, content, "md5");
         var sha1 = readSignature(artifact, content, "sha1");
-        return new ArtifactSignatures(pgp, md5, sha1);
+        return new ArtifactContentSignatures(pgp, md5, sha1);
     }
 
     /**

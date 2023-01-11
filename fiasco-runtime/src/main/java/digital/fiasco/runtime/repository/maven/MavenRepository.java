@@ -13,8 +13,8 @@ import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.ArtifactContentSignatures;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.ArtifactSignatures;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.maven.resolver.MavenDependency;
@@ -31,10 +31,11 @@ import static com.telenav.kivakit.resource.Extension.SHA1;
 import static com.telenav.kivakit.resource.FileName.parseFileName;
 import static com.telenav.kivakit.resource.ResourcePath.parseResourcePath;
 import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.CONTENT_SUFFIX;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.JAVADOC_SUFFIX;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.POM_SUFFIX;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.SOURCES_SUFFIX;
+import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.POM_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
@@ -92,11 +93,11 @@ public class MavenRepository extends BaseRepository
         lock().write(() ->
         {
             var descriptor = artifact.artifactDescriptor();
-            mavenWriteContent(artifact.attachment(CONTENT_SUFFIX));
+            mavenWriteContent(artifact.attachment(JAR_ATTACHMENT));
             if (artifact instanceof Library library)
             {
-                mavenWriteContent(artifact.attachment(JAVADOC_SUFFIX));
-                mavenWriteContent(artifact.attachment(SOURCES_SUFFIX));
+                mavenWriteContent(artifact.attachment(JAVADOC_ATTACHMENT));
+                mavenWriteContent(artifact.attachment(SOURCES_ATTACHMENT));
             }
             mavenWritePom(artifact);
         });
@@ -116,7 +117,7 @@ public class MavenRepository extends BaseRepository
     {
         return lock().read(() ->
         {
-            DependencyList<Artifact<?>> resolved = new DependencyList<>();
+            DependencyList<Artifact<?>> resolved = dependencyList();
 
             // Go through each descriptor,
             for (var descriptor : descriptors)
@@ -125,12 +126,12 @@ public class MavenRepository extends BaseRepository
 
                 // read any artifact jar attachment (if the repository does not contain the artifact,
                 // the return value assigned to jar will be null),
-                var jar = mavenReadContent(new ArtifactAttachment(artifact, CONTENT_SUFFIX));
+                var jar = mavenReadContent(new ArtifactAttachment(artifact, JAR_ATTACHMENT));
                 if (jar != null)
                 {
                     // then read any Javadoc or source code attachments,
-                    var javadoc = mavenReadContent(new ArtifactAttachment(artifact, JAVADOC_SUFFIX));
-                    var source = mavenReadContent(new ArtifactAttachment(artifact, SOURCES_SUFFIX));
+                    var javadoc = mavenReadContent(new ArtifactAttachment(artifact, JAVADOC_ATTACHMENT));
+                    var source = mavenReadContent(new ArtifactAttachment(artifact, SOURCES_ATTACHMENT));
 
                     // and resolve dependencies for the artifact from remote repositories.
                     var dependencyDescriptors = mavenResolver
@@ -163,9 +164,9 @@ public class MavenRepository extends BaseRepository
     }
 
     /**
-     * Returns this descriptor as a filename with the given suffix.
+     * Returns this descriptor as a filename with the given type.
      *
-     * @param suffix The suffix to add to the filename
+     * @param suffix The type to add to the filename
      * @return The filename
      */
     private FileName mavenFileName(Artifact<?> artifact, String suffix)
@@ -215,11 +216,11 @@ public class MavenRepository extends BaseRepository
         var resource = mavenResource(rootFolder, attachment, null);
         if (resource.exists())
         {
-            var suffix = attachment.suffix();
-            var pgp = mavenResource(rootFolder, attachment.withSuffix(suffix), Extension.PGP).reader().readText();
-            var md5 = mavenResource(rootFolder, attachment.withSuffix(suffix), MD5).reader().readText();
-            var sha1 = mavenResource(rootFolder, attachment.withSuffix(suffix), SHA1).reader().readText();
-            var signatures = new ArtifactSignatures(pgp, md5, sha1);
+            var type = attachment.type();
+            var pgp = mavenResource(rootFolder, attachment.withType(type), Extension.PGP).reader().readText();
+            var md5 = mavenResource(rootFolder, attachment.withType(type), MD5).reader().readText();
+            var sha1 = mavenResource(rootFolder, attachment.withType(type), SHA1).reader().readText();
+            var signatures = new ArtifactContentSignatures(pgp, md5, sha1);
             return new ArtifactContent()
                 .withName(attachment.content().name())
                 .withSignatures(signatures)
@@ -231,7 +232,7 @@ public class MavenRepository extends BaseRepository
     }
 
     /**
-     * Returns a file under the given target folder for the given descriptor and file suffix
+     * Returns a file under the given target folder for the given descriptor and file type
      *
      * @param target The target folder
      * @param attachment The artifact attachment
@@ -243,7 +244,7 @@ public class MavenRepository extends BaseRepository
     {
         var artifact = attachment.artifact();
         var folder = mavenFolder(target, artifact);
-        return folder.resource(mavenFileName(artifact, attachment.suffix().suffix() +
+        return folder.resource(mavenFileName(artifact, attachment.type().suffix() +
             (signatureExtension == null
                 ? ""
                 : signatureExtension)));
@@ -280,10 +281,10 @@ public class MavenRepository extends BaseRepository
             var signature = attachment.content().signatures();
 
             // and write them to the folder.
-            var suffix = attachment.suffix();
-            ((File) mavenResource(targetFolder, attachment.withSuffix(suffix), Extension.ASC)).saveText(signature.pgp());
-            ((File) mavenResource(targetFolder, attachment.withSuffix(suffix), MD5)).saveText(signature.md5());
-            ((File) mavenResource(targetFolder, attachment.withSuffix(suffix), SHA1)).saveText(signature.sha1());
+            var type = attachment.type();
+            ((File) mavenResource(targetFolder, attachment.withType(type), Extension.ASC)).saveText(signature.pgp());
+            ((File) mavenResource(targetFolder, attachment.withType(type), MD5)).saveText(signature.md5());
+            ((File) mavenResource(targetFolder, attachment.withType(type), SHA1)).saveText(signature.sha1());
         }
     }
 
@@ -317,7 +318,7 @@ public class MavenRepository extends BaseRepository
         if (rootFolder instanceof Folder target)
         {
             // get the file to write to
-            var file = (File) mavenResource(target, new ArtifactAttachment(artifact, POM_SUFFIX), POM);
+            var file = (File) mavenResource(target, new ArtifactAttachment(artifact, POM_ATTACHMENT), POM);
             file.saveText(artifact.mavenPom());
         }
         else

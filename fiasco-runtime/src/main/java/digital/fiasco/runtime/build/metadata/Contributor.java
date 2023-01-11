@@ -10,6 +10,35 @@ import java.time.ZoneId;
 /**
  * Model for a project contributor
  *
+ * <p><b>Creation</b></p>
+ *
+ * <ul>
+ *     <li>{@link #contributor(String)}</li>
+ * </ul>
+ *
+ * <p><b>Properties</b></p>
+ *
+ * <ul>
+ *     <li>{@link #name()}</li>
+ *     <li>{@link #nickname()}</li>
+ *     <li>{@link #email()}</li>
+ *     <li>{@link #organization()}</li>
+ *     <li>{@link #timeZone()}</li>
+ *     <li>{@link #roles()}</li>
+ * </ul>
+ *
+ * <p><b>Functional</b></p>
+ *
+ * <ul>
+ *     <li>{@link #withName(String)}</li>
+ *     <li>{@link #withNickname(String)}</li>
+ *     <li>{@link #withEmail(String)}</li>
+ *     <li>{@link #withOrganization(Organization)}</li>
+ *     <li>{@link #withTimeZone(String)}</li>
+ *     <li>{@link #withRole(ProjectRole)}</li>
+ *     <li>{@link #withRoles(ProjectRole...)}</li>
+ * </ul>
+ *
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")

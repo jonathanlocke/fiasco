@@ -5,7 +5,21 @@ import com.telenav.kivakit.interfaces.naming.Named;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
 
 /**
- * The group for an artifact, where an artifact desriptor is group:identifier:version.
+ * The group for an artifact, where an artifact desriptor is [group:artifact:version].
+ *
+ * <p><b>Properties</b></p>
+ *
+ * <ul>
+ *     <li>{@link #name()}</li>
+ * </ul>
+ *
+ * <p><b>Group Artifacts</b></p>
+ *
+ * <ul>
+ *     <li>{@link #asset(String)}</li>
+ *     <li>{@link #library(String)}</li>
+ *     <li>{@link #descriptor(ArtifactIdentifier)}</li>
+ * </ul>
  *
  * @author Jonathan Locke
  */

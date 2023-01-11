@@ -82,7 +82,7 @@ public class Librarian extends BaseTool
             for (var resolved : dependencies(dependency))
             {
                 // and if it is not excluded by the library,
-                if (resolved != null && artifact.excludes(resolved.artifactDescriptor()))
+                if (resolved != null && artifact.isExcluded(resolved.artifactDescriptor()))
                 {
                     // add it to the dependencies list.
                     dependencies = dependencies.with(resolved);
@@ -100,7 +100,7 @@ public class Librarian extends BaseTool
             if (resolved != null)
             {
                 // and if it isn't excluded,
-                if (resolved.first().excludes(resolved.first().artifactDescriptor()))
+                if (resolved.first().isExcluded(resolved.first().artifactDescriptor()))
                 {
                     // add it to the dependencies.
                     dependencies = dependencies.with(resolved.first());

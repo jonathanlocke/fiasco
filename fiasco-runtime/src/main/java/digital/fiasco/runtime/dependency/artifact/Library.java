@@ -12,8 +12,8 @@ import digital.fiasco.runtime.dependency.DependencyList;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.JAVADOC_SUFFIX;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.SOURCES_SUFFIX;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 
 /**
  * A library is an artifact with source code and Javadoc JAR attachments.
@@ -86,17 +86,6 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
         return new Library(artifactDescriptor);
     }
 
-    /**
-     * Creates a library for the given artifact
-     *
-     * @param artifact The library artifact
-     * @return The library
-     */
-    public static Library library(Artifact<?> artifact)
-    {
-        return new Library(artifact.artifactDescriptor());
-    }
-
     protected Library(ArtifactDescriptor descriptor)
     {
         super(descriptor);
@@ -123,7 +112,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      */
     public ArtifactContent javadoc()
     {
-        return attachment(JAVADOC_SUFFIX).content();
+        return attachment(JAVADOC_ATTACHMENT).content();
     }
 
     /**
@@ -133,7 +122,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      */
     public ArtifactContent source()
     {
-        return attachment(SOURCES_SUFFIX).content();
+        return attachment(SOURCES_ATTACHMENT).content();
     }
 
     /**
@@ -145,7 +134,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
     public Library withJavadoc(ArtifactContent javadoc)
     {
         var copy = copy();
-        copy.withAttachment(new ArtifactAttachment(this, JAVADOC_SUFFIX, javadoc));
+        copy.withAttachment(new ArtifactAttachment(this, JAVADOC_ATTACHMENT, javadoc));
         return copy;
     }
 
@@ -158,7 +147,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
     public Library withSource(ArtifactContent source)
     {
         var copy = copy();
-        copy.withAttachment(new ArtifactAttachment(this, JAVADOC_SUFFIX, source));
+        copy.withAttachment(new ArtifactAttachment(this, JAVADOC_ATTACHMENT, source));
         return copy;
     }
 }

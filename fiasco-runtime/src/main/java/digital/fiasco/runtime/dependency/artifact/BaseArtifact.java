@@ -14,8 +14,8 @@ import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.AttachmentSuffix.CONTENT_SUFFIX;
+
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 
 /**
  * Represents an artifact, either an {@link Asset} or a {@link Library}
@@ -41,17 +41,17 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.Atta
  *
  * <ul>
  *     <li>{@link #dependencies()}</li>
- *     <li>{@link #excludes(ArtifactDescriptor)}</li>
+ *     <li>{@link #isExcluded(ArtifactDescriptor)}</li>
  *     <li>{@link #withDependencies(DependencyList)}</li>
- *     <li>{@link #withoutDependencies(ArtifactDescriptor...)}</li>
- *     <li>{@link #withoutDependencies(String...)}</li>
- *     <li>{@link #withoutDependencies(Matcher)}</li>
+ *     <li>{@link #excluding(ArtifactDescriptor...)}</li>
+ *     <li>{@link #excluding(String...)}</li>
+ *     <li>{@link #excluding(Matcher)}</li>
  * </ul>
  *
  * <p><b>Attachments</b></p>
  *
  * <ul>
- *     <li>{@link #attachment(AttachmentSuffix)}</li>
+ *     <li>{@link #attachment(ArtifactAttachmentType)}</li>
  *     <li>{@link #withAttachment(ArtifactAttachment)}</li>
  * </ul>
  *
@@ -68,9 +68,9 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.Atta
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
  *     <li>{@link #withArtifactIdentifier(String)} - Returns this artifact with the given identifier</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
- *     <li>{@link #withoutDependencies(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
- *     <li>{@link #withoutDependencies(String...)} - Returns this artifact without the given dependencies</li>
- *     <li>{@link #withoutDependencies(Matcher)} - Returns this artifact without the given dependencies</li>
+ *     <li>{@link #excluding(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
+ *     <li>{@link #excluding(String...)} - Returns this artifact without the given dependencies</li>
+ *     <li>{@link #excluding(Matcher)} - Returns this artifact without the given dependencies</li>
  * </ul>
  *
  *
@@ -104,8 +104,8 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     /** Dependency exclusions for this artifact */
     protected ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptAll());
 
-    /** The content attachments by suffix */
-    private ObjectMap<AttachmentSuffix, ArtifactAttachment> suffixToAttachment = new ObjectMap<>();
+    /** The content attachments by type */
+    private ObjectMap<ArtifactAttachmentType, ArtifactAttachment> typeToAttachment = new ObjectMap<>();
 
     /**
      * Create artifact
@@ -128,7 +128,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
         this.descriptor = that.artifactDescriptor();
         this.dependencies = that.dependencies().copy();
         this.exclusions = that.exclusions().copy();
-        this.suffixToAttachment = that.suffixToAttachment.copy();
+        this.typeToAttachment = that.typeToAttachment.copy();
     }
 
     protected BaseArtifact()
@@ -145,15 +145,15 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     }
 
     /**
-     * Returns the attached resource for the given suffix, such as <i>.jar</i> or <i>-sources.jar</i>.
+     * Returns the attached resource for the given type, such as <i>.jar</i> or <i>-sources.jar</i>.
      *
-     * @param suffix The artifact suffix
+     * @param type The artifact type
      * @return Any attached resource with the given name, or null if there is none
      */
     @Override
-    public ArtifactAttachment attachment(AttachmentSuffix suffix)
+    public ArtifactAttachment attachment(ArtifactAttachmentType type)
     {
-        return suffixToAttachment.get(suffix);
+        return typeToAttachment.get(type);
     }
 
     /**
@@ -162,7 +162,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     public ObjectList<ArtifactAttachment> attachments()
     {
-        return list(suffixToAttachment.values());
+        return list(typeToAttachment.values());
     }
 
     @Override
@@ -203,19 +203,42 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a copy of this artifact that excludes all descriptors matching the given pattern from its dependencies
+     *
+     * @param pattern The pattern to exclude
+     * @return The new artifact
      */
     @Override
-    public boolean excludes(ArtifactDescriptor descriptor)
+    public T excluding(Matcher<ArtifactDescriptor> pattern)
     {
-        for (var at : exclusions)
-        {
-            if (!at.matches(descriptor))
-            {
-                return true;
-            }
-        }
-        return false;
+        var copy = copy();
+        copy.exclusions.add(pattern);
+        return copy;
+    }
+
+    /**
+     * Returns a copy of this artifact that excludes the given descriptors from its dependencies
+     *
+     * @param exclude The descriptors to exclude
+     * @return The new artifact
+     */
+    @Override
+    public T excluding(ArtifactDescriptor... exclude)
+    {
+        return excluding(library -> arrayContains(exclude, library));
+    }
+
+    /**
+     * Returns a copy of this artifact that excludes the given descriptors from its dependencies
+     *
+     * @param exclude The descriptors to exclude
+     * @return The new artifact
+     */
+    @Override
+    public T excluding(String... exclude)
+    {
+        var descriptors = list(exclude).map(ArtifactDescriptor::artifactDescriptor);
+        return excluding(descriptors::contains);
     }
 
     /**
@@ -226,6 +249,22 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     public ObjectList<Matcher<ArtifactDescriptor>> exclusions()
     {
         return exclusions;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public boolean isExcluded(ArtifactDescriptor descriptor)
+    {
+        for (var at : exclusions)
+        {
+            if (!at.matches(descriptor))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -302,7 +341,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     }
 
     /**
-     * Attaches the resource for the given artifact suffix, such as <i>.jar</i>
+     * Attaches the resource for the given artifact type, such as <i>.jar</i>
      *
      * @param attachment The content to attach
      */
@@ -310,15 +349,15 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     public T withAttachment(ArtifactAttachment attachment)
     {
         var copy = copy();
-        ((BaseArtifact<T>) copy).suffixToAttachment.put(attachment.suffix(), attachment);
+        ((BaseArtifact<T>) copy).typeToAttachment.put(attachment.type(), attachment);
         return copy;
     }
 
     @Override
-    public T withAttachments(ObjectMap<AttachmentSuffix, ArtifactAttachment> attachments)
+    public T withAttachments(ObjectMap<ArtifactAttachmentType, ArtifactAttachment> attachments)
     {
         var copy = copy();
-        ((BaseArtifact<T>) copy).suffixToAttachment = attachments;
+        ((BaseArtifact<T>) copy).typeToAttachment = attachments;
         return copy;
     }
 
@@ -331,7 +370,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     public T withContent(ArtifactContent content)
     {
         var copy = copy();
-        copy.withAttachment(new ArtifactAttachment(this, CONTENT_SUFFIX, content));
+        copy.withAttachment(new ArtifactAttachment(this, JAR_ATTACHMENT, content));
         return copy;
     }
 
@@ -373,44 +412,5 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     public T withVersion(Version version)
     {
         return withDescriptor(artifactDescriptor().withVersion(version));
-    }
-
-    /**
-     * Returns a copy of this artifact that excludes all descriptors matching the given pattern from its dependencies
-     *
-     * @param pattern The pattern to exclude
-     * @return The new artifact
-     */
-    @Override
-    public T withoutDependencies(Matcher<ArtifactDescriptor> pattern)
-    {
-        var copy = copy();
-        copy.exclusions.add(pattern);
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this artifact that excludes the given descriptors from its dependencies
-     *
-     * @param exclude The descriptors to exclude
-     * @return The new artifact
-     */
-    @Override
-    public T withoutDependencies(ArtifactDescriptor... exclude)
-    {
-        return withoutDependencies(library -> arrayContains(exclude, library));
-    }
-
-    /**
-     * Returns a copy of this artifact that excludes the given descriptors from its dependencies
-     *
-     * @param exclude The descriptors to exclude
-     * @return The new artifact
-     */
-    @Override
-    public T withoutDependencies(String... exclude)
-    {
-        var descriptors = list(exclude).map(ArtifactDescriptor::artifactDescriptor);
-        return withoutDependencies(descriptors::contains);
     }
 }

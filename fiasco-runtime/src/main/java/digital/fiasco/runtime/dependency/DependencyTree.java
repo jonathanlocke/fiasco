@@ -12,6 +12,30 @@ import static java.util.Collections.disjoint;
  * dependencies where the leaves are first and the root is last. If the dependency graph is cyclic, a
  * {@link MessageException} will be thrown.
  *
+ * <p><b>Creation</b></p>
+ *
+ * <ul>
+ *     <li>{@link #dependencyTree(Dependency, Class)}</li>
+ * </ul>
+ *
+ * <p><b>Properties</b></p>
+ *
+ * <ul>
+ *     <li>{@link #root()}</li>
+ * </ul>
+ *
+ * <p><b>Traversal</b></p>
+ *
+ * <ul>
+ *     <li>{@link #depthFirst()}</li>
+ * </ul>
+ *
+ * <p><b>Grouping for Parallel Execution</b></p>
+ *
+ * <ul>
+ *     <li>{@link #grouped()}</li>
+ * </ul>
+ *
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
