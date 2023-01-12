@@ -30,7 +30,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  * <p>
  * Artifacts are referenced by {@link ArtifactDescriptor}s, which take the form [group:artifact:version], for example,
  * "com.telenav.kivakit:kivakit-application:1.10.0". The descriptor for an artifact can be retrieved with
- * {@link #artifactDescriptor()}.
+ * {@link #descriptor()}.
  * </p>
  *
  * <p><b>Artifact Content Attachments</b></p>
@@ -65,7 +65,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  * <p><b>Identity</b></p>
  *
  * <ul>
- *     <li>{@link #artifactDescriptor()}</li>
+ *     <li>{@link #descriptor()}</li>
  *     <li>{@link #version(String)}</li>
  *     <li>{@link #version(Version)}</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)}</li>
@@ -149,7 +149,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @return The artifact descriptor
      */
     @Override
-    ArtifactDescriptor artifactDescriptor();
+    ArtifactDescriptor descriptor();
 
     /**
      * Returns the attached resource for the given artifact type, such as <i>.jar</i>
@@ -210,7 +210,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     default T excluding(String... exclude)
     {
-        var descriptors = list(exclude).map(ArtifactDescriptor::artifactDescriptor);
+        var descriptors = list(exclude).map(ArtifactDescriptor::descriptor);
         return excluding(descriptors::contains);
     }
 
@@ -280,7 +280,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     default T withArtifactIdentifier(String artifact)
     {
-        return withDescriptor(artifactDescriptor().withArtifactIdentifier(artifact));
+        return withDescriptor(descriptor().withArtifact(artifact));
     }
 
     /**
@@ -333,6 +333,6 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     default T withVersion(Version version)
     {
-        return withDescriptor(artifactDescriptor().withVersion(version));
+        return withDescriptor(descriptor().withVersion(version));
     }
 }

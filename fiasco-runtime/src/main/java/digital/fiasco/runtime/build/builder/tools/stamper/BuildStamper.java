@@ -84,7 +84,7 @@ public class BuildStamper extends BaseTool implements
     {
         information("Stamping build");
 
-        var name = associatedBuilder().artifactDescriptor().name().replaceAll("\\.", "-");
+        var name = associatedBuilder().descriptor().name().replaceAll("\\.", "-");
 
         targetClassesFolder()
             .file(name + "-project.properties")
@@ -123,7 +123,7 @@ public class BuildStamper extends BaseTool implements
      */
     private StringList projectProperties()
     {
-        var descriptor = associatedBuilder().artifactDescriptor();
+        var descriptor = associatedBuilder().descriptor();
         return stringList("artifact.group = " + descriptor.group(),
             "artifact.name = " + descriptor.name(),
             "artifact.version = " + descriptor.version(),

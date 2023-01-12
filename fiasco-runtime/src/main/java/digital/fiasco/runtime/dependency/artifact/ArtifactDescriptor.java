@@ -17,8 +17,8 @@ import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
  * <p><b>Creation</b></p>
  *
  * <ul>
- *     <li>{@link #artifactDescriptor(String)} - Returns the given descriptor, or throws an exception</li>
- *     <li>{@link #parseArtifactDescriptor(Listener, String)} - Parses the given descriptor, broadcasting a problem if parsing fails</li>
+ *     <li>{@link #descriptor(String)} - Returns the given descriptor, or throws an exception</li>
+ *     <li>{@link #parseDescriptor(Listener, String)} - Parses the given descriptor, broadcasting a problem if parsing fails</li>
  * </ul>
  *
  * <p><b>Properties</b></p>
@@ -48,7 +48,7 @@ import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
  * <p><b>Validity</b></p>
  *
  * <ul>
- *     <li>{@link #isValid()} - Returns true if this descriptor fully describes an artifact, having a group, identifier, and version.</li>
+ *     <li>{@link #isComplete()} - Returns true if this descriptor fully describes an artifact, having a group, identifier, and version.</li>
  * </ul>
  *
  * <p><b>Functional</b></p>
@@ -56,8 +56,8 @@ import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
  * <ul>
  *     <li>{@link #withGroup(String)}</li>
  *     <li>{@link #withGroup(ArtifactGroup)}</li>
- *     <li>{@link #withArtifactIdentifier(String)}</li>
- *     <li>{@link #withArtifactIdentifier(ArtifactIdentifier)}</li>
+ *     <li>{@link #withArtifact(String)}</li>
+ *     <li>{@link #withArtifact(ArtifactIdentifier)}</li>
  *     <li>{@link #withVersion(String)}</li>
  *     <li>{@link #withVersion(Version)}</li>
  * </ul>
@@ -84,9 +84,9 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @return The new artifact descriptor
      * @throws RuntimeException Throws a subclass of {@link RuntimeException} if parsing fails
      */
-    public static ArtifactDescriptor artifactDescriptor(String text)
+    public static ArtifactDescriptor descriptor(String text)
     {
-        return parseArtifactDescriptor(throwingListener(), text);
+        return parseDescriptor(throwingListener(), text);
     }
 
     /**
@@ -96,7 +96,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param text The descriptor text
      * @return The artifact descriptor, or null if parsing fails
      */
-    public static ArtifactDescriptor parseArtifactDescriptor(Listener listener, String text)
+    public static ArtifactDescriptor parseDescriptor(Listener listener, String text)
     {
         var matcher = DESCRIPTOR_PATTERN.matcher(text);
         if (matcher.matches())
@@ -107,7 +107,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
             ensureNotNull(group);
             return new ArtifactDescriptor(new ArtifactGroup(group),
                 artifact != null
-                    ? new ArtifactIdentifier(artifact)
+                    ? ArtifactIdentifier.artifact(artifact)
                     : null,
                 version != null
                     ? Version.version(version, LENIENT)
@@ -134,7 +134,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      *
      * @return True if this descriptor is valid
      */
-    public boolean isValid()
+    public boolean isComplete()
     {
         return group != null && artifact != null && version != null;
     }
@@ -163,8 +163,10 @@ public record ArtifactDescriptor(ArtifactGroup group,
     public String name()
     {
         return group
-            + (artifact == null ? "" : ":" + artifact)
-            + (version == null ? "" : ":" + version);
+            + ":"
+            + (artifact == null ? "" : artifact)
+            + ":"
+            + (version == null ? "" : version);
     }
 
     @Override
@@ -174,12 +176,23 @@ public record ArtifactDescriptor(ArtifactGroup group,
     }
 
     /**
-     * Returns a copy of this descriptor with the given identifier
+     * Returns a copy of this descriptor with the given version
      *
-     * @param artifact The identifier
-     * @return The copy
+     * @param version The version
+     * @return The descriptor
      */
-    public ArtifactDescriptor withArtifactIdentifier(ArtifactIdentifier artifact)
+    public ArtifactDescriptor version(String version)
+    {
+        return withVersion(Version.version(version));
+    }
+
+    /**
+     * Returns a copy of this descriptor with the given version
+     *
+     * @param version The version
+     * @return The descriptor
+     */
+    public ArtifactDescriptor version(Version version)
     {
         return new ArtifactDescriptor(group, artifact, version);
     }
@@ -190,9 +203,20 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param artifact The identifier
      * @return The copy
      */
-    public ArtifactDescriptor withArtifactIdentifier(String artifact)
+    public ArtifactDescriptor withArtifact(ArtifactIdentifier artifact)
     {
-        return withArtifactIdentifier(new ArtifactIdentifier(artifact));
+        return new ArtifactDescriptor(group, artifact, version);
+    }
+
+    /**
+     * Returns a copy of this descriptor with the given identifier
+     *
+     * @param artifact The identifier
+     * @return The copy
+     */
+    public ArtifactDescriptor withArtifact(String artifact)
+    {
+        return withArtifact(ArtifactIdentifier.artifact(artifact));
     }
 
     /**
@@ -237,5 +261,22 @@ public record ArtifactDescriptor(ArtifactGroup group,
     public ArtifactDescriptor withVersion(Version version)
     {
         return new ArtifactDescriptor(group, artifact, version);
+    }
+
+    /**
+     * Returns a copy of this descriptor without any version
+     */
+    public ArtifactDescriptor withoutArtifact()
+    {
+        return descriptor(group.name() + "::")
+            .withVersion(version);
+    }
+
+    /**
+     * Returns a copy of this descriptor without any version
+     */
+    public ArtifactDescriptor withoutVersion()
+    {
+        return group.artifact(artifact);
     }
 }

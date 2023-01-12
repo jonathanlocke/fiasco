@@ -4,6 +4,7 @@ import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.resource.Resource;
+import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
@@ -116,7 +117,7 @@ public interface Repository extends Repeater, Named
      * @return The resolved artifacts
      * @throws IllegalArgumentException Thrown if any descriptor cannot be resolved
      */
-    ObjectList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors);
+    DependencyList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors);
 
     /**
      * Returns the URI of this repository

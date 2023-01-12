@@ -31,7 +31,7 @@ public record ArtifactResolverTask(Librarian librarian,
 
         // ask the librarian to resolve them,
         var issues = new MessageList();
-        issues.capture(() -> librarian.resolve(descriptors),
+        issues.captureMessages(() -> librarian.resolve(descriptors),
             "Unable to resolve artifacts: $", artifacts);
 
         // then mark the artifacts as resolved (potentially allowing a builder that is waiting

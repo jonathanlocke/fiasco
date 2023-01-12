@@ -4,19 +4,20 @@ import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.resource.resources.StringResource;
+import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContentSignatures;
+import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
 
-import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static com.telenav.kivakit.resource.WriteMode.APPEND;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
+import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJson;
 
 /**
@@ -130,13 +131,13 @@ public class LocalRepository extends BaseRepository
      * @return The artifacts
      */
     @Override
-    public final ObjectList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
+    public final DependencyList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
     {
         return lock().read(() ->
         {
             // Find the artifacts that are in this repository,
             var resolvedArtifacts = resolve(descriptors);
-            var resolvedDescriptors = resolvedArtifacts.map(Artifact::artifactDescriptor);
+            var resolvedDescriptors = resolvedArtifacts.map(Artifact::descriptor);
 
             // and those that are not.
             var unresolvedDescriptors = descriptors.without(resolvedDescriptors::contains);
@@ -147,7 +148,7 @@ public class LocalRepository extends BaseRepository
             resolvedArtifacts.addAll(downloadedArtifacts);
 
             // Return the resolved artifacts with their content attached.
-            ObjectList<Artifact<?>> resolved = list();
+            DependencyList<Artifact<?>> resolved = dependencyList();
             resolvedArtifacts.forEach(artifact -> resolved.add(loadArtifactContent(artifact)));
             return resolved;
         });
@@ -231,7 +232,7 @@ public class LocalRepository extends BaseRepository
                 var entry = artifactFromJson(at);
 
                 // and put the entry into the entries map.
-                artifacts().put(entry.artifactDescriptor(), entry);
+                artifacts().put(entry.descriptor(), entry);
             }
         });
     }
@@ -275,7 +276,7 @@ public class LocalRepository extends BaseRepository
      */
     private Folder repositoryFolder(Artifact<?> artifact)
     {
-        var descriptor = artifact.artifactDescriptor();
+        var descriptor = artifact.descriptor();
         return rootFolder.folder(descriptor.group().name().replaceAll("\\.", "/") + "/" + descriptor.artifact() + "-" + descriptor.version());
     }
 }

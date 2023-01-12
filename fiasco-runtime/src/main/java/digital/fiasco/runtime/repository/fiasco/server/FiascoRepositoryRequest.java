@@ -58,7 +58,7 @@ public class FiascoRepositoryRequest
      */
     public ObjectList<ArtifactDescriptor> descriptors()
     {
-        return descriptors.map(ArtifactDescriptor::artifactDescriptor);
+        return descriptors.map(ArtifactDescriptor::descriptor);
     }
 
     /**

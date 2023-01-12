@@ -19,7 +19,7 @@ import digital.fiasco.runtime.repository.Repository;
  * <p><b>Properties</b></p>
  *
  * <ul>
- *     <li>{@link #artifactDescriptor()}</li>
+ *     <li>{@link #descriptor()}</li>
  *     <li>{@link #repository()}</li>
  *     <li>{@link #dependencies()}</li>
  * </ul>
@@ -65,7 +65,7 @@ public interface Dependency extends Named
     /**
      * The artifact descriptor for this dependency
      */
-    ArtifactDescriptor artifactDescriptor();
+    ArtifactDescriptor descriptor();
 
     /**
      * Gets all asset dependencies

@@ -38,6 +38,7 @@ import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
 import static digital.fiasco.runtime.build.BuildOption.HELP;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactIdentifier.artifact;
 import static digital.fiasco.runtime.dependency.processing.TaskResult.taskResult;
 
 /**
@@ -164,7 +165,7 @@ import static digital.fiasco.runtime.dependency.processing.TaskResult.taskResult
  * <p><b>Artifact Descriptors</b></p>
  *
  * <ul>
- *     <li>{@link #artifactDescriptor()}</li>
+ *     <li>{@link #descriptor()}</li>
  *     <li>{@link #withArtifactDescriptor(String)}</li>
  *     <li>{@link #withArtifactDescriptor(ArtifactDescriptor)}</li>
  *     <li>{@link #withArtifactGroup(String)}</li>
@@ -285,7 +286,7 @@ public class Builder extends BaseRepeater implements
      * Returns the artifact descriptor for this builder
      */
     @Override
-    public ArtifactDescriptor artifactDescriptor()
+    public ArtifactDescriptor descriptor()
     {
         return settings.artifactDescriptor();
     }
@@ -540,7 +541,7 @@ public class Builder extends BaseRepeater implements
     @Override
     public String name()
     {
-        return artifactDescriptor().name();
+        return descriptor().name();
     }
 
     /**
@@ -728,7 +729,7 @@ public class Builder extends BaseRepeater implements
     public Builder withArtifactDescriptor(String descriptor)
     {
         var copy = copy();
-        copy.settings = settings.withArtifactDescriptor(ArtifactDescriptor.artifactDescriptor(descriptor));
+        copy.settings = settings.withArtifactDescriptor(ArtifactDescriptor.descriptor(descriptor));
         return copy;
     }
 
@@ -753,7 +754,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withArtifactGroup(ArtifactGroup group)
     {
-        return withArtifactDescriptor(artifactDescriptor().withGroup(group));
+        return withArtifactDescriptor(descriptor().withGroup(group));
     }
 
     /**
@@ -775,7 +776,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withArtifactIdentifier(ArtifactIdentifier artifact)
     {
-        return withArtifactDescriptor(artifactDescriptor().withArtifactIdentifier(artifact));
+        return withArtifactDescriptor(descriptor().withArtifact(artifact));
     }
 
     /**
@@ -786,7 +787,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withArtifactIdentifier(String artifact)
     {
-        return withArtifactIdentifier(new ArtifactIdentifier(artifact));
+        return withArtifactIdentifier(artifact(artifact));
     }
 
     /**
@@ -819,7 +820,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withArtifactVersion(Version version)
     {
-        return withArtifactDescriptor(artifactDescriptor().withVersion(version));
+        return withArtifactDescriptor(descriptor().withVersion(version));
     }
 
     /**

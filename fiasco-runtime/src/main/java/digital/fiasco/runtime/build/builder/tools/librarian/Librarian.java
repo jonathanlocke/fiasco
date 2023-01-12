@@ -82,7 +82,7 @@ public class Librarian extends BaseTool
             for (var resolved : dependencies(dependency))
             {
                 // and if it is not excluded by the library,
-                if (resolved != null && artifact.isExcluded(resolved.artifactDescriptor()))
+                if (resolved != null && artifact.isExcluded(resolved.descriptor()))
                 {
                     // add it to the dependencies list.
                     dependencies = dependencies.with(resolved);
@@ -95,12 +95,12 @@ public class Librarian extends BaseTool
         for (var repository : repositories)
         {
             // resolve the library's descriptor to an artifact,
-            var descriptor = resolveArtifactVersion(artifact.artifactDescriptor());
+            var descriptor = resolveArtifactVersion(artifact.descriptor());
             var resolved = repository.resolveArtifacts(list(descriptor));
             if (resolved != null)
             {
                 // and if it isn't excluded,
-                if (resolved.first().isExcluded(resolved.first().artifactDescriptor()))
+                if (resolved.first().isExcluded(resolved.first().descriptor()))
                 {
                     // add it to the dependencies.
                     dependencies = dependencies.with(resolved.first());
@@ -169,7 +169,7 @@ public class Librarian extends BaseTool
      */
     public Librarian pinVersion(Artifact<?> artifact, Version version)
     {
-        var descriptor = artifact.artifactDescriptor();
+        var descriptor = artifact.descriptor();
         pinnedVersions.put(descriptor, version);
         return this;
     }
@@ -183,7 +183,7 @@ public class Librarian extends BaseTool
      */
     public Librarian pinVersion(Artifact<?> artifact, String version)
     {
-        pinVersion(artifact.artifactDescriptor(), version(version));
+        pinVersion(artifact.descriptor(), version(version));
         return this;
     }
 
@@ -196,7 +196,7 @@ public class Librarian extends BaseTool
      */
     public Librarian pinVersion(String descriptor, String version)
     {
-        pinVersion(ArtifactDescriptor.artifactDescriptor(descriptor), version(version));
+        pinVersion(ArtifactDescriptor.descriptor(descriptor), version(version));
         return this;
     }
 

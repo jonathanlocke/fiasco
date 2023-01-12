@@ -35,7 +35,7 @@ public class DependencyGrouper<T extends Dependency>
             for (T dependency : dependencies)
             {
                 // and if all of our dependency's dependencies are already grouped,
-                if (grouped.containsAll(dependency.dependencies()))
+                if (grouped.containsAll(dependency.dependencies().asSet()))
                 {
                     // add the dependency to this group,
                     group.add(dependency);

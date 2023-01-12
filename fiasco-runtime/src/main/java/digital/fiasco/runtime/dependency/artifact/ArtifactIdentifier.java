@@ -8,6 +8,11 @@ package digital.fiasco.runtime.dependency.artifact;
 @SuppressWarnings("unused")
 public record ArtifactIdentifier(String identifier) implements Comparable<ArtifactIdentifier>
 {
+    public static ArtifactIdentifier artifact(String identifier)
+    {
+        return new ArtifactIdentifier(identifier);
+    }
+
     /**
      * {@inheritDoc}
      */

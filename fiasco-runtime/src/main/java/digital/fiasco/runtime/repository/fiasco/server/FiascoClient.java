@@ -1,11 +1,11 @@
 package digital.fiasco.runtime.repository.fiasco.server;
 
 import com.telenav.kivakit.component.BaseComponent;
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.network.http.secure.SecureHttpNetworkLocation;
 import com.telenav.kivakit.resource.resources.DataResource;
 import com.telenav.kivakit.resource.resources.InputResource;
+import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType;
@@ -43,7 +43,7 @@ public class FiascoClient extends BaseComponent
             var response = responseFromJson(new InputResource(in));
 
             // Then, for each artifact,
-            var resolved = new ObjectList<Artifact<?>>();
+            var resolved = new DependencyList<Artifact<?>>();
             for (var artifact : response.artifacts())
             {
                 // and attachment,

@@ -1,7 +1,11 @@
 package digital.fiasco.runtime.dependency;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
+import com.telenav.kivakit.core.collections.list.StringList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
+import com.telenav.kivakit.core.value.count.Count;
+import com.telenav.kivakit.interfaces.collection.Addable;
+import com.telenav.kivakit.interfaces.collection.Sized;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
@@ -9,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
+
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 
 /**
  * An immutable, ordered list of {@link Dependency} objects.
@@ -44,13 +50,16 @@ import java.util.Iterator;
  *     <li>{@link #with(Dependency)}</li>
  *     <li>{@link #with(Dependency, Dependency...)}</li>
  *     <li>{@link #without(Matcher)}</li>
- *     <li>{@link #without(Collection)</li>
+ *     <li>{@link #without(Collection)}</li>
  * </ul>
  *
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class DependencyList<T extends Dependency> extends ObjectList<T>
+public class DependencyList<T extends Dependency> implements
+    Iterable<T>,
+    Addable<T>,
+    Sized
 {
     /**
      * Creates a list of dependencies
@@ -78,7 +87,7 @@ public class DependencyList<T extends Dependency> extends ObjectList<T>
     /** The underlying dependencies */
     private ObjectList<T> dependencies = list();
 
-    protected DependencyList()
+    public DependencyList()
     {
     }
 
@@ -89,13 +98,13 @@ public class DependencyList<T extends Dependency> extends ObjectList<T>
 
     public ObjectList<ArtifactDescriptor> asArtifactDescriptors()
     {
-        return map(Dependency::artifactDescriptor);
+        return dependencies.map(Dependency::descriptor);
     }
 
     public DependencyList<Artifact<?>> asArtifactList()
     {
         var wildcard = new DependencyList<Artifact<?>>();
-        for (var at : this)
+        for (var at : dependencies)
         {
             wildcard.add((Artifact<?>) at);
         }
@@ -107,7 +116,6 @@ public class DependencyList<T extends Dependency> extends ObjectList<T>
      *
      * @return The list
      */
-    @Override
     public ObjectList<T> asList()
     {
         return dependencies.copy();
@@ -118,10 +126,24 @@ public class DependencyList<T extends Dependency> extends ObjectList<T>
      *
      * @return The list
      */
-    @Override
     public ObjectSet<T> asSet()
     {
         return new ObjectSet<>(dependencies.copy());
+    }
+
+    public String asString()
+    {
+        return dependencies.asString();
+    }
+
+    public StringList asStringList()
+    {
+        return dependencies.asStringList();
+    }
+
+    public boolean containsAll(DependencyList<T> dependencies)
+    {
+        return this.dependencies.containsAll(dependencies.dependencies);
     }
 
     /**
@@ -129,28 +151,68 @@ public class DependencyList<T extends Dependency> extends ObjectList<T>
      *
      * @return The copy
      */
-    @Override
     public DependencyList<T> copy()
     {
         return new DependencyList<>(dependencies.copy());
     }
 
+    public Count count()
+    {
+        return dependencies.count();
+    }
+
+    public T first()
+    {
+        return dependencies.first();
+    }
+
+    public T get(int index)
+    {
+        return dependencies.get(index);
+    }
+
     /**
      * {@inheritDoc}
      */
-    @NotNull
     @Override
+    @NotNull
     public Iterator<T> iterator()
     {
         return dependencies.iterator();
     }
 
-    @Override
+    public String join(String separator)
+    {
+        return dependencies.join(separator);
+    }
+
+    public T last()
+    {
+        return dependencies.last();
+    }
+
     public DependencyList<T> matching(Matcher<T> matcher)
     {
         var matching = new DependencyList<T>();
         matching.dependencies = matching.dependencies.matching(matcher);
         return matching;
+    }
+
+    @Override
+    public boolean onAdd(T value)
+    {
+        return dependencies.add(value);
+    }
+
+    @Override
+    public int size()
+    {
+        return dependencies.size();
+    }
+
+    public DependencyList<T> sorted()
+    {
+        return dependencyList(dependencies.sorted());
     }
 
     /**
@@ -163,13 +225,19 @@ public class DependencyList<T extends Dependency> extends ObjectList<T>
     public final DependencyList<T> with(T first, T... dependencies)
     {
         var copy = copy();
-        copy.dependencies.add(first);
-        copy.dependencies.addAll(dependencies);
+        copy.add(first);
+        copy.addAll(dependencies);
         return copy;
     }
 
-    @Override
     public DependencyList<T> with(T value)
+    {
+        var copy = copy();
+        copy.dependencies = dependencies.with(value);
+        return copy;
+    }
+
+    public DependencyList<T> with(T[] value)
     {
         var copy = copy();
         copy.dependencies = dependencies.with(value);
@@ -184,7 +252,7 @@ public class DependencyList<T extends Dependency> extends ObjectList<T>
     public DependencyList<T> with(DependencyList<T> dependencies)
     {
         var copy = copy();
-        copy.dependencies.addAll(dependencies.dependencies);
+        copy.addAll(dependencies.dependencies);
         return copy;
     }
 
@@ -193,11 +261,10 @@ public class DependencyList<T extends Dependency> extends ObjectList<T>
      *
      * @return A copy of this list with the given dependencies
      */
-    @Override
     public DependencyList<T> with(Iterable<T> dependencies)
     {
         var copy = copy();
-        copy.dependencies.addAll(dependencies);
+        copy.addAll(dependencies);
         return copy;
     }
 
@@ -220,7 +287,6 @@ public class DependencyList<T extends Dependency> extends ObjectList<T>
      * @param pattern The pattern to match
      * @return A copy of this list without the specified dependencies
      */
-    @Override
     public DependencyList<T> without(Matcher<T> pattern)
     {
         var copy = copy();

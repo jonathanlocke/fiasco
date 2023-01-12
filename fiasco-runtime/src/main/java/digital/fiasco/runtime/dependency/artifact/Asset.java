@@ -38,7 +38,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      */
     public static Asset asset(String artifactDescriptor)
     {
-        return asset(ArtifactDescriptor.artifactDescriptor(artifactDescriptor));
+        return asset(ArtifactDescriptor.descriptor(artifactDescriptor));
     }
 
     /**
@@ -60,7 +60,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      */
     public static Asset asset(Asset artifact)
     {
-        return asset(artifact.artifactDescriptor());
+        return asset(artifact.descriptor());
     }
 
     /**
@@ -72,7 +72,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
     public static DependencyList<Asset> assets(String... descriptors)
     {
         var assets = stringList(descriptors).map(Asset::asset);
-        return dependencyList(assets.asArray(Asset.class));
+        return dependencyList(assets);
     }
 
     /**

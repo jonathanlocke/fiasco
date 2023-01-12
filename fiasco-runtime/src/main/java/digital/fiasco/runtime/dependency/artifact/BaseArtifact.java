@@ -12,9 +12,8 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.core.string.Formatter.format;
-import static com.telenav.kivakit.interfaces.comparison.Filter.acceptAll;
+import static com.telenav.kivakit.interfaces.comparison.Filter.acceptNone;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 
 /**
@@ -29,7 +28,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  * <p><b>Identity</b></p>
  *
  * <ul>
- *     <li>{@link #artifactDescriptor()}</li>
+ *     <li>{@link #descriptor()}</li>
  *     <li>{@link #version(String)}</li>
  *     <li>{@link #version(Version)}</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)}</li>
@@ -102,7 +101,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     protected DependencyList<Artifact<?>> dependencies = dependencyList();
 
     /** Dependency exclusions for this artifact */
-    protected ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptAll());
+    protected ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptNone());
 
     /** The content attachments by type */
     private ObjectMap<ArtifactAttachmentType, ArtifactAttachment> typeToAttachment = new ObjectMap<>();
@@ -125,7 +124,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     protected BaseArtifact(BaseArtifact<T> that)
     {
         this.repository = that.repository();
-        this.descriptor = that.artifactDescriptor();
+        this.descriptor = that.descriptor();
         this.dependencies = that.dependencies().copy();
         this.exclusions = that.exclusions().copy();
         this.typeToAttachment = that.typeToAttachment.copy();
@@ -133,15 +132,6 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
 
     protected BaseArtifact()
     {
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public final ArtifactDescriptor artifactDescriptor()
-    {
-        return descriptor;
     }
 
     /**
@@ -179,7 +169,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
         var copy = dependencies.copy();
         for (var exclusion : exclusions)
         {
-            copy = copy.without(at -> exclusion.matches(at.artifactDescriptor()));
+            copy = copy.without(at -> exclusion.matches(at.descriptor()));
         }
         return copy;
     }
@@ -200,6 +190,25 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
             }
         }
         return illegalState("No dependency $ found", name);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public final ArtifactDescriptor descriptor()
+    {
+        return descriptor;
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object instanceof Artifact<?> artifact)
+        {
+            return descriptor().equals(artifact.descriptor());
+        }
+        return false;
     }
 
     /**
@@ -237,7 +246,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     public T excluding(String... exclude)
     {
-        var descriptors = list(exclude).map(ArtifactDescriptor::artifactDescriptor);
+        var descriptors = list(exclude).map(ArtifactDescriptor::descriptor);
         return excluding(descriptors::contains);
     }
 
@@ -249,6 +258,12 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     public ObjectList<Matcher<ArtifactDescriptor>> exclusions()
     {
         return exclusions;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return descriptor().hashCode();
     }
 
     /**
@@ -278,7 +293,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
         var dependencies = stringList();
         for (var artifact : dependencies())
         {
-            var descriptor = artifact.artifactDescriptor();
+            var descriptor = artifact.descriptor();
             dependencies.add("""
                     <dependency>
                       <groupId>$</groupId>
@@ -337,7 +352,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     public T withArtifactIdentifier(String artifact)
     {
-        return withDescriptor(artifactDescriptor().withArtifactIdentifier(artifact));
+        return withDescriptor(descriptor().withArtifact(artifact));
     }
 
     /**
@@ -411,6 +426,6 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     public T withVersion(Version version)
     {
-        return withDescriptor(artifactDescriptor().withVersion(version));
+        return withDescriptor(descriptor().withVersion(version));
     }
 }

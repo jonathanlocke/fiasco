@@ -23,8 +23,8 @@ import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.os.Console.console;
 import static com.telenav.kivakit.resource.Urls.url;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.artifactDescriptor;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.parseArtifactDescriptor;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.parseDescriptor;
 import static org.eclipse.aether.util.artifact.JavaScopes.COMPILE;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.classpathFilter;
 
@@ -140,7 +140,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
                     + ":" + mavenArtifact.getArtifactId()
                     + ":" + mavenArtifact.getVersion();
                 var mavenRepository = repository(artifactResult.getRepository().getId());
-                var fiascoDescriptor = parseArtifactDescriptor(this, mavenArtifactDescriptor);
+                var fiascoDescriptor = parseDescriptor(this, mavenArtifactDescriptor);
                 if (mavenRepository != null && fiascoDescriptor != null)
                 {
                     dependencies.add(new MavenDependency(mavenRepository, fiascoDescriptor));
@@ -158,7 +158,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
      */
     public ObjectList<MavenDependency> resolveDependencies(String descriptor)
     {
-        return resolveDependencies(artifactDescriptor(descriptor));
+        return resolveDependencies(descriptor(descriptor));
     }
 
     /**

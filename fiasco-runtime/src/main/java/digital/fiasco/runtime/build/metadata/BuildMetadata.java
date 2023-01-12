@@ -34,7 +34,7 @@ public record BuildMetadata(@FormatProperty ArtifactDescriptor artifactDescripto
 
     public BuildMetadata withArtifactDescriptor(String artifactDescriptor)
     {
-        return withArtifactDescriptor(ArtifactDescriptor.artifactDescriptor(artifactDescriptor));
+        return withArtifactDescriptor(ArtifactDescriptor.descriptor(artifactDescriptor));
     }
 
     public BuildMetadata withArtifactDescriptor(ArtifactDescriptor artifactDescriptor)
