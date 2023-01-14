@@ -8,6 +8,7 @@ import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.InputResource;
 import com.telenav.kivakit.resource.resources.OutputResource;
 import com.telenav.kivakit.resource.writing.WritableResource;
+import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.fiasco.CacheRepository;
@@ -126,7 +127,7 @@ public class FiascoServer extends Application
             for (var attachment : artifact.attachments())
             {
                 // and copy it back to the requester.
-                attachment
+                ((ArtifactAttachment) attachment)
                     .content()
                     .resource()
                     .copyTo(target, STREAM, LEAVE_OPEN, reporter);

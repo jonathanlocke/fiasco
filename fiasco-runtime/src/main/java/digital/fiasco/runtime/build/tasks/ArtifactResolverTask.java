@@ -2,8 +2,7 @@ package digital.fiasco.runtime.build.tasks;
 
 import com.telenav.kivakit.core.messaging.listeners.MessageList;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
-import digital.fiasco.runtime.dependency.DependencyList;
-import digital.fiasco.runtime.dependency.artifact.Artifact;
+import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.dependency.processing.Task;
 import digital.fiasco.runtime.dependency.processing.TaskResult;
 
@@ -12,19 +11,19 @@ import static digital.fiasco.runtime.dependency.processing.TaskResult.taskResult
 /**
  * A task that can be executed in parallel that resolves the given artifacts using the given {@link Librarian}. As each
  * group of artifacts is resolved, they are marked as resolved by calling
- * {@link ResolvedArtifacts#markResolved(DependencyList)}.
+ * {@link ResolvedArtifacts#markResolved(ArtifactList)}.
  *
  * @param librarian The librarian to resolve artifacts
  * @param artifacts The artifacts to resolve
  * @param resolved The set of resolved artifacts to update
  */
 public record ArtifactResolverTask(Librarian librarian,
-                                   DependencyList<Artifact<?>> artifacts,
+                                   ArtifactList artifacts,
                                    ResolvedArtifacts resolved)
-    implements Task<DependencyList<Artifact<?>>>
+    implements Task<ArtifactList>
 {
     @Override
-    public TaskResult<DependencyList<Artifact<?>>> call()
+    public TaskResult<ArtifactList> call()
     {
         // Get the list of descriptors to resolve,
         var descriptors = artifacts.asArtifactDescriptors();

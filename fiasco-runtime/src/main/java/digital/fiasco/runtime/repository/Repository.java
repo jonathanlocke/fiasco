@@ -4,10 +4,10 @@ import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.resource.Resource;
-import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.repository.fiasco.CacheRepository;
 import digital.fiasco.runtime.repository.fiasco.LocalRepository;
 import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
@@ -119,7 +119,7 @@ public interface Repository extends
      * @return The resolved artifacts
      * @throws IllegalArgumentException Thrown if any descriptor cannot be resolved
      */
-    DependencyList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors);
+    ArtifactList resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors);
 
     /**
      * Returns the URI of this repository

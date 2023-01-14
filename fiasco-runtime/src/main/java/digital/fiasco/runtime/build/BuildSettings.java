@@ -9,10 +9,10 @@ import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.build.builder.phases.standard.StandardPhases;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
-import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactGroup;
+import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.dependency.artifact.ArtifactName;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,8 +21,8 @@ import java.util.function.Function;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
-import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifact;
 
 /**
@@ -55,7 +55,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifact;
  *     <li>{@link #pinVersion(Artifact, String)}</li>
  *     <li>{@link #pinVersion(Artifact, Version)}</li>
  *     <li>{@link #requires(Artifact, Artifact[])}</li>
- *     <li>{@link #requires(DependencyList)}</li>
+ *     <li>{@link #requires(ArtifactList)}</li>
  * </ul>
  *
  * <p><b>Build Phases</b></p>
@@ -118,7 +118,7 @@ public class BuildSettings
     private ArtifactDescriptor descriptor;
 
     /** Libraries to compile with */
-    private DependencyList<Artifact<?>> dependencies;
+    private ArtifactList dependencies;
 
     /** The librarian to manage libraries */
     private final Librarian librarian;
@@ -130,7 +130,7 @@ public class BuildSettings
     {
         this.builder = builder;
         this.phases = new StandardPhases(builder);
-        this.dependencies = dependencyList();
+        this.dependencies = artifactList();
         this.librarian = builder.newLibrarian();
         this.rootFolder = currentFolder();
     }
@@ -152,14 +152,6 @@ public class BuildSettings
         this.dependencies = that.dependencies().copy();
         this.librarian = that.librarian;
         this.enabledProfiles = that.enabledProfiles.copy();
-    }
-
-    /**
-     * Returns the artifact descriptor for this build
-     */
-    public ArtifactDescriptor descriptor()
-    {
-        return descriptor;
     }
 
     /**
@@ -194,9 +186,17 @@ public class BuildSettings
      *
      * @return The libraries to compile against
      */
-    public DependencyList<Artifact<?>> dependencies()
+    public ArtifactList dependencies()
     {
         return dependencies;
+    }
+
+    /**
+     * Returns the artifact descriptor for this build
+     */
+    public ArtifactDescriptor descriptor()
+    {
+        return descriptor;
     }
 
     /**
@@ -387,7 +387,7 @@ public class BuildSettings
      *
      * @param dependencies The dependencies to add
      */
-    public BuildSettings requires(DependencyList<Artifact<?>> dependencies)
+    public BuildSettings requires(ArtifactList dependencies)
     {
         var copy = copy();
         copy.dependencies = this.dependencies.with(dependencies);
@@ -436,8 +436,8 @@ public class BuildSettings
     }
 
     /**
-     * Applies the given tranformation function to the {@link #descriptor()}, returning a copy of this settings
-     * object with the transformed descriptor.
+     * Applies the given tranformation function to the {@link #descriptor()}, returning a copy of this settings object
+     * with the transformed descriptor.
      *
      * @param function The function to apply
      * @return The copy

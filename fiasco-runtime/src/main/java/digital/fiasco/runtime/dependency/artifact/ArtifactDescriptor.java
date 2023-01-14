@@ -2,6 +2,7 @@ package digital.fiasco.runtime.dependency.artifact;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
+import com.telenav.kivakit.conversion.BaseStringConverter;
 import com.telenav.kivakit.core.messaging.Listener;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.naming.Named;
@@ -83,9 +84,9 @@ import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
     )
 public record ArtifactDescriptor(ArtifactGroup group,
                                  ArtifactName artifact,
-                                 Version version) implements
-    Named
+                                 Version version) implements Named
 {
+
     /**
      * A lenient pattern for matching artifact descriptors.
      */
@@ -200,6 +201,26 @@ public record ArtifactDescriptor(ArtifactGroup group,
         }
         listener.problem("Unable to parse artifact descriptor: $", text);
         return null;
+    }
+
+    public static class ArtifactDescriptorConverter extends BaseStringConverter<ArtifactDescriptor>
+    {
+        public ArtifactDescriptorConverter(Listener listener)
+        {
+            super(listener, ArtifactDescriptor.class);
+        }
+
+        @Override
+        protected String onToString(ArtifactDescriptor descriptor)
+        {
+            return descriptor.name();
+        }
+
+        @Override
+        protected ArtifactDescriptor onToValue(String text)
+        {
+            return descriptor(text);
+        }
     }
 
     /**

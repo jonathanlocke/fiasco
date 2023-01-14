@@ -27,6 +27,7 @@ import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactGroup;
+import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.dependency.artifact.ArtifactName;
 import digital.fiasco.runtime.dependency.processing.TaskResult;
 import digital.fiasco.runtime.repository.Repository;
@@ -129,7 +130,7 @@ import static digital.fiasco.runtime.dependency.processing.TaskResult.taskResult
  *     <li>{@link #pinVersion(Artifact, String)}</li>
  *     <li>{@link #pinVersion(Artifact, Version)}</li>
  *     <li>{@link #requires(Artifact, Artifact[])}</li>
- *     <li>{@link #requires(DependencyList)}</li>
+ *     <li>{@link #requires(ArtifactList)}</li>
  * </ul>
  *
  * <p><b>Build Phases</b></p>
@@ -283,15 +284,6 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Returns the artifact descriptor for this builder
-     */
-    @Override
-    public ArtifactDescriptor descriptor()
-    {
-        return settings.descriptor();
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
@@ -418,6 +410,15 @@ public class Builder extends BaseRepeater implements
         }
 
         return description.titledBox("Fiasco Help");
+    }
+
+    /**
+     * Returns the artifact descriptor for this builder
+     */
+    @Override
+    public ArtifactDescriptor descriptor()
+    {
+        return settings.descriptor();
     }
 
     /**
@@ -692,7 +693,7 @@ public class Builder extends BaseRepeater implements
      *
      * @param dependencies The dependencies to add
      */
-    public Builder requires(DependencyList<Artifact<?>> dependencies)
+    public Builder requires(ArtifactList dependencies)
     {
         settings = settings.requires(dependencies);
         return this;

@@ -10,12 +10,14 @@ import com.telenav.kivakit.interfaces.collection.Sized;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 
 /**
  * An immutable, ordered list of {@link Dependency} objects.
@@ -93,6 +95,11 @@ public class DependencyList<T extends Dependency> implements
     {
     }
 
+    public DependencyList(DependencyList<T> that)
+    {
+        this.dependencies = that.dependencies.copy();
+    }
+
     protected DependencyList(Collection<T> dependencies)
     {
         this.dependencies.addAll(dependencies);
@@ -103,9 +110,9 @@ public class DependencyList<T extends Dependency> implements
         return dependencies.map(Dependency::descriptor);
     }
 
-    public DependencyList<Artifact<?>> asArtifactList()
+    public ArtifactList asArtifactList()
     {
-        var wildcard = new DependencyList<Artifact<?>>();
+        var wildcard = artifactList();
         for (var at : dependencies)
         {
             wildcard.add((Artifact<?>) at);
@@ -241,8 +248,7 @@ public class DependencyList<T extends Dependency> implements
      * @param dependencies A variable-argument list of dependencies to include
      * @return A copy of this list with the given dependencies
      */
-    @SafeVarargs
-    public final DependencyList<T> with(T first, T... dependencies)
+    public DependencyList<T> with(T first, T... dependencies)
     {
         var copy = copy();
         copy.add(first);

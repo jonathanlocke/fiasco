@@ -9,12 +9,12 @@ import com.telenav.kivakit.resource.FileName;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.ResourceFolder;
 import com.telenav.kivakit.resource.ResourcePath;
-import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContentSignatures;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.maven.resolver.MavenDependency;
@@ -31,13 +31,13 @@ import static com.telenav.kivakit.resource.Extension.SHA1;
 import static com.telenav.kivakit.resource.FileName.parseFileName;
 import static com.telenav.kivakit.resource.ResourcePath.parseResourcePath;
 import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
-import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.POM_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactContent.content;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
@@ -115,11 +115,11 @@ public class MavenRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public DependencyList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
+    public ArtifactList resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
     {
         return lock().read(() ->
         {
-            DependencyList<Artifact<?>> resolved = dependencyList();
+            var resolved = artifactList();
 
             // Go through each descriptor,
             for (var descriptor : descriptors)

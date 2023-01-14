@@ -1,10 +1,10 @@
 package digital.fiasco.runtime.repository.fiasco;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
-import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.fiasco.server.FiascoClient;
@@ -78,7 +78,7 @@ public class RemoteRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public DependencyList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
+    public ArtifactList resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
     {
         // Return resolved artifacts for the given descriptors
         return new FiascoClient()

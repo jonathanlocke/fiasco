@@ -23,6 +23,7 @@ import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.project.Project;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.serialization.gson.GsonSerializationProject;
+import digital.fiasco.runtime.serialization.FiascoGsonFactory;
 import digital.fiasco.runtime.build.builder.BuildAction;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.phases.Phase;
@@ -242,6 +243,12 @@ public abstract class BaseBuild extends Application implements Build
 
         // then show the results.
         results.matching(at -> at.issues().hasProblems()).forEach(TaskResult::showResult);
+    }
+
+    @Override
+    protected void onSerializationInitialize()
+    {
+        register(new FiascoGsonFactory(this));
     }
 
     /**

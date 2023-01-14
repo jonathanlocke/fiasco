@@ -4,21 +4,24 @@ import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.resource.resources.StringResource;
-import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContentSignatures;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
 
+import java.net.URI;
+
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
+import static com.telenav.kivakit.filesystem.Folder.folder;
 import static com.telenav.kivakit.resource.WriteMode.APPEND;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
-import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJson;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 
 /**
  * A repository of artifacts and their metadata on the local filesystem.
@@ -82,14 +85,25 @@ public class LocalRepository extends BaseRepository
      * Creates a local Fiasco repository in the given folder
      *
      * @param name The name of the repository
+     * @param uri The uri of the folder for this repository
+     */
+    public LocalRepository(@NotNull String name, @NotNull URI uri)
+    {
+        super(name, uri);
+        this.rootFolder = folder(uri);
+        metadataFile = repositoryRootFile("artifacts.txt");
+        loadAllArtifactMetadata();
+    }
+
+    /**
+     * Creates a local Fiasco repository in the given folder
+     *
+     * @param name The name of the repository
      * @param rootFolder The root folder of the repository
      */
     public LocalRepository(@NotNull String name, @NotNull Folder rootFolder)
     {
-        super(name, rootFolder.uri());
-        this.rootFolder = rootFolder;
-        metadataFile = repositoryRootFile("artifacts.txt");
-        loadAllArtifactMetadata();
+        this(name, rootFolder.uri());
     }
 
     /**
@@ -131,13 +145,13 @@ public class LocalRepository extends BaseRepository
      * @return The artifacts
      */
     @Override
-    public final DependencyList<Artifact<?>> resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
+    public final ArtifactList resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
     {
         return lock().read(() ->
         {
             // Find the artifacts that are in this repository,
             var resolvedArtifacts = resolve(descriptors);
-            var resolvedDescriptors = resolvedArtifacts.map(Artifact::descriptor);
+            var resolvedDescriptors = resolvedArtifacts.asArtifactDescriptors();
 
             // and those that are not.
             var unresolvedDescriptors = descriptors.without(resolvedDescriptors::contains);
@@ -148,7 +162,7 @@ public class LocalRepository extends BaseRepository
             resolvedArtifacts.addAll(downloadedArtifacts);
 
             // Return the resolved artifacts with their content attached.
-            DependencyList<Artifact<?>> resolved = dependencyList();
+            var resolved = artifactList();
             resolvedArtifacts.forEach(artifact -> resolved.add(loadArtifactContent(artifact)));
             return resolved;
         });

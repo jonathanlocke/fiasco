@@ -12,9 +12,9 @@ import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.version.Version;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.BaseTool;
-import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.fiasco.LocalRepository;
 import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
@@ -27,7 +27,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.resource.Uris.uri;
-import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 
 /**
  * Manages {@link Artifact}s and their dependencies. Searches the list of repositories added to this librarian with
@@ -71,9 +71,9 @@ public class Librarian extends BaseTool
      * @param artifact The artifact
      * @return The artifact and all of its dependencies
      */
-    public DependencyList<Artifact<?>> dependencies(Artifact<?> artifact)
+    public ArtifactList dependencies(Artifact<?> artifact)
     {
-        DependencyList<Artifact<?>> dependencies = dependencyList();
+        var dependencies = artifactList();
 
         // Go through the library's dependencies,
         for (var dependency : artifact.dependencies())
@@ -225,9 +225,9 @@ public class Librarian extends BaseTool
      * @param descriptors The descriptor
      * @return The library
      */
-    public ObjectList<Artifact<?>> resolve(ObjectList<ArtifactDescriptor> descriptors)
+    public ArtifactList resolve(ObjectList<ArtifactDescriptor> descriptors)
     {
-        ObjectList<Artifact<?>> artifacts = list();
+        var artifacts = artifactList();
 
         // Go through each repository,
         for (var repository : repositories())

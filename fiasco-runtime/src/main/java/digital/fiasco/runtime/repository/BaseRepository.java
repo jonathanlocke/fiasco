@@ -7,6 +7,7 @@ import com.telenav.kivakit.core.thread.locks.ReadWriteLock;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.repository.fiasco.CacheRepository;
 import digital.fiasco.runtime.repository.fiasco.LocalRepository;
 import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
@@ -18,6 +19,7 @@ import java.net.URI;
 import java.util.Objects;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 
 /**
  * Base class for repositories of artifacts and their metadata. Subclasses include:
@@ -108,10 +110,10 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     private final URI uri;
 
     /** The cached artifact entries */
-    private final ObjectMap<ArtifactDescriptor, Artifact<?>> artifacts = new ObjectMap<>();
+    private transient final ObjectMap<ArtifactDescriptor, Artifact<?>> artifacts = new ObjectMap<>();
 
     /** Cache lock (filesystem locking not yet supported) */
-    private final ReadWriteLock lock = new ReadWriteLock();
+    private transient final ReadWriteLock lock = new ReadWriteLock();
 
     /**
      * Creates a maven repository
@@ -189,8 +191,8 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
         return lock;
     }
 
-    protected ObjectList<Artifact<?>> resolve(Iterable<ArtifactDescriptor> descriptors)
+    protected ArtifactList resolve(Iterable<ArtifactDescriptor> descriptors)
     {
-        return list(descriptors).map(artifacts::get);
+        return artifactList(list(descriptors).map(artifacts::get));
     }
 }

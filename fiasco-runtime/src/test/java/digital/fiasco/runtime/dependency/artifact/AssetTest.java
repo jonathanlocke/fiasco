@@ -4,7 +4,6 @@ import digital.fiasco.runtime.FiascoTest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
@@ -76,7 +75,7 @@ public class AssetTest extends FiascoTest
     public void testDependencies()
     {
         var asset = asset()
-            .withDependencies(dependencyList(Asset.asset("a:b:1.0")));
+            .withDependencies(assets("a:b:1.0"));
         ensureEqual(asset.dependencies().size(), 1);
         ensureEqual(asset.dependencies().get(0).descriptor(), descriptor("a:b:1.0"));
     }

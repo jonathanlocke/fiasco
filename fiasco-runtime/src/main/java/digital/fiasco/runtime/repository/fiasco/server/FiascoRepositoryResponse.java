@@ -4,13 +4,13 @@ import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.StringOutputResource;
 import com.telenav.kivakit.resource.serialization.SerializableObject;
 import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
-import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 
 import java.io.InputStream;
 
-import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 
 /**
  * The response header for a {@link FiascoRepositoryRequest} containing the {@link ArtifactContent} metadata for each
@@ -21,7 +21,7 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
  * <ul>
  *     <li>{@link #artifacts()}</li>
  *     <li>{@link #with(Artifact...)}</li>
- *     <li>{@link #with(DependencyList)}</li>
+ *     <li>{@link #with(ArtifactList)}</li>
  * </ul>
  *
  * <p><b>Serialization</b></p>
@@ -49,12 +49,12 @@ public class FiascoRepositoryResponse
     }
 
     /** The list of artifact content metadata */
-    private transient DependencyList<Artifact<?>> artifacts = dependencyList();
+    private transient ArtifactList artifacts = artifactList();
 
     /**
      * Returns the artifacts that have been added to this response
      */
-    public DependencyList<Artifact<?>> artifacts()
+    public ArtifactList artifacts()
     {
         return artifacts.copy();
     }
@@ -64,7 +64,7 @@ public class FiascoRepositoryResponse
      *
      * @param artifacts The artifacts
      */
-    public void artifacts(DependencyList<Artifact<?>> artifacts)
+    public void artifacts(ArtifactList artifacts)
     {
         this.artifacts = artifacts;
     }
@@ -96,7 +96,7 @@ public class FiascoRepositoryResponse
      *
      * @param artifacts The artifacts to add
      */
-    public FiascoRepositoryResponse with(DependencyList<Artifact<?>> artifacts)
+    public FiascoRepositoryResponse with(ArtifactList artifacts)
     {
         var copy = new FiascoRepositoryResponse();
         copy.artifacts = this.artifacts.with(artifacts);

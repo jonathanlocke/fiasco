@@ -6,8 +6,12 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.repository.fiasco.server.FiascoServer;
+import org.jetbrains.annotations.NotNull;
+
+import java.net.URI;
 
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
+import static com.telenav.kivakit.filesystem.Folder.folder;
 import static com.telenav.kivakit.resource.WriteMode.APPEND;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
 
@@ -73,6 +77,17 @@ public class CacheRepository extends LocalRepository
     public CacheRepository(String name)
     {
         super(name, fiascoCacheFolder().folder(name));
+    }
+
+    /**
+     * Creates a local Fiasco repository in the given folder
+     *
+     * @param name The name of the repository
+     * @param uri The uri of the folder for this repository
+     */
+    public CacheRepository(@NotNull String name, @NotNull URI uri)
+    {
+        super(name, folder(uri));
     }
 
     /**

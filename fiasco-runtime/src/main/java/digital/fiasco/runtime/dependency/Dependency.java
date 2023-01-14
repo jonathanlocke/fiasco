@@ -5,9 +5,12 @@ import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.dependency.artifact.Asset;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.Repository;
+
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 
 /**
  * A dependency is either a {@link Builder}, or an {@link Artifact} with an associated {@link #repository()}. An
@@ -49,9 +52,9 @@ public interface Dependency extends Named
      *
      * @return The dependencies
      */
-    default DependencyList<Artifact<?>> artifactDependencies()
+    default ArtifactList artifactDependencies()
     {
-        var dependencies = new DependencyList<Artifact<?>>();
+        var dependencies = artifactList();
         for (var at : dependencies())
         {
             if (at instanceof Artifact<?> asset)
@@ -61,11 +64,6 @@ public interface Dependency extends Named
         }
         return dependencies;
     }
-
-    /**
-     * The artifact descriptor for this dependency
-     */
-    ArtifactDescriptor descriptor();
 
     /**
      * Gets all asset dependencies
@@ -108,6 +106,11 @@ public interface Dependency extends Named
      * @return The objects that this depends on
      */
     DependencyList<?> dependencies();
+
+    /**
+     * The artifact descriptor for this dependency
+     */
+    ArtifactDescriptor descriptor();
 
     /**
      * Gets all library dependencies

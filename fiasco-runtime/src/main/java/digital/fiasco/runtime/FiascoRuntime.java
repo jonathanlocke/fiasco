@@ -2,6 +2,7 @@ package digital.fiasco.runtime;
 
 import com.telenav.kivakit.core.project.Project;
 import com.telenav.kivakit.filesystem.Folder;
+import digital.fiasco.runtime.serialization.FiascoGsonFactory;
 
 import static com.telenav.kivakit.filesystem.Folders.userHome;
 
@@ -22,5 +23,11 @@ public class FiascoRuntime extends Project
         return userHome()
             .folder(".fiasco")
             .mkdirs();
+    }
+
+    @Override
+    public void onInitialize()
+    {
+        register(new FiascoGsonFactory(this));
     }
 }

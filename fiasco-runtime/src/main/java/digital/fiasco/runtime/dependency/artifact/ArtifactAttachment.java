@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.dependency.artifact;
 
+import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.string.FormatProperty;
@@ -49,8 +50,8 @@ import static com.telenav.kivakit.core.language.Objects.areEqualPairs;
 public record ArtifactAttachment
     (
         Artifact<?> artifact,
-        @FormatProperty @NotNull ArtifactAttachmentType attachmentType,
-        @FormatProperty ArtifactContent content
+        @Expose @FormatProperty @NotNull ArtifactAttachmentType attachmentType,
+        @Expose @FormatProperty ArtifactContent content
     )
 {
     /**

@@ -10,7 +10,6 @@ import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
-import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.repository.Repository;
 
 import java.util.LinkedHashMap;
@@ -28,9 +27,9 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.interfaces.comparison.Filter.acceptNone;
-import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 
 /**
  * Represents an artifact, either an {@link Asset} or a {@link Library}
@@ -57,7 +56,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  * <ul>
  *     <li>{@link #dependencies()}</li>
  *     <li>{@link #isExcluded(ArtifactDescriptor)}</li>
- *     <li>{@link #withDependencies(DependencyList)}</li>
+ *     <li>{@link #withDependencies(ArtifactList)}</li>
  *     <li>{@link #excluding(ArtifactDescriptor...)}</li>
  *     <li>{@link #excluding(String...)}</li>
  *     <li>{@link #excluding(Matcher)}</li>
@@ -79,7 +78,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *     <li>{@link #version(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #withAttachment(ArtifactAttachment)} - Attaches the given content</li>
  *     <li>{@link #withContent(ArtifactContent)}</li>
- *     <li>{@link #withDependencies(DependencyList)} - Returns this artifact with the given dependencies</li>
+ *     <li>{@link #withDependencies(ArtifactList)} - Returns this artifact with the given dependencies</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
  *     <li>{@link #withArtifact(String)} - Returns this artifact with the given artifact name</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
@@ -126,20 +125,26 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
 
     /** List of dependent artifacts */
     @Expose
-    protected DependencyList<Artifact<?>> dependencies = dependencyList();
+    protected ArtifactList dependencies = artifactList();
 
     /** Dependency exclusions for this artifact */
-    @Expose
-    protected ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptNone());
+    protected transient ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptNone());
 
     /** The content attachments by type */
+    @Expose
     private ObjectMap<ArtifactAttachmentType, ArtifactAttachment> typeToAttachment = new ObjectMap<>(new LinkedHashMap<>());
 
     /**
-     * Create artifact
+     * Create an artifact
      *
      * @param descriptor The artifact descriptor
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     protected BaseArtifact(ArtifactDescriptor descriptor)
     {
         this.descriptor = descriptor;
@@ -150,6 +155,12 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      *
      * @param that The artifact to copy
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     protected BaseArtifact(BaseArtifact<T> that)
     {
         this.repository = that.repository();
@@ -237,7 +248,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
             documentation = DOCUMENTATION_COMPLETE,
             testing = TESTED
         )
-    public DependencyList<Artifact<?>> dependencies()
+    public ArtifactList dependencies()
     {
         return dependencies.matching(at -> !isExcluded(at.descriptor()));
     }
@@ -255,9 +266,9 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
             documentation = DOCUMENTATION_COMPLETE,
             testing = TESTED
         )
-    public DependencyList<Artifact<?>> dependenciesMatching(String pattern)
+    public ArtifactList dependenciesMatching(String pattern)
     {
-        var matches = new DependencyList<Artifact<?>>();
+        var matches = artifactList();
         var matcher = ArtifactDescriptor.descriptor(pattern);
         for (var at : dependencies)
         {
@@ -334,7 +345,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
         )
     public T dependsOn(Artifact<?>... dependencies)
     {
-        return withDependencies(dependencyList(dependencies));
+        return withDependencies(artifactList(dependencies));
     }
 
     /**
@@ -674,7 +685,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
             documentation = DOCUMENTATION_COMPLETE,
             testing = TESTED
         )
-    public T withDependencies(DependencyList<Artifact<?>> dependencies)
+    public T withDependencies(ArtifactList dependencies)
     {
         var copy = copy();
         copy.dependencies = dependencies.copy();

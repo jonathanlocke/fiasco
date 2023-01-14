@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.dependency.artifact;
 
+import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.string.FormatProperty;
@@ -27,9 +28,9 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_NOT_N
     )
 public record ArtifactContentSignatures
     (
-        @FormatProperty String pgp,  // PGP signature text
-        @FormatProperty String md5,  // MD5 hash
-        @FormatProperty String sha1  // SHA-1 hash
+        @FormatProperty @Expose String pgp,  // PGP signature text
+        @FormatProperty @Expose String md5,  // MD5 hash
+        @FormatProperty @Expose String sha1  // SHA-1 hash
     )
 {
     @MethodQuality

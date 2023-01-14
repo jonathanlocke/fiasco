@@ -19,7 +19,7 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
-import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 
 /**
  * An asset is an artifact having only a single content attachment
@@ -104,9 +104,9 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
             documentation = DOCUMENTATION_COMPLETE,
             testing = TESTED
         )
-    public static DependencyList<Asset> assets(String... descriptors)
+    public static ArtifactList assets(String... descriptors)
     {
-        return dependencyList(stringList(descriptors).map(Asset::asset));
+        return artifactList(stringList(descriptors).map(Asset::asset));
     }
 
     /**
@@ -120,9 +120,9 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
             documentation = DOCUMENTATION_COMPLETE,
             testing = TESTED
         )
-    public static DependencyList<Asset> assets(Asset... assets)
+    public static ArtifactList assets(Asset... assets)
     {
-        return dependencyList(assets);
+        return artifactList(assets);
     }
 
     @MethodQuality

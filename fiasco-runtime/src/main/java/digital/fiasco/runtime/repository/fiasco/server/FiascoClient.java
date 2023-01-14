@@ -5,8 +5,6 @@ import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.network.http.secure.SecureHttpNetworkLocation;
 import com.telenav.kivakit.resource.resources.DataResource;
 import com.telenav.kivakit.resource.resources.InputResource;
-import digital.fiasco.runtime.dependency.DependencyList;
-import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType;
 import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
@@ -15,6 +13,7 @@ import java.net.URI;
 
 import static com.telenav.kivakit.core.ensure.Ensure.ensureEqual;
 import static com.telenav.kivakit.resource.Uris.uri;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 import static digital.fiasco.runtime.repository.fiasco.server.FiascoRepositoryResponse.responseFromJson;
 import static digital.fiasco.runtime.repository.fiasco.server.FiascoServer.FIASCO_PORT;
 
@@ -43,14 +42,15 @@ public class FiascoClient extends BaseComponent
             var response = responseFromJson(new InputResource(in));
 
             // Then, for each artifact,
-            var resolved = new DependencyList<Artifact<?>>();
+            var resolved = artifactList();
             for (var artifact : response.artifacts())
             {
                 // and attachment,
                 var resolvedAttachments = new ObjectMap<ArtifactAttachmentType, ArtifactAttachment>();
-                for (var attachment : artifact.attachments())
+                for (var at : artifact.attachments())
                 {
                     // read the content data,
+                    var attachment = (ArtifactAttachment) at;
                     var content = attachment.content();
                     var size = content.size().asInt();
                     var data = new byte[size];
@@ -63,6 +63,7 @@ public class FiascoClient extends BaseComponent
                 }
 
                 // Assign the resolved attachments to the artifact then resolve the artifact.
+                // noinspection unchecked
                 resolved.add(artifact.withAttachments(resolvedAttachments));
             }
 

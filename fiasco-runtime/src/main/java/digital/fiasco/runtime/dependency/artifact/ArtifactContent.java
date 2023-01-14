@@ -7,18 +7,20 @@ import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.core.time.Time;
 import com.telenav.kivakit.core.value.count.Bytes;
 import com.telenav.kivakit.resource.Resource;
+import com.telenav.kivakit.resource.ResourceIdentifier;
 
 import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
+import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 
 /**
  * Holds the content for a single artifact attachment, for example the main JAR, Javadoc, or source code.
  *
  * @param name The name of the artifact resource
  * @param signatures The signatures for this content
- * @param resource The resource containing the content
+ * @param resourceIdentifier The resource containing the content
  * @param offset The offset of this content in a cache file (if any)
  * @param lastModified The time of last modification of the resource
  * @param size The size of the content
@@ -35,7 +37,7 @@ public record ArtifactContent
     (
         @FormatProperty @Expose String name,
         @FormatProperty @Expose ArtifactContentSignatures signatures,
-        @FormatProperty @Expose Resource resource,
+        @FormatProperty @Expose ResourceIdentifier resourceIdentifier,
         @FormatProperty @Expose long offset,
         @FormatProperty @Expose Time lastModified,
         @FormatProperty @Expose Bytes size
@@ -44,6 +46,11 @@ public record ArtifactContent
     public static ArtifactContent content()
     {
         return new ArtifactContent(null, null, null, -1, null, null);
+    }
+
+    public Resource resource()
+    {
+        return resourceIdentifier.resolve(throwingListener());
     }
 
     @Override
@@ -60,7 +67,7 @@ public record ArtifactContent
      */
     public ArtifactContent withLastModified(Time lastModified)
     {
-        return new ArtifactContent(name, signatures, resource, offset, lastModified, size);
+        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
     }
 
     /**
@@ -71,7 +78,7 @@ public record ArtifactContent
      */
     public ArtifactContent withName(String name)
     {
-        return new ArtifactContent(name, signatures, resource, offset, lastModified, size);
+        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
     }
 
     /**
@@ -82,7 +89,7 @@ public record ArtifactContent
      */
     public ArtifactContent withOffset(long offset)
     {
-        return new ArtifactContent(name, signatures, resource, offset, lastModified, size);
+        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
     }
 
     /**
@@ -93,7 +100,7 @@ public record ArtifactContent
      */
     public ArtifactContent withResource(Resource resource)
     {
-        return new ArtifactContent(name, signatures, resource, offset, lastModified, size);
+        return new ArtifactContent(name, signatures, resource.identifier(), offset, lastModified, size);
     }
 
     /**
@@ -104,7 +111,7 @@ public record ArtifactContent
      */
     public ArtifactContent withSignatures(ArtifactContentSignatures signatures)
     {
-        return new ArtifactContent(name, signatures, resource, offset, lastModified, size);
+        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
     }
 
     /**
@@ -115,6 +122,6 @@ public record ArtifactContent
      */
     public ArtifactContent withSize(Bytes size)
     {
-        return new ArtifactContent(name, signatures, resource, offset, lastModified, size);
+        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
     }
 }

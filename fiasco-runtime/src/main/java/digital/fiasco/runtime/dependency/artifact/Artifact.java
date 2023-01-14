@@ -16,8 +16,6 @@ import digital.fiasco.runtime.repository.Repository;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
-import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
-import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_VERSION;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 
 /**
@@ -77,7 +75,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  * <ul>
  *     <li>{@link #dependencies()}</li>
  *     <li>{@link #isExcluded(ArtifactDescriptor)}</li>
- *     <li>{@link #withDependencies(DependencyList)}</li>
+ *     <li>{@link #withDependencies(ArtifactList)}</li>
  *     <li>{@link #excluding(ArtifactDescriptor...)}</li>
  *     <li>{@link #excluding(String...)}</li>
  *     <li>{@link #excluding(Matcher)}</li>
@@ -100,7 +98,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *     <li>{@link #version(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #withAttachment(ArtifactAttachment)} - Attaches the given content</li>
  *     <li>{@link #withContent(ArtifactContent)}</li>
- *     <li>{@link #withDependencies(DependencyList)} - Returns this artifact with the given dependencies</li>
+ *     <li>{@link #withDependencies(ArtifactList)} - Returns this artifact with the given dependencies</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
  *     <li>{@link #withArtifact(String)} - Returns this artifact with the given name</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
@@ -139,7 +137,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
         var serialized = new StringResource(json);
         var serializer = new GsonObjectSerializer();
         // noinspection unchecked
-        return (T) serializer.readObject(serialized, METADATA_OBJECT_TYPE, METADATA_OBJECT_VERSION).object();
+        return (T) serializer.readObject(serialized).object();
     }
 
     /**
@@ -202,7 +200,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @return The dependency list
      */
     @Override
-    DependencyList<Artifact<?>> dependencies();
+    ArtifactList dependencies();
 
     /**
      * Returns the dependencies matching the given dependency pattern
@@ -210,7 +208,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param pattern The pattern to match, like "a:b:" or "a::"
      * @return Any matching dependencies
      */
-    DependencyList<Artifact<?>> dependenciesMatching(String pattern);
+    ArtifactList dependenciesMatching(String pattern);
 
     /**
      * Returns the dependency matching the given dependency pattern
@@ -335,7 +333,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     {
         var serializer = new GsonObjectSerializer();
         var serialized = new StringOutputResource();
-        serializer.writeObject(serialized, new SerializableObject<>(this), METADATA_OBJECT_TYPE, METADATA_OBJECT_VERSION);
+        serializer.writeObject(serialized, new SerializableObject<>(this));
         return serialized.string();
     }
 
@@ -403,7 +401,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param dependencies The new dependencies
      * @return The new artifact
      */
-    T withDependencies(DependencyList<Artifact<?>> dependencies);
+    T withDependencies(ArtifactList dependencies);
 
     /**
      * Returns a copy of this artifact with the given descriptor
