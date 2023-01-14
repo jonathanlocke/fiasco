@@ -1,7 +1,9 @@
 package digital.fiasco.runtime.dependency.artifact;
 
+import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
+import com.telenav.kivakit.core.string.AsciiArt;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.core.version.Version;
@@ -11,12 +13,16 @@ import digital.fiasco.runtime.repository.Repository;
 
 import java.util.LinkedHashMap;
 
+import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_INTERNAL;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+import static com.telenav.kivakit.core.collections.list.StringList.split;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.core.string.Formatter.format;
-import static com.telenav.kivakit.core.string.ObjectFormatter.ObjectFormat.MULTILINE;
 import static com.telenav.kivakit.interfaces.comparison.Filter.acceptNone;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
@@ -38,7 +44,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *     <li>{@link #version(String)}</li>
  *     <li>{@link #version(Version)}</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)}</li>
- *     <li>{@link #withArtifactName(String)}</li>
+ *     <li>{@link #withArtifact(String)}</li>
  *     <li>{@link #withVersion(Version)}</li>
  * </ul>
  *
@@ -71,7 +77,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *     <li>{@link #withContent(ArtifactContent)}</li>
  *     <li>{@link #withDependencies(DependencyList)} - Returns this artifact with the given dependencies</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
- *     <li>{@link #withArtifactName(String)} - Returns this artifact with the given artifact name</li>
+ *     <li>{@link #withArtifact(String)} - Returns this artifact with the given artifact name</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #excluding(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
  *     <li>{@link #excluding(String...)} - Returns this artifact without the given dependencies</li>
@@ -142,13 +148,23 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     {
     }
 
+    public ArtifactName artifact()
+    {
+        return descriptor.artifact();
+    }
+
     /**
      * Returns the attached resource for the given type, such as <i>.jar</i> or <i>-sources.jar</i>.
      *
      * @param type The artifact type
-     * @return Any attached resource with the given name, or null if there is none
+     * @return The attachment of the given type with the given name, or null if there is none
      */
     @Override
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public ArtifactAttachment attachmentOfType(ArtifactAttachmentType type)
     {
         return typeToAttachment.get(type);
@@ -159,12 +175,27 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      */
     @Override
     @FormatProperty
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public ObjectList<ArtifactAttachment> attachments()
     {
         return list(typeToAttachment.values());
     }
 
+    /**
+     * Returns a copy of this artifact, of type T, where T is either Library or Asset.
+     *
+     * @return The copy
+     */
     @Override
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public abstract T copy();
 
     /**
@@ -185,12 +216,53 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     }
 
     /**
+     * Returns the dependency matching the given dependency pattern
+     *
+     * @param pattern The pattern to match, like "a:b:" or "a::"
+     * @return Any matching dependency
+     */
+    @Override
+    public DependencyList<Artifact<?>> dependenciesMatching(String pattern)
+    {
+        var matches = new DependencyList<Artifact<?>>();
+        var matcher = ArtifactDescriptor.descriptor(pattern);
+        for (var at : dependencies)
+        {
+            if (matcher.matches(at.descriptor()))
+            {
+                matches.add(at);
+            }
+        }
+        return matches;
+    }
+
+    /**
+     * Returns the dependency matching the given dependency pattern
+     *
+     * @param pattern The pattern to match, like "a:b:" or "a::"
+     * @return Any matching dependency
+     */
+    @Override
+    public Artifact<?> dependencyMatching(String pattern)
+    {
+        for (var at : dependencies)
+        {
+            if (ArtifactDescriptor.descriptor(pattern).matches(at.descriptor()))
+            {
+                return at;
+            }
+        }
+        return illegalState("No dependency $ found", pattern);
+    }
+
+    /**
      * Returns the named dependency of this artifact
      *
      * @param name The name of the dependency
      * @return The dependency
      */
-    public Artifact<?> dependency(String name)
+    @Override
+    public Artifact<?> dependencyNamed(String name)
     {
         for (var at : dependencies)
         {
@@ -200,6 +272,18 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
             }
         }
         return illegalState("No dependency $ found", name);
+    }
+
+    /**
+     * Returns a copy of this artifact with the given dependencies
+     *
+     * @param dependencies The new dependencies
+     * @return The new artifact
+     */
+    @Override
+    public T dependsOn(Artifact<?>... dependencies)
+    {
+        return withDependencies(dependencyList(dependencies));
     }
 
     /**
@@ -293,6 +377,16 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     }
 
     /**
+     * Returns the JAR attachment for this library,
+     *
+     * @return The JAR content
+     */
+    public ArtifactContent jar()
+    {
+        return attachmentOfType(JAR_ATTACHMENT).content();
+    }
+
+    /**
      * Returns this artifact metadata as a Maven POM file
      *
      * @return The POM file
@@ -304,16 +398,16 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
         for (var artifact : dependencies())
         {
             var descriptor = artifact.descriptor();
-            dependencies.add("""
-                    <dependency>
-                      <groupId>$</groupId>
-                      <artifactId>$</artifactId>
-                      <version>$</version>
-                    </dependency>
-                     """,
+            dependencies.addAll(split(format("""
+                       <dependency>
+                           <groupId>$</groupId>
+                           <artifactId>$</artifactId>
+                           <version>$</version>
+                       </dependency>
+                    """,
                 descriptor.group(),
                 descriptor.artifact(),
-                descriptor.version());
+                descriptor.version()), "\n"));
         }
 
         return format("""
@@ -321,21 +415,25 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
                   xmlns="http://maven.apache.org/POM/4.0.0"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-                 <modelVersion>4.0.0</modelVersion>
-                 <groupId>$</groupId>
-                 <artifactId>$</artifactId>
-                 <version>$</version>
-                 <dependencies>
-                 $
-                 </dependencies>
+                   <modelVersion>4.0.0</modelVersion>
+                   <groupId>$</groupId>
+                   <artifactId>$</artifactId>
+                   <version>$</version>
+                 
+                   <dependencies>
+                 
+                       $
+                   </dependencies>
+                     
                 </project>
                   """,
             descriptor.group(),
             descriptor.artifact(),
             descriptor.version(),
             dependencies
-                .indented(2)
-                .join("\n"));
+                .prefixedWith("    ")
+                .join("\n")
+                .replaceFirst(AsciiArt.repeat(7, ' '), ""));
     }
 
     @Override
@@ -357,19 +455,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     public String toString()
     {
-        return new ObjectFormatter(this).asString(MULTILINE);
-    }
-
-    /**
-     * Returns a copy of this artifact with the given artifact name
-     *
-     * @param artifact The new artifact name
-     * @return The new artifact
-     */
-    @Override
-    public T withArtifactName(String artifact)
-    {
-        return withDescriptor(descriptor().withArtifact(artifact));
+        return new ObjectFormatter(this).toString();
     }
 
     /**
@@ -378,6 +464,11 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @param attachment The content to attach
      */
     @Override
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public T withAttachment(ArtifactAttachment attachment)
     {
         var copy = copy();
@@ -386,6 +477,12 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
         return copy;
     }
 
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_NOT_NEEDED,
+            testing = TESTED
+        )
     @Override
     public T withAttachments(ObjectMap<ArtifactAttachmentType, ArtifactAttachment> attachments)
     {
@@ -405,9 +502,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     public T withContent(ArtifactContent content)
     {
-        var copy = copy();
-        copy.withAttachment(attachment(JAR_ATTACHMENT, content));
-        return copy;
+        return copy().withAttachment(attachment(JAR_ATTACHMENT, content));
     }
 
     /**
@@ -439,14 +534,27 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     }
 
     /**
-     * Returns a copy of this artifact with the given version
+     * Returns a copy of this library with the given Javadoc attachment
      *
-     * @param version The new version
+     * @param jar The Javadoc content
+     * @return The new library
+     */
+    public T withJar(ArtifactContent jar)
+    {
+        return copy().withAttachment(attachment(JAR_ATTACHMENT, jar));
+    }
+
+    /**
+     * Returns a copy of this artifact with the given repository
+     *
+     * @param repository The new descriptor
      * @return The new artifact
      */
     @Override
-    public T withVersion(Version version)
+    public T withRepository(Repository repository)
     {
-        return withDescriptor(descriptor().withVersion(version));
+        var copy = copy();
+        ((BaseArtifact<?>) copy).repository = repository;
+        return copy;
     }
 }

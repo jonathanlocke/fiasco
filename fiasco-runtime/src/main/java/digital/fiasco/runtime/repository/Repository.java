@@ -89,7 +89,9 @@ import java.net.URI;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public interface Repository extends Repeater, Named
+public interface Repository extends
+    Repeater,
+    Named
 {
     /**
      * Adds the given content {@link Resource}s to content.bin, and the {@link Artifact} metadata to metadata.txt in

@@ -7,9 +7,15 @@
 
 package digital.fiasco.runtime.dependency.artifact;
 
+import com.telenav.kivakit.annotations.code.quality.MethodQuality;
+import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.registry.RegistryTrait;
 import digital.fiasco.runtime.dependency.DependencyList;
 
+import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
+import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
@@ -32,13 +38,20 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *
  * <ul>
  *     <li>{@link #javadoc()} - The Javadoc attachment for this library</li>
- *     <li>{@link #source()} - The source attachment for this library</li>
+ *     <li>{@link #sources()} - The source attachment for this library</li>
  *     <li>{@link #withJavadoc(ArtifactContent)} - Returns a copy of this library with the given Javadoc content attached</li>
- *     <li>{@link #withSource(ArtifactContent)} - Returns a copy of this library with the given Javadoc source content attached</li>
+ *     <li>{@link #withSources(ArtifactContent)} - Returns a copy of this library with the given Javadoc source content attached</li>
  * </ul>
  *
  * @author Jonathan Locke
  */
+@TypeQuality
+    (
+        audience = AUDIENCE_PUBLIC,
+        documentation = DOCUMENTATION_COMPLETE,
+        testing = TESTED,
+        stability = STABLE
+    )
 @SuppressWarnings("unused")
 public class Library extends BaseArtifact<Library> implements RegistryTrait
 {
@@ -48,6 +61,11 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      * @param descriptors The library descriptors
      * @return The library dependency list
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public static DependencyList<Library> libraries(String... descriptors)
     {
         var libraries = stringList(descriptors).map(Library::library);
@@ -60,6 +78,11 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      * @param libraries The libraries
      * @return The library dependency list
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public static DependencyList<Library> libraries(Library... libraries)
     {
         return dependencyList(libraries);
@@ -71,6 +94,11 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      * @param descriptor The artifact descriptor
      * @return The library
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public static Library library(String descriptor)
     {
         return new Library(ArtifactDescriptor.descriptor(descriptor));
@@ -82,6 +110,11 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      * @param descriptor The artifact descriptor
      * @return The library
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public static Library library(ArtifactDescriptor descriptor)
     {
         return new Library(descriptor);
@@ -101,6 +134,11 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      * {@inheritDoc}
      */
     @Override
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public Library copy()
     {
         return new Library(this);
@@ -111,6 +149,11 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      *
      * @return The Javadoc content
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public ArtifactContent javadoc()
     {
         return attachmentOfType(JAVADOC_ATTACHMENT).content();
@@ -121,7 +164,12 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      *
      * @return The source code JAR
      */
-    public ArtifactContent source()
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
+    public ArtifactContent sources()
     {
         return attachmentOfType(SOURCES_ATTACHMENT).content();
     }
@@ -132,23 +180,29 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      * @param javadoc The Javadoc content
      * @return The new library
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public Library withJavadoc(ArtifactContent javadoc)
     {
-        var copy = copy();
-        copy.withAttachment(attachment(JAVADOC_ATTACHMENT, javadoc));
-        return copy;
+        return copy().withAttachment(attachment(JAVADOC_ATTACHMENT, javadoc));
     }
 
     /**
      * Returns a copy of this library with the given source attachment
      *
-     * @param source The source code JAR attachment
+     * @param sources The source code JAR attachment
      * @return The new library
      */
-    public Library withSource(ArtifactContent source)
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
+    public Library withSources(ArtifactContent sources)
     {
-        var copy = copy();
-        copy.withAttachment(attachment(JAVADOC_ATTACHMENT, source));
-        return copy;
+        return copy().withAttachment(attachment(SOURCES_ATTACHMENT, sources));
     }
 }

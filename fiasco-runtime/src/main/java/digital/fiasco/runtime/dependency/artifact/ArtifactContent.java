@@ -28,9 +28,9 @@ public record ArtifactContent
         @FormatProperty @Expose Bytes size
     )
 {
-    public ArtifactContent()
+    public static ArtifactContent content()
     {
-        this(null, null, null, -1, null, null);
+        return new ArtifactContent(null, null, null, -1, null, null);
     }
 
     @Override

@@ -37,6 +37,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.POM_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactContent.content;
 import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
@@ -80,8 +81,8 @@ public class MavenRepository extends BaseRepository
     public MavenRepository(String name, URI uri)
     {
         super(name, uri);
-        this.rootFolder = new HttpResourceFolder(uri);
 
+        this.rootFolder = new HttpResourceFolder(uri);
         mavenResolver = mavenResolver.withRepository(this);
     }
 
@@ -149,7 +150,7 @@ public class MavenRepository extends BaseRepository
                             .withDependencies(resolvedArtifacts)
                             .withContent(jar)
                             .withJavadoc(javadoc)
-                            .withSource(source));
+                            .withSources(source));
                     }
                     else
                     {
@@ -221,7 +222,8 @@ public class MavenRepository extends BaseRepository
             var md5 = mavenResource(rootFolder, attachment.withType(type), MD5).reader().readText();
             var sha1 = mavenResource(rootFolder, attachment.withType(type), SHA1).reader().readText();
             var signatures = new ArtifactContentSignatures(pgp, md5, sha1);
-            return new ArtifactContent()
+
+            return content()
                 .withName(attachment.content().name())
                 .withSignatures(signatures)
                 .withResource(resource)

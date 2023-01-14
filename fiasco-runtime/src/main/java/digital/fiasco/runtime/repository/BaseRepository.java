@@ -139,7 +139,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     @Override
     public boolean equals(Object object)
     {
-        if (object instanceof MavenRepository that)
+        if (object instanceof BaseRepository that)
         {
             return this.name().equals(that.name());
         }

@@ -1,0 +1,117 @@
+package digital.fiasco.runtime.dependency.artifact;
+
+import digital.fiasco.runtime.FiascoTest;
+import org.jetbrains.annotations.NotNull;
+import org.junit.Test;
+
+import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
+import static digital.fiasco.runtime.dependency.artifact.Library.libraries;
+
+public class LibraryTest extends FiascoTest
+{
+    @Test
+    public void testAttachments()
+    {
+        var library = library();
+
+        library = library
+            .withAttachment(jarAttachment())
+            .withAttachment(sourcesAttachment())
+            .withAttachment(javadocAttachment());
+
+        ensureEqual(library.attachments().size(), 3);
+
+        ensureEqual(library.attachmentOfType(JAR_ATTACHMENT), jarAttachment());
+        ensureEqual(library.attachmentOfType(SOURCES_ATTACHMENT), sourcesAttachment());
+        ensureEqual(library.attachmentOfType(JAVADOC_ATTACHMENT), javadocAttachment());
+
+        ensure(library.attachmentOfType(JAR_ATTACHMENT).content().equals(library.jar()));
+        ensure(library.attachmentOfType(JAVADOC_ATTACHMENT).content().equals(library.javadoc()));
+        ensure(library.attachmentOfType(SOURCES_ATTACHMENT).content().equals(library.javadoc()));
+
+        ensure(library.attachments().contains(jarAttachment()));
+        ensure(library.attachments().contains(sourcesAttachment()));
+        ensure(library.attachments().contains(javadocAttachment()));
+    }
+
+    @Test
+    public void testCopy()
+    {
+        {
+            var library = Library.library("a:b:1");
+            ensureEqual(library, library.copy());
+        }
+        {
+            var library = Library.library("a::1");
+            ensureEqual(library, library.copy());
+        }
+        {
+            var library = Library.library("a:b:");
+            ensureEqual(library, library.copy());
+        }
+        {
+            var library = Library.library("a::");
+            ensureEqual(library, library.copy());
+        }
+    }
+
+    @Test
+    public void testCreation()
+    {
+        ensureNotNull(Library.library("x:y:1.0"));
+        ensureThrows(() -> Library.library("?"));
+        {
+            var librarys = libraries("x:y:1.0", "a:b:0.1");
+            ensureEqual(librarys.size(), 2);
+            ensureEqual(librarys.get(0), Library.library("x:y:1.0"));
+        }
+        {
+            var librarys = libraries(Library.library("x:y:1.0"), Library.library("a:b:0.1"));
+            ensureEqual(librarys.size(), 2);
+            ensureEqual(librarys.get(0), Library.library("x:y:1.0"));
+        }
+    }
+
+    @Test
+    public void testDependencies()
+    {
+        var library = library()
+            .withDependencies(dependencyList(Library.library("a:b:1.0")));
+        ensureEqual(library.dependencies().size(), 1);
+        ensureEqual(library.dependencies().get(0).descriptor(), descriptor("a:b:1.0"));
+    }
+
+    @Test
+    public void testDescriptor()
+    {
+        var library = library();
+        ensureEqual(library.descriptor(), descriptor("x:y:1.0"));
+    }
+
+    @Test
+    public void testWith()
+    {
+        {
+            var library = library().withSources(content());
+            ensure(library.sources().equals(content()));
+        }
+        {
+            var library = library().withJavadoc(content());
+            ensure(library.javadoc().equals(content()));
+        }
+        {
+            var library = library().withJar(content());
+            ensure(library.jar().equals(content()));
+        }
+    }
+
+    @NotNull
+    private Library library()
+    {
+        return Library.library("x:y:1.0");
+    }
+}

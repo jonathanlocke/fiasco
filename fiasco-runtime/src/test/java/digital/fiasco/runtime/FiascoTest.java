@@ -7,6 +7,8 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContentSignatures;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.Asset;
+import digital.fiasco.runtime.dependency.artifact.Library;
 
 import static com.telenav.kivakit.core.time.Day.dayOfMonth;
 import static com.telenav.kivakit.core.time.Hour.hourOfDay;
@@ -17,13 +19,15 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.atta
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
+import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
 public class FiascoTest extends UnitTest
 {
     protected ArtifactContent content()
     {
         var resource = new StringResource("abc"); //packageResource("content.txt");
-        return new ArtifactContent()
+        return ArtifactContent.content()
             .withResource(resource)
             .withLastModified(Time.utcTime(
                 year(2023),
@@ -84,6 +88,36 @@ public class FiascoTest extends UnitTest
     protected ArtifactAttachment javadocAttachment()
     {
         return attachment(JAVADOC_ATTACHMENT, content());
+    }
+
+    protected Library kivakitApplication()
+    {
+        return library("com.telenav.kivakit:kivakit-application:1.8.5");
+    }
+
+    protected Library kivakitCore()
+    {
+        return library("com.telenav.kivakit:kivakit-core:1.8.5");
+    }
+
+    protected Asset kivakitIcons()
+    {
+        return asset("com.telenav.kivakit:kivakit-icons:1.8.5");
+    }
+
+    protected Asset kivakitImages()
+    {
+        return asset("com.telenav.kivakit:kivakit-images:1.8.5");
+    }
+
+    protected Asset kivakitLogos()
+    {
+        return asset("com.telenav.kivakit:kivakit-logos:1.8.5");
+    }
+
+    protected Library kivakitResource()
+    {
+        return library("com.telenav.kivakit:kivakit-resource:1.8.5");
     }
 
     protected ArtifactContentSignatures signatures()

@@ -16,7 +16,6 @@ import digital.fiasco.runtime.repository.Repository;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
-import static com.telenav.kivakit.core.version.Version.parseVersion;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_VERSION;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
@@ -69,7 +68,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *     <li>{@link #version(String)}</li>
  *     <li>{@link #version(Version)}</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)}</li>
- *     <li>{@link #withArtifactName(String)}</li>
+ *     <li>{@link #withArtifact(String)}</li>
  *     <li>{@link #withVersion(Version)}</li>
  * </ul>
  *
@@ -103,7 +102,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *     <li>{@link #withContent(ArtifactContent)}</li>
  *     <li>{@link #withDependencies(DependencyList)} - Returns this artifact with the given dependencies</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
- *     <li>{@link #withArtifactName(String)} - Returns this artifact with the given name</li>
+ *     <li>{@link #withArtifact(String)} - Returns this artifact with the given name</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #excluding(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
  *     <li>{@link #excluding(String...)} - Returns this artifact without the given dependencies</li>
@@ -141,6 +140,28 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
         var serializer = new GsonObjectSerializer();
         // noinspection unchecked
         return (T) serializer.readObject(serialized, METADATA_OBJECT_TYPE, METADATA_OBJECT_VERSION).object();
+    }
+
+    /**
+     * Returns a copy of this artifact with the given name
+     *
+     * @param artifact The new artifact name
+     * @return The new artifact
+     */
+    default T artifact(String artifact)
+    {
+        return withArtifact(artifact);
+    }
+
+    /**
+     * Returns a copy of this artifact with the given name
+     *
+     * @param artifact The new artifact name
+     * @return The new artifact
+     */
+    default T artifact(ArtifactName artifact)
+    {
+        return withArtifact(artifact);
     }
 
     /**
@@ -182,6 +203,38 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @Override
     DependencyList<Artifact<?>> dependencies();
+
+    /**
+     * Returns the dependencies matching the given dependency pattern
+     *
+     * @param pattern The pattern to match, like "a:b:" or "a::"
+     * @return Any matching dependencies
+     */
+    DependencyList<Artifact<?>> dependenciesMatching(String pattern);
+
+    /**
+     * Returns the dependency matching the given dependency pattern
+     *
+     * @param pattern The pattern to match, like "a:b:" or "a::"
+     * @return Any matching dependency
+     */
+    Artifact<?> dependencyMatching(String pattern);
+
+    /**
+     * Returns the named dependency of this artifact
+     *
+     * @param name The name of the dependency
+     * @return The dependency
+     */
+    Artifact<?> dependencyNamed(String name);
+
+    /**
+     * Returns a copy of this artifact with the given dependencies
+     *
+     * @param dependencies The new dependencies
+     * @return The new artifact
+     */
+    T dependsOn(Artifact<?>... dependencies);
 
     /**
      * Returns the descriptor for this artifact
@@ -269,7 +322,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     default T version(String version)
     {
-        return withVersion(parseVersion(version));
+        return withVersion(Version.version(version));
     }
 
     /**
@@ -278,7 +331,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param artifact The new artifact name
      * @return The new artifact
      */
-    default T withArtifactName(String artifact)
+    default T withArtifact(String artifact)
+    {
+        return withDescriptor(descriptor().withArtifact(artifact));
+    }
+
+    default T withArtifact(ArtifactName artifact)
     {
         return withDescriptor(descriptor().withArtifact(artifact));
     }
@@ -326,12 +384,31 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     T withDescriptor(ArtifactDescriptor descriptor);
 
     /**
+     * Returns a copy of this artifact with the given repository
+     *
+     * @param repository The repository
+     * @return A copy of this artifact in the given repository
+     */
+    T withRepository(Repository repository);
+
+    /**
      * Returns a copy of this artifact with the given version
      *
      * @param version The new version
      * @return The new artifact
      */
     default T withVersion(Version version)
+    {
+        return withDescriptor(descriptor().withVersion(version));
+    }
+
+    /**
+     * Returns a copy of this artifact with the given version
+     *
+     * @param version The new version
+     * @return The new artifact
+     */
+    default T withVersion(String version)
     {
         return withDescriptor(descriptor().withVersion(version));
     }

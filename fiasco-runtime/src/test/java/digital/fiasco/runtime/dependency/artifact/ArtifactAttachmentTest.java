@@ -5,38 +5,9 @@ import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;
 
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
 public class ArtifactAttachmentTest extends FiascoTest
 {
-    @Test
-    public void testArtifactAttachmentOfType()
-    {
-        var library = library("com.telenav.kivakit:kivakit:1.8.0");
-
-        library = library.withAttachment(jarAttachment())
-            .withAttachment(javadocAttachment())
-            .withAttachment(sourcesAttachment());
-
-        {
-            var attachment = library.attachmentOfType(JAR_ATTACHMENT);
-            ensureEqual(attachment.toString(), jarAttachment().toString());
-            ensureEqual(attachment, jarAttachment());
-        }
-        {
-            var attachment = library.attachmentOfType(SOURCES_ATTACHMENT);
-            ensureEqual(attachment.toString(), sourcesAttachment().toString());
-            ensureEqual(attachment, sourcesAttachment());
-        }
-        {
-            var attachment = library.attachmentOfType(JAVADOC_ATTACHMENT);
-            ensureEqual(attachment.toString(), javadocAttachment().toString());
-            ensureEqual(attachment, javadocAttachment());
-        }
-    }
-
     @Test
     public void testEqualsHashCode()
     {

@@ -163,6 +163,18 @@ public class DependencyList<T extends Dependency> implements
         return dependencies.count();
     }
 
+    @SuppressWarnings("SuspiciousMethodCalls")
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object instanceof DependencyList<?> that)
+        {
+            return this.dependencies.containsAll(that.dependencies)
+                && that.dependencies.containsAll(this.dependencies);
+        }
+        return false;
+    }
+
     public T first()
     {
         return dependencies.first();
@@ -171,6 +183,12 @@ public class DependencyList<T extends Dependency> implements
     public T get(int index)
     {
         return dependencies.get(index);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return dependencies.hashCode();
     }
 
     /**
