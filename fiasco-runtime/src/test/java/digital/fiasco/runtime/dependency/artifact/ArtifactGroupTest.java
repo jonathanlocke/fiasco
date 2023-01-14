@@ -1,19 +1,21 @@
 package digital.fiasco.runtime.dependency.artifact;
 
-import com.telenav.kivakit.testing.UnitTest;
+import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;
 
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifact;
 
-public class ArtifactGroupTest extends UnitTest
+public class ArtifactGroupTest extends FiascoTest
 {
     @Test
     public void testArtifact()
     {
         ensureEqual(group("x").artifact("y"), descriptor("x:y:"));
-
         ensureEqual(group("x").artifact("y").version("1.9"), descriptor("x:y:1.9"));
+        ensureEqual(group("x").artifact(artifact("y")), descriptor("x:y:"));
+        ensureEqual(group("x").artifact(artifact("y")).version("1.9"), descriptor("x:y:1.9"));
     }
 
     @Test

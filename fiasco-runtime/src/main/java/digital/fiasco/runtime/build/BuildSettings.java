@@ -13,7 +13,7 @@ import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactGroup;
-import digital.fiasco.runtime.dependency.artifact.ArtifactIdentifier;
+import digital.fiasco.runtime.dependency.artifact.ArtifactName;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
@@ -23,7 +23,7 @@ import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactIdentifier.artifact;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifact;
 
 /**
  * Settings used by {@link Builder} to modify the way that it builds.
@@ -80,13 +80,13 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactIdentifier.arti
  * <p><b>Artifact Descriptors</b></p>
  *
  * <ul>
- *     <li>{@link #artifactDescriptor()}</li>
+ *     <li>{@link #descriptor()}</li>
  *     <li>{@link #withArtifactDescriptor(String)}</li>
  *     <li>{@link #withArtifactDescriptor(ArtifactDescriptor)}</li>
  *     <li>{@link #withArtifactGroup(String)}</li>
  *     <li>{@link #withArtifactGroup(ArtifactGroup)}</li>
  *     <li>{@link #withArtifact(String)}</li>
- *     <li>{@link #withArtifact(ArtifactIdentifier)}</li>
+ *     <li>{@link #withArtifact(ArtifactName)}</li>
  *     <li>{@link #withArtifactVersion(String)}</li>
  *     <li>{@link #withArtifactVersion(Version)}</li>
  * </ul>
@@ -115,7 +115,7 @@ public class BuildSettings
     private Folder rootFolder;
 
     /** The primary artifact being built */
-    private ArtifactDescriptor artifactDescriptor;
+    private ArtifactDescriptor descriptor;
 
     /** Libraries to compile with */
     private DependencyList<Artifact<?>> dependencies;
@@ -148,7 +148,7 @@ public class BuildSettings
         this.artifactResolverThreads = that.artifactResolverThreads;
         this.builderThreads = that.builderThreads;
         this.enabledOptions = that.enabledOptions.copy();
-        this.artifactDescriptor = that.artifactDescriptor;
+        this.descriptor = that.descriptor;
         this.dependencies = that.dependencies().copy();
         this.librarian = that.librarian;
         this.enabledProfiles = that.enabledProfiles.copy();
@@ -157,9 +157,9 @@ public class BuildSettings
     /**
      * Returns the artifact descriptor for this build
      */
-    public ArtifactDescriptor artifactDescriptor()
+    public ArtifactDescriptor descriptor()
     {
-        return artifactDescriptor;
+        return descriptor;
     }
 
     /**
@@ -405,7 +405,7 @@ public class BuildSettings
     /**
      * Returns a copy of this settings object with the given artifact
      *
-     * @param artifact The artifact identifier
+     * @param artifact The artifact name
      * @return The copy
      */
     public BuildSettings withArtifact(String artifact)
@@ -419,7 +419,7 @@ public class BuildSettings
      * @param artifact The artifact
      * @return The copy
      */
-    public BuildSettings withArtifact(ArtifactIdentifier artifact)
+    public BuildSettings withArtifact(ArtifactName artifact)
     {
         return withArtifactDescriptor(descriptor -> descriptor.withArtifact(artifact));
     }
@@ -436,7 +436,7 @@ public class BuildSettings
     }
 
     /**
-     * Applies the given tranformation function to the {@link #artifactDescriptor()}, returning a copy of this settings
+     * Applies the given tranformation function to the {@link #descriptor()}, returning a copy of this settings
      * object with the transformed descriptor.
      *
      * @param function The function to apply
@@ -444,7 +444,7 @@ public class BuildSettings
      */
     public BuildSettings withArtifactDescriptor(Function<ArtifactDescriptor, ArtifactDescriptor> function)
     {
-        return withArtifactDescriptor(function.apply(artifactDescriptor()));
+        return withArtifactDescriptor(function.apply(descriptor()));
     }
 
     /**
@@ -456,7 +456,7 @@ public class BuildSettings
     public BuildSettings withArtifactDescriptor(ArtifactDescriptor descriptor)
     {
         var copy = copy();
-        copy.artifactDescriptor = descriptor;
+        copy.descriptor = descriptor;
         return copy;
     }
 

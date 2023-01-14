@@ -32,6 +32,7 @@ import static com.telenav.kivakit.resource.FileName.parseFileName;
 import static com.telenav.kivakit.resource.ResourcePath.parseResourcePath;
 import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.POM_ATTACHMENT;
@@ -93,11 +94,11 @@ public class MavenRepository extends BaseRepository
         lock().write(() ->
         {
             var descriptor = artifact.descriptor();
-            mavenWriteContent(artifact.attachment(JAR_ATTACHMENT));
+            mavenWriteContent(artifact.attachmentOfType(JAR_ATTACHMENT));
             if (artifact instanceof Library library)
             {
-                mavenWriteContent(artifact.attachment(JAVADOC_ATTACHMENT));
-                mavenWriteContent(artifact.attachment(SOURCES_ATTACHMENT));
+                mavenWriteContent(artifact.attachmentOfType(JAVADOC_ATTACHMENT));
+                mavenWriteContent(artifact.attachmentOfType(SOURCES_ATTACHMENT));
             }
             mavenWritePom(artifact);
         });
@@ -126,12 +127,12 @@ public class MavenRepository extends BaseRepository
 
                 // read any artifact jar attachment (if the repository does not contain the artifact,
                 // the return value assigned to jar will be null),
-                var jar = mavenReadContent(new ArtifactAttachment(artifact, JAR_ATTACHMENT));
+                var jar = mavenReadContent(attachment(JAR_ATTACHMENT));
                 if (jar != null)
                 {
                     // then read any Javadoc or source code attachments,
-                    var javadoc = mavenReadContent(new ArtifactAttachment(artifact, JAVADOC_ATTACHMENT));
-                    var source = mavenReadContent(new ArtifactAttachment(artifact, SOURCES_ATTACHMENT));
+                    var javadoc = mavenReadContent(attachment(JAVADOC_ATTACHMENT));
+                    var source = mavenReadContent(attachment(SOURCES_ATTACHMENT));
 
                     // and resolve dependencies for the artifact from remote repositories.
                     var dependencyDescriptors = mavenResolver
@@ -212,11 +213,10 @@ public class MavenRepository extends BaseRepository
      */
     private ArtifactContent mavenReadContent(ArtifactAttachment attachment)
     {
-        var artifact = attachment.artifact();
         var resource = mavenResource(rootFolder, attachment, null);
         if (resource.exists())
         {
-            var type = attachment.type();
+            var type = attachment.attachmentType();
             var pgp = mavenResource(rootFolder, attachment.withType(type), Extension.PGP).reader().readText();
             var md5 = mavenResource(rootFolder, attachment.withType(type), MD5).reader().readText();
             var sha1 = mavenResource(rootFolder, attachment.withType(type), SHA1).reader().readText();
@@ -236,6 +236,7 @@ public class MavenRepository extends BaseRepository
      *
      * @param target The target folder
      * @param attachment The artifact attachment
+     * @param signatureExtension The extension of the type of signature, like ".sha1"
      * @return The file
      */
     private Resource mavenResource(ResourceFolder<?> target,
@@ -244,7 +245,7 @@ public class MavenRepository extends BaseRepository
     {
         var artifact = attachment.artifact();
         var folder = mavenFolder(target, artifact);
-        return folder.resource(mavenFileName(artifact, attachment.type().suffix() +
+        return folder.resource(mavenFileName(artifact, attachment.attachmentType().fileSuffix() +
             (signatureExtension == null
                 ? ""
                 : signatureExtension)));
@@ -263,13 +264,11 @@ public class MavenRepository extends BaseRepository
      */
     private void mavenWriteContent(@NotNull ArtifactAttachment attachment)
     {
-        var artifact = attachment.artifact();
-
         // If we can write to the folder,
         if (rootFolder instanceof Folder targetFolder)
         {
             // get the target sub-folder,
-            targetFolder = (Folder) mavenFolder(targetFolder, artifact);
+            targetFolder = (Folder) mavenFolder(targetFolder, attachment.artifact());
 
             // and the target file in that folder,
             var targetFile = (File) mavenResource(targetFolder, attachment, null);
@@ -281,7 +280,7 @@ public class MavenRepository extends BaseRepository
             var signature = attachment.content().signatures();
 
             // and write them to the folder.
-            var type = attachment.type();
+            var type = attachment.attachmentType();
             ((File) mavenResource(targetFolder, attachment.withType(type), Extension.ASC)).saveText(signature.pgp());
             ((File) mavenResource(targetFolder, attachment.withType(type), MD5)).saveText(signature.md5());
             ((File) mavenResource(targetFolder, attachment.withType(type), SHA1)).saveText(signature.sha1());
@@ -318,7 +317,7 @@ public class MavenRepository extends BaseRepository
         if (rootFolder instanceof Folder target)
         {
             // get the file to write to
-            var file = (File) mavenResource(target, new ArtifactAttachment(artifact, POM_ATTACHMENT), POM);
+            var file = (File) mavenResource(target, attachment(POM_ATTACHMENT), POM);
             file.saveText(artifact.mavenPom());
         }
         else

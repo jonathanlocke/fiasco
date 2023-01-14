@@ -3,6 +3,7 @@ package digital.fiasco.runtime.dependency;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.list.StringList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
+import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.interfaces.collection.Addable;
 import com.telenav.kivakit.interfaces.collection.Sized;
@@ -85,6 +86,7 @@ public class DependencyList<T extends Dependency> implements
     }
 
     /** The underlying dependencies */
+    @FormatProperty
     private ObjectList<T> dependencies = list();
 
     public DependencyList()

@@ -57,7 +57,7 @@ public class FiascoClient extends BaseComponent
                     ensureEqual(in.read(data), size);
 
                     // and resolve the attachment.
-                    resolvedAttachments.put(attachment.type(), attachment
+                    resolvedAttachments.put(attachment.attachmentType(), attachment
                         .withContent(content
                             .withResource(new DataResource(data))));
                 }

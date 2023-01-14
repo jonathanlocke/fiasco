@@ -27,7 +27,7 @@ import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactGroup;
-import digital.fiasco.runtime.dependency.artifact.ArtifactIdentifier;
+import digital.fiasco.runtime.dependency.artifact.ArtifactName;
 import digital.fiasco.runtime.dependency.processing.TaskResult;
 import digital.fiasco.runtime.repository.Repository;
 
@@ -38,7 +38,7 @@ import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
 import static digital.fiasco.runtime.build.BuildOption.HELP;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactIdentifier.artifact;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifact;
 import static digital.fiasco.runtime.dependency.processing.TaskResult.taskResult;
 
 /**
@@ -170,8 +170,8 @@ import static digital.fiasco.runtime.dependency.processing.TaskResult.taskResult
  *     <li>{@link #withArtifactDescriptor(ArtifactDescriptor)}</li>
  *     <li>{@link #withArtifactGroup(String)}</li>
  *     <li>{@link #withArtifactGroup(ArtifactGroup)}</li>
- *     <li>{@link #withArtifactIdentifier(String)}</li>
- *     <li>{@link #withArtifactIdentifier(ArtifactIdentifier)}</li>
+ *     <li>{@link #withArtifactName(String)}</li>
+ *     <li>{@link #withArtifactName(ArtifactName)}</li>
  *     <li>{@link #withArtifactVersion(String)}</li>
  *     <li>{@link #withArtifactVersion(Version)}</li>
  * </ul>
@@ -288,7 +288,7 @@ public class Builder extends BaseRepeater implements
     @Override
     public ArtifactDescriptor descriptor()
     {
-        return settings.artifactDescriptor();
+        return settings.descriptor();
     }
 
     /**
@@ -383,7 +383,7 @@ public class Builder extends BaseRepeater implements
     public Builder deriveBuilder(String path)
     {
         return withRootFolder(rootFolder().folder(path))
-            .withArtifactIdentifier(pathTail(path, '/'));
+            .withArtifactName(pathTail(path, '/'));
     }
 
     /**
@@ -769,25 +769,25 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Returns a copy of this builder with the given artifact identifier
+     * Returns a copy of this builder with the given artifact name
      *
-     * @param artifact The artifact identifier
+     * @param artifact The artifact name
      * @return The copy
      */
-    public Builder withArtifactIdentifier(ArtifactIdentifier artifact)
+    public Builder withArtifactName(ArtifactName artifact)
     {
         return withArtifactDescriptor(descriptor().withArtifact(artifact));
     }
 
     /**
-     * Returns a copy of this builder with the given artifact identifier
+     * Returns a copy of this builder with the given artifact name
      *
-     * @param artifact The artifact identifier
+     * @param artifact The artifact name
      * @return The copy
      */
-    public Builder withArtifactIdentifier(String artifact)
+    public Builder withArtifactName(String artifact)
     {
-        return withArtifactIdentifier(artifact(artifact));
+        return withArtifactName(artifact(artifact));
     }
 
     /**

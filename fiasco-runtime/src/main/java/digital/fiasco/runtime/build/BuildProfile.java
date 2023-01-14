@@ -1,16 +1,10 @@
 package digital.fiasco.runtime.build;
 
-import com.telenav.kivakit.core.value.identifier.StringIdentifier;
-
 /**
- * Identifier for a profile which can be used to enable or disable tools based on command line options
+ * The name of a profile which can be used to enable or disable tools based on command line options
  *
  * @author Jonathan Locke
  */
-public class BuildProfile extends StringIdentifier
+public record BuildProfile(String name)
 {
-    public BuildProfile(String identifier)
-    {
-        super(identifier);
-    }
 }

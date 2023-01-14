@@ -12,6 +12,7 @@ import digital.fiasco.runtime.dependency.DependencyList;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 
@@ -67,23 +68,23 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
     /**
      * Creates a {@link Library} with the given artifact descriptor
      *
-     * @param artifactDescriptor The artifact descriptor
+     * @param descriptor The artifact descriptor
      * @return The library
      */
-    public static Library library(String artifactDescriptor)
+    public static Library library(String descriptor)
     {
-        return new Library(ArtifactDescriptor.descriptor(artifactDescriptor));
+        return new Library(ArtifactDescriptor.descriptor(descriptor));
     }
 
     /**
      * Creates a {@link Library} with the given artifact descriptor
      *
-     * @param artifactDescriptor The artifact descriptor
+     * @param descriptor The artifact descriptor
      * @return The library
      */
-    public static Library library(ArtifactDescriptor artifactDescriptor)
+    public static Library library(ArtifactDescriptor descriptor)
     {
-        return new Library(artifactDescriptor);
+        return new Library(descriptor);
     }
 
     protected Library(ArtifactDescriptor descriptor)
@@ -112,7 +113,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      */
     public ArtifactContent javadoc()
     {
-        return attachment(JAVADOC_ATTACHMENT).content();
+        return attachmentOfType(JAVADOC_ATTACHMENT).content();
     }
 
     /**
@@ -122,7 +123,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      */
     public ArtifactContent source()
     {
-        return attachment(SOURCES_ATTACHMENT).content();
+        return attachmentOfType(SOURCES_ATTACHMENT).content();
     }
 
     /**
@@ -134,7 +135,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
     public Library withJavadoc(ArtifactContent javadoc)
     {
         var copy = copy();
-        copy.withAttachment(new ArtifactAttachment(this, JAVADOC_ATTACHMENT, javadoc));
+        copy.withAttachment(attachment(JAVADOC_ATTACHMENT, javadoc));
         return copy;
     }
 
@@ -147,7 +148,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
     public Library withSource(ArtifactContent source)
     {
         var copy = copy();
-        copy.withAttachment(new ArtifactAttachment(this, JAVADOC_ATTACHMENT, source));
+        copy.withAttachment(attachment(JAVADOC_ATTACHMENT, source));
         return copy;
     }
 }

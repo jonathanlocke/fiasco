@@ -1,18 +1,24 @@
 package digital.fiasco.runtime.dependency.artifact;
 
+import com.telenav.kivakit.annotations.code.quality.MethodQuality;
+import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.messaging.Listener;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.naming.Named;
 
 import java.util.regex.Pattern;
 
+import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
+import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
 
 /**
- * An identifier that uniquely identifies an artifact, including its group, artifact identifier and version. Artifact
- * descriptors take the text form <b>group:artifact:version</b>.
+ * A string that uniquely identifies an artifact, including its group, artifact name and version. Artifact descriptors
+ * take the text form [group:artifact:version].
  *
  * <p><b>Creation</b></p>
  *
@@ -24,9 +30,9 @@ import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
  * <p><b>Properties</b></p>
  *
  * <ul>
- *     <li>{@link #name()} - The full name of this descriptor (group:identifier:version)</li>
+ *     <li>{@link #name()} - The full name of this descriptor as [group:artifact:version]</li>
  *     <li>{@link #group()} - The artifact group, like <i>com.telenav.kivakit</i></li>
- *     <li>{@link #artifact()} - The artifact identifier, like <i>kivakit-application</i></li>
+ *     <li>{@link #artifact()} - The artifact name, like <i>kivakit-application</i></li>
  *     <li>{@link #version()} - The artifact version, like <i>1.8.0</i></li>
  * </ul>
  *
@@ -42,13 +48,13 @@ import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
  *
  * <ul>
  *     <li>{@link #matches(ArtifactDescriptor)} - Returns true if the given descriptor matches this one, allowing for wildcard
- *     matching if the artifact or version values are missing from either descriptor</li>
+ *     matching if the artifact or version values are missing from this descriptor</li>
  * </ul>
  *
  * <p><b>Validity</b></p>
  *
  * <ul>
- *     <li>{@link #isComplete()} - Returns true if this descriptor fully describes an artifact, having a group, identifier, and version.</li>
+ *     <li>{@link #isComplete()} - Returns true if this descriptor fully describes an artifact, having a group, name, and version.</li>
  * </ul>
  *
  * <p><b>Functional</b></p>
@@ -57,16 +63,26 @@ import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
  *     <li>{@link #withGroup(String)}</li>
  *     <li>{@link #withGroup(ArtifactGroup)}</li>
  *     <li>{@link #withArtifact(String)}</li>
- *     <li>{@link #withArtifact(ArtifactIdentifier)}</li>
+ *     <li>{@link #withArtifact(ArtifactName)}</li>
  *     <li>{@link #withVersion(String)}</li>
  *     <li>{@link #withVersion(Version)}</li>
  * </ul>
  *
  * @author Jonathan Locke
+ * @see ArtifactGroup
+ * @see ArtifactName
+ * @see Version
  */
 @SuppressWarnings("unused")
+@TypeQuality
+    (
+        audience = AUDIENCE_PUBLIC,
+        documentation = DOCUMENTATION_COMPLETE,
+        testing = TESTED,
+        stability = STABLE
+    )
 public record ArtifactDescriptor(ArtifactGroup group,
-                                 ArtifactIdentifier artifact,
+                                 ArtifactName artifact,
                                  Version version) implements
     Named
 {
@@ -78,24 +94,93 @@ public record ArtifactDescriptor(ArtifactGroup group,
         + ":(?<version>[A-Za-z0-9._-]+)?");
 
     /**
-     * Returns the artifact descriptor for the given text
+     * Returns an artifact descriptor for the given text. The text format for an artifact descriptor is
+     * [group:artifact:version], for example "com.telenav.kivakit:kivakit-core:1.8.0". The group is always required, but
+     * the artifact name and version are both optional. For example, "com.telenav.kivakit:kivakit-core:" or
+     * "com.telenav.kivakit::". If the artifact name or version (or both) is missing, that portion of the descriptor
+     * functions like a wildcard, and can take on any value in calls to {@link #matches(ArtifactDescriptor)}.
      *
      * @param text The descriptor text
      * @return The new artifact descriptor
      * @throws RuntimeException Throws a subclass of {@link RuntimeException} if parsing fails
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public static ArtifactDescriptor descriptor(String text)
     {
         return parseDescriptor(throwingListener(), text);
     }
 
     /**
-     * Parses the given artifact desriptor
+     * Creates a descriptor for the given group and artifact name
+     *
+     * @param group The group
+     * @param artifact The artifact
+     * @return The descriptor
+     */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
+    public static ArtifactDescriptor descriptor(ArtifactGroup group, ArtifactName artifact)
+    {
+        return descriptor(group, artifact, null);
+    }
+
+    /**
+     * Creates a descriptor for the given group
+     *
+     * @param group The group
+     * @return The descriptor
+     */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
+    public static ArtifactDescriptor descriptor(ArtifactGroup group)
+    {
+        return descriptor(group, null, null);
+    }
+
+    /**
+     * Creates a descriptor for the given group, artifact name, and version.
+     *
+     * @param group The group
+     * @param artifact The artifact
+     * @param version The version
+     * @return The descriptor
+     */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
+    public static ArtifactDescriptor descriptor(ArtifactGroup group, ArtifactName artifact, Version version)
+    {
+        return new ArtifactDescriptor(group, artifact, version);
+    }
+
+    /**
+     * Returns an artifact descriptor for the given text. The text format for an artifact descriptor is
+     * [group:artifact:version], for example "com.telenav.kivakit:kivakit-core:1.8.0". The group is always required, but
+     * the artifact name and version are both optional. For example, "com.telenav.kivakit:kivakit-core:" or
+     * "com.telenav.kivakit::". If the artifact name or version (or both) is missing, that portion of the descriptor
+     * functions like a wildcard, and can take on any value in calls to {@link #matches(ArtifactDescriptor)}.
      *
      * @param listener The listener to call with any problems
      * @param text The descriptor text
      * @return The artifact descriptor, or null if parsing fails
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public static ArtifactDescriptor parseDescriptor(Listener listener, String text)
     {
         var matcher = DESCRIPTOR_PATTERN.matcher(text);
@@ -107,7 +192,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
             ensureNotNull(group);
             return new ArtifactDescriptor(new ArtifactGroup(group),
                 artifact != null
-                    ? ArtifactIdentifier.artifact(artifact)
+                    ? ArtifactName.artifact(artifact)
                     : null,
                 version != null
                     ? Version.version(version, LENIENT)
@@ -117,49 +202,55 @@ public record ArtifactDescriptor(ArtifactGroup group,
         return null;
     }
 
-    @Override
-    public boolean equals(Object object)
-    {
-        if (object instanceof ArtifactDescriptor that)
-        {
-            return group.equals(that.group)
-                && (artifact == null || that.artifact == null || artifact.equals(that.artifact))
-                && (version == null || that.version == null || version.equals(that.version));
-        }
-        return false;
-    }
-
     /**
-     * Returns true if this descriptor is complete, having a group, identifier and version.
+     * Returns true if this descriptor is complete, having a group, artifact and version.
      *
-     * @return True if this descriptor is valid
+     * @return True if this descriptor is a fully-specified descriptor
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public boolean isComplete()
     {
         return group != null && artifact != null && version != null;
     }
 
     /**
-     * Returns true if this descriptor matches the given descriptor. If either descriptor is missing the artifact
-     * identifier, artifact identifiers are considered to match like a wildcard. The same goes for versions (which also
-     * do their own wildcard matches if the minor or patch version is omitted). For example,
-     * "com.telenav.kivakit:kivakit-core" will match "com.telenav.kivakit:kivakit-core:1.8.0". Similarly,
+     * Returns true if this descriptor matches the given descriptor (but not necessarily vice versa!). If this
+     * descriptor is missing the artifact name, it is considered to match like a wildcard against that descriptor. The
+     * same goes for versions (which also do their own wildcard matching if the minor or patch version is omitted). For
+     * example, "com.telenav.kivakit:kivakit-core:" will match "com.telenav.kivakit:kivakit-core:1.8.0" (but
+     * "com.telenav.kivakit-core:1.8.0" will not match against "com.telenav.kivakit-core:". Similarly,
      * "com.telenav.kivakit::1.8" will match "com.telenav.kivakit:kivakit-converter:1.8.7".
      *
      * @param that The version to match against
      * @return True if this version matches the given version
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public boolean matches(ArtifactDescriptor that)
     {
         return group.equals(that.group)
-            && (artifact == null || that.artifact == null || artifact.equals(that.artifact))
-            && (version == null || that.version == null || version.equals(that.version));
+            && (artifact == null || artifact.equals(that.artifact))
+            && (version == null || version.equals(that.version));
     }
 
     /**
-     * Returns the name of this descriptor as [group]:[identifier]:[version]
+     * Returns the name of this descriptor as [group]:[artifact]:[version]. If the artifact or version is null, it will
+     * be blank in the returned descriptor, as in "com.telenav.kivakit:kivakit:", "com.telenav.kivakit::1.0" or
+     * "com.telenav.kivakit::".
      */
     @Override
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public String name()
     {
         return group
@@ -169,6 +260,9 @@ public record ArtifactDescriptor(ArtifactGroup group,
             + (version == null ? "" : version);
     }
 
+    /**
+     * Returns the fully-specified name of this descriptor (see {@link #name()}).
+     */
     @Override
     public String toString()
     {
@@ -181,9 +275,14 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param version The version
      * @return The descriptor
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public ArtifactDescriptor version(String version)
     {
-        return withVersion(Version.version(version));
+        return withVersion(version);
     }
 
     /**
@@ -192,31 +291,46 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param version The version
      * @return The descriptor
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public ArtifactDescriptor version(Version version)
     {
         return new ArtifactDescriptor(group, artifact, version);
     }
 
     /**
-     * Returns a copy of this descriptor with the given identifier
+     * Returns a copy of this descriptor with the given artifact name
      *
-     * @param artifact The identifier
+     * @param artifact The artifact name
      * @return The copy
      */
-    public ArtifactDescriptor withArtifact(ArtifactIdentifier artifact)
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
+    public ArtifactDescriptor withArtifact(ArtifactName artifact)
     {
         return new ArtifactDescriptor(group, artifact, version);
     }
 
     /**
-     * Returns a copy of this descriptor with the given identifier
+     * Returns a copy of this descriptor with the given artifact name
      *
-     * @param artifact The identifier
+     * @param artifact The artifact name
      * @return The copy
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public ArtifactDescriptor withArtifact(String artifact)
     {
-        return withArtifact(ArtifactIdentifier.artifact(artifact));
+        return withArtifact(ArtifactName.artifact(artifact));
     }
 
     /**
@@ -225,6 +339,11 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param group The group
      * @return The copy
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public ArtifactDescriptor withGroup(ArtifactGroup group)
     {
         return new ArtifactDescriptor(group, artifact, version);
@@ -236,6 +355,11 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param group The group
      * @return The copy
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public ArtifactDescriptor withGroup(String group)
     {
         return withGroup(ArtifactGroup.group(group));
@@ -247,6 +371,11 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param version The version
      * @return The descriptor
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public ArtifactDescriptor withVersion(String version)
     {
         return withVersion(Version.version(version));
@@ -258,6 +387,11 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param version The version
      * @return The descriptor
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public ArtifactDescriptor withVersion(Version version)
     {
         return new ArtifactDescriptor(group, artifact, version);
@@ -266,6 +400,11 @@ public record ArtifactDescriptor(ArtifactGroup group,
     /**
      * Returns a copy of this descriptor without any version
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public ArtifactDescriptor withoutArtifact()
     {
         return descriptor(group.name() + "::")
@@ -275,6 +414,11 @@ public record ArtifactDescriptor(ArtifactGroup group,
     /**
      * Returns a copy of this descriptor without any version
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public ArtifactDescriptor withoutVersion()
     {
         return group.artifact(artifact);

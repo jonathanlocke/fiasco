@@ -1,7 +1,13 @@
 package digital.fiasco.runtime.dependency.artifact;
 
+import com.telenav.kivakit.annotations.code.quality.MethodQuality;
+import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.interfaces.naming.Named;
 
+import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
+import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
 
 /**
@@ -18,14 +24,32 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.desc
  * <ul>
  *     <li>{@link #asset(String)}</li>
  *     <li>{@link #library(String)}</li>
- *     <li>{@link #artifact(ArtifactIdentifier)}</li>
+ *     <li>{@link #artifact(ArtifactName)}</li>
  * </ul>
  *
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
+@TypeQuality
+    (
+        audience = AUDIENCE_PUBLIC,
+        documentation = DOCUMENTATION_COMPLETE,
+        testing = TESTED,
+        stability = STABLE
+    )
 public record ArtifactGroup(String name) implements Named
 {
+    /**
+     * Creates a new group with the given name
+     *
+     * @param name The name of the group
+     * @return The new group instance
+     */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public static ArtifactGroup group(String name)
     {
         return new ArtifactGroup(name);
@@ -34,10 +58,15 @@ public record ArtifactGroup(String name) implements Named
     /**
      * Returns an artifact descriptor for the given artifact in this group
      *
-     * @param artifact The identifier
+     * @param artifact The artifact name
      * @return The artifact descriptor
      */
-    public ArtifactDescriptor artifact(ArtifactIdentifier artifact)
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
+    public ArtifactDescriptor artifact(ArtifactName artifact)
     {
         return new ArtifactDescriptor(this, artifact, null);
     }
@@ -45,20 +74,30 @@ public record ArtifactGroup(String name) implements Named
     /**
      * Returns an artifact descriptor for the given artifact in this group
      *
-     * @param artifact The identifier
+     * @param artifact The artifact name
      * @return The artifact descriptor
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public ArtifactDescriptor artifact(String artifact)
     {
-        return artifact(ArtifactIdentifier.artifact(artifact));
+        return artifact(ArtifactName.artifact(artifact));
     }
 
     /**
      * Returns the given asset in this group
      *
-     * @param asset The asset identifier
+     * @param asset The asset name
      * @return The asset
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public Asset asset(String asset)
     {
         return Asset.asset(descriptor(name + ":" + asset + ":"));
@@ -67,20 +106,35 @@ public record ArtifactGroup(String name) implements Named
     /**
      * Returns the given library in this group
      *
-     * @param library The library identifier
+     * @param library The library name
      * @return The library
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public Library library(String library)
     {
         return Library.library(descriptor(name + ":" + library + ":"));
     }
 
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     @Override
     public String name()
     {
         return name;
     }
 
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     @Override
     public String toString()
     {

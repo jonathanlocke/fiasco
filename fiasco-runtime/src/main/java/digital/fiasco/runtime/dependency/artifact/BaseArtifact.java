@@ -2,18 +2,24 @@ package digital.fiasco.runtime.dependency.artifact;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
+import com.telenav.kivakit.core.string.FormatProperty;
+import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.repository.Repository;
+
+import java.util.LinkedHashMap;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.core.string.Formatter.format;
+import static com.telenav.kivakit.core.string.ObjectFormatter.ObjectFormat.MULTILINE;
 import static com.telenav.kivakit.interfaces.comparison.Filter.acceptNone;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 
 /**
@@ -32,7 +38,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *     <li>{@link #version(String)}</li>
  *     <li>{@link #version(Version)}</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)}</li>
- *     <li>{@link #withArtifactIdentifier(String)}</li>
+ *     <li>{@link #withArtifactName(String)}</li>
  *     <li>{@link #withVersion(Version)}</li>
  * </ul>
  *
@@ -50,7 +56,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  * <p><b>Attachments</b></p>
  *
  * <ul>
- *     <li>{@link #attachment(ArtifactAttachmentType)}</li>
+ *     <li>{@link #attachmentOfType(ArtifactAttachmentType)}</li>
  *     <li>{@link #withAttachment(ArtifactAttachment)}</li>
  * </ul>
  *
@@ -65,7 +71,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *     <li>{@link #withContent(ArtifactContent)}</li>
  *     <li>{@link #withDependencies(DependencyList)} - Returns this artifact with the given dependencies</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
- *     <li>{@link #withArtifactIdentifier(String)} - Returns this artifact with the given identifier</li>
+ *     <li>{@link #withArtifactName(String)} - Returns this artifact with the given artifact name</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #excluding(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
  *     <li>{@link #excluding(String...)} - Returns this artifact without the given dependencies</li>
@@ -92,9 +98,11 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
 public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifact<T>
 {
     /** The repository where this artifact is hosted */
+    @FormatProperty
     private Repository repository;
 
     /** The descriptor for this artifact */
+    @FormatProperty
     protected ArtifactDescriptor descriptor;
 
     /** List of dependent artifacts */
@@ -104,7 +112,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     protected ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptNone());
 
     /** The content attachments by type */
-    private ObjectMap<ArtifactAttachmentType, ArtifactAttachment> typeToAttachment = new ObjectMap<>();
+    private ObjectMap<ArtifactAttachmentType, ArtifactAttachment> typeToAttachment = new ObjectMap<>(new LinkedHashMap<>());
 
     /**
      * Create artifact
@@ -141,7 +149,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return Any attached resource with the given name, or null if there is none
      */
     @Override
-    public ArtifactAttachment attachment(ArtifactAttachmentType type)
+    public ArtifactAttachment attachmentOfType(ArtifactAttachmentType type)
     {
         return typeToAttachment.get(type);
     }
@@ -150,6 +158,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * {@inheritDoc}
      */
     @Override
+    @FormatProperty
     public ObjectList<ArtifactAttachment> attachments()
     {
         return list(typeToAttachment.values());
@@ -164,6 +173,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return The artifacts
      */
     @Override
+    @FormatProperty
     public DependencyList<Artifact<?>> dependencies()
     {
         var copy = dependencies.copy();
@@ -329,6 +339,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     }
 
     @Override
+    @FormatProperty
     public String name()
     {
         return descriptor.name();
@@ -343,14 +354,20 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
         return repository;
     }
 
+    @Override
+    public String toString()
+    {
+        return new ObjectFormatter(this).asString(MULTILINE);
+    }
+
     /**
-     * Returns a copy of this artifact with the given identifier
+     * Returns a copy of this artifact with the given artifact name
      *
-     * @param artifact The new artifact identifier
+     * @param artifact The new artifact name
      * @return The new artifact
      */
     @Override
-    public T withArtifactIdentifier(String artifact)
+    public T withArtifactName(String artifact)
     {
         return withDescriptor(descriptor().withArtifact(artifact));
     }
@@ -364,7 +381,8 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     public T withAttachment(ArtifactAttachment attachment)
     {
         var copy = copy();
-        ((BaseArtifact<T>) copy).typeToAttachment.put(attachment.type(), attachment);
+        attachment = attachment.withArtifact(copy);
+        ((BaseArtifact<T>) copy).typeToAttachment.put(attachment.attachmentType(), attachment);
         return copy;
     }
 
@@ -372,7 +390,10 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     public T withAttachments(ObjectMap<ArtifactAttachmentType, ArtifactAttachment> attachments)
     {
         var copy = copy();
-        ((BaseArtifact<T>) copy).typeToAttachment = attachments;
+        for (var entry : attachments.entrySet())
+        {
+            copy = copy.withAttachment(entry.getValue());
+        }
         return copy;
     }
 
@@ -385,7 +406,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     public T withContent(ArtifactContent content)
     {
         var copy = copy();
-        copy.withAttachment(new ArtifactAttachment(this, JAR_ATTACHMENT, content));
+        copy.withAttachment(attachment(JAR_ATTACHMENT, content));
         return copy;
     }
 

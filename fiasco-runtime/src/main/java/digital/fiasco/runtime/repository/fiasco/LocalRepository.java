@@ -212,7 +212,7 @@ public class LocalRepository extends BaseRepository
     private File artifactAttachmentFile(@NotNull ArtifactAttachment attachment)
     {
         return repositoryFolder(attachment.artifact())
-            .file(attachment.content().name() + attachment.type());
+            .file(attachment.content().name() + attachment.attachmentType());
     }
 
     /**

@@ -9,7 +9,7 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 /**
  * The metadata for a build.
  *
- * @param artifactDescriptor The type of artifact that is built
+ * @param descriptor The type of artifact that is built
  * @param description A description of the project being built
  * @param copyrights Any copyright
  * @param licenses Any license
@@ -18,7 +18,7 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  * @param contributors The project contributors
  */
 @SuppressWarnings("unused")
-public record BuildMetadata(@FormatProperty ArtifactDescriptor artifactDescriptor,
+public record BuildMetadata(@FormatProperty ArtifactDescriptor descriptor,
                             @FormatProperty String description,
                             @FormatProperty ObjectList<Copyright> copyrights,
                             @FormatProperty ObjectList<License> licenses,
@@ -32,14 +32,14 @@ public record BuildMetadata(@FormatProperty ArtifactDescriptor artifactDescripto
         return new BuildMetadata(null, null, list(), list(), list(), list(), list(), list());
     }
 
-    public BuildMetadata withArtifactDescriptor(String artifactDescriptor)
+    public BuildMetadata withArtifactDescriptor(String descriptor)
     {
-        return withArtifactDescriptor(ArtifactDescriptor.descriptor(artifactDescriptor));
+        return withArtifactDescriptor(ArtifactDescriptor.descriptor(descriptor));
     }
 
-    public BuildMetadata withArtifactDescriptor(ArtifactDescriptor artifactDescriptor)
+    public BuildMetadata withArtifactDescriptor(ArtifactDescriptor descriptor)
     {
-        return new BuildMetadata(artifactDescriptor, description, copyrights, licenses, resources, mailingLists, organizations, contributors);
+        return new BuildMetadata(descriptor, description, copyrights, licenses, resources, mailingLists, organizations, contributors);
     }
 
     public BuildMetadata withContributor(Contributor contributor)
@@ -49,7 +49,7 @@ public record BuildMetadata(@FormatProperty ArtifactDescriptor artifactDescripto
 
     public BuildMetadata withContributors(Contributor... contributors)
     {
-        return new BuildMetadata(artifactDescriptor, description, copyrights, licenses, resources, mailingLists, organizations, this.contributors.with(contributors));
+        return new BuildMetadata(descriptor, description, copyrights, licenses, resources, mailingLists, organizations, this.contributors.with(contributors));
     }
 
     public BuildMetadata withCopyright(Copyright copyright)
@@ -59,12 +59,12 @@ public record BuildMetadata(@FormatProperty ArtifactDescriptor artifactDescripto
 
     public BuildMetadata withCopyrights(Copyright... copyrights)
     {
-        return new BuildMetadata(artifactDescriptor, description, this.copyrights.with(copyrights), licenses, resources, mailingLists, organizations, contributors);
+        return new BuildMetadata(descriptor, description, this.copyrights.with(copyrights), licenses, resources, mailingLists, organizations, contributors);
     }
 
     public BuildMetadata withDescription(String description)
     {
-        return new BuildMetadata(artifactDescriptor, description, copyrights, licenses, resources, mailingLists, organizations, contributors);
+        return new BuildMetadata(descriptor, description, copyrights, licenses, resources, mailingLists, organizations, contributors);
     }
 
     public BuildMetadata withLicense(License license)
@@ -74,12 +74,12 @@ public record BuildMetadata(@FormatProperty ArtifactDescriptor artifactDescripto
 
     public BuildMetadata withLicenses(License... licenses)
     {
-        return new BuildMetadata(artifactDescriptor, description, copyrights, this.licenses.with(licenses), resources, mailingLists, organizations, contributors);
+        return new BuildMetadata(descriptor, description, copyrights, this.licenses.with(licenses), resources, mailingLists, organizations, contributors);
     }
 
     public BuildMetadata withMailingLists(MailingList... mailingLists)
     {
-        return new BuildMetadata(artifactDescriptor, description, copyrights, licenses, resources, this.mailingLists.with(mailingLists), organizations, contributors);
+        return new BuildMetadata(descriptor, description, copyrights, licenses, resources, this.mailingLists.with(mailingLists), organizations, contributors);
     }
 
     public BuildMetadata withOrganization(Organization organization)
@@ -89,16 +89,16 @@ public record BuildMetadata(@FormatProperty ArtifactDescriptor artifactDescripto
 
     public BuildMetadata withOrganizations(Organization... organizations)
     {
-        return new BuildMetadata(artifactDescriptor, description, copyrights, licenses, resources, mailingLists, this.organizations.with(organizations), contributors);
+        return new BuildMetadata(descriptor, description, copyrights, licenses, resources, mailingLists, this.organizations.with(organizations), contributors);
     }
 
     public BuildMetadata withProjectResource(ProjectResource resource)
     {
-        return new BuildMetadata(artifactDescriptor, description, copyrights, licenses, resources, mailingLists, organizations, contributors);
+        return new BuildMetadata(descriptor, description, copyrights, licenses, resources, mailingLists, organizations, contributors);
     }
 
     public BuildMetadata withProjectResources(ProjectResource... resources)
     {
-        return new BuildMetadata(artifactDescriptor, description, copyrights, licenses, this.resources.with(resources), mailingLists, organizations, contributors);
+        return new BuildMetadata(descriptor, description, copyrights, licenses, this.resources.with(resources), mailingLists, organizations, contributors);
     }
 }

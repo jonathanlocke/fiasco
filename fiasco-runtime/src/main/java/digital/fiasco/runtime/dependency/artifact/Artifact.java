@@ -38,7 +38,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  * <p>
  * Each artifact has a set of {@link ArtifactAttachment}s, one for each {@link ArtifactAttachmentType}. The attachment
  * for a particular type, like {@link ArtifactAttachmentType#JAVADOC_ATTACHMENT}, can be retrieved with
- * {@link #attachment(ArtifactAttachmentType)}. The list of all attachments can be retrieved with
+ * {@link #attachmentOfType(ArtifactAttachmentType)}. The list of all attachments can be retrieved with
  * {@link #attachments()}. Each attachment has {@link ArtifactContent}, which includes the content {@link Resource} and
  * a set of {@link ArtifactContentSignatures} to allow verification of the accuracy of the content. The primary JAR
  * content for an artifact can be retrieved with {@link #content()}
@@ -69,7 +69,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *     <li>{@link #version(String)}</li>
  *     <li>{@link #version(Version)}</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)}</li>
- *     <li>{@link #withArtifactIdentifier(String)}</li>
+ *     <li>{@link #withArtifactName(String)}</li>
  *     <li>{@link #withVersion(Version)}</li>
  * </ul>
  *
@@ -88,7 +88,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *
  * <ul>
  *     <li>{@link #attachments()}</li>
- *     <li>{@link #attachment(ArtifactAttachmentType)}</li>
+ *     <li>{@link #attachmentOfType(ArtifactAttachmentType)}</li>
  *     <li>{@link #withAttachment(ArtifactAttachment)}</li>
  * </ul>
  *
@@ -103,7 +103,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *     <li>{@link #withContent(ArtifactContent)}</li>
  *     <li>{@link #withDependencies(DependencyList)} - Returns this artifact with the given dependencies</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
- *     <li>{@link #withArtifactIdentifier(String)} - Returns this artifact with the given identifier</li>
+ *     <li>{@link #withArtifactName(String)} - Returns this artifact with the given name</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #excluding(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
  *     <li>{@link #excluding(String...)} - Returns this artifact without the given dependencies</li>
@@ -144,20 +144,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     }
 
     /**
-     * Returns the descriptor for this artifact
-     *
-     * @return The artifact descriptor
-     */
-    @Override
-    ArtifactDescriptor descriptor();
-
-    /**
      * Returns the attached resource for the given artifact type, such as <i>.jar</i>
      *
      * @param type The artifact type
      * @return The attached resource
      */
-    ArtifactAttachment attachment(ArtifactAttachmentType type);
+    ArtifactAttachment attachmentOfType(ArtifactAttachmentType type);
 
     /**
      * Returns a list of all attachments to this artifact
@@ -173,7 +165,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     default ArtifactContent content()
     {
-        return attachment(JAR_ATTACHMENT).content();
+        return attachmentOfType(JAR_ATTACHMENT).content();
     }
 
     /**
@@ -190,6 +182,14 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @Override
     DependencyList<Artifact<?>> dependencies();
+
+    /**
+     * Returns the descriptor for this artifact
+     *
+     * @return The artifact descriptor
+     */
+    @Override
+    ArtifactDescriptor descriptor();
 
     /**
      * Returns a copy of this artifact that excludes the given descriptors from its dependencies
@@ -273,12 +273,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     }
 
     /**
-     * Returns a copy of this artifact with the given identifier
+     * Returns a copy of this artifact with the given name
      *
-     * @param artifact The new artifact identifier
+     * @param artifact The new artifact name
      * @return The new artifact
      */
-    default T withArtifactIdentifier(String artifact)
+    default T withArtifactName(String artifact)
     {
         return withDescriptor(descriptor().withArtifact(artifact));
     }

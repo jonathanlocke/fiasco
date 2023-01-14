@@ -1,6 +1,8 @@
 package digital.fiasco.runtime.dependency.artifact;
 
 import com.google.gson.annotations.Expose;
+import com.telenav.kivakit.core.string.FormatProperty;
+import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.core.time.Time;
 import com.telenav.kivakit.core.value.count.Bytes;
 import com.telenav.kivakit.resource.Resource;
@@ -18,17 +20,23 @@ import com.telenav.kivakit.resource.Resource;
 @SuppressWarnings("unused")
 public record ArtifactContent
     (
-        @Expose String name,
-        @Expose ArtifactContentSignatures signatures,
-        @Expose Resource resource,
-        @Expose long offset,
-        @Expose Time lastModified,
-        @Expose Bytes size
+        @FormatProperty @Expose String name,
+        @FormatProperty @Expose ArtifactContentSignatures signatures,
+        @FormatProperty @Expose Resource resource,
+        @FormatProperty @Expose long offset,
+        @FormatProperty @Expose Time lastModified,
+        @FormatProperty @Expose Bytes size
     )
 {
     public ArtifactContent()
     {
         this(null, null, null, -1, null, null);
+    }
+
+    @Override
+    public String toString()
+    {
+        return new ObjectFormatter(this).toString();
     }
 
     /**

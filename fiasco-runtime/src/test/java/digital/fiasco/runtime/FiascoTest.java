@@ -1,0 +1,98 @@
+package digital.fiasco.runtime;
+
+import com.telenav.kivakit.core.time.Time;
+import com.telenav.kivakit.resource.resources.StringResource;
+import com.telenav.kivakit.testing.UnitTest;
+import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
+import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.ArtifactContentSignatures;
+import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+
+import static com.telenav.kivakit.core.time.Day.dayOfMonth;
+import static com.telenav.kivakit.core.time.Hour.hourOfDay;
+import static com.telenav.kivakit.core.time.Meridiem.AM;
+import static com.telenav.kivakit.core.time.Month.JANUARY;
+import static com.telenav.kivakit.core.time.Year.year;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
+
+public class FiascoTest extends UnitTest
+{
+    protected ArtifactContent content()
+    {
+        var resource = new StringResource("abc"); //packageResource("content.txt");
+        return new ArtifactContent()
+            .withResource(resource)
+            .withLastModified(Time.utcTime(
+                year(2023),
+                JANUARY,
+                dayOfMonth(12),
+                hourOfDay(6, AM)))
+            .withSize(resource.sizeInBytes())
+            .withOffset(0)
+            .withName(resource.fileName().name())
+            .withSignatures(signatures());
+    }
+
+    protected ArtifactDescriptor descriptorA()
+    {
+        return ArtifactDescriptor.descriptor("a::");
+    }
+
+    protected ArtifactDescriptor descriptorAb()
+    {
+        return ArtifactDescriptor.descriptor("a:b:");
+    }
+
+    protected ArtifactDescriptor descriptorAbv()
+    {
+        return ArtifactDescriptor.descriptor("a:b:1.2.3");
+    }
+
+    protected ArtifactDescriptor descriptorAv()
+    {
+        return ArtifactDescriptor.descriptor("a::1.2.3");
+    }
+
+    protected ArtifactDescriptor descriptorX()
+    {
+        return ArtifactDescriptor.descriptor("x::");
+    }
+
+    protected ArtifactDescriptor descriptorXv()
+    {
+        return ArtifactDescriptor.descriptor("x::1.2.3");
+    }
+
+    protected ArtifactDescriptor descriptorXy()
+    {
+        return ArtifactDescriptor.descriptor("x:y:");
+    }
+
+    protected ArtifactDescriptor descriptorXyv()
+    {
+        return ArtifactDescriptor.descriptor("x:y:1.2.3");
+    }
+
+    protected ArtifactAttachment jarAttachment()
+    {
+        return attachment(JAR_ATTACHMENT, content());
+    }
+
+    protected ArtifactAttachment javadocAttachment()
+    {
+        return attachment(JAVADOC_ATTACHMENT, content());
+    }
+
+    protected ArtifactContentSignatures signatures()
+    {
+        return new ArtifactContentSignatures("oisdfoiusdfoiu198273", "12983791826501", "120378019821");
+    }
+
+    protected ArtifactAttachment sourcesAttachment()
+    {
+        return attachment(SOURCES_ATTACHMENT, content());
+    }
+}

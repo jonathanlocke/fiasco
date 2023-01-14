@@ -162,9 +162,9 @@ public class Librarian extends BaseTool
 
     /**
      * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
-     * descriptor will be assigned the version.
+     * descriptor will be assigned the given version.
      *
-     * @param artifact The group and artifact identifier (which can be lacking a version)
+     * @param artifact The group and artifact name
      * @param version The version to enforce for the descriptor
      */
     public Librarian pinVersion(Artifact<?> artifact, Version version)

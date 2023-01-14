@@ -235,7 +235,7 @@ public abstract class BaseBuild extends Application implements Build
     {
         // Create the root builder,
         var rootBuilder = listenTo(newBuilder()
-            .withArtifactDescriptor(metadata.artifactDescriptor()));
+            .withArtifactDescriptor(metadata.descriptor()));
 
         // resolve artifacts and run builders,
         var results = build(rootBuilder);

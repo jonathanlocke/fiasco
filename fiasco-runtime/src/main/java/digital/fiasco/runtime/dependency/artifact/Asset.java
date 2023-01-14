@@ -7,9 +7,17 @@
 
 package digital.fiasco.runtime.dependency.artifact;
 
+import com.telenav.kivakit.annotations.code.quality.MethodQuality;
+import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.registry.RegistryTrait;
 import digital.fiasco.runtime.dependency.DependencyList;
 
+import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_INTERNAL;
+import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
+import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 
@@ -28,28 +36,45 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
+@TypeQuality
+    (
+        audience = AUDIENCE_PUBLIC,
+        documentation = DOCUMENTATION_COMPLETE,
+        testing = TESTED,
+        stability = STABLE
+    )
 public class Asset extends BaseArtifact<Asset> implements RegistryTrait
 {
     /**
      * Creates a {@link Asset} with the given artifact descriptor
      *
-     * @param artifactDescriptor The artifact descriptor
+     * @param descriptor The artifact descriptor
      * @return The asset
      */
-    public static Asset asset(String artifactDescriptor)
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
+    public static Asset asset(String descriptor)
     {
-        return asset(ArtifactDescriptor.descriptor(artifactDescriptor));
+        return asset(ArtifactDescriptor.descriptor(descriptor));
     }
 
     /**
      * Creates a {@link Asset} with the given artifact descriptor
      *
-     * @param artifactDescriptor The artifact descriptor
+     * @param descriptor The artifact descriptor
      * @return The asset
      */
-    public static Asset asset(ArtifactDescriptor artifactDescriptor)
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
+    public static Asset asset(ArtifactDescriptor descriptor)
     {
-        return new Asset(artifactDescriptor);
+        return new Asset(descriptor);
     }
 
     /**
@@ -58,7 +83,12 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      * @param artifact The asset artifact
      * @return The asset
      */
-    public static Asset asset(Asset artifact)
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
+    public static Asset asset(Artifact<?> artifact)
     {
         return asset(artifact.descriptor());
     }
@@ -69,10 +99,14 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      * @param descriptors The artifact descriptors
      * @return The asset dependency list
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public static DependencyList<Asset> assets(String... descriptors)
     {
-        var assets = stringList(descriptors).map(Asset::asset);
-        return dependencyList(assets);
+        return dependencyList(stringList(descriptors).map(Asset::asset));
     }
 
     /**
@@ -81,16 +115,33 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      * @param assets The assets
      * @return The asset dependency list
      */
+    @MethodQuality
+        (
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public static DependencyList<Asset> assets(Asset... assets)
     {
         return dependencyList(assets);
     }
 
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_NOT_NEEDED,
+            testing = TESTED
+        )
     protected Asset(ArtifactDescriptor descriptor)
     {
         super(descriptor);
     }
 
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_NOT_NEEDED,
+            testing = TESTED
+        )
     protected Asset(Asset that)
     {
         super(that);
@@ -100,6 +151,12 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      * {@inheritDoc}
      */
     @Override
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     public Asset copy()
     {
         return new Asset(this);
