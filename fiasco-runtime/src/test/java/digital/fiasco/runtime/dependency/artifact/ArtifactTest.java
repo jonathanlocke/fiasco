@@ -17,6 +17,12 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
 public class ArtifactTest extends FiascoTest
 {
     @Test
+    public void testArtifact()
+    {
+        ensureEqual(kivakitCore().artifact().name(), "kivakit-core");
+    }
+
+    @Test
     public void testAttachmentOfType()
     {
         var library = library("com.telenav.kivakit:kivakit:1.8.0");
@@ -160,9 +166,87 @@ public class ArtifactTest extends FiascoTest
     }
 
     @Test
-    public void testExclusions()
+    public void testDependsOn()
     {
+        var application = kivakitApplication()
+            .dependsOn(kivakitCore(), kivakitResource());
 
+        ensure(application.dependencies().containsAll(dependencyList(kivakitCore(), kivakitResource())));
+    }
+
+    @Test
+    public void testDescriptor()
+    {
+        ensureEqual(kivakitApplication().descriptor(), descriptor("com.telenav.kivakit:kivakit-application:1.8.5"));
+    }
+
+    @Test
+    public void testEqualsHash()
+    {
+        var map = new ObjectMap<Artifact<?>, Integer>();
+        map.put(kivakitApplication(), 1);
+        map.put(kivakitCore(), 2);
+
+        ensure(map.containsKey(kivakitApplication()));
+        ensure(map.containsKey(kivakitCore()));
+        ensureEqual(map.get(kivakitApplication()), 1);
+        ensureEqual(map.get(kivakitCore()), 2);
+    }
+
+    @Test
+    public void testExcluding()
+    {
+        var application = kivakitApplication()
+            .dependsOn(kivakitCore(), kivakitResource());
+
+        ensureEqual(application
+                .excluding("com.telenav.kivakit:kivakit-core:")
+                .dependencies(),
+            dependencyList(kivakitResource()));
+
+        ensureEqual(application
+                .excluding("com.telenav.kivakit::")
+                .dependencies(),
+            dependencyList());
+
+        ensureEqual(application
+                .excluding(at -> at.name().contains("core"))
+                .dependencies(),
+            dependencyList(kivakitResource()));
+
+        ensureEqual(application
+                .excluding(kivakitCore())
+                .dependencies(),
+            dependencyList(kivakitResource()));
+
+        ensureEqual(application
+                .excluding(kivakitResource())
+                .dependencies(),
+            dependencyList(kivakitCore()));
+
+        ensureEqual(application
+                .excluding(kivakitResource())
+                .excluding(kivakitCore()).dependencies(),
+            dependencyList());
+    }
+
+    @Test
+    public void testIsExcluded()
+    {
+        var application = kivakitApplication()
+            .dependsOn(kivakitCore(), kivakitResource());
+
+        ensure(application
+            .excluding("com.telenav.kivakit:kivakit-core:")
+            .isExcluded(kivakitCore()));
+
+        ensure(application
+            .excluding("com.telenav.kivakit::")
+            .isExcluded(kivakitCore()));
+
+        ensure(application
+            .excluding("com.telenav.kivakit::")
+            .isExcluded(kivakitResource()));
     }
 
     @Test
@@ -172,6 +256,21 @@ public class ArtifactTest extends FiascoTest
             .withJar(content());
 
         ensureEqual(library.jar(), content());
+    }
+
+    @Test
+    public void testJson()
+    {
+        var application = kivakitApplication()
+            .dependsOn(kivakitCore(), kivakitResource())
+            .withRepository(MAVEN_CENTRAL)
+            .withJar(content())
+            .withJavadoc(content());
+
+        var json = application.toJson();
+        var deserialized = Artifact.artifactFromJson(json);
+
+        ensureEqual(application, deserialized);
     }
 
     @Test
@@ -213,6 +312,15 @@ public class ArtifactTest extends FiascoTest
     public void testName()
     {
         ensureEqual(kivakitCore().name(), "com.telenav.kivakit:kivakit-core:1.8.5");
+    }
+
+    @Test
+    public void testRepository()
+    {
+        var application = kivakitApplication()
+            .withRepository(MAVEN_CENTRAL);
+
+        ensureEqual(application.repository(), MAVEN_CENTRAL);
     }
 
     @Test

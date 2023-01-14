@@ -2,6 +2,7 @@ package digital.fiasco.runtime;
 
 import com.telenav.kivakit.core.time.Time;
 import com.telenav.kivakit.resource.resources.StringResource;
+import com.telenav.kivakit.serialization.gson.factory.KivaKitCoreGsonFactory;
 import com.telenav.kivakit.testing.UnitTest;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
@@ -24,6 +25,11 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
 public class FiascoTest extends UnitTest
 {
+    public FiascoTest()
+    {
+        register(new KivaKitCoreGsonFactory(this));
+    }
+
     protected ArtifactContent content()
     {
         var resource = new StringResource("abc"); //packageResource("content.txt");

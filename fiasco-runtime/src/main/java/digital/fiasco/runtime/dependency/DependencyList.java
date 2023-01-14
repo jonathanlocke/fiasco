@@ -213,9 +213,9 @@ public class DependencyList<T extends Dependency> implements
 
     public DependencyList<T> matching(Matcher<T> matcher)
     {
-        var matching = new DependencyList<T>();
-        matching.dependencies = matching.dependencies.matching(matcher);
-        return matching;
+        var copy = copy();
+        copy.dependencies = copy.dependencies.matching(matcher);
+        return copy;
     }
 
     @Override

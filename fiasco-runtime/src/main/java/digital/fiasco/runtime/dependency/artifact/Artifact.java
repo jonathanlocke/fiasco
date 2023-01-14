@@ -145,12 +145,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     /**
      * Returns a copy of this artifact with the given name
      *
-     * @param artifact The new artifact name
+     * @param artifactName The new artifact name
      * @return The new artifact
      */
-    default T artifact(String artifact)
+    default T artifact(String artifactName)
     {
-        return withArtifact(artifact);
+        return withArtifact(artifactName);
     }
 
     /**
@@ -268,6 +268,25 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     }
 
     /**
+     * Returns a copy of this artifact that excludes the given descriptors from its dependencies
+     *
+     * @param exclusions The descriptors to exclude
+     * @return The new artifact
+     */
+    T excluding(ObjectList<ArtifactDescriptor> exclusions);
+
+    /**
+     * Returns a copy of this artifact that excludes the given artifacts from its dependencies
+     *
+     * @param exclusions The artifacts to exclude
+     * @return The new artifact
+     */
+    default T excluding(Artifact<?>... exclusions)
+    {
+        return excluding(list(exclusions).map(Artifact::descriptor));
+    }
+
+    /**
      * Returns a copy of this artifact that excludes all descriptors matching the given pattern from its dependencies
      *
      * @param pattern The pattern to exclude
@@ -282,6 +301,17 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @return True if the descriptor is excluded
      */
     boolean isExcluded(ArtifactDescriptor descriptor);
+
+    /**
+     * Returns true if this artifact excludes the given artifact
+     *
+     * @param artifact The artifact
+     * @return True if the descriptor is excluded
+     */
+    default boolean isExcluded(Artifact<?> artifact)
+    {
+        return isExcluded(artifact.descriptor());
+    }
 
     /**
      * Returns a skeletal Maven POM for this artifact
@@ -328,17 +358,17 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     /**
      * Returns a copy of this artifact with the given name
      *
-     * @param artifact The new artifact name
+     * @param artifactName The new artifact name
      * @return The new artifact
      */
-    default T withArtifact(String artifact)
+    default T withArtifact(String artifactName)
     {
-        return withDescriptor(descriptor().withArtifact(artifact));
+        return withDescriptor(descriptor().withArtifact(artifactName));
     }
 
-    default T withArtifact(ArtifactName artifact)
+    default T withArtifact(ArtifactName artifactName)
     {
-        return withDescriptor(descriptor().withArtifact(artifact));
+        return withDescriptor(descriptor().withArtifact(artifactName));
     }
 
     /**

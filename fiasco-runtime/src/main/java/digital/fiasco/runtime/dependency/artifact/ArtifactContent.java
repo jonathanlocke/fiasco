@@ -1,11 +1,17 @@
 package digital.fiasco.runtime.dependency.artifact;
 
 import com.google.gson.annotations.Expose;
+import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.core.time.Time;
 import com.telenav.kivakit.core.value.count.Bytes;
 import com.telenav.kivakit.resource.Resource;
+
+import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
+import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 
 /**
  * Holds the content for a single artifact attachment, for example the main JAR, Javadoc, or source code.
@@ -18,6 +24,13 @@ import com.telenav.kivakit.resource.Resource;
  * @param size The size of the content
  */
 @SuppressWarnings("unused")
+@TypeQuality
+    (
+        audience = AUDIENCE_PUBLIC,
+        documentation = DOCUMENTATION_COMPLETE,
+        testing = TESTED,
+        stability = STABLE
+    )
 public record ArtifactContent
     (
         @FormatProperty @Expose String name,
