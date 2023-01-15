@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.dependency.artifact;
 
+import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.version.Version;
@@ -14,8 +15,12 @@ import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.repository.Repository;
 
+import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_INTERNAL;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
+import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 
 /**
@@ -132,12 +137,18 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param json The JSON
      * @return The artifact
      */
+    @SuppressWarnings("unchecked")
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     static <T extends Artifact<T>> T artifactFromJson(String json)
     {
         var serialized = new StringResource(json);
         var serializer = new GsonObjectSerializer();
-        // noinspection unchecked
-        return (T) serializer.readObject(serialized).object();
+        return (T) serializer.readObject(serialized, METADATA_OBJECT_TYPE).object();
     }
 
     /**
@@ -146,6 +157,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param artifactName The new artifact name
      * @return The new artifact
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     default T artifact(String artifactName)
     {
         return withArtifact(artifactName);
@@ -157,6 +174,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param artifact The new artifact name
      * @return The new artifact
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     default T artifact(ArtifactName artifact)
     {
         return withArtifact(artifact);
@@ -182,6 +205,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      *
      * @return The content
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     default ArtifactContent content()
     {
         return attachmentOfType(JAR_ATTACHMENT).content();
@@ -248,6 +277,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param exclude The descriptors to exclude
      * @return The new artifact
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     default T excluding(ArtifactDescriptor... exclude)
     {
         return excluding(library -> arrayContains(exclude, library));
@@ -259,6 +294,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param exclude The descriptors to exclude
      * @return The new artifact
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     default T excluding(String... exclude)
     {
         var descriptors = list(exclude).map(ArtifactDescriptor::descriptor);
@@ -279,6 +320,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param exclusions The artifacts to exclude
      * @return The new artifact
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     default T excluding(Artifact<?>... exclusions)
     {
         return excluding(list(exclusions).map(Artifact::descriptor));
@@ -306,6 +353,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param artifact The artifact
      * @return True if the descriptor is excluded
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     default boolean isExcluded(Artifact<?> artifact)
     {
         return isExcluded(artifact.descriptor());
@@ -329,17 +382,29 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     /**
      * Returns this artifact in JSON form
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     default String toJson()
     {
         var serializer = new GsonObjectSerializer();
         var serialized = new StringOutputResource();
-        serializer.writeObject(serialized, new SerializableObject<>(this));
+        serializer.writeObject(serialized, new SerializableObject<>(this), METADATA_OBJECT_TYPE);
         return serialized.string();
     }
 
     /**
      * Convenience method for {@link #withVersion(Version)}
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     default T version(Version version)
     {
         return withVersion(version);
@@ -348,6 +413,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     /**
      * Convenience method for {@link #withVersion(Version)}
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     default T version(String version)
     {
         return withVersion(Version.version(version));
@@ -359,11 +430,29 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param artifactName The new artifact name
      * @return The new artifact
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     default T withArtifact(String artifactName)
     {
         return withDescriptor(descriptor().withArtifact(artifactName));
     }
 
+    /**
+     * Returns a copy of this artifact with the given name
+     *
+     * @param artifactName The new artifact name
+     * @return The new artifact
+     */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     default T withArtifact(ArtifactName artifactName)
     {
         return withDescriptor(descriptor().withArtifact(artifactName));
@@ -388,6 +477,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      *
      * @return The content
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     default T withContent(ArtifactContent content)
     {
         var copy = copy();
@@ -425,6 +520,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param version The new version
      * @return The new artifact
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     default T withVersion(Version version)
     {
         return withDescriptor(descriptor().withVersion(version));
@@ -436,6 +537,12 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param version The new version
      * @return The new artifact
      */
+    @MethodQuality
+        (
+            audience = AUDIENCE_INTERNAL,
+            documentation = DOCUMENTATION_COMPLETE,
+            testing = TESTED
+        )
     default T withVersion(String version)
     {
         return withDescriptor(descriptor().withVersion(version));

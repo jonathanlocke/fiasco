@@ -27,11 +27,8 @@ public class ArtifactAttachmentTest extends FiascoTest
     {
         var text = jarAttachment().toString();
         ensure(text.contains("content"));
-        ensure(text.contains("resource"));
-        ensure(text.contains("created"));
+        ensure(text.contains("resourceIdentifier"));
         ensure(text.contains("lastModified"));
-        ensure(text.contains("text"));
-        ensure(text.contains("name"));
         ensure(text.contains("offset"));
         ensure(text.contains("signatures"));
         ensure(text.contains("md5"));

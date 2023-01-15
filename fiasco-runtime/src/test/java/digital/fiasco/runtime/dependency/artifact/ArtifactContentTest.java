@@ -27,7 +27,7 @@ public class ArtifactContentTest extends FiascoTest
         }
         {
             var now = Time.now();
-            content = content.withLastModified(now);
+            content = content.withLastModified(now.asLocalTime());
             ensureEqual(content.lastModified(), now);
         }
         {

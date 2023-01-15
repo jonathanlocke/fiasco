@@ -4,7 +4,6 @@ import com.telenav.kivakit.core.collections.map.ObjectMap;
 import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;
 
-import static com.telenav.kivakit.core.os.Console.console;
 import static digital.fiasco.runtime.build.BuildRepositories.MAVEN_CENTRAL;
 import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJson;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
@@ -270,11 +269,7 @@ public class ArtifactTest extends FiascoTest
             .withJavadoc(content());
 
         var json = application.toJson();
-
-        console().println(json);
-
         var deserialized = artifactFromJson(json);
-
         ensureEqual(application, deserialized);
     }
 

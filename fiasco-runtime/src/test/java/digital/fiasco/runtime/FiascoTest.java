@@ -38,7 +38,7 @@ public class FiascoTest extends UnitTest
                 year(2023),
                 JANUARY,
                 dayOfMonth(12),
-                hourOfDay(6, AM)))
+                hourOfDay(6, AM)).asLocalTime())
             .withSize(resource.sizeInBytes())
             .withOffset(0)
             .withName(resource.fileName().name())

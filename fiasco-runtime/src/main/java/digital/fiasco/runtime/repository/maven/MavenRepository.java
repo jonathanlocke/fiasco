@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.repository.maven;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
+import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.network.http.HttpResourceFolder;
@@ -73,6 +74,7 @@ public class MavenRepository extends BaseRepository
     private static MavenResolver mavenResolver = new MavenResolver();
 
     /** The root folder for this repository */
+    @FormatProperty
     private final ResourceFolder<?> rootFolder;
 
     /**
@@ -227,7 +229,7 @@ public class MavenRepository extends BaseRepository
                 .withName(attachment.content().name())
                 .withSignatures(signatures)
                 .withResource(resource)
-                .withLastModified(resource.lastModified())
+                .withLastModified(resource.lastModified().asLocalTime())
                 .withSize(resource.sizeInBytes());
         }
         return null;
