@@ -38,7 +38,7 @@ public class DependencyGrouper<T extends Dependency>
                 if (grouped.containsAll(dependency.dependencies().asSet()))
                 {
                     // add the dependency to this group,
-                    group.add(dependency);
+                    group = group.with(dependency);
 
                     // and mark the dependency as having been grouped.
                     grouped.add(dependency);

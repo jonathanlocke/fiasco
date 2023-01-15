@@ -15,7 +15,6 @@ import digital.fiasco.runtime.repository.Repository;
 import java.util.LinkedHashMap;
 
 import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_INTERNAL;
-import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
@@ -180,7 +179,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      */
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactName artifact()
@@ -242,7 +241,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @FormatProperty
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactList dependencies()
@@ -259,7 +258,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactList dependenciesMatching(String pattern)
@@ -270,7 +269,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
         {
             if (matcher.matches(at.descriptor()))
             {
-                matches.add(at);
+                matches = matches.with(at);
             }
         }
         return matches;
@@ -285,7 +284,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public Artifact<?> dependencyMatching(String pattern)
@@ -309,7 +308,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public Artifact<?> dependencyNamed(String name)
@@ -333,7 +332,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public T dependsOn(Artifact<?>... dependencies)
@@ -347,7 +346,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public final ArtifactDescriptor descriptor()
@@ -358,7 +357,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public boolean equals(Object object)
@@ -379,7 +378,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public T excluding(Matcher<ArtifactDescriptor> exclusion)
@@ -398,7 +397,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public T excluding(ArtifactDescriptor... exclusions)
@@ -425,7 +424,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public T excluding(ObjectList<ArtifactDescriptor> exclusions)
@@ -452,7 +451,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public T excluding(String... exclusions)
@@ -463,7 +462,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public int hashCode()
@@ -477,7 +476,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public boolean isExcluded(ArtifactDescriptor descriptor)
@@ -499,7 +498,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      */
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactContent jar()
@@ -515,7 +514,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public String mavenPom()
@@ -566,7 +565,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @FormatProperty
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public String name()
@@ -580,7 +579,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public final Repository repository()
@@ -591,7 +590,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTATION_NOT_NEEDED,
+            documentation = DOCUMENTATION_NOT_NEEDED,
             testing = TESTING_NOT_NEEDED
         )
     public String toString()
@@ -642,7 +641,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public T withContent(ArtifactContent content)
@@ -659,7 +658,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public T withDependencies(ArtifactList dependencies)
@@ -678,7 +677,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public T withDescriptor(ArtifactDescriptor descriptor)
@@ -696,7 +695,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      */
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public T withJar(ArtifactContent jar)
@@ -713,7 +712,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @Override
     @MethodQuality
         (
-                documentation = DOCUMENTED,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public T withRepository(Repository repository)

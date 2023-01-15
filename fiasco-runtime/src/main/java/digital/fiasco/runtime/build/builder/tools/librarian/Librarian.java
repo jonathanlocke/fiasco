@@ -236,7 +236,7 @@ public class Librarian extends BaseTool
             var resolved = repository.resolveArtifacts(descriptors);
 
             // Add the resolved artifacts to the result.
-            artifacts.addAll(resolved);
+            artifacts = artifacts.with(resolved);
         }
 
         return artifacts;

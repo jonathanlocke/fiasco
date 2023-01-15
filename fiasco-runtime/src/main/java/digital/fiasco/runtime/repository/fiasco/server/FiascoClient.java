@@ -64,7 +64,7 @@ public class FiascoClient extends BaseComponent
 
                 // Assign the resolved attachments to the artifact then resolve the artifact.
                 // noinspection unchecked
-                resolved.add(artifact.withAttachments(resolvedAttachments));
+                resolved = resolved.with(artifact.withAttachments(resolvedAttachments));
             }
 
             // Assign the resolved artifacts to the response.

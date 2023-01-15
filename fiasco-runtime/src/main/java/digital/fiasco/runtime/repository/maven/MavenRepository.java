@@ -148,7 +148,7 @@ public class MavenRepository extends BaseRepository
                     if (source != null)
                     {
                         // return it as a library,
-                        resolved.add(library(descriptor)
+                        resolved = resolved.with(library(descriptor)
                             .withDependencies(resolvedArtifacts)
                             .withContent(jar)
                             .withJavadoc(javadoc)
@@ -157,7 +157,7 @@ public class MavenRepository extends BaseRepository
                     else
                     {
                         // otherwise, return it as an asset.
-                        resolved.add(asset(descriptor)
+                        resolved = resolved.with(asset(descriptor)
                             .withDependencies(resolvedArtifacts)
                             .withContent(jar));
                     }

@@ -21,7 +21,6 @@ import static com.telenav.kivakit.filesystem.Folder.folder;
 import static com.telenav.kivakit.resource.WriteMode.APPEND;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
 import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJson;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 
 /**
  * A repository of artifacts and their metadata on the local filesystem.
@@ -159,12 +158,11 @@ public class LocalRepository extends BaseRepository
             // Install and resolve any unresolved artifacts that are in the downloads cache.
             var downloadedArtifacts = downloads.resolveArtifacts(unresolvedDescriptors);
             downloadedArtifacts.forEach(this::installArtifact);
-            resolvedArtifacts.addAll(downloadedArtifacts);
+            resolvedArtifacts = resolvedArtifacts.with(downloadedArtifacts);
 
             // Return the resolved artifacts with their content attached.
-            var resolved = artifactList();
-            resolvedArtifacts.forEach(artifact -> resolved.add(loadArtifactContent(artifact)));
-            return resolved;
+            resolvedArtifacts.forEach(this::loadArtifactContent);
+            return resolvedArtifacts;
         });
     }
 

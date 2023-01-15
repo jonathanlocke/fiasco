@@ -10,8 +10,6 @@ import digital.fiasco.runtime.dependency.artifact.Asset;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.Repository;
 
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
-
 /**
  * A dependency is either a {@link Builder}, or an {@link Artifact} with an associated {@link #repository()}. An
  * {@link Artifact} can be either an {@link Asset} or a {@link Library}. Each dependency can have its own list of
@@ -54,15 +52,7 @@ public interface Dependency extends Named
      */
     default ArtifactList artifactDependencies()
     {
-        var dependencies = artifactList();
-        for (var at : dependencies())
-        {
-            if (at instanceof Artifact<?> asset)
-            {
-                dependencies.add(asset);
-            }
-        }
-        return dependencies;
+        return dependencies().asArtifactList();
     }
 
     /**
@@ -77,7 +67,7 @@ public interface Dependency extends Named
         {
             if (at instanceof Asset asset)
             {
-                dependencies.add(asset);
+                dependencies = dependencies.with(asset);
             }
         }
         return dependencies;
@@ -96,7 +86,7 @@ public interface Dependency extends Named
             if (type.isAssignableFrom(at.getClass()))
             {
                 //noinspection unchecked
-                dependencies.add((T) at);
+                dependencies = dependencies.with((T) at);
             }
         }
         return dependencies;
@@ -124,7 +114,7 @@ public interface Dependency extends Named
         {
             if (at instanceof Library asset)
             {
-                dependencies.add(asset);
+                dependencies = dependencies.with(asset);
             }
         }
         return dependencies;

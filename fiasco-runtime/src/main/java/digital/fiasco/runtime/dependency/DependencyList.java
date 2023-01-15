@@ -1,12 +1,12 @@
 package digital.fiasco.runtime.dependency;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
+import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.list.StringList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.value.count.Count;
-import com.telenav.kivakit.interfaces.collection.Addable;
 import com.telenav.kivakit.interfaces.collection.Sized;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
@@ -18,7 +18,9 @@ import java.util.Collection;
 import java.util.Iterator;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
+import static com.telenav.kivakit.annotations.code.quality.Stability.STABILITY_UNDETERMINED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_INSUFFICIENT;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 
@@ -75,9 +77,14 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactLi
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
+@TypeQuality
+    (
+        documentation = DOCUMENTED,
+        testing = TESTING_INSUFFICIENT,
+        stability = STABILITY_UNDETERMINED
+    )
 public class DependencyList<T extends Dependency> implements
     Iterable<T>,
-    Addable<T>,
     Sized
 {
     /**
@@ -133,12 +140,12 @@ public class DependencyList<T extends Dependency> implements
 
     public ArtifactList asArtifactList()
     {
-        var wildcard = artifactList();
+        var artifacts = artifactList();
         for (var at : dependencies)
         {
-            wildcard.add((Artifact<?>) at);
+            artifacts = artifacts.with((Artifact<?>) at);
         }
-        return wildcard;
+        return artifacts;
     }
 
     /**
@@ -270,12 +277,6 @@ public class DependencyList<T extends Dependency> implements
         return copy;
     }
 
-    @Override
-    public boolean onAdd(T value)
-    {
-        return dependencies.add(value);
-    }
-
     /**
      * Returns the size of this list in elements
      */
@@ -310,8 +311,8 @@ public class DependencyList<T extends Dependency> implements
     public DependencyList<T> with(T first, T[] dependencies)
     {
         var copy = copy();
-        copy.add(first);
-        copy.addAll(dependencies);
+        copy.dependencies.add(first);
+        copy.dependencies.addAll(dependencies);
         return copy;
     }
 
@@ -337,7 +338,7 @@ public class DependencyList<T extends Dependency> implements
     public DependencyList<T> with(DependencyList<T> dependencies)
     {
         var copy = copy();
-        copy.addAll(dependencies.dependencies);
+        copy.dependencies.addAll(dependencies.dependencies);
         return copy;
     }
 
@@ -349,7 +350,7 @@ public class DependencyList<T extends Dependency> implements
     public DependencyList<T> with(Iterable<T> dependencies)
     {
         var copy = copy();
-        copy.addAll(dependencies);
+        copy.dependencies.addAll(dependencies);
         return copy;
     }
 

@@ -15,7 +15,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactLi
 public class ResolvedArtifacts
 {
     /** The set of artifacts that have been resolved */
-    private final ArtifactList resolved = artifactList();
+    private ArtifactList resolved = artifactList();
 
     /** A monitor that is signaled when artifacts are resolved */
     private final Monitor updated = new Monitor();
@@ -29,7 +29,7 @@ public class ResolvedArtifacts
     {
         synchronized (updated)
         {
-            this.resolved.addAll(artifacts);
+            this.resolved = resolved.with(artifacts);
             updated.signal();
         }
     }

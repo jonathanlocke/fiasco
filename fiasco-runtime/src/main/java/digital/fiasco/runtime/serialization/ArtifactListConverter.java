@@ -35,11 +35,11 @@ public class ArtifactListConverter extends BaseStringConverter<ArtifactList>
         var split = splitOnPattern(text, "\\s*,\\s*");
         var descriptors = split.rightOf(1);
 
-        var dependencies = artifactList();
+        var artifacts = artifactList();
         for (var at : descriptors)
         {
-            dependencies.add(artifactConverter.convert(at));
+            artifacts = artifacts.with(artifactConverter.convert(at));
         }
-        return dependencies;
+        return artifacts;
     }
 }
