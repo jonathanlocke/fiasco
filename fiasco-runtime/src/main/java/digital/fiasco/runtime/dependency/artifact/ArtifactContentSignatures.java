@@ -7,7 +7,7 @@ import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 
 import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
-import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
@@ -21,8 +21,7 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_NOT_N
 @SuppressWarnings("unused")
 @TypeQuality
     (
-        audience = AUDIENCE_PUBLIC,
-        documentation = DOCUMENTATION_COMPLETE,
+        documentation = DOCUMENTED,
         testing = TESTING_NOT_NEEDED,
         stability = STABLE
     )

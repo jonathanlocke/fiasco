@@ -10,7 +10,7 @@ import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.ResourceIdentifier;
 
 import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
-import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
@@ -28,8 +28,7 @@ import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 @SuppressWarnings("unused")
 @TypeQuality
     (
-        audience = AUDIENCE_PUBLIC,
-        documentation = DOCUMENTATION_COMPLETE,
+        documentation = DOCUMENTED,
         testing = TESTED,
         stability = STABLE
     )

@@ -16,7 +16,7 @@ import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.repository.Repository;
 
 import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_INTERNAL;
-import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
@@ -140,8 +140,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     @SuppressWarnings("unchecked")
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     static <T extends Artifact<T>> T artifactFromJson(String json)
@@ -159,8 +158,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     default T artifact(String artifactName)
@@ -176,8 +174,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     default T artifact(ArtifactName artifact)
@@ -207,8 +204,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     default ArtifactContent content()
@@ -279,8 +275,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     default T excluding(ArtifactDescriptor... exclude)
@@ -296,8 +291,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     default T excluding(String... exclude)
@@ -322,8 +316,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     default T excluding(Artifact<?>... exclusions)
@@ -355,8 +348,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     default boolean isExcluded(Artifact<?> artifact)
@@ -384,8 +376,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     default String toJson()
@@ -401,8 +392,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     default T version(Version version)
@@ -415,8 +405,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     default T version(String version)
@@ -432,8 +421,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     default T withArtifact(String artifactName)
@@ -449,8 +437,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     default T withArtifact(ArtifactName artifactName)
@@ -479,8 +466,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     default T withContent(ArtifactContent content)
@@ -522,8 +508,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     default T withVersion(Version version)
@@ -539,8 +524,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      */
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     default T withVersion(String version)

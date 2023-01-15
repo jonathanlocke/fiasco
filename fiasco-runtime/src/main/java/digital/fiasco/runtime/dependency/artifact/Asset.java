@@ -14,8 +14,8 @@ import digital.fiasco.runtime.dependency.DependencyList;
 
 import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_INTERNAL;
 import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
-import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
@@ -38,8 +38,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactLi
 @SuppressWarnings("unused")
 @TypeQuality
     (
-        audience = AUDIENCE_PUBLIC,
-        documentation = DOCUMENTATION_COMPLETE,
+        documentation = DOCUMENTED,
         testing = TESTED,
         stability = STABLE
     )
@@ -53,7 +52,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static Asset asset(String descriptor)
@@ -69,7 +68,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static Asset asset(ArtifactDescriptor descriptor)
@@ -85,7 +84,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static Asset asset(Artifact<?> artifact)
@@ -101,7 +100,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static ArtifactList assets(String... descriptors)
@@ -117,7 +116,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static ArtifactList assets(Asset... assets)
@@ -153,8 +152,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
     @Override
     @MethodQuality
         (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public Asset copy()

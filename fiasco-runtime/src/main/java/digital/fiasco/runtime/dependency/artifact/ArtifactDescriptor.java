@@ -10,7 +10,7 @@ import com.telenav.kivakit.interfaces.naming.Named;
 import java.util.regex.Pattern;
 
 import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
-import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
@@ -77,8 +77,7 @@ import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
 @SuppressWarnings("unused")
 @TypeQuality
     (
-        audience = AUDIENCE_PUBLIC,
-        documentation = DOCUMENTATION_COMPLETE,
+        documentation = DOCUMENTED,
         testing = TESTED,
         stability = STABLE
     )
@@ -107,7 +106,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static ArtifactDescriptor descriptor(String text)
@@ -124,7 +123,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static ArtifactDescriptor descriptor(ArtifactGroup group, ArtifactName artifact)
@@ -140,7 +139,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static ArtifactDescriptor descriptor(ArtifactGroup group)
@@ -158,7 +157,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static ArtifactDescriptor descriptor(ArtifactGroup group, ArtifactName artifact, Version version)
@@ -179,7 +178,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static ArtifactDescriptor parseDescriptor(Listener listener, String text)
@@ -230,7 +229,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public boolean isComplete()
@@ -251,7 +250,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public boolean matches(ArtifactDescriptor that)
@@ -269,7 +268,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
     @Override
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public String name()
@@ -298,7 +297,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactDescriptor version(String version)
@@ -314,7 +313,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactDescriptor version(Version version)
@@ -330,7 +329,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactDescriptor withArtifact(ArtifactName artifact)
@@ -346,7 +345,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactDescriptor withArtifact(String artifact)
@@ -362,7 +361,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactDescriptor withGroup(ArtifactGroup group)
@@ -378,7 +377,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactDescriptor withGroup(String group)
@@ -394,7 +393,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactDescriptor withVersion(String version)
@@ -410,7 +409,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactDescriptor withVersion(Version version)
@@ -423,7 +422,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactDescriptor withoutArtifact()
@@ -437,7 +436,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactDescriptor withoutVersion()

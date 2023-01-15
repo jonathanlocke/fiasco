@@ -5,7 +5,7 @@ import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.interfaces.naming.Named;
 
 import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
-import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
@@ -32,8 +32,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.desc
 @SuppressWarnings("unused")
 @TypeQuality
     (
-        audience = AUDIENCE_PUBLIC,
-        documentation = DOCUMENTATION_COMPLETE,
+        documentation = DOCUMENTED,
         testing = TESTED,
         stability = STABLE
     )
@@ -47,7 +46,7 @@ public record ArtifactGroup(String name) implements Named
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static ArtifactGroup group(String name)
@@ -63,7 +62,7 @@ public record ArtifactGroup(String name) implements Named
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactDescriptor artifact(ArtifactName artifact)
@@ -79,7 +78,7 @@ public record ArtifactGroup(String name) implements Named
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactDescriptor artifact(String artifact)
@@ -95,7 +94,7 @@ public record ArtifactGroup(String name) implements Named
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public Asset asset(String asset)
@@ -111,7 +110,7 @@ public record ArtifactGroup(String name) implements Named
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public Library library(String library)
@@ -121,7 +120,7 @@ public record ArtifactGroup(String name) implements Named
 
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     @Override
@@ -132,7 +131,7 @@ public record ArtifactGroup(String name) implements Named
 
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     @Override

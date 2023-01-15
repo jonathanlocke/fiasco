@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.dependency;
 
+import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.list.StringList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
@@ -16,6 +17,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.Iterator;
 
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 
@@ -33,6 +36,19 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactLi
  *
  * <ul>
  *     <li>{@link #matching(Matcher)}</li>
+ * </ul>
+ *
+ * <p><b>List Operations</b></p>
+ *
+ * <ul>
+ *     <li>{@link #count()}</li>
+ *     <li>{@link #size()}</li>
+ *     <li>{@link #first()}</li>
+ *     <li>{@link #get(int)}</li>
+ *     <li>{@link #iterator()}</li>
+ *     <li>{@link #containsAll(DependencyList)}</li>
+ *     <li>{@link #sorted()}</li>
+ *     <li>{@link #join(String)}</li>
  * </ul>
  *
  * <p><b>Conversions</b></p>
@@ -105,6 +121,11 @@ public class DependencyList<T extends Dependency> implements
         this.dependencies.addAll(dependencies);
     }
 
+    /**
+     * Returns the dependencies in this list as {@link ArtifactDescriptor}s
+     *
+     * @return The list of descriptors
+     */
     public ObjectList<ArtifactDescriptor> asArtifactDescriptors()
     {
         return dependencies.map(Dependency::descriptor);
@@ -150,6 +171,14 @@ public class DependencyList<T extends Dependency> implements
         return dependencies.asStringList();
     }
 
+    /**
+     * Returns true if this dependency list contains all the dependencies in the given list
+     */
+    @MethodQuality
+        (
+            documentation = DOCUMENTED,
+            testing = TESTED
+        )
     public boolean containsAll(DependencyList<T> dependencies)
     {
         return this.dependencies.containsAll(dependencies.dependencies);
@@ -165,6 +194,14 @@ public class DependencyList<T extends Dependency> implements
         return new DependencyList<>(dependencies.copy());
     }
 
+    /**
+     * Returns the count of dependencies in this list
+     */
+    @MethodQuality
+        (
+            documentation = DOCUMENTED,
+            testing = TESTED
+        )
     public Count count()
     {
         return dependencies.count();
@@ -182,6 +219,14 @@ public class DependencyList<T extends Dependency> implements
         return false;
     }
 
+    /**
+     * Returns the first dependency in this list
+     */
+    @MethodQuality
+        (
+            documentation = DOCUMENTED,
+            testing = TESTED
+        )
     public T first()
     {
         return dependencies.first();
@@ -231,6 +276,14 @@ public class DependencyList<T extends Dependency> implements
         return dependencies.add(value);
     }
 
+    /**
+     * Returns the size of this list in elements
+     */
+    @MethodQuality
+        (
+            documentation = DOCUMENTED,
+            testing = TESTED
+        )
     @Override
     public int size()
     {
@@ -242,13 +295,19 @@ public class DependencyList<T extends Dependency> implements
         return dependencyList(dependencies.sorted());
     }
 
+    @Override
+    public String toString()
+    {
+        return dependencies.join(", ");
+    }
+
     /**
      * Returns this list with the given dependencies
      *
      * @param dependencies A variable-argument list of dependencies to include
      * @return A copy of this list with the given dependencies
      */
-    public DependencyList<T> with(T first, T... dependencies)
+    public DependencyList<T> with(T first, T[] dependencies)
     {
         var copy = copy();
         copy.add(first);
@@ -304,6 +363,26 @@ public class DependencyList<T extends Dependency> implements
     {
         var copy = copy();
         copy.dependencies.removeAll(exclusions);
+        return copy;
+    }
+
+    /**
+     * Returns a copy of this list without the given dependencies
+     *
+     * @param exclusion The dependencies to exclude
+     * @return The dependency list
+     */
+    public DependencyList<T> without(T exclusion)
+    {
+        var copy = copy();
+        copy.dependencies.remove(exclusion);
+        return copy;
+    }
+
+    public DependencyList<T> without(DependencyList<T> artifacts)
+    {
+        var copy = copy();
+        copy.dependencies.removeAll(artifacts.dependencies);
         return copy;
     }
 

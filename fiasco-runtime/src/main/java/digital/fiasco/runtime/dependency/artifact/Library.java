@@ -13,7 +13,7 @@ import com.telenav.kivakit.core.registry.RegistryTrait;
 import digital.fiasco.runtime.dependency.DependencyList;
 
 import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
-import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
@@ -47,8 +47,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  */
 @TypeQuality
     (
-        audience = AUDIENCE_PUBLIC,
-        documentation = DOCUMENTATION_COMPLETE,
+        documentation = DOCUMENTED,
         testing = TESTED,
         stability = STABLE
     )
@@ -63,7 +62,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static DependencyList<Library> libraries(String... descriptors)
@@ -80,7 +79,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static DependencyList<Library> libraries(Library... libraries)
@@ -96,7 +95,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static Library library(String descriptor)
@@ -112,7 +111,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static Library library(ArtifactDescriptor descriptor)
@@ -136,7 +135,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
     @Override
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public Library copy()
@@ -151,7 +150,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactContent javadoc()
@@ -166,7 +165,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactContent sources()
@@ -182,7 +181,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public Library withJavadoc(ArtifactContent javadoc)
@@ -198,7 +197,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public Library withSources(ArtifactContent sources)

@@ -8,7 +8,7 @@ import com.telenav.kivakit.core.string.ObjectFormatter;
 import org.jetbrains.annotations.NotNull;
 
 import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
-import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_COMPLETE;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.language.Hash.hashMany;
@@ -42,8 +42,7 @@ import static com.telenav.kivakit.core.language.Objects.areEqualPairs;
  */
 @TypeQuality
     (
-        audience = AUDIENCE_PUBLIC,
-        documentation = DOCUMENTATION_COMPLETE,
+        documentation = DOCUMENTED,
         testing = TESTED,
         stability = STABLE
     )
@@ -63,7 +62,7 @@ public record ArtifactAttachment
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static ArtifactAttachment attachment(ArtifactAttachmentType type, ArtifactContent content)
@@ -79,7 +78,7 @@ public record ArtifactAttachment
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public static ArtifactAttachment attachment(ArtifactAttachmentType type)
@@ -93,7 +92,7 @@ public record ArtifactAttachment
     @Override
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public boolean equals(Object object)
@@ -111,7 +110,7 @@ public record ArtifactAttachment
     @Override
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public int hashCode()
@@ -136,7 +135,7 @@ public record ArtifactAttachment
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactAttachment withArtifact(Artifact<?> artifact)
@@ -152,7 +151,7 @@ public record ArtifactAttachment
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactAttachment withContent(ArtifactContent content)
@@ -168,7 +167,7 @@ public record ArtifactAttachment
      */
     @MethodQuality
         (
-            documentation = DOCUMENTATION_COMPLETE,
+            documentation = DOCUMENTED,
             testing = TESTED
         )
     public ArtifactAttachment withType(ArtifactAttachmentType type)

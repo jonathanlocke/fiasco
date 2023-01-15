@@ -6,6 +6,7 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContentSignatures;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.dependency.artifact.Asset;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.serialization.FiascoGsonFactory;
@@ -19,6 +20,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.atta
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
@@ -100,6 +102,16 @@ public class FiascoTest extends UnitTest
         return library("com.telenav.kivakit:kivakit-application:1.8.5");
     }
 
+    protected ArtifactList kivakitArtifacts()
+    {
+        return artifactList(kivakitCore(), kivakitIcons(), kivakitApplication(), kivakitLogos());
+    }
+
+    protected ArtifactList kivakitAssets()
+    {
+        return artifactList(kivakitLogos(), kivakitIcons());
+    }
+
     protected Library kivakitCore()
     {
         return library("com.telenav.kivakit:kivakit-core:1.8.5");
@@ -113,6 +125,11 @@ public class FiascoTest extends UnitTest
     protected Asset kivakitImages()
     {
         return asset("com.telenav.kivakit:kivakit-images:1.8.5");
+    }
+
+    protected ArtifactList kivakitLibraries()
+    {
+        return artifactList(kivakitApplication(), kivakitCore());
     }
 
     protected Asset kivakitLogos()
