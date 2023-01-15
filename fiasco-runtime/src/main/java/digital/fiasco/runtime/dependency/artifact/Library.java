@@ -12,7 +12,6 @@ import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.registry.RegistryTrait;
 import digital.fiasco.runtime.dependency.DependencyList;
 
-import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;

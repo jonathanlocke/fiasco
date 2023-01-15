@@ -248,7 +248,10 @@ public class Builder extends BaseRepeater implements
     /** The settings for this builder */
     private BuildSettings settings;
 
-    /** The dependencies to resolve before this builder can run */
+    /**
+     * The dependencies that must be resolved before this builder can run. Dependencies can include both artifacts and
+     * other builders.
+     */
     private DependencyList<?> dependencies;
 
     /**
@@ -372,7 +375,6 @@ public class Builder extends BaseRepeater implements
      * @param dependencies The new dependencies
      * @return The new artifact
      */
-    @Override
     public Builder dependsOn(Dependency... dependencies)
     {
         return withDependencies(dependencyList(dependencies));

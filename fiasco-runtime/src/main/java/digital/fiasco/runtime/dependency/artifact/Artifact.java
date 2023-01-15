@@ -15,7 +15,6 @@ import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.repository.Repository;
 
-import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_INTERNAL;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
@@ -257,6 +256,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param dependencies The new dependencies
      * @return The new artifact
      */
+    @SuppressWarnings("unchecked")
     T dependsOn(T... dependencies);
 
     /**
