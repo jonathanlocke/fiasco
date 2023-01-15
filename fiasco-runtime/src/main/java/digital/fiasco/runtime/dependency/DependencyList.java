@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.function.Function;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABILITY_UNDETERMINED;
@@ -178,6 +179,11 @@ public class DependencyList<T extends Dependency> implements
         return dependencies.asStringList();
     }
 
+    public boolean contains(T dependency)
+    {
+        return dependencies.contains(dependency);
+    }
+
     /**
      * Returns true if this dependency list contains all the dependencies in the given list
      */
@@ -268,6 +274,11 @@ public class DependencyList<T extends Dependency> implements
     public T last()
     {
         return dependencies.last();
+    }
+
+    public <To> ObjectList<To> map(Function<T, To> mapper)
+    {
+        return dependencies.map(mapper);
     }
 
     public DependencyList<T> matching(Matcher<T> matcher)

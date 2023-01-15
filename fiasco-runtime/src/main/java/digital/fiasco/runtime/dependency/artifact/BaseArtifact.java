@@ -163,7 +163,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     {
         this.repository = that.repository();
         this.descriptor = that.descriptor();
-        this.dependencies = that.dependencies().copy();
+        this.dependencies = that.dependencies.copy();
         this.exclusions = that.exclusions.copy();
         this.typeToAttachment = that.typeToAttachment.copy();
     }
