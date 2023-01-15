@@ -2,9 +2,8 @@ package digital.fiasco.runtime.build.builder;
 
 import com.telenav.kivakit.commandline.CommandLine;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
+import com.telenav.kivakit.core.function.Result;
 import com.telenav.kivakit.core.language.trait.TryCatchTrait;
-import com.telenav.kivakit.core.messaging.Message;
-import com.telenav.kivakit.core.messaging.listeners.MessageList;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.core.version.Version;
@@ -29,18 +28,18 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactGroup;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.dependency.artifact.ArtifactName;
-import digital.fiasco.runtime.dependency.processing.TaskResult;
 import digital.fiasco.runtime.repository.Repository;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
+import static com.telenav.kivakit.core.function.Result.result;
 import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
 import static com.telenav.kivakit.core.string.Paths.pathTail;
 import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
 import static digital.fiasco.runtime.build.BuildOption.HELP;
+import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifact;
-import static digital.fiasco.runtime.dependency.processing.TaskResult.taskResult;
 
 /**
  * <p>
@@ -249,6 +248,9 @@ public class Builder extends BaseRepeater implements
     /** The settings for this builder */
     private BuildSettings settings;
 
+    /** The dependencies to resolve before this builder can run */
+    private DependencyList<?> dependencies;
+
     /**
      * Creates a builder for the given build
      *
@@ -257,6 +259,7 @@ public class Builder extends BaseRepeater implements
     public Builder(Build build)
     {
         this.build = build;
+        this.dependencies = dependencyList();
     }
 
     /**
@@ -268,6 +271,7 @@ public class Builder extends BaseRepeater implements
     {
         this(that.build);
         this.settings = that.settings;
+        this.dependencies = that.dependencies;
     }
 
     /**
@@ -306,43 +310,41 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Runs this builder.
+     * Runs this builder, returning a result. The result contains any captured messages, and a reference to the builder
+     * to signify which builder the result is for.
      *
      * @return Returns the build result
      */
-    public final TaskResult<Builder> build()
+    public final Result<Builder> build()
     {
-        // Listen to any problems broadcast by the build,
-        var issues = new MessageList(Message::isFailure);
-        issues.listenTo(this);
-
-        // go through each phase in order,
-        for (var phase : settings.phases())
+        return result(() ->
         {
-            // and if the phase is enabled,
-            if (settings.isEnabled(phase))
+            // go through each phase in order,
+            for (var phase : settings.phases())
             {
-                // notify that the phase has started,
-                phase.internalOnBefore(this);
-
-                // run the phase calling all listeners,
-                if (isEnabled(DESCRIBE))
+                // and if the phase is enabled,
+                if (settings.isEnabled(phase))
                 {
-                    announce(" \n$", bannerLine(phase.name()));
-                }
-                else
-                {
-                    announce(bannerLine(phase.name()));
-                }
-                phase.internalOnRun(this);
+                    // notify that the phase has started,
+                    phase.internalOnBefore(this);
 
-                // notify that the phase has ended,
-                phase.internalOnAfter(this);
+                    // run the phase calling all listeners,
+                    if (isEnabled(DESCRIBE))
+                    {
+                        announce(" \n$", bannerLine(phase.name()));
+                    }
+                    else
+                    {
+                        announce(bannerLine(phase.name()));
+                    }
+                    phase.internalOnRun(this);
+
+                    // notify that the phase has ended,
+                    phase.internalOnAfter(this);
+                }
             }
-        }
-
-        // and return the result of the build.
-        return taskResult(this, issues);
+            return this;
+        });
     }
 
     /**
@@ -362,6 +364,18 @@ public class Builder extends BaseRepeater implements
     public DependencyList<?> dependencies()
     {
         return settings.dependencies();
+    }
+
+    /**
+     * Returns a copy of this artifact with the given dependencies
+     *
+     * @param dependencies The new dependencies
+     * @return The new artifact
+     */
+    @Override
+    public Builder dependsOn(Dependency... dependencies)
+    {
+        return withDependencies(dependencyList(dependencies));
     }
 
     /**
@@ -833,6 +847,19 @@ public class Builder extends BaseRepeater implements
     public Builder withBuilderThreads(Count threads)
     {
         return withSettings(settings.withBuilderThreads(threads));
+    }
+
+    /**
+     * Returns a copy of this artifact with the given dependencies
+     *
+     * @param dependencies The new dependencies
+     * @return The new artifact
+     */
+    public Builder withDependencies(DependencyList<?> dependencies)
+    {
+        var copy = copy();
+        copy.dependencies = dependencies.copy();
+        return copy;
     }
 
     /**

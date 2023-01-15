@@ -24,6 +24,7 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
+import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.resource.Uris.uri;
@@ -38,8 +39,9 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactLi
  * <p><b>Finding Libraries</b></p>
  *
  * <ul>
- *     <li>{@link #resolve(ArtifactDescriptor)} - Resolves the library specified by the given descriptor</li>
- *     <li>{@link #dependencies(Artifact)} - Returns the dependencies for the given library. Dependent libraries are resolved in depth-first order.</li>
+ *     <li>{@link #resolve(ObjectList)} - Resolves the specified artifacts</li>
+ *     <li>{@link #dependencies(Artifact)} - Returns the dependencies for the given library. Dependent libraries
+ *                                           are resolved in depth-first order.</li>
  *     <li>{@link #lookIn(Repository)} - Adds a repository to look in when resolving libraries</li>
  *     <li>{@link #repositories()} - The list of repositories to search</li>
  *     <li>{@link #pinVersion(ArtifactDescriptor, Version)} - Pins the given artifact to the specified version</li>
@@ -209,18 +211,7 @@ public class Librarian extends BaseTool
     }
 
     /**
-     * Resolves the given artifact descriptor to a library
-     *
-     * @param descriptor The descriptor
-     * @return The library
-     */
-    public Artifact<?> resolve(ArtifactDescriptor descriptor)
-    {
-        return resolve(list(descriptor)).first();
-    }
-
-    /**
-     * Resolves the given artifact descriptor to a library
+     * Resolves the given artifact descriptors using this librarian's repositories
      *
      * @param descriptors The descriptor
      * @return The library
@@ -229,15 +220,20 @@ public class Librarian extends BaseTool
     {
         var artifacts = artifactList();
 
+        var progress = progressReporter(this, "dependency", descriptors.count());
+        progress.start("Resolving $ artifacts", descriptors.count());
+
         // Go through each repository,
         for (var repository : repositories())
         {
-            // resolve as many descriptors as possible from the repository.
+            // and resolve as many descriptors as possible from the repository,
             var resolved = repository.resolveArtifacts(descriptors);
 
-            // Add the resolved artifacts to the result.
+            // adding the resolved artifacts to the result.
             artifacts = artifacts.with(resolved);
+            progress.next(resolved.count());
         }
+        progress.end();
 
         return artifacts;
     }

@@ -98,6 +98,14 @@ public interface Dependency extends Named
     DependencyList<?> dependencies();
 
     /**
+     * Returns a copy of this dependency with the given dependencies added
+     *
+     * @param dependencies The new dependencies
+     * @return The new dependency
+     */
+    Dependency dependsOn(Dependency... dependencies);
+
+    /**
      * The artifact descriptor for this dependency
      */
     ArtifactDescriptor descriptor();

@@ -257,7 +257,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param dependencies The new dependencies
      * @return The new artifact
      */
-    T dependsOn(Artifact<?>... dependencies);
+    T dependsOn(T... dependencies);
 
     /**
      * Returns the descriptor for this artifact

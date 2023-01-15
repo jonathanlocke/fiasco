@@ -1,6 +1,5 @@
 package digital.fiasco.runtime.build;
 
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.interfaces.string.Described;
@@ -14,9 +13,9 @@ import digital.fiasco.runtime.build.metadata.BuildMetadata;
  * Defines a Fiasco build.
  *
  * <p>
- * The {@link #onBuild(Builder)} method is called to obtain a list of configured {@link Builder}s to be executed to
- * perform the build. Typically, each builder builds a single project. Multi-project builds are possible simply by
- * returning more than one builder (child builders can be created with {@link Builder#deriveBuilder(String)}).
+ * The {@link #onConfigureBuild(Builder)} method is called to obtain a list of configured {@link Builder}s to be
+ * executed to perform the build. Typically, each builder builds a single project. Multi-project builds are possible
+ * simply by returning more than one builder (child builders can be created with {@link Builder#deriveBuilder(String)}).
  * Dependencies between builders and artifacts are used to determine the order of execution of builders and the order in
  * which artifacts are resolved from repositories.
  * </p>
@@ -25,8 +24,8 @@ import digital.fiasco.runtime.build.metadata.BuildMetadata;
  *
  * <p>
  * The {@link BuildSettings} class holds configuration information for the build. Some of this information is used to
- * initialize the root builder passed to {@link #onBuild(Builder)}. Some build settings are switched on and off by the
- * {@link BaseBuild} application's built-in switches:
+ * initialize the root builder passed to {@link #onConfigureBuild(Builder)}. Some build settings are switched on and off
+ * by the {@link BaseBuild} application's built-in switches:
  * </p>
  *
  * <ul>
@@ -110,7 +109,7 @@ import digital.fiasco.runtime.build.metadata.BuildMetadata;
  * <p><b>Building</b></p>
  *
  * <ul>
- *     <li>{@link #onBuild(Builder)}</li>
+ *     <li>{@link #onConfigureBuild(Builder)}</li>
  * </ul>
  *
  * <p><b>Build Metadata</b></p>
@@ -166,10 +165,11 @@ public interface Build extends
     BuildMetadata metadata();
 
     /**
-     * Called to configure the build to be executed
+     * Called to configure the root builder for a build. In the case of multi-project builds, this may involve adding
+     * child builders to the root builder. T
      *
-     * @param rootBuilder The root builder for the build, from which child builders can be derived
-     * @return A list of builders to execute
+     * @param root The root builder for the build, from which child builders can be derived
+     * @return A newly configured root builder based on the given root builder
      */
-    ObjectList<Builder> onBuild(Builder rootBuilder);
+    Builder onConfigureBuild(Builder root);
 }

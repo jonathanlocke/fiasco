@@ -1,13 +1,11 @@
 package fiasco;
 
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import digital.fiasco.libraries.Libraries;
 import digital.fiasco.runtime.build.BaseBuild;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
 import digital.fiasco.runtime.build.metadata.Organization;
 
-import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.resource.Urls.url;
 import static digital.fiasco.libraries.utilities.serialization.Kryo.kryo;
 import static digital.fiasco.runtime.build.metadata.BuildMetadata.buildMetadata;
@@ -82,25 +80,19 @@ public class ExampleBuild extends BaseBuild implements Libraries
      * {@inheritDoc}
      */
     @Override
-    public ObjectList<Builder> onBuild(Builder rootBuilder)
+    public Builder onConfigureBuild(Builder root)
     {
-        return list(
-
-            rootBuilder
-                .requires(apache_ant, apache_commons_logging, kryo)
-                .pinVersion(apache_ant, "1.0.3")
-                .pinVersion(apache_commons_logging, "1.9.0")
-                .pinVersion(kryo, "4.3.1")
-                .beforePhase("compile", it ->
-                {
-                    var cleaner = it.newCleaner();
-                    cleaner.run();
-                }),
-
-            rootBuilder
+        return root.requires(apache_ant, apache_commons_logging, kryo)
+            .pinVersion(apache_ant, "1.0.3")
+            .pinVersion(apache_commons_logging, "1.9.0")
+            .pinVersion(kryo, "4.3.1")
+            .beforePhase("compile", it ->
+            {
+                var cleaner = it.newCleaner();
+                cleaner.run();
+            })
+            .dependsOn(root
                 .deriveBuilder("child")
-                .requires(hamcrest_library.version("5.0"))
-
-        );
+                .requires(hamcrest_library.version("5.0")));
     }
 }

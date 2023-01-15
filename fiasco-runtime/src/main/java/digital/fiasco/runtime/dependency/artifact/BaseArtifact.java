@@ -335,7 +335,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
             documentation = DOCUMENTED,
             testing = TESTED
         )
-    public T dependsOn(Artifact<?>... dependencies)
+    public T dependsOn(T... dependencies)
     {
         return withDependencies(artifactList(dependencies));
     }

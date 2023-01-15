@@ -23,20 +23,13 @@ import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.project.Project;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.serialization.gson.GsonSerializationProject;
-import digital.fiasco.runtime.serialization.FiascoGsonFactory;
 import digital.fiasco.runtime.build.builder.BuildAction;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
+import digital.fiasco.runtime.build.execution.BuildExecutor;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
-import digital.fiasco.runtime.build.tasks.ArtifactResolverTask;
-import digital.fiasco.runtime.build.tasks.BuilderTask;
-import digital.fiasco.runtime.build.tasks.ResolvedArtifacts;
-import digital.fiasco.runtime.dependency.Dependency;
-import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.processing.TaskExecutor;
-import digital.fiasco.runtime.dependency.processing.TaskList;
-import digital.fiasco.runtime.dependency.processing.TaskResult;
+import digital.fiasco.runtime.serialization.FiascoGsonFactory;
 
 import java.util.Set;
 
@@ -45,9 +38,9 @@ import static com.telenav.kivakit.commandline.SwitchParsers.countSwitchParser;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
+import static com.telenav.kivakit.core.value.count.Count._0;
 import static com.telenav.kivakit.core.value.count.Count._16;
 import static com.telenav.kivakit.core.vm.JavaVirtualMachine.javaVirtualMachine;
-import static digital.fiasco.runtime.dependency.DependencyTree.dependencyTree;
 
 /**
  * Base {@link Application} for Fiasco command-line builds.
@@ -115,7 +108,7 @@ import static digital.fiasco.runtime.dependency.DependencyTree.dependencyTree;
  *
  * <ul>
  *     <li>{@link #newBuilder()}</li>
- *     <li>{@link #onBuild(Builder)}</li>
+ *     <li>{@link #onConfigureBuild(Builder)}</li>
  * </ul>
  *
  * <p><b>Build Metadata</b></p>
@@ -152,7 +145,7 @@ public abstract class BaseBuild extends Application implements Build
     /** Switch parser for -builder-threads=[count] */
     private final SwitchParser<Count> BUILDER_THREADS = countSwitchParser(this, "builder-threads",
         "The number of threads to use when building")
-        .defaultValue(javaVirtualMachine().processors().dividedBy(2))
+        .defaultValue(javaVirtualMachine().processors())
         .build();
 
     /** Switch parser for -artifact-resolver-threads=[count] */
@@ -204,7 +197,7 @@ public abstract class BaseBuild extends Application implements Build
      * {@inheritDoc}
      */
     @Override
-    public abstract ObjectList<Builder> onBuild(Builder rootBuilder);
+    public abstract Builder onConfigureBuild(Builder root);
 
     /**
      * {@inheritDoc}
@@ -235,14 +228,19 @@ public abstract class BaseBuild extends Application implements Build
     protected final void onRun()
     {
         // Create the root builder,
-        var rootBuilder = listenTo(newBuilder()
-            .withArtifactDescriptor(metadata.descriptor()));
+        var root = newBuilder().withArtifactDescriptor(metadata.descriptor());
 
-        // resolve artifacts and run builders,
-        var results = build(rootBuilder);
+        // configure and run the build,
+        var results = listenTo(new BuildExecutor(onConfigureBuild(root))).build();
 
         // then show the results.
-        results.matching(at -> at.issues().hasProblems()).forEach(TaskResult::showResult);
+        var problems = _0;
+        for (var at : results)
+        {
+            at.messages().broadcastTo(this);
+            problems = problems.plus(at.messages().problems());
+        }
+        information("Build completed with $ problems", problems);
     }
 
     @Override
@@ -260,28 +258,6 @@ public abstract class BaseBuild extends Application implements Build
         return super.switchParsers().with(
             BUILDER_THREADS,
             ARTIFACT_RESOLVER_THREADS);
-    }
-
-    /**
-     * Performs a build of the dependency tree with the given root builder
-     *
-     * @param rootBuilder The root builder
-     * @return List of results
-     */
-    private ObjectList<TaskResult<Builder>> build(Builder rootBuilder)
-    {
-        // Get build settings,
-        var settings = rootBuilder.settings();
-
-        // configure the root builder and create any child builders,
-        var builders = onBuild(rootBuilder);
-
-        // start resolving artifacts in parallel groups and marking them as resolved,
-        var resolved = new ResolvedArtifacts();
-        resolveArtifacts(settings, rootBuilder, resolved);
-
-        // start running builders in parallel groups as soon as their required artifacts are resolved.
-        return executeBuilders(settings, rootBuilder, resolved);
     }
 
     /**
@@ -304,37 +280,6 @@ public abstract class BaseBuild extends Application implements Build
         this.metadata = that.metadata;
     }
 
-    /**
-     * Executes all builders from the root in parallel groups.
-     */
-    private ObjectList<TaskResult<Builder>> executeBuilders(BuildSettings settings,
-                                                            Builder rootBuilder,
-                                                            ResolvedArtifacts resolved)
-    {
-        var executor = listenTo(new TaskExecutor());
-        var results = new ObjectList<TaskResult<Builder>>();
-
-        // For each group of builders that can be executed in parallel,
-        for (var group : dependencyTree(rootBuilder, Builder.class).grouped())
-        {
-            // turn them into a list of tasks to run,
-            var tasks = new TaskList<Builder>();
-            for (var builder : group)
-            {
-                resolved.waitFor(builder.artifactDependencies());
-                resolved.waitFor(builder.libraryDependencies().asArtifactList());
-
-                var task = new BuilderTask(builder, resolved);
-                tasks.add(task);
-            }
-
-            // then execute the tasks.
-            results.addAll(executor.process(settings.builderThreads(), tasks));
-        }
-
-        return results;
-    }
-
     private Builder newBuilder()
     {
         var builder = new Builder(this);
@@ -343,25 +288,5 @@ public abstract class BaseBuild extends Application implements Build
                 .withBuilderThreads(get(BUILDER_THREADS))
                 .withArtifactResolverThreads(get(ARTIFACT_RESOLVER_THREADS)))
             .parseCommandLine(commandLine());
-    }
-
-    /**
-     * Resolves artifacts in parallel groups, marking them as resolved when completed.
-     *
-     * @param settings The build settings, to obtain the number of threads to use, and the librarian to resolve
-     * artifacts
-     * @param root The root of the builder tree
-     * @param resolved The set of resolved artifacts to update
-     */
-    private void resolveArtifacts(BuildSettings settings, Dependency root, ResolvedArtifacts resolved)
-    {
-        var executor = listenTo(new TaskExecutor());
-        var grouped = dependencyTree(root, Artifact.class).grouped();
-        for (var group : grouped)
-        {
-            var task = new ArtifactResolverTask(settings.librarian(), group.asArtifactList(), resolved);
-            var results = executor.process(settings.artifactResolverThreads(), new TaskList<>(list(task)));
-            results.matching(at -> at.issues().hasProblems()).forEach(TaskResult::showResult);
-        }
     }
 }

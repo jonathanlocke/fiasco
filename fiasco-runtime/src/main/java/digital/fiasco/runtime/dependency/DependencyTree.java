@@ -1,6 +1,5 @@
 package digital.fiasco.runtime.dependency;
 
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.messages.MessageException;
 
 import static com.telenav.kivakit.core.ensure.Ensure.fail;
@@ -28,12 +27,6 @@ import static java.util.Collections.disjoint;
  *
  * <ul>
  *     <li>{@link #depthFirst()}</li>
- * </ul>
- *
- * <p><b>Grouping for Parallel Execution</b></p>
- *
- * <ul>
- *     <li>{@link #grouped()}</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -66,21 +59,19 @@ public class DependencyTree<T extends Dependency>
     }
 
     /**
+     * Returns this dependency tree as a queue
+     */
+    public DependencyResolutionQueue<T> asQueue()
+    {
+        return new DependencyResolutionQueue<>(depthFirst(), type);
+    }
+
+    /**
      * @return The dependencies in this graph in depth-first order
      */
     public DependencyList<T> depthFirst()
     {
         return depthFirst;
-    }
-
-    /**
-     * Returns the elements of this dependency tree organized into groups for parallel execution
-     *
-     * @return A list of dependency groups
-     */
-    public ObjectList<DependencyList<T>> grouped()
-    {
-        return new DependencyGrouper<T>().group(this, type);
     }
 
     /**
@@ -123,6 +114,7 @@ public class DependencyTree<T extends Dependency>
             // noinspection unchecked
             return explored.with((T) root);
         }
+
         return explored;
     }
 }
