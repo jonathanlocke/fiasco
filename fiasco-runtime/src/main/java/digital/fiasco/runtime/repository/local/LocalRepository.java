@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static com.telenav.kivakit.core.object.Lazy.lazy;
 import static com.telenav.kivakit.filesystem.Folder.folder;
@@ -186,12 +187,16 @@ public class LocalRepository extends BaseRepository
      */
     protected Artifact<?> loadArtifactContent(Artifact<?> artifact)
     {
-        for (var attachment : artifact.attachments())
+        var attachments = list(artifact.attachments());
+        artifact = artifact.withoutAttachments();
+        for (var attachment : attachments)
         {
-            artifact = artifact.withAttachment(attachment
-                .withContent(attachment.content()
-                    .withResource(artifactAttachmentFile(attachment))
-                    .withSignatures(readSignatures(attachment))));
+            attachment = attachment.withArtifact(artifact);
+            attachment = attachment.withContent(attachment.content()
+                .withResource(artifactAttachmentFile(attachment))
+                .withSignatures(readSignatures(attachment)));
+
+            artifact = artifact.withAttachment(attachment);
         }
         return artifact;
     }

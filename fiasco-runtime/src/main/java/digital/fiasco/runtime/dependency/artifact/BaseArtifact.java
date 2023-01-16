@@ -119,11 +119,11 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     protected ArtifactList dependencies = ArtifactList.artifacts();
 
     /** Dependency exclusions for this artifact */
-    protected transient ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptNone());
+    protected transient ObjectList<Matcher<ArtifactDescriptor>> exclusions;
 
     /** The content attachments by type */
     @Expose
-    private ObjectMap<ArtifactAttachmentType, ArtifactAttachment> typeToAttachment = new ObjectMap<>(new LinkedHashMap<>());
+    private ObjectMap<ArtifactAttachmentType, ArtifactAttachment> typeToAttachment;
 
     /**
      * Create an artifact
@@ -147,8 +147,8 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
         this.repository = that.repository();
         this.descriptor = that.descriptor();
         this.dependencies = that.dependencies.copy();
-        this.exclusions = that.exclusions.copy();
-        this.typeToAttachment = that.typeToAttachment.copy();
+        this.exclusions = that.exclusions().copy();
+        this.typeToAttachment = that.typeToAttachment().copy();
     }
 
     /**
@@ -185,7 +185,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactAttachment attachmentOfType(ArtifactAttachmentType type)
     {
-        return typeToAttachment.get(type);
+        return typeToAttachment().get(type);
     }
 
     /**
@@ -196,7 +196,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ObjectList<ArtifactAttachment> attachments()
     {
-        return list(typeToAttachment.values());
+        return list(typeToAttachment().values());
     }
 
     /**
@@ -310,7 +310,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     public T excluding(Matcher<ArtifactDescriptor> exclusion)
     {
         var copy = copy();
-        copy.exclusions.add(exclusion);
+        copy.exclusions().add(exclusion);
         return copy;
     }
 
@@ -326,7 +326,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     {
         return excluding(at ->
         {
-            for (var exclusion : exclusions)
+            for (var exclusion : exclusions())
             {
                 if (exclusion.matches(at))
                 {
@@ -351,7 +351,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean isExcluded(ArtifactDescriptor descriptor)
     {
-        return exclusions.stream().anyMatch(at -> at.matches(descriptor));
+        return exclusions().stream().anyMatch(at -> at.matches(descriptor));
     }
 
     /**
@@ -435,20 +435,14 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     }
 
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTATION_NOT_NEEDED,
-            testing = TESTING_NOT_NEEDED
-        )
+    @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTING_NOT_NEEDED)
     public String toString()
     {
         return name();
     }
 
     /**
-     * Attaches the resource for the given artifact type, such as <i>.jar</i>
-     *
-     * @param attachment The content to attach
+     * {@inheritDoc}
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
@@ -456,15 +450,14 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     {
         var copy = copy();
         attachment = attachment.withArtifact(copy);
-        ((BaseArtifact<T>) copy).typeToAttachment.put(attachment.attachmentType(), attachment);
+        ((BaseArtifact<T>) copy).typeToAttachment().put(attachment.attachmentType(), attachment);
         return copy;
     }
 
-    @MethodQuality
-        (
-            documentation = DOCUMENTATION_NOT_NEEDED,
-            testing = TESTED
-        )
+    /**
+     * {@inheritDoc}
+     */
+    @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTED)
     @Override
     public T withAttachments(ObjectMap<ArtifactAttachmentType, ArtifactAttachment> attachments)
     {
@@ -477,10 +470,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     }
 
     /**
-     * Returns a copy of this artifact with the given dependencies
-     *
-     * @param dependencies The new dependencies
-     * @return The new artifact
+     * {@inheritDoc}
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
@@ -492,10 +482,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     }
 
     /**
-     * Returns a copy of this artifact with the given descriptor
-     *
-     * @param descriptor The new descriptor
-     * @return The new artifact
+     * {@inheritDoc}
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
@@ -507,10 +494,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     }
 
     /**
-     * Returns a copy of this artifact with the given repository
-     *
-     * @param repository The new descriptor
-     * @return The new artifact
+     * {@inheritDoc}
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
@@ -519,5 +503,34 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
         var copy = copy();
         ((BaseArtifact<?>) copy).repository = repository;
         return copy;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public T withoutAttachments()
+    {
+        var copy = copy();
+        ((BaseArtifact<T>) copy).typeToAttachment = new ObjectMap<>();
+        return copy;
+    }
+
+    ObjectList<Matcher<ArtifactDescriptor>> exclusions()
+    {
+        if (exclusions == null)
+        {
+            exclusions = list(acceptNone());
+        }
+        return exclusions;
+    }
+
+    private ObjectMap<ArtifactAttachmentType, ArtifactAttachment> typeToAttachment()
+    {
+        if (typeToAttachment == null)
+        {
+            typeToAttachment = new ObjectMap<>(new LinkedHashMap<>());
+        }
+        return typeToAttachment;
     }
 }

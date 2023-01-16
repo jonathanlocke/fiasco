@@ -469,4 +469,9 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
     {
         return withDescriptor(descriptor().withVersion(version));
     }
+
+    /**
+     * Returns this artifact without any attachments
+     */
+    T withoutAttachments();
 }
