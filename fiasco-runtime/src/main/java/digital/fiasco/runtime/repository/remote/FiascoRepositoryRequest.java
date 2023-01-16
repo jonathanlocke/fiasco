@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.fiasco.server;
+package digital.fiasco.runtime.repository.remote;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.list.StringList;

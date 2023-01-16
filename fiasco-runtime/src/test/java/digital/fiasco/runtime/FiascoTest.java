@@ -101,12 +101,12 @@ public class FiascoTest extends UnitTest
 
     protected ArtifactList kivakitArtifacts()
     {
-        return ArtifactList.artifacts(kivakitCore(), kivakitIcons(), kivakitApplication(), kivakitLogos());
+        return artifacts(kivakitCore(), kivakitIcons(), kivakitApplication(), kivakitLogos());
     }
 
     protected ArtifactList kivakitAssets()
     {
-        return ArtifactList.artifacts(kivakitLogos(), kivakitIcons());
+        return artifacts(kivakitLogos(), kivakitIcons());
     }
 
     protected Library kivakitCore()
@@ -126,7 +126,7 @@ public class FiascoTest extends UnitTest
 
     protected ArtifactList kivakitLibraries()
     {
-        return ArtifactList.artifacts(kivakitApplication(), kivakitCore());
+        return artifacts(kivakitApplication(), kivakitCore());
     }
 
     protected Asset kivakitLogos()

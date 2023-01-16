@@ -13,9 +13,9 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.ArtifactDescriptorConverter;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.repository.fiasco.CacheRepository;
-import digital.fiasco.runtime.repository.fiasco.LocalRepository;
-import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
+import digital.fiasco.runtime.repository.local.CacheRepository;
+import digital.fiasco.runtime.repository.local.LocalRepository;
+import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;

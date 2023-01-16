@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.fiasco.server;
+package digital.fiasco.runtime.repository.remote;
 
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.StringOutputResource;

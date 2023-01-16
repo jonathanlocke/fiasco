@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.fiasco.server;
+package digital.fiasco.runtime.repository.remote;
 
 import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
@@ -8,15 +8,14 @@ import com.telenav.kivakit.resource.resources.InputResource;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
-import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
 
 import java.net.URI;
 
 import static com.telenav.kivakit.core.ensure.Ensure.ensureEqual;
 import static com.telenav.kivakit.resource.Uris.uri;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
-import static digital.fiasco.runtime.repository.fiasco.server.FiascoRepositoryResponse.responseFromJson;
-import static digital.fiasco.runtime.repository.fiasco.server.FiascoServer.FIASCO_PORT;
+import static digital.fiasco.runtime.repository.remote.FiascoRepositoryResponse.responseFromJson;
+import static digital.fiasco.runtime.repository.remote.FiascoServer.FIASCO_PORT;
 
 /**
  * Client that resolves requests to a {@link RemoteRepository} using the Fiasco repository protocol over HTTPS.

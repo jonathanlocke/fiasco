@@ -1,6 +1,7 @@
-package digital.fiasco.runtime.repository.fiasco;
+package digital.fiasco.runtime.repository.local;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
+import com.telenav.kivakit.core.object.Lazy;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.resource.resources.StringResource;
@@ -17,8 +18,10 @@ import org.jetbrains.annotations.NotNull;
 import java.net.URI;
 
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
+import static com.telenav.kivakit.core.object.Lazy.lazy;
 import static com.telenav.kivakit.filesystem.Folder.folder;
 import static com.telenav.kivakit.resource.WriteMode.APPEND;
+import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
 import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJson;
 
@@ -78,7 +81,7 @@ public class LocalRepository extends BaseRepository
     private final File metadataFile;
 
     /** The append-only download cache repository */
-    private final CacheRepository downloads = new CacheRepository("download-cache-repository");
+    private final Lazy<CacheRepository> downloads = lazy(() -> new CacheRepository("download-cache-repository"));
 
     /**
      * Creates a local Fiasco repository in the given folder
@@ -102,7 +105,7 @@ public class LocalRepository extends BaseRepository
      */
     public LocalRepository(@NotNull String name, @NotNull Folder rootFolder)
     {
-        this(name, rootFolder.uri());
+        this(name, rootFolder.mkdirs().asUri());
     }
 
     /**
@@ -129,11 +132,17 @@ public class LocalRepository extends BaseRepository
     {
         lock().write(() ->
         {
-            saveArtifactMetadata(artifact);
-            artifact.attachments().forEach(attachment ->
-                attachment.content()
-                    .resource()
-                    .safeCopyTo(artifactAttachmentFile(attachment), APPEND));
+            if (!contains(artifact))
+            {
+                saveArtifactMetadata(artifact);
+                repositoryFolder(artifact).mkdirs().clearAll();
+                artifact.attachments().forEach(attachment ->
+                {
+                    var resource = attachment.content().resource();
+                    resource.safeCopyTo(artifactAttachmentFile(attachment), OVERWRITE);
+                });
+                artifactMap().put(artifact.descriptor(), artifact);
+            }
         });
     }
 
@@ -152,13 +161,16 @@ public class LocalRepository extends BaseRepository
             var resolvedArtifacts = resolve(descriptors);
             var resolvedDescriptors = resolvedArtifacts.asArtifactDescriptors();
 
-            // and those that are not.
+            // and those that are not added yet.
             var unresolvedDescriptors = descriptors.without(resolvedDescriptors::contains);
 
             // Install and resolve any unresolved artifacts that are in the downloads cache.
-            var downloadedArtifacts = downloads.resolveArtifacts(unresolvedDescriptors);
-            downloadedArtifacts.forEach(this::installArtifact);
-            resolvedArtifacts = resolvedArtifacts.with(downloadedArtifacts);
+            if (!(this instanceof CacheRepository))
+            {
+                var downloadedArtifacts = downloads.get().resolveArtifacts(unresolvedDescriptors);
+                downloadedArtifacts.forEach(this::installArtifact);
+                resolvedArtifacts = resolvedArtifacts.with(downloadedArtifacts);
+            }
 
             // Return the resolved artifacts with their content attached.
             resolvedArtifacts.forEach(this::loadArtifactContent);
@@ -203,7 +215,7 @@ public class LocalRepository extends BaseRepository
     protected void saveArtifactMetadata(Artifact<?> artifact)
     {
         // Get JSON for artifact metadata,
-        var text = artifact.toJson();
+        var text = artifact.toJson().trim();
 
         // add a separator if necessary,
         if (metadataFile.exists())
@@ -223,8 +235,10 @@ public class LocalRepository extends BaseRepository
      */
     private File artifactAttachmentFile(@NotNull ArtifactAttachment attachment)
     {
-        return repositoryFolder(attachment.artifact())
-            .file(attachment.content().name() + attachment.attachmentType());
+        var artifact = attachment.artifact();
+        var descriptor = artifact.descriptor();
+        var file = descriptor.artifact() + "-" + descriptor.version() + attachment.attachmentType().fileSuffix();
+        return repositoryFolder(artifact).file(file);
     }
 
     /**
@@ -234,17 +248,20 @@ public class LocalRepository extends BaseRepository
     {
         lock().write(() ->
         {
-            // Read the file,
-            var text = metadataFile.reader().readText();
-
-            // split it into chunks,
-            for (var at : text.split(ARTIFACT_SEPARATOR))
+            if (metadataFile.exists())
             {
-                // convert the chunk to a cache entry,
-                var entry = artifactFromJson(at);
+                // Read the file,
+                var text = metadataFile.reader().readText();
 
-                // and put the entry into the entries map.
-                artifacts().put(entry.descriptor(), entry);
+                // split it into chunks,
+                for (var at : text.split(ARTIFACT_SEPARATOR))
+                {
+                    // convert the chunk to a cache entry,
+                    var entry = artifactFromJson(at);
+
+                    // and put the entry into the entries map.
+                    artifactMap().put(entry.descriptor(), entry);
+                }
             }
         });
     }
@@ -259,7 +276,8 @@ public class LocalRepository extends BaseRepository
      */
     private String readSignature(Artifact<?> artifact, ArtifactContent content, String algorithm)
     {
-        return repositoryFolder(artifact).file(content.name() + "." + algorithm).readText();
+        var file = repositoryFolder(artifact).file(content.name() + "." + algorithm);
+        return file.exists() ? file.readText() : null;
     }
 
     /**
@@ -289,6 +307,9 @@ public class LocalRepository extends BaseRepository
     private Folder repositoryFolder(Artifact<?> artifact)
     {
         var descriptor = artifact.descriptor();
-        return rootFolder.folder(descriptor.group().name().replaceAll("\\.", "/") + "/" + descriptor.artifact() + "-" + descriptor.version());
+        return rootFolder.folder(descriptor.group().name()
+            .replaceAll("\\.", "/")
+            + "/" + descriptor.artifact()
+            + "/" + descriptor.version()).mkdirs();
     }
 }

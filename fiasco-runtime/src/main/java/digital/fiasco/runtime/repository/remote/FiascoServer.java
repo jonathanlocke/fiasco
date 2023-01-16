@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.fiasco.server;
+package digital.fiasco.runtime.repository.remote;
 
 import com.telenav.kivakit.application.Application;
 import com.telenav.kivakit.core.progress.ProgressReporter;
@@ -10,8 +10,8 @@ import com.telenav.kivakit.resource.resources.OutputResource;
 import com.telenav.kivakit.resource.writing.WritableResource;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.repository.local.CacheRepository;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.repository.fiasco.CacheRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.Socket;
@@ -21,7 +21,7 @@ import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressRep
 import static com.telenav.kivakit.core.value.count.Maximum._8;
 import static com.telenav.kivakit.resource.CloseMode.LEAVE_OPEN;
 import static com.telenav.kivakit.resource.WriteMode.STREAM;
-import static digital.fiasco.runtime.repository.fiasco.server.FiascoRepositoryRequest.requestFromJson;
+import static digital.fiasco.runtime.repository.remote.FiascoRepositoryRequest.requestFromJson;
 
 /**
  * A server application that accepts JSON-encoded {@link FiascoRepositoryRequest}s and produces

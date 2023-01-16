@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.fiasco;
+package digital.fiasco.runtime.repository.remote;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
@@ -6,10 +6,8 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
+import digital.fiasco.runtime.repository.local.CacheRepository;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.repository.fiasco.server.FiascoClient;
-import digital.fiasco.runtime.repository.fiasco.server.FiascoRepositoryRequest;
-import digital.fiasco.runtime.repository.fiasco.server.FiascoServer;
 
 import java.net.URI;
 

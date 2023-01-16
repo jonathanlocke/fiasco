@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.repository;
 
+import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
@@ -8,17 +9,18 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
-import digital.fiasco.runtime.repository.fiasco.CacheRepository;
-import digital.fiasco.runtime.repository.fiasco.LocalRepository;
-import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
-import digital.fiasco.runtime.repository.fiasco.server.FiascoClient;
-import digital.fiasco.runtime.repository.fiasco.server.FiascoServer;
+import digital.fiasco.runtime.repository.local.CacheRepository;
+import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
+import digital.fiasco.runtime.repository.remote.FiascoClient;
+import digital.fiasco.runtime.repository.remote.FiascoServer;
+import digital.fiasco.runtime.repository.remote.RemoteRepository;
 
 import java.net.URI;
 import java.util.Objects;
 
-import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 
 /**
@@ -161,6 +163,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
      * {@inheritDoc}
      */
     @Override
+    @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTED)
     public String name()
     {
         return name;
@@ -178,7 +181,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     /**
      * Returns the map from descriptor to artifact
      */
-    protected ObjectMap<ArtifactDescriptor, Artifact<?>> artifacts()
+    protected ObjectMap<ArtifactDescriptor, Artifact<?>> artifactMap()
     {
         return artifacts;
     }
@@ -193,6 +196,24 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
 
     protected ArtifactList resolve(Iterable<ArtifactDescriptor> descriptors)
     {
-        return ArtifactList.artifacts(list(descriptors).map(artifacts::get));
+        var resolved = artifacts();
+        for (var descriptor : descriptors)
+        {
+            resolved = resolved.with(matching(descriptor));
+        }
+        return resolved;
+    }
+
+    private ArtifactList matching(ArtifactDescriptor descriptor)
+    {
+        var matches = artifacts();
+        for (var at : artifactMap().values())
+        {
+            if (descriptor.matches(at.descriptor()))
+            {
+                matches = matches.with(at);
+            }
+        }
+        return matches;
     }
 }

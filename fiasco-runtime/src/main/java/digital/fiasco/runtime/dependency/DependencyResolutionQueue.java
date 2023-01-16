@@ -3,9 +3,9 @@ package digital.fiasco.runtime.dependency;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.thread.Monitor;
-import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
-import digital.fiasco.runtime.repository.fiasco.server.FiascoClient;
-import digital.fiasco.runtime.repository.fiasco.server.FiascoServer;
+import digital.fiasco.runtime.repository.remote.RemoteRepository;
+import digital.fiasco.runtime.repository.remote.FiascoClient;
+import digital.fiasco.runtime.repository.remote.FiascoServer;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;

@@ -1,11 +1,11 @@
-package digital.fiasco.runtime.repository.fiasco;
+package digital.fiasco.runtime.repository.local;
 
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.resource.resources.ResourceSection;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
-import digital.fiasco.runtime.repository.fiasco.server.FiascoServer;
+import digital.fiasco.runtime.repository.remote.FiascoServer;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;

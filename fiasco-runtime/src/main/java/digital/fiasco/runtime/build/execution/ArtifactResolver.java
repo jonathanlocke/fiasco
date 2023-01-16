@@ -12,9 +12,9 @@ import digital.fiasco.runtime.dependency.DependencyResolutionQueue;
 import digital.fiasco.runtime.dependency.DependencyTree;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
-import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
-import digital.fiasco.runtime.repository.fiasco.server.FiascoClient;
-import digital.fiasco.runtime.repository.fiasco.server.FiascoServer;
+import digital.fiasco.runtime.repository.remote.RemoteRepository;
+import digital.fiasco.runtime.repository.remote.FiascoClient;
+import digital.fiasco.runtime.repository.remote.FiascoServer;
 
 import java.util.concurrent.ExecutorCompletionService;
 
