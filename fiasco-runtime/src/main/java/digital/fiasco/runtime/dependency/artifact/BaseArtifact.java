@@ -9,7 +9,6 @@ import com.telenav.kivakit.core.string.AsciiArt;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.core.version.Version;
-import com.telenav.kivakit.interfaces.comparison.Matcher;
 import digital.fiasco.runtime.repository.Repository;
 
 import java.util.LinkedHashMap;
@@ -25,7 +24,6 @@ import static com.telenav.kivakit.core.collections.list.StringList.split;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.string.Formatter.format;
-import static com.telenav.kivakit.interfaces.comparison.Filter.acceptNone;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 
 /**
@@ -56,7 +54,6 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *     <li>{@link #withDependencies(ArtifactList)}</li>
  *     <li>{@link #excluding(ArtifactDescriptor...)}</li>
  *     <li>{@link #excluding(String...)}</li>
- *     <li>{@link #excluding(Matcher)}</li>
  * </ul>
  *
  * <p><b>Attachments</b></p>
@@ -81,7 +78,6 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #excluding(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
  *     <li>{@link #excluding(String...)} - Returns this artifact without the given dependencies</li>
- *     <li>{@link #excluding(Matcher)} - Returns this artifact without the given dependencies</li>
  * </ul>
  *
  *
@@ -119,7 +115,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     protected ArtifactList dependencies = ArtifactList.artifacts();
 
     /** Dependency exclusions for this artifact */
-    protected transient ObjectList<Matcher<ArtifactDescriptor>> exclusions;
+    protected transient ObjectList<ArtifactDescriptor> exclusions;
 
     /** The content attachments by type */
     @Expose
@@ -218,7 +214,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactList dependencies()
     {
-        return dependencies.matching(at -> !isExcluded(at.descriptor()));
+        return dependencies.matching(at -> !isExcluded(at));
     }
 
     /**
@@ -307,7 +303,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public T excluding(Matcher<ArtifactDescriptor> exclusion)
+    public T excluding(ArtifactDescriptor exclusion)
     {
         var copy = copy();
         copy.exclusions().add(exclusion);
@@ -324,17 +320,9 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T excluding(ObjectList<ArtifactDescriptor> exclusions)
     {
-        return excluding(at ->
-        {
-            for (var exclusion : exclusions())
-            {
-                if (exclusion.matches(at))
-                {
-                    return true;
-                }
-            }
-            return false;
-        });
+        var copy = copy();
+        copy.exclusions.addAll(exclusions);
+        return copy;
     }
 
     @Override
@@ -351,7 +339,14 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean isExcluded(ArtifactDescriptor descriptor)
     {
-        return exclusions().stream().anyMatch(at -> at.matches(descriptor));
+        for (var at : exclusions())
+        {
+            if (at.matches(descriptor))
+            {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -516,11 +511,11 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
         return copy;
     }
 
-    ObjectList<Matcher<ArtifactDescriptor>> exclusions()
+    ObjectList<ArtifactDescriptor> exclusions()
     {
         if (exclusions == null)
         {
-            exclusions = list(acceptNone());
+            exclusions = list();
         }
         return exclusions;
     }

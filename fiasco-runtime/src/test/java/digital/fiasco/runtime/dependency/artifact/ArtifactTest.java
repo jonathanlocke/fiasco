@@ -220,13 +220,6 @@ public class ArtifactTest extends FiascoTest
             ArtifactList.artifacts());
 
         ensureEqual(application
-                .excluding(at -> at.name().contains("core"))
-                .excluding(kivakitIcons())
-                .excluding(kivakitLogos())
-                .dependencies(),
-            ArtifactList.artifacts(kivakitResource()));
-
-        ensureEqual(application
                 .excluding(kivakitCore())
                 .excluding(kivakitIcons())
                 .excluding(kivakitLogos())

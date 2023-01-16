@@ -15,22 +15,50 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.desc
 public class LocalRepositoryTest extends FiascoTest
 {
     @Test
+    public void testCreate()
+    {
+        var core = kivakitCore()
+            .withContent(packageContent());
+
+        var funky = new LocalRepository("funky");
+        funky.installArtifact(core);
+
+        var resolved = funky.resolveArtifacts(list(descriptor("com.telenav.kivakit::")));
+        ensure(resolved.size() == 1);
+        ensureEqual(resolved.first(), core);
+    }
+
+    @Test
+    public void testEquals()
+    {
+        ensureEqual(repository(), repository());
+        ensureNotEqual(repository(), 5);
+    }
+
+    @Test
     public void testInstall()
     {
         var core = kivakitCore()
             .withContent(packageContent());
 
-        var local = local();
-        local.installArtifact(core);
-        var resolved = local.resolveArtifacts(list(core.descriptor()));
+        var repository = repository();
+        repository.installArtifact(core);
+
+        var resolved = repository.resolveArtifacts(list(core.descriptor()));
         ensure(resolved.size() == 1);
         ensure(resolved.first().equals(core));
     }
 
     @Test
+    public void testIsRemote()
+    {
+        ensure(!repository().isRemote());
+    }
+
+    @Test
     public void testName()
     {
-        ensure(local().name().equals("test"));
+        ensure(repository().name().equals("test"));
     }
 
     @Test
@@ -43,10 +71,10 @@ public class LocalRepositoryTest extends FiascoTest
         var logos = kivakitLogos()
             .withContent(packageContent());
 
-        var local = local();
-        local.installArtifact(core);
-        local.installArtifact(icons);
-        local.installArtifact(logos);
+        var repository = repository();
+        repository.installArtifact(core);
+        repository.installArtifact(icons);
+        repository.installArtifact(logos);
 
         var reloaded = new LocalRepository("test", root());
         testRepository(reloaded, core, icons, logos);
@@ -62,22 +90,22 @@ public class LocalRepositoryTest extends FiascoTest
         var logos = kivakitLogos()
             .withContent(packageContent());
 
-        var local = local();
-        local.installArtifact(core);
-        local.installArtifact(icons);
-        local.installArtifact(logos);
+        var repository = repository();
+        repository.installArtifact(core);
+        repository.installArtifact(icons);
+        repository.installArtifact(logos);
 
-        testRepository(local, core, icons, logos);
+        testRepository(repository, core, icons, logos);
     }
 
     @Test
     public void testUri()
     {
-        ensureEqual(local().uri(), root().asUri());
+        ensureEqual(repository().uri(), root().asUri());
     }
 
     @NotNull
-    private static LocalRepository local()
+    private static Repository repository()
     {
         return new LocalRepository("test", root().mkdirs().clearAll());
     }
@@ -87,27 +115,27 @@ public class LocalRepositoryTest extends FiascoTest
         return currentFolder().folder("target/.fiasco/test").absolute();
     }
 
-    private void testRepository(LocalRepository local, Library core, Asset icons, Asset logos)
+    private void testRepository(Repository repository, Library core, Asset icons, Asset logos)
     {
         {
-            var resolved = local.resolveArtifacts(list(core.descriptor()));
+            var resolved = repository.resolveArtifacts(list(core.descriptor()));
             ensure(resolved.size() == 1);
             ensure(resolved.first().equals(core));
         }
         {
-            var resolved = local.resolveArtifacts(list(icons.descriptor()));
+            var resolved = repository.resolveArtifacts(list(icons.descriptor()));
             ensure(resolved.size() == 1);
             ensure(resolved.first().equals(icons));
         }
         {
-            var resolved = local.resolveArtifacts(list(descriptor("com.telenav.kivakit::")));
+            var resolved = repository.resolveArtifacts(list(descriptor("com.telenav.kivakit::")));
             ensure(resolved.size() == 3);
             ensure(resolved.first().equals(core));
             ensure(resolved.get(1).equals(icons));
             ensure(resolved.get(2).equals(logos));
         }
         {
-            var resolved = local.resolveArtifacts(list(descriptor("com.telenav.x::")));
+            var resolved = repository.resolveArtifacts(list(descriptor("com.telenav.x::")));
             ensure(resolved.size() == 0);
         }
     }

@@ -7,7 +7,6 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static com.telenav.kivakit.core.time.Duration.milliseconds;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencies;
 import static digital.fiasco.runtime.dependency.DependencyTree.dependencyTree;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
@@ -54,28 +53,13 @@ public class DependencyResolutionQueueTest extends FiascoTest
     public void testNextReadyAwait()
     {
         var queue = queue();
-        var ready = new Monitor();
         KivaKitThread.run(this, "await", () ->
         {
             queue.resolve(c);
-            milliseconds(100).sleep();
-            ready.signal();
-            milliseconds(100).sleep();
             queue.resolve(b);
-            milliseconds(100).sleep();
-            ready.signal();
-            milliseconds(100).sleep();
             queue.resolve(e);
-            milliseconds(100).sleep();
-            ready.signal();
-            milliseconds(100).sleep();
             queue.resolve(f);
-            milliseconds(100).sleep();
-            ready.signal();
-            milliseconds(100).sleep();
             queue.resolve(d);
-            milliseconds(100).sleep();
-            ready.signal();
             queue.resolve(a);
         });
         ensureEqual(queue.nextReady(), c);

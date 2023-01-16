@@ -3,17 +3,16 @@ package digital.fiasco.runtime.repository;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.naming.Named;
-import com.telenav.kivakit.resource.Resource;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.repository.local.CacheRepository;
 import digital.fiasco.runtime.repository.local.LocalRepository;
-import digital.fiasco.runtime.repository.remote.RemoteRepository;
+import digital.fiasco.runtime.repository.maven.MavenRepository;
 import digital.fiasco.runtime.repository.remote.FiascoClient;
 import digital.fiasco.runtime.repository.remote.FiascoServer;
-import digital.fiasco.runtime.repository.maven.MavenRepository;
+import digital.fiasco.runtime.repository.remote.RemoteRepository;
 
 import java.net.URI;
 
@@ -94,10 +93,9 @@ public interface Repository extends
     Named
 {
     /**
-     * Adds the given content {@link Resource}s to content.bin, and the {@link Artifact} metadata to metadata.txt in
-     * JSON format.
+     * Installs the given artifact in this repository
      *
-     * @param artifact The cache entry metadata to append to metadata.txt in JSON format
+     * @param artifact The artifact to install
      * @throws IllegalStateException Thrown if the artifact cannot be installed in this repository
      */
     void installArtifact(Artifact<?> artifact);

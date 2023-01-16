@@ -126,7 +126,7 @@ public class MavenRepository extends BaseRepository
             // Go through each descriptor,
             for (var descriptor : descriptors)
             {
-                var artifact = artifactMap().get(descriptor);
+                var artifact = descriptorToArtifactMap().get(descriptor);
 
                 // read any artifact jar attachment (if the repository does not contain the artifact,
                 // the return value assigned to jar will be null),

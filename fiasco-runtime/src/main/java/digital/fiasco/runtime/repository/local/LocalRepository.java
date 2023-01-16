@@ -1,5 +1,7 @@
 package digital.fiasco.runtime.repository.local;
 
+import com.telenav.kivakit.annotations.code.quality.MethodQuality;
+import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.object.Lazy;
 import com.telenav.kivakit.filesystem.File;
@@ -17,6 +19,9 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
+import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static com.telenav.kivakit.core.object.Lazy.lazy;
@@ -25,6 +30,7 @@ import static com.telenav.kivakit.resource.WriteMode.APPEND;
 import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
 import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJson;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 
 /**
  * A repository of artifacts and their metadata on the local filesystem.
@@ -70,6 +76,7 @@ import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJs
  * @see CacheRepository
  */
 @SuppressWarnings({ "unused", "SameParameterValue" })
+@TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public class LocalRepository extends BaseRepository
 {
     /** Separator to use between artifact entries in the artifacts.txt file */
@@ -90,11 +97,12 @@ public class LocalRepository extends BaseRepository
      * @param name The name of the repository
      * @param uri The uri of the folder for this repository
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public LocalRepository(@NotNull String name, @NotNull URI uri)
     {
         super(name, uri);
         this.rootFolder = folder(uri);
-        metadataFile = repositoryRootFile("artifacts.txt");
+        metadataFile = repositoryFile("artifacts.txt");
         loadAllArtifactMetadata();
     }
 
@@ -104,6 +112,7 @@ public class LocalRepository extends BaseRepository
      * @param name The name of the repository
      * @param rootFolder The root folder of the repository
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public LocalRepository(@NotNull String name, @NotNull Folder rootFolder)
     {
         this(name, rootFolder.mkdirs().asUri());
@@ -114,6 +123,7 @@ public class LocalRepository extends BaseRepository
      *
      * @param name The name of the repository
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public LocalRepository(@NotNull String name)
     {
         this(name, fiascoCacheFolder()
@@ -123,26 +133,44 @@ public class LocalRepository extends BaseRepository
     }
 
     /**
-     * Adds the given content is stored in the repository in a folder hierarchy, and the {@link Artifact} artifact to
-     * artifacts.txt in JSON format.
+     * {@inheritDoc}
+     * <p><b>Steps</b></p>
+     * <ol>
+     *     <li>Adds the {@link Artifact} metadata to artifacts.txt in JSON format</li>
+     *     <li>Adds the artifact to the {@link #descriptorToArtifactMap()}</li>
+     *     <li>Saves the artifact's content by calling {@link #saveAttachment(ArtifactAttachment)}</li>
+     * </ol>
      *
      * @param artifact The artifact to install
      */
     @Override
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public void installArtifact(Artifact<?> artifact)
     {
         lock().write(() ->
         {
+            // If we don't already have this artifact installed,
             if (!contains(artifact))
             {
-                saveArtifactMetadata(artifact);
-                repositoryFolder(artifact).mkdirs().clearAll();
-                artifact.attachments().forEach(attachment ->
+                try
                 {
-                    var resource = attachment.content().resource();
-                    resource.safeCopyTo(artifactAttachmentFile(attachment), OVERWRITE);
-                });
-                artifactMap().put(artifact.descriptor(), artifact);
+                    // append each attachment to the attachments file,
+                    var source = artifact;
+                    for (var attachment : source.attachments())
+                    {
+                        source = source.withAttachment(saveAttachment(attachment));
+                    }
+
+                    // save metadata,
+                    saveArtifactMetadata(source);
+
+                    // and add the artifact to the map.
+                    descriptorToArtifactMap().put(artifact.descriptor(), artifact);
+                }
+                catch (Exception e)
+                {
+                    problem(e, "Unable to install artifact: $", artifact);
+                }
             }
         });
     }
@@ -154,6 +182,7 @@ public class LocalRepository extends BaseRepository
      * @return The artifacts
      */
     @Override
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public final ArtifactList resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
     {
         return lock().read(() ->
@@ -174,8 +203,7 @@ public class LocalRepository extends BaseRepository
             }
 
             // Return the resolved artifacts with their content attached.
-            resolvedArtifacts.forEach(this::loadArtifactContent);
-            return resolvedArtifacts;
+            return artifacts(resolvedArtifacts.map(this::loadAttachments));
         });
     }
 
@@ -185,7 +213,7 @@ public class LocalRepository extends BaseRepository
      * @param artifact The artifact
      * @return The artifact with attachments populated with content
      */
-    protected Artifact<?> loadArtifactContent(Artifact<?> artifact)
+    protected Artifact<?> loadAttachments(Artifact<?> artifact)
     {
         var attachments = list(artifact.attachments());
         artifact = artifact.withoutAttachments();
@@ -207,7 +235,7 @@ public class LocalRepository extends BaseRepository
      * @param name The name of the file
      * @return The file
      */
-    protected File repositoryRootFile(String name)
+    protected File repositoryFile(String name)
     {
         return ensureNotNull(rootFolder).file(name);
     }
@@ -230,6 +258,17 @@ public class LocalRepository extends BaseRepository
 
         // then append the JSON to the metadata file.
         new StringResource(text).copyTo(metadataFile, APPEND);
+    }
+
+    /**
+     * Saves the given attachment into this repository. {@link LocalRepository} stores the attachment in the file
+     * returned by {@link #artifactAttachmentFile(ArtifactAttachment)}.
+     */
+    protected ArtifactAttachment saveAttachment(ArtifactAttachment attachment)
+    {
+        var resource = attachment.content().resource();
+        resource.safeCopyTo(artifactAttachmentFile(attachment), OVERWRITE);
+        return attachment;
     }
 
     /**
@@ -265,7 +304,7 @@ public class LocalRepository extends BaseRepository
                     var entry = artifactFromJson(at);
 
                     // and put the entry into the entries map.
-                    artifactMap().put(entry.descriptor(), entry);
+                    descriptorToArtifactMap().put(entry.descriptor(), entry);
                 }
             }
         });

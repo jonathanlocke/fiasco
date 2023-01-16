@@ -1,6 +1,8 @@
 package digital.fiasco.runtime.repository.local;
 
+import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.filesystem.File;
+import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.resource.resources.ResourceSection;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
@@ -10,6 +12,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.filesystem.Folder.folder;
 import static com.telenav.kivakit.resource.WriteMode.APPEND;
@@ -67,13 +71,14 @@ import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
 public class CacheRepository extends LocalRepository
 {
     /** The binary file containing artifacts, laid out end-to-end */
-    private final File artifactContentFile = repositoryRootFile("artifact-content.binary");
+    private final File artifactContentFile = repositoryFile("artifact-content.binary");
 
     /**
      * Creates a cache repository in the Fiasco cache folder
      *
      * @param name The name of the repository
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public CacheRepository(String name)
     {
         super(name, fiascoCacheFolder().folder(name));
@@ -91,37 +96,14 @@ public class CacheRepository extends LocalRepository
     }
 
     /**
-     * Adds the given content to the attachments file, and the {@link Artifact} metadata to artifacts.txt in JSON
-     * format.
+     * Creates a local Fiasco repository in the given folder
      *
-     * @param artifact The artifact to install
+     * @param name The name of the repository
+     * @param folder The folder for this repository
      */
-    @Override
-    public void installArtifact(Artifact<?> artifact)
+    public CacheRepository(@NotNull String name, @NotNull Folder folder)
     {
-        lock().write(() ->
-        {
-            // If we don't already have this artifact installed,
-            if (!contains(artifact))
-            {
-                try
-                {
-                    // append each attachment to the attachments file,
-                    var source = artifact;
-                    for (var attachment : source.attachments())
-                    {
-                        source = source.withAttachment(saveAttachment(attachment));
-                    }
-
-                    // then append the updated metadata.
-                    super.saveArtifactMetadata(source);
-                }
-                catch (Exception e)
-                {
-                    problem(e, "Unable to install artifact: $", artifact);
-                }
-            }
-        });
+        super(name, folder);
     }
 
     /**
@@ -131,7 +113,7 @@ public class CacheRepository extends LocalRepository
      * @return The artifact with attachments populated with content
      */
     @Override
-    protected Artifact<?> loadArtifactContent(Artifact<?> artifact)
+    protected Artifact<?> loadAttachments(Artifact<?> artifact)
     {
         for (var attachment : artifact.attachments())
         {
@@ -153,7 +135,8 @@ public class CacheRepository extends LocalRepository
      * @param attachment The artifact attachment to append to the attachments file
      * @throws IllegalStateException Thrown if the content cannot be attached
      */
-    private ArtifactAttachment saveAttachment(ArtifactAttachment attachment)
+    @Override
+    protected ArtifactAttachment saveAttachment(ArtifactAttachment attachment)
     {
         var content = attachment.content();
 

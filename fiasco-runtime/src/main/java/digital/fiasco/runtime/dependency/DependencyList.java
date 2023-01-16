@@ -17,6 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.function.Function;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
@@ -329,6 +330,17 @@ public class DependencyList<T extends Dependency> implements
     public T last()
     {
         return dependencies.last();
+    }
+
+    /**
+     * Maps the dependencies in this list to values in an object list
+     *
+     * @param mapper The mapping function
+     * @return The mapped list
+     */
+    public <To> ObjectList<To> map(Function<T, To> mapper)
+    {
+        return dependencies.map(mapper);
     }
 
     /**

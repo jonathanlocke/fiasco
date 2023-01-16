@@ -1,11 +1,11 @@
 package digital.fiasco.runtime.dependency.artifact;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
+import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.string.AsString;
 import com.telenav.kivakit.core.version.Version;
-import com.telenav.kivakit.interfaces.comparison.Matcher;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.StringOutputResource;
 import com.telenav.kivakit.resource.resources.StringResource;
@@ -17,9 +17,9 @@ import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.repository.Repository;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
+import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
-import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
@@ -52,8 +52,8 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  * <p>
  * An artifact can have zero or more dependencies. The method {@link #dependencies()} returns a {@link DependencyList}
  * of {@link Artifact}s (note that there are non-artifact dependencies, such as {@link Builder}s). Artifact dependencies
- * can be filtered by excluding certain descriptors with {@link #excluding(String...)},
- * {@link #excluding(ArtifactDescriptor...)}, or {@link #excluding(Matcher)}.
+ * can be filtered by excluding certain descriptors with {@link #excluding(String...)}, or
+ * {@link #excluding(ArtifactDescriptor...)}.
  * </p>
  *
  * <p><b>Properties</b></p>
@@ -84,7 +84,6 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *     <li>{@link #withDependencies(ArtifactList)}</li>
  *     <li>{@link #excluding(ArtifactDescriptor...)}</li>
  *     <li>{@link #excluding(String...)}</li>
- *     <li>{@link #excluding(Matcher)}</li>
  * </ul>
  *
  * <p><b>Attachments</b></p>
@@ -110,7 +109,6 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #excluding(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
  *     <li>{@link #excluding(String...)} - Returns this artifact without the given dependencies</li>
- *     <li>{@link #excluding(Matcher)} - Returns this artifact without the given dependencies</li>
  * </ul>
  *
  *
@@ -130,6 +128,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
+@TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
 {
     /**
@@ -247,13 +246,13 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
     /**
      * Returns a copy of this artifact that excludes the given descriptors from its dependencies
      *
-     * @param exclude The descriptors to exclude
+     * @param exclusions The descriptors to exclude
      * @return The new artifact
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default T excluding(ArtifactDescriptor... exclude)
+    default T excluding(ArtifactDescriptor... exclusions)
     {
-        return excluding(at -> arrayContains(exclude, at));
+        return excluding(list(exclusions));
     }
 
     /**
@@ -294,7 +293,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @param pattern The pattern to exclude
      * @return The new artifact
      */
-    T excluding(Matcher<ArtifactDescriptor> pattern);
+    T excluding(ArtifactDescriptor pattern);
 
     /**
      * Returns true if this artifact excludes the given artifact

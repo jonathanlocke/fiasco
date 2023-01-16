@@ -20,6 +20,7 @@ import java.net.URI;
 import java.util.Objects;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 
@@ -112,7 +113,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     private final URI uri;
 
     /** The cached artifact entries */
-    private transient final ObjectMap<ArtifactDescriptor, Artifact<?>> artifacts = new ObjectMap<>();
+    private transient final ObjectMap<ArtifactDescriptor, Artifact<?>> descriptorToArtifact = new ObjectMap<>();
 
     /** Cache lock (filesystem locking not yet supported) */
     private transient final ReadWriteLock lock = new ReadWriteLock();
@@ -120,6 +121,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     /**
      * Creates a maven repository
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public BaseRepository(String name, URI uri)
     {
         this.name = name;
@@ -132,15 +134,17 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
      * @param artifact The artifact
      * @return True if it is in this repository
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean contains(Artifact<?> artifact)
     {
-        return artifacts.containsValue(artifact);
+        return descriptorToArtifact.containsValue(artifact);
     }
 
     /**
      * {@inheritDoc}
      */
     @Override
+    @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTED)
     public boolean equals(Object object)
     {
         if (object instanceof BaseRepository that)
@@ -154,6 +158,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
      * {@inheritDoc}
      */
     @Override
+    @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTED)
     public int hashCode()
     {
         return Objects.hash(name);
@@ -173,6 +178,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
      * {@inheritDoc}
      */
     @Override
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public URI uri()
     {
         return uri;
@@ -181,9 +187,9 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     /**
      * Returns the map from descriptor to artifact
      */
-    protected ObjectMap<ArtifactDescriptor, Artifact<?>> artifactMap()
+    protected ObjectMap<ArtifactDescriptor, Artifact<?>> descriptorToArtifactMap()
     {
-        return artifacts;
+        return descriptorToArtifact;
     }
 
     /**
@@ -207,7 +213,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     private ArtifactList matching(ArtifactDescriptor descriptor)
     {
         var matches = artifacts();
-        for (var at : artifactMap().values())
+        for (var at : descriptorToArtifactMap().values())
         {
             if (descriptor.matches(at.descriptor()))
             {
