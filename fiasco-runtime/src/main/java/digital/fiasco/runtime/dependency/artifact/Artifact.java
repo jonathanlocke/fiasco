@@ -3,6 +3,7 @@ package digital.fiasco.runtime.dependency.artifact;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
+import com.telenav.kivakit.core.string.AsString;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import com.telenav.kivakit.resource.Resource;
@@ -128,7 +129,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public interface Artifact<T extends Artifact<T>> extends Dependency
+public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
 {
     /**
      * Returns an artifact for a given JSON string
@@ -137,11 +138,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @return The artifact
      */
     @SuppressWarnings("unchecked")
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     static <T extends Artifact<T>> T artifactFromJson(String json)
     {
         var serialized = new StringResource(json);
@@ -155,11 +152,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param artifactName The new artifact name
      * @return The new artifact
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default T artifact(String artifactName)
     {
         return withArtifact(artifactName);
@@ -171,11 +164,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param artifact The new artifact name
      * @return The new artifact
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default T artifact(ArtifactName artifact)
     {
         return withArtifact(artifact);
@@ -201,11 +190,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      *
      * @return The content
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default ArtifactContent content()
     {
         return attachmentOfType(JAR_ATTACHMENT).content();
@@ -256,8 +241,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param dependencies The new dependencies
      * @return The new artifact
      */
-    @SuppressWarnings("unchecked")
-    T dependsOn(T... dependencies);
+    T dependsOn(T[] dependencies);
 
     /**
      * Returns the descriptor for this artifact
@@ -273,11 +257,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param exclude The descriptors to exclude
      * @return The new artifact
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default T excluding(ArtifactDescriptor... exclude)
     {
         return excluding(library -> arrayContains(exclude, library));
@@ -289,11 +269,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param exclude The descriptors to exclude
      * @return The new artifact
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default T excluding(String... exclude)
     {
         var descriptors = list(exclude).map(ArtifactDescriptor::descriptor);
@@ -314,11 +290,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param exclusions The artifacts to exclude
      * @return The new artifact
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default T excluding(Artifact<?>... exclusions)
     {
         return excluding(list(exclusions).map(Artifact::descriptor));
@@ -346,11 +318,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param artifact The artifact
      * @return True if the descriptor is excluded
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default boolean isExcluded(Artifact<?> artifact)
     {
         return isExcluded(artifact.descriptor());
@@ -374,11 +342,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     /**
      * Returns this artifact in JSON form
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default String toJson()
     {
         var serializer = new GsonObjectSerializer();
@@ -390,11 +354,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     /**
      * Convenience method for {@link #withVersion(Version)}
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default T version(Version version)
     {
         return withVersion(version);
@@ -403,11 +363,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
     /**
      * Convenience method for {@link #withVersion(Version)}
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default T version(String version)
     {
         return withVersion(Version.version(version));
@@ -419,11 +375,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param artifactName The new artifact name
      * @return The new artifact
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default T withArtifact(String artifactName)
     {
         return withDescriptor(descriptor().withArtifact(artifactName));
@@ -435,11 +387,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param artifactName The new artifact name
      * @return The new artifact
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default T withArtifact(ArtifactName artifactName)
     {
         return withDescriptor(descriptor().withArtifact(artifactName));
@@ -464,11 +412,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      *
      * @return The content
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default T withContent(ArtifactContent content)
     {
         var copy = copy();
@@ -506,11 +450,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param version The new version
      * @return The new artifact
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default T withVersion(Version version)
     {
         return withDescriptor(descriptor().withVersion(version));
@@ -522,11 +462,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency
      * @param version The new version
      * @return The new artifact
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default T withVersion(String version)
     {
         return withDescriptor(descriptor().withVersion(version));

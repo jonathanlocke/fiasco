@@ -104,11 +104,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @return The new artifact descriptor
      * @throws RuntimeException Throws a subclass of {@link RuntimeException} if parsing fails
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactDescriptor descriptor(String text)
     {
         return parseDescriptor(throwingListener(), text);
@@ -121,11 +117,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param artifact The artifact
      * @return The descriptor
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactDescriptor descriptor(ArtifactGroup group, ArtifactName artifact)
     {
         return descriptor(group, artifact, null);
@@ -137,11 +129,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param group The group
      * @return The descriptor
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactDescriptor descriptor(ArtifactGroup group)
     {
         return descriptor(group, null, null);
@@ -155,11 +143,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param version The version
      * @return The descriptor
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactDescriptor descriptor(ArtifactGroup group, ArtifactName artifact, Version version)
     {
         return new ArtifactDescriptor(group, artifact, version);
@@ -176,11 +160,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param text The descriptor text
      * @return The artifact descriptor, or null if parsing fails
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactDescriptor parseDescriptor(Listener listener, String text)
     {
         var matcher = DESCRIPTOR_PATTERN.matcher(text);
@@ -227,11 +207,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      *
      * @return True if this descriptor is a fully-specified descriptor
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean isComplete()
     {
         return group != null && artifact != null && version != null;
@@ -248,11 +224,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param that The version to match against
      * @return True if this version matches the given version
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean matches(ArtifactDescriptor that)
     {
         return group.equals(that.group)
@@ -266,11 +238,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * "com.telenav.kivakit::".
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public String name()
     {
         return group
@@ -295,11 +263,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param version The version
      * @return The descriptor
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor version(String version)
     {
         return withVersion(version);
@@ -311,11 +275,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param version The version
      * @return The descriptor
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor version(Version version)
     {
         return new ArtifactDescriptor(group, artifact, version);
@@ -327,11 +287,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param artifact The artifact name
      * @return The copy
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor withArtifact(ArtifactName artifact)
     {
         return new ArtifactDescriptor(group, artifact, version);
@@ -343,11 +299,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param artifact The artifact name
      * @return The copy
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor withArtifact(String artifact)
     {
         return withArtifact(ArtifactName.artifact(artifact));
@@ -359,11 +311,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param group The group
      * @return The copy
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor withGroup(ArtifactGroup group)
     {
         return new ArtifactDescriptor(group, artifact, version);
@@ -375,11 +323,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param group The group
      * @return The copy
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor withGroup(String group)
     {
         return withGroup(ArtifactGroup.group(group));
@@ -391,11 +335,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param version The version
      * @return The descriptor
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor withVersion(String version)
     {
         return withVersion(Version.version(version));
@@ -407,11 +347,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
      * @param version The version
      * @return The descriptor
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor withVersion(Version version)
     {
         return new ArtifactDescriptor(group, artifact, version);
@@ -420,11 +356,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
     /**
      * Returns a copy of this descriptor without any version
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor withoutArtifact()
     {
         return descriptor(group.name() + "::")
@@ -434,11 +366,7 @@ public record ArtifactDescriptor(ArtifactGroup group,
     /**
      * Returns a copy of this descriptor without any version
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor withoutVersion()
     {
         return group.artifact(artifact);

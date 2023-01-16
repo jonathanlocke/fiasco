@@ -44,11 +44,7 @@ public record ArtifactGroup(String name) implements Named
      * @param name The name of the group
      * @return The new group instance
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactGroup group(String name)
     {
         return new ArtifactGroup(name);
@@ -60,11 +56,7 @@ public record ArtifactGroup(String name) implements Named
      * @param artifact The artifact name
      * @return The artifact descriptor
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor artifact(ArtifactName artifact)
     {
         return new ArtifactDescriptor(this, artifact, null);
@@ -76,11 +68,7 @@ public record ArtifactGroup(String name) implements Named
      * @param artifact The artifact name
      * @return The artifact descriptor
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor artifact(String artifact)
     {
         return artifact(ArtifactName.artifact(artifact));
@@ -92,11 +80,7 @@ public record ArtifactGroup(String name) implements Named
      * @param asset The asset name
      * @return The asset
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public Asset asset(String asset)
     {
         return Asset.asset(descriptor(name + ":" + asset + ":"));
@@ -108,32 +92,20 @@ public record ArtifactGroup(String name) implements Named
      * @param library The library name
      * @return The library
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public Library library(String library)
     {
         return Library.library(descriptor(name + ":" + library + ":"));
     }
 
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     @Override
     public String name()
     {
         return name;
     }
 
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     @Override
     public String toString()
     {

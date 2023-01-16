@@ -5,6 +5,7 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.DependencyTree.dependencyTree;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
@@ -22,6 +23,31 @@ public class DependencyTreeTest extends FiascoTest
     Library e = library("e:e:1");
 
     Library f = library("f:f:1");
+
+    @Test
+    public void testAsQueue()
+    {
+        var queue = libraryTree().asQueue();
+
+        var group1 = queue.nextReadyGroup();
+        ensure(group1.equals(dependencyList(c, e, f)));
+        queue.resolveGroup(group1);
+
+        var group2 = queue.nextReadyGroup();
+        ensure(group2.equals(dependencyList(b, d)));
+        queue.resolveGroup(group2);
+
+        var group3 = queue.nextReadyGroup();
+        ensure(group3.equals(dependencyList(a)));
+        queue.resolveGroup(group3);
+    }
+
+    @Test
+    public void testRoot()
+    {
+        var tree = libraryTree();
+        ensure(tree.root().equals(a));
+    }
 
     @Test
     public void testDepthFirst()

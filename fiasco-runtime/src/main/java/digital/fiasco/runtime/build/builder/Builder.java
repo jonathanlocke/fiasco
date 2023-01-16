@@ -381,6 +381,17 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
+     * Returns a copy of this artifact with the given dependencies
+     *
+     * @param dependencies The new dependencies
+     * @return The new artifact
+     */
+    public Builder dependsOn(DependencyList<?> dependencies)
+    {
+        return withDependencies(dependencies);
+    }
+
+    /**
      * Returns a child builder at the given path with an empty dependency list. If the artifact descriptor for a builder
      * "x" is "apache.stuff:double-stuff:1.5.0", then x.childBuilder("stuff-utilities") will return a new builder with
      * the artifact descriptor "apache.stuff:stuff-utilities:1.5.0". The root folder will be

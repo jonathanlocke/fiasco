@@ -28,11 +28,7 @@ public record ArtifactName(String name) implements Comparable<ArtifactName>
      * @param name The artifact name
      * @return The new instance of {@link ArtifactName}
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactName artifact(String name)
     {
         return new ArtifactName(name);
@@ -42,22 +38,14 @@ public record ArtifactName(String name) implements Comparable<ArtifactName>
      * {@inheritDoc}
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public int compareTo(ArtifactName that)
     {
         return this.name.compareTo(that.name);
     }
 
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public String toString()
     {
         return name;

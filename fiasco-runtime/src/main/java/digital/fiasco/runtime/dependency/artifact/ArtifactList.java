@@ -57,7 +57,6 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  * <ul>
  *     <li>{@link #copy()}</li>
  *     <li>{@link #with(DependencyList)}</li>
- *     <li>{@link #with(Iterable)}</li>
  *     <li>{@link #with(Artifact)}</li>
  *     <li>{@link #with(Artifact, Artifact[])}</li>
  *     <li>{@link #with(Artifact[])}</li>
@@ -88,11 +87,7 @@ public class ArtifactList extends DependencyList<Artifact>
      * @param artifacts The artifacts to add
      * @return The dependency list
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactList artifactList(Collection<Artifact> artifacts)
     {
         return new ArtifactList(artifacts);
@@ -104,26 +99,22 @@ public class ArtifactList extends DependencyList<Artifact>
      * @param artifacts The dependencies to add
      * @return The dependency list
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactList artifactList(Artifact... artifacts)
     {
         return new ArtifactList(list(artifacts));
     }
 
-    public ArtifactList()
+    protected ArtifactList()
     {
     }
 
-    public ArtifactList(ArtifactList that)
+    protected ArtifactList(ArtifactList that)
     {
         super(that);
     }
 
-    public ArtifactList(Collection<Artifact> artifacts)
+    protected ArtifactList(Collection<Artifact> artifacts)
     {
         super(artifacts);
     }
@@ -131,11 +122,7 @@ public class ArtifactList extends DependencyList<Artifact>
     /**
      * Returns the {@link Asset} artifacts in this list
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactList assets()
     {
         return matching(at -> at instanceof Asset);
@@ -145,11 +132,7 @@ public class ArtifactList extends DependencyList<Artifact>
      * {@inheritDoc}
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactList copy()
     {
         return new ArtifactList(this);
@@ -158,11 +141,7 @@ public class ArtifactList extends DependencyList<Artifact>
     /**
      * Returns the {@link Library} artifacts in this list
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactList libraries()
     {
         return matching(at -> at instanceof Library);
@@ -171,115 +150,77 @@ public class ArtifactList extends DependencyList<Artifact>
     /**
      * Returns the artifacts in this list that match the given matcher
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     @Override
     public ArtifactList matching(Matcher<Artifact> matcher)
     {
         return (ArtifactList) super.matching(matcher);
     }
 
+    /**
+     * {@inheritDoc}
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     @Override
-    public ArtifactList with(Iterable<Artifact> dependencies)
+    public ArtifactList with(DependencyList<Artifact> inclusions)
     {
-        return (ArtifactList) super.with(dependencies);
+        return (ArtifactList) super.with(inclusions);
     }
 
     /**
      * {@inheritDoc}
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     @Override
-    public ArtifactList with(DependencyList<Artifact> dependencies)
+    public ArtifactList with(Artifact inclusion)
     {
-        return (ArtifactList) super.with(dependencies);
+        return (ArtifactList) super.with(inclusion);
     }
 
     /**
      * {@inheritDoc}
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     @Override
-    public ArtifactList with(Artifact value)
+    public ArtifactList with(Artifact first, Artifact... rest)
     {
-        return (ArtifactList) super.with(value);
+        return (ArtifactList) super.with(first, rest);
     }
 
     /**
      * {@inheritDoc}
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     @Override
-    public ArtifactList with(Artifact first, Artifact... dependencies)
+    public ArtifactList with(Artifact[] inclusions)
     {
-        return (ArtifactList) super.with(first, dependencies);
+        return (ArtifactList) super.with(inclusions);
     }
 
     /**
      * {@inheritDoc}
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     @Override
-    public ArtifactList with(Artifact[] value)
+    public ArtifactList without(Matcher<Artifact> exclusionPattern)
     {
-        return (ArtifactList) super.with(value);
+        return (ArtifactList) super.without(exclusionPattern);
     }
 
     /**
      * {@inheritDoc}
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     @Override
-    public ArtifactList without(Matcher<Artifact> pattern)
+    public ArtifactList without(DependencyList<Artifact> exclusions)
     {
-        return (ArtifactList) super.without(pattern);
+        return (ArtifactList) super.without(exclusions);
     }
 
     /**
      * {@inheritDoc}
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
-    @Override
-    public ArtifactList without(DependencyList<Artifact> artifacts)
-    {
-        return (ArtifactList) super.without(artifacts);
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     @Override
     public ArtifactList without(Collection<Artifact> exclusions)
     {

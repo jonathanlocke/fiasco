@@ -11,6 +11,7 @@ import digital.fiasco.runtime.dependency.artifact.Asset;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.serialization.FiascoGsonFactory;
 
+import static com.telenav.kivakit.core.os.Console.console;
 import static com.telenav.kivakit.core.time.Day.dayOfMonth;
 import static com.telenav.kivakit.core.time.Hour.hourOfDay;
 import static com.telenav.kivakit.core.time.Meridiem.AM;
@@ -142,9 +143,17 @@ public class FiascoTest extends UnitTest
         return library("com.telenav.kivakit:kivakit-resource:1.8.5");
     }
 
+    protected void println(String message, Object... arguments)
+    {
+        console().println(message, arguments);
+    }
+
     protected ArtifactContentSignatures signatures()
     {
-        return new ArtifactContentSignatures("oisdfoiusdfoiu198273", "12983791826501", "120378019821");
+        return ArtifactContentSignatures.signatures()
+            .withPgp("1769187598761516661")
+            .withMd5("12983791826501")
+            .withSha1("120378019821");
     }
 
     protected ArtifactAttachment sourcesAttachment()

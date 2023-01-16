@@ -59,11 +59,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      * @param descriptors The library descriptors
      * @return The library dependency list
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static DependencyList<Library> libraries(String... descriptors)
     {
         var libraries = stringList(descriptors).map(Library::library);
@@ -76,11 +72,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      * @param libraries The libraries
      * @return The library dependency list
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static DependencyList<Library> libraries(Library... libraries)
     {
         return dependencyList(libraries);
@@ -92,11 +84,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      * @param descriptor The artifact descriptor
      * @return The library
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static Library library(String descriptor)
     {
         return new Library(ArtifactDescriptor.descriptor(descriptor));
@@ -108,11 +96,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      * @param descriptor The artifact descriptor
      * @return The library
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static Library library(ArtifactDescriptor descriptor)
     {
         return new Library(descriptor);
@@ -132,11 +116,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      * {@inheritDoc}
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public Library copy()
     {
         return new Library(this);
@@ -147,11 +127,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      *
      * @return The Javadoc content
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactContent javadoc()
     {
         return attachmentOfType(JAVADOC_ATTACHMENT).content();
@@ -162,11 +138,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      *
      * @return The source code JAR
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactContent sources()
     {
         return attachmentOfType(SOURCES_ATTACHMENT).content();
@@ -178,11 +150,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      * @param javadoc The Javadoc content
      * @return The new library
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public Library withJavadoc(ArtifactContent javadoc)
     {
         return copy().withAttachment(attachment(JAVADOC_ATTACHMENT, javadoc));
@@ -194,11 +162,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
      * @param sources The source code JAR attachment
      * @return The new library
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public Library withSources(ArtifactContent sources)
     {
         return copy().withAttachment(attachment(SOURCES_ATTACHMENT, sources));

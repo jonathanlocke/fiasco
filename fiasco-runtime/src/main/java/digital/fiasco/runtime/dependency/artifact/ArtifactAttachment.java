@@ -60,11 +60,7 @@ public record ArtifactAttachment
      * @param content The content*
      * @return The attachment
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactAttachment attachment(ArtifactAttachmentType type, ArtifactContent content)
     {
         return new ArtifactAttachment(null, type, content);
@@ -76,11 +72,7 @@ public record ArtifactAttachment
      * @param type The type of attachment
      * @return The attachment
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactAttachment attachment(ArtifactAttachmentType type)
     {
         return attachment(type, null);
@@ -90,11 +82,7 @@ public record ArtifactAttachment
      * {@inheritDoc}
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean equals(Object object)
     {
         if (object instanceof ArtifactAttachment that)
@@ -108,11 +96,7 @@ public record ArtifactAttachment
      * {@inheritDoc}
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public int hashCode()
     {
         return hashMany(attachmentType, content);
@@ -133,11 +117,7 @@ public record ArtifactAttachment
      * @param artifact The artifact that this attachment belongs to
      * @return The attachment
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactAttachment withArtifact(Artifact<?> artifact)
     {
         return new ArtifactAttachment(artifact, attachmentType, content);
@@ -149,11 +129,7 @@ public record ArtifactAttachment
      * @param content The content for this attachment
      * @return The attachment
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactAttachment withContent(ArtifactContent content)
     {
         return new ArtifactAttachment(artifact, attachmentType, content);
@@ -165,11 +141,7 @@ public record ArtifactAttachment
      * @param type The type of this attachment
      * @return The attachment
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactAttachment withType(ArtifactAttachmentType type)
     {
         return new ArtifactAttachment(artifact, type, content);

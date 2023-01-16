@@ -47,11 +47,7 @@ public enum ArtifactAttachmentType
      *
      * @return The suffix
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public String fileSuffix()
     {
         return fileSuffix;

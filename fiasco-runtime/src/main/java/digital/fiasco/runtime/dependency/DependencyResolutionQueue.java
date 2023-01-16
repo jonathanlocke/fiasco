@@ -29,6 +29,7 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
  *
  * @param <T> The dependency type
  */
+@SuppressWarnings("unused")
 public class DependencyResolutionQueue<T extends Dependency>
 {
     /** The resolved dependencies */

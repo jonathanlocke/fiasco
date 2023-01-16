@@ -16,12 +16,13 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
-import java.util.function.Function;
 
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABILITY_UNDETERMINED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_INSUFFICIENT;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_NOT_NEEDED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 
@@ -68,7 +69,6 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactLi
  * <ul>
  *     <li>{@link #copy()}</li>
  *     <li>{@link #with(DependencyList)}</li>
- *     <li>{@link #with(Iterable)}</li>
  *     <li>{@link #with(Dependency)}</li>
  *     <li>{@link #with(Dependency, Dependency...)}</li>
  *     <li>{@link #without(Matcher)}</li>
@@ -95,6 +95,7 @@ public class DependencyList<T extends Dependency> implements
      * @return The dependency list
      */
     @SafeVarargs
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static <T extends Dependency> DependencyList<T> dependencyList(T... dependencies)
     {
         return new DependencyList<>(list(dependencies));
@@ -106,6 +107,7 @@ public class DependencyList<T extends Dependency> implements
      * @param dependencies The dependencies to add
      * @return The dependency list
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static <T extends Dependency> DependencyList<T> dependencyList(Collection<T> dependencies)
     {
         return new DependencyList<>(dependencies);
@@ -115,11 +117,12 @@ public class DependencyList<T extends Dependency> implements
     @FormatProperty
     private ObjectList<T> dependencies = list();
 
+    @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTING_NOT_NEEDED)
     public DependencyList()
     {
     }
 
-    public DependencyList(DependencyList<T> that)
+    protected DependencyList(DependencyList<T> that)
     {
         this.dependencies = that.dependencies.copy();
     }
@@ -134,17 +137,25 @@ public class DependencyList<T extends Dependency> implements
      *
      * @return The list of descriptors
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ObjectList<ArtifactDescriptor> asArtifactDescriptors()
     {
         return dependencies.map(Dependency::descriptor);
     }
 
+    /**
+     * Returns an {@link ArtifactList} containing all artifacts in this dependency list
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactList asArtifactList()
     {
         var artifacts = artifactList();
         for (var at : dependencies)
         {
-            artifacts = artifacts.with((Artifact<?>) at);
+            if (at instanceof Artifact<?> artifact)
+            {
+                artifacts = artifacts.with(artifact);
+            }
         }
         return artifacts;
     }
@@ -154,6 +165,7 @@ public class DependencyList<T extends Dependency> implements
      *
      * @return The list
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ObjectList<T> asList()
     {
         return dependencies.copy();
@@ -164,21 +176,36 @@ public class DependencyList<T extends Dependency> implements
      *
      * @return The list
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ObjectSet<T> asSet()
     {
         return new ObjectSet<>(dependencies.copy());
     }
 
+    /**
+     * Returns this dependency list as a string
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public String asString()
     {
         return dependencies.asString();
     }
 
+    /**
+     * Returns the descriptors of artifacts in this list as a string list
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public StringList asStringList()
     {
         return dependencies.asStringList();
     }
 
+    /**
+     * Returns true if this list contains the given dependency
+     *
+     * @param dependency The dependency
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean contains(T dependency)
     {
         return dependencies.contains(dependency);
@@ -187,11 +214,7 @@ public class DependencyList<T extends Dependency> implements
     /**
      * Returns true if this dependency list contains all the dependencies in the given list
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean containsAll(DependencyList<T> dependencies)
     {
         return this.dependencies.containsAll(dependencies.dependencies);
@@ -202,6 +225,7 @@ public class DependencyList<T extends Dependency> implements
      *
      * @return The copy
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyList<T> copy()
     {
         return new DependencyList<>(dependencies.copy());
@@ -210,11 +234,7 @@ public class DependencyList<T extends Dependency> implements
     /**
      * Returns the count of dependencies in this list
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public Count count()
     {
         return dependencies.count();
@@ -222,6 +242,7 @@ public class DependencyList<T extends Dependency> implements
 
     @SuppressWarnings("SuspiciousMethodCalls")
     @Override
+    @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTED)
     public boolean equals(Object object)
     {
         if (object instanceof DependencyList<?> that)
@@ -235,22 +256,30 @@ public class DependencyList<T extends Dependency> implements
     /**
      * Returns the first dependency in this list
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T first()
     {
         return dependencies.first();
     }
 
+    /**
+     * Returns the dependency at the given index in this list
+     *
+     * @param index The index
+     * @return The dependency at the given index
+     * @throws IndexOutOfBoundsException if the index is out of range ({@code index < 0 || index >= size()})
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T get(int index)
     {
         return dependencies.get(index);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTED)
     public int hashCode()
     {
         return dependencies.hashCode();
@@ -261,26 +290,40 @@ public class DependencyList<T extends Dependency> implements
      */
     @Override
     @NotNull
+    @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTING_NOT_NEEDED)
     public Iterator<T> iterator()
     {
         return dependencies.iterator();
     }
 
+    /**
+     * Returns the dependencies in this list as a string of artifact descriptors separated with the given separator
+     *
+     * @param separator The separator
+     * @return The joined string
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public String join(String separator)
     {
         return dependencies.join(separator);
     }
 
+    /**
+     * Returns the last dependency in this list
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T last()
     {
         return dependencies.last();
     }
 
-    public <To> ObjectList<To> map(Function<T, To> mapper)
-    {
-        return dependencies.map(mapper);
-    }
-
+    /**
+     * Returns a new list with only the dependencies in this list that match the given matcher
+     *
+     * @param matcher The matcher
+     * @return The new list
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyList<T> matching(Matcher<T> matcher)
     {
         var copy = copy();
@@ -291,17 +334,17 @@ public class DependencyList<T extends Dependency> implements
     /**
      * Returns the size of this list in elements
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
     @Override
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public int size()
     {
         return dependencies.size();
     }
 
+    /**
+     * Returns a copy of this list in natural sorted order
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyList<T> sorted()
     {
         return dependencyList(dependencies.sorted());
@@ -314,54 +357,60 @@ public class DependencyList<T extends Dependency> implements
     }
 
     /**
-     * Returns this list with the given dependencies
+     * Returns a copy of this list with the given dependencies added
      *
-     * @param dependencies A variable-argument list of dependencies to include
-     * @return A copy of this list with the given dependencies
+     * @param first The first dependency to include
+     * @param rest The dependencies to include
+     * @return The new list
      */
-    public DependencyList<T> with(T first, T[] dependencies)
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public DependencyList<T> with(T first, T[] rest)
     {
         var copy = copy();
         copy.dependencies.add(first);
-        copy.dependencies.addAll(dependencies);
-        return copy;
-    }
-
-    public DependencyList<T> with(T value)
-    {
-        var copy = copy();
-        copy.dependencies = dependencies.with(value);
-        return copy;
-    }
-
-    public DependencyList<T> with(T[] value)
-    {
-        var copy = copy();
-        copy.dependencies = dependencies.with(value);
+        copy.dependencies.addAll(rest);
         return copy;
     }
 
     /**
-     * Returns this list with the given dependencies
+     * Returns a copy of this list with the given dependency added
      *
-     * @return A copy of this list with the given dependencies
+     * @param inclusion The dependency to included
+     * @return The new list
      */
-    public DependencyList<T> with(DependencyList<T> dependencies)
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public DependencyList<T> with(T inclusion)
     {
         var copy = copy();
-        copy.dependencies.addAll(dependencies.dependencies);
+        copy.dependencies = dependencies.with(inclusion);
         return copy;
     }
 
     /**
-     * Returns this list with the given dependencies
+     * Returns a copy of this list with the given dependencies added
      *
-     * @return A copy of this list with the given dependencies
+     * @param inclusions The dependencies to included
+     * @return The new list
      */
-    public DependencyList<T> with(Iterable<T> dependencies)
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public DependencyList<T> with(T[] inclusions)
     {
         var copy = copy();
-        copy.dependencies.addAll(dependencies);
+        copy.dependencies = dependencies.with(inclusions);
+        return copy;
+    }
+
+    /**
+     * Returns a copy of this list with the given dependencies added
+     *
+     * @param inclusions The dependencies to included
+     * @return The new list
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public DependencyList<T> with(DependencyList<T> inclusions)
+    {
+        var copy = copy();
+        copy.dependencies.addAll(inclusions);
         return copy;
     }
 
@@ -369,8 +418,9 @@ public class DependencyList<T extends Dependency> implements
      * Returns a copy of this list without the given dependencies
      *
      * @param exclusions The dependencies to exclude
-     * @return The dependency list
+     * @return The new list
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyList<T> without(Collection<T> exclusions)
     {
         var copy = copy();
@@ -379,11 +429,12 @@ public class DependencyList<T extends Dependency> implements
     }
 
     /**
-     * Returns a copy of this list without the given dependencies
+     * Returns a copy of this list without the given dependency
      *
      * @param exclusion The dependencies to exclude
-     * @return The dependency list
+     * @return The new list
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyList<T> without(T exclusion)
     {
         var copy = copy();
@@ -391,23 +442,31 @@ public class DependencyList<T extends Dependency> implements
         return copy;
     }
 
-    public DependencyList<T> without(DependencyList<T> artifacts)
+    /**
+     * Returns a copy of this list without the given dependencies
+     *
+     * @param exclusions The dependencies to exclude
+     * @return The new list
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public DependencyList<T> without(DependencyList<T> exclusions)
     {
         var copy = copy();
-        copy.dependencies.removeAll(artifacts.dependencies);
+        copy.dependencies.removeAll(exclusions.dependencies);
         return copy;
     }
 
     /**
      * Returns a copy of this dependency list without all dependencies matching the given pattern
      *
-     * @param pattern The pattern to match
-     * @return A copy of this list without the specified dependencies
+     * @param exclusionPattern The pattern to match
+     * @return The new list
      */
-    public DependencyList<T> without(Matcher<T> pattern)
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public DependencyList<T> without(Matcher<T> exclusionPattern)
     {
         var copy = copy();
-        copy.dependencies.removeIf(pattern::matches);
+        copy.dependencies.removeIf(exclusionPattern::matches);
         return copy;
     }
 }

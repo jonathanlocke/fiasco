@@ -9,6 +9,7 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.dependency.artifact.Asset;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.Repository;
+import org.jetbrains.annotations.NotNull;
 
 /**
  * A dependency is either a {@link Builder}, or an {@link Artifact} with an associated {@link #repository()}. An
@@ -43,7 +44,9 @@ import digital.fiasco.runtime.repository.Repository;
  * @see Librarian
  */
 @SuppressWarnings("unused")
-public interface Dependency extends Named
+public interface Dependency extends
+    Named,
+    Comparable<Dependency>
 {
     /**
      * Gets all artifact dependencies
@@ -71,6 +74,12 @@ public interface Dependency extends Named
             }
         }
         return dependencies;
+    }
+
+    @Override
+    default int compareTo(@NotNull Dependency that)
+    {
+        return name().compareTo(that.name());
     }
 
     /**

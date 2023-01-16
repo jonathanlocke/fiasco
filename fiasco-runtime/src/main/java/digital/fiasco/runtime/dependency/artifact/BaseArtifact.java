@@ -10,6 +10,7 @@ import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
+import com.telenav.kivakit.interfaces.string.StringFormattable;
 import digital.fiasco.runtime.repository.Repository;
 
 import java.util.LinkedHashMap;
@@ -177,14 +178,23 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      *
      * @return The artifact name
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactName artifact()
     {
         return descriptor.artifact();
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public String asString(StringFormattable.Format format)
+    {
+        return switch (format)
+            {
+                case DEBUG -> new ObjectFormatter(this).toString();
+                default -> name();
+            };
     }
 
     /**
@@ -194,11 +204,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return The attachment of the given type with the given name, or null if there is none
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactAttachment attachmentOfType(ArtifactAttachmentType type)
     {
         return typeToAttachment.get(type);
@@ -209,11 +215,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      */
     @Override
     @FormatProperty
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ObjectList<ArtifactAttachment> attachments()
     {
         return list(typeToAttachment.values());
@@ -225,11 +227,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return The copy
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public abstract T copy();
 
     /**
@@ -239,11 +237,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      */
     @Override
     @FormatProperty
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactList dependencies()
     {
         return dependencies.matching(at -> !isExcluded(at.descriptor()));
@@ -256,11 +250,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return Any matching dependency
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactList dependenciesMatching(String pattern)
     {
         var matches = artifactList();
@@ -282,11 +272,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return Any matching dependency
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public Artifact<?> dependencyMatching(String pattern)
     {
         for (var at : dependencies)
@@ -306,11 +292,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return The dependency
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public Artifact<?> dependencyNamed(String name)
     {
         for (var at : dependencies)
@@ -329,13 +311,10 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @param dependencies The new dependencies
      * @return The new artifact
      */
+    @SafeVarargs
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
-    public T dependsOn(T... dependencies)
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public final T dependsOn(T... dependencies)
     {
         return withDependencies(artifactList(dependencies));
     }
@@ -344,22 +323,14 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * {@inheritDoc}
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public final ArtifactDescriptor descriptor()
     {
         return descriptor;
     }
 
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean equals(Object object)
     {
         if (object instanceof Artifact<?> artifact)
@@ -376,11 +347,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return The new artifact
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T excluding(Matcher<ArtifactDescriptor> exclusion)
     {
         var copy = copy();
@@ -395,11 +362,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return The new artifact
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T excluding(ArtifactDescriptor... exclusions)
     {
         return excluding(at ->
@@ -422,11 +385,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return The new artifact
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T excluding(ObjectList<ArtifactDescriptor> exclusions)
     {
         return excluding(at ->
@@ -449,22 +408,14 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return The new artifact
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T excluding(String... exclusions)
     {
         return excluding(list(exclusions).map(ArtifactDescriptor::descriptor));
     }
 
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public int hashCode()
     {
         return descriptor().hashCode();
@@ -474,11 +425,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * {@inheritDoc}
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean isExcluded(ArtifactDescriptor descriptor)
     {
         for (var at : exclusions)
@@ -496,11 +443,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      *
      * @return The JAR content
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactContent jar()
     {
         return attachmentOfType(JAR_ATTACHMENT).content();
@@ -512,11 +455,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return The POM file
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public String mavenPom()
     {
         var dependencies = stringList();
@@ -563,11 +502,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
 
     @Override
     @FormatProperty
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public String name()
     {
         return descriptor.name();
@@ -577,11 +512,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * {@inheritDoc}
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public final Repository repository()
     {
         return repository;
@@ -595,7 +526,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
         )
     public String toString()
     {
-        return new ObjectFormatter(this).toString();
+        return name();
     }
 
     /**
@@ -604,11 +535,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @param attachment The content to attach
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T withAttachment(ArtifactAttachment attachment)
     {
         var copy = copy();
@@ -639,11 +566,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return The content
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T withContent(ArtifactContent content)
     {
         return copy().withAttachment(attachment(JAR_ATTACHMENT, content));
@@ -656,11 +579,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return The new artifact
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T withDependencies(ArtifactList dependencies)
     {
         var copy = copy();
@@ -675,11 +594,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return The new artifact
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T withDescriptor(ArtifactDescriptor descriptor)
     {
         var copy = copy();
@@ -693,11 +608,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @param jar The Javadoc content
      * @return The new library
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T withJar(ArtifactContent jar)
     {
         return copy().withAttachment(attachment(JAR_ATTACHMENT, jar));
@@ -710,11 +621,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @return The new artifact
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T withRepository(Repository repository)
     {
         var copy = copy();

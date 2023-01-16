@@ -13,11 +13,11 @@ import com.telenav.kivakit.core.registry.RegistryTrait;
 import digital.fiasco.runtime.dependency.DependencyList;
 
 import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_INTERNAL;
-import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
+import static com.telenav.kivakit.annotations.code.quality.Testing.UNTESTED;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 
@@ -50,11 +50,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      * @param descriptor The artifact descriptor
      * @return The asset
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static Asset asset(String descriptor)
     {
         return asset(ArtifactDescriptor.descriptor(descriptor));
@@ -66,11 +62,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      * @param descriptor The artifact descriptor
      * @return The asset
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static Asset asset(ArtifactDescriptor descriptor)
     {
         return new Asset(descriptor);
@@ -82,11 +74,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      * @param artifact The asset artifact
      * @return The asset
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = UNTESTED)
     public static Asset asset(Artifact<?> artifact)
     {
         return asset(artifact.descriptor());
@@ -98,11 +86,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      * @param descriptors The artifact descriptors
      * @return The asset dependency list
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactList assets(String... descriptors)
     {
         return artifactList(stringList(descriptors).map(Asset::asset));
@@ -114,11 +98,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      * @param assets The assets
      * @return The asset dependency list
      */
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactList assets(Asset... assets)
     {
         return artifactList(assets);
@@ -150,11 +130,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
      * {@inheritDoc}
      */
     @Override
-    @MethodQuality
-        (
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public Asset copy()
     {
         return new Asset(this);

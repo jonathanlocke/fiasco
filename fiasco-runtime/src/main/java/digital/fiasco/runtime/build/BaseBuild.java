@@ -231,7 +231,7 @@ public abstract class BaseBuild extends Application implements Build
         var root = newBuilder().withArtifactDescriptor(metadata.descriptor());
 
         // configure and run the build,
-        var results = listenTo(new BuildExecutor(onConfigureBuild(root))).build();
+        var results = listenTo(new BuildExecutor(onConfigureBuild(root))). build();
 
         // then show the results.
         var problems = _0;

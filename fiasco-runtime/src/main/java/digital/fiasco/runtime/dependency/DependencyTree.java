@@ -1,10 +1,14 @@
 package digital.fiasco.runtime.dependency;
 
+import com.telenav.kivakit.annotations.code.quality.MethodQuality;
+import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.messaging.messages.MessageException;
 
-import static com.telenav.kivakit.core.ensure.Ensure.fail;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
+import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
+import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
-import static java.util.Collections.disjoint;
 
 /**
  * Tree of dependencies created by traversing dependencies in depth-first order from the root, resulting in a list of
@@ -31,12 +35,19 @@ import static java.util.Collections.disjoint;
  *
  * @author Jonathan Locke
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({ "unused", "unchecked" })
+@TypeQuality
+    (
+        documentation = DOCUMENTED,
+        testing = TESTED,
+        stability = STABLE
+    )
 public class DependencyTree<T extends Dependency>
 {
     /**
      * @return The dependency graph formed by traversing dependencies starting at the given root
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static <T extends Dependency> DependencyTree<T> dependencyTree(Dependency root, Class<T> type)
     {
         return new DependencyTree<>(root, type);
@@ -55,12 +66,14 @@ public class DependencyTree<T extends Dependency>
     {
         this.root = root;
         this.type = type;
-        depthFirst = depthFirst(root);
+
+        depthFirst = depthFirst(root, dependencyList()).with((T) root);
     }
 
     /**
      * Returns this dependency tree as a queue
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyResolutionQueue<T> asQueue()
     {
         return new DependencyResolutionQueue<>(depthFirst(), type);
@@ -69,6 +82,7 @@ public class DependencyTree<T extends Dependency>
     /**
      * @return The dependencies in this graph in depth-first order
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyList<T> depthFirst()
     {
         return depthFirst;
@@ -77,6 +91,7 @@ public class DependencyTree<T extends Dependency>
     /**
      * @return The root node of this dependency graph
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public Dependency root()
     {
         return root;
@@ -85,34 +100,16 @@ public class DependencyTree<T extends Dependency>
     /**
      * @return List of dependencies in depth-first order
      */
-    private DependencyList<T> depthFirst(Dependency root)
+    private DependencyList<T> depthFirst(Dependency root, DependencyList<T> explored)
     {
-        DependencyList<T> explored = dependencyList();
-
-        // Go through each child of the root
+        // Go through each child of the root,
         for (var child : root.dependencies(type))
         {
-            // and explore it (in a depth-first traversal)
-            var descendants = depthFirst(child);
+            // check for cycles (which should not be possible in our functional api),
+            ensure(!explored.contains(child), "The dependency tree is cyclic:", root);
 
-            // and if none of the explored values has already been explored
-            if (disjoint(explored.asSet(), descendants.asSet()))
-            {
-                // then add the explored descendants to the list of dependencies
-                explored = explored.with(descendants);
-            }
-            else
-            {
-                // otherwise, if the explored list intersects the descendants, there is a cyclic dependency graph.
-                fail("The dependency graph '$' is cyclic.", root);
-            }
-        }
-
-        // Finally, return the explored children with the root.
-        if (type.isAssignableFrom(root.getClass()))
-        {
-            // noinspection unchecked
-            return explored.with((T) root);
+            // and explore the child (in a depth-first traversal)
+            explored = depthFirst(child, explored).with(child);
         }
 
         return explored;
