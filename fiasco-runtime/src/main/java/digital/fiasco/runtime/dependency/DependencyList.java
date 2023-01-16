@@ -16,6 +16,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.LinkedHashSet;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
@@ -24,7 +25,6 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_INSUFFICIENT;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_NOT_NEEDED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 
 /**
  * An immutable, ordered list of {@link Dependency} objects.
@@ -32,8 +32,8 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactLi
  * <p><b>Creation</b></p>
  *
  * <ul>
- *     <li>{@link #dependencyList(Dependency[])} - Variable arguments factory method</li>
- *     <li>{@link #dependencyList(Collection)} - List factory method</li>
+ *     <li>{@link #dependencies(Dependency[])} - Variable arguments factory method</li>
+ *     <li>{@link #dependencies(Collection)} - List factory method</li>
  * </ul>
  *
  * <p><b>Filtering</b></p>
@@ -96,7 +96,7 @@ public class DependencyList<T extends Dependency> implements
      */
     @SafeVarargs
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static <T extends Dependency> DependencyList<T> dependencyList(T... dependencies)
+    public static <T extends Dependency> DependencyList<T> dependencies(T... dependencies)
     {
         return new DependencyList<>(list(dependencies));
     }
@@ -108,7 +108,7 @@ public class DependencyList<T extends Dependency> implements
      * @return The dependency list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static <T extends Dependency> DependencyList<T> dependencyList(Collection<T> dependencies)
+    public static <T extends Dependency> DependencyList<T> dependencies(Collection<T> dependencies)
     {
         return new DependencyList<>(dependencies);
     }
@@ -149,7 +149,7 @@ public class DependencyList<T extends Dependency> implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactList asArtifactList()
     {
-        var artifacts = artifactList();
+        var artifacts = ArtifactList.artifacts();
         for (var at : dependencies)
         {
             if (at instanceof Artifact<?> artifact)
@@ -179,7 +179,7 @@ public class DependencyList<T extends Dependency> implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ObjectSet<T> asSet()
     {
-        return new ObjectSet<>(dependencies.copy());
+        return new ObjectSet<>(new LinkedHashSet<>(dependencies.copy()));
     }
 
     /**
@@ -240,6 +240,19 @@ public class DependencyList<T extends Dependency> implements
         return dependencies.count();
     }
 
+    public DependencyList<T> deduplicate()
+    {
+        var deduplicated = new DependencyList<T>();
+        for (var at : this)
+        {
+            if (!deduplicated.contains(at))
+            {
+                deduplicated = deduplicated.with(at);
+            }
+        }
+        return deduplicated;
+    }
+
     @SuppressWarnings("SuspiciousMethodCalls")
     @Override
     @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTED)
@@ -247,7 +260,8 @@ public class DependencyList<T extends Dependency> implements
     {
         if (object instanceof DependencyList<?> that)
         {
-            return this.dependencies.containsAll(that.dependencies)
+            return this.dependencies.size() == that.dependencies.size()
+                && this.dependencies.containsAll(that.dependencies)
                 && that.dependencies.containsAll(this.dependencies);
         }
         return false;
@@ -347,7 +361,7 @@ public class DependencyList<T extends Dependency> implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyList<T> sorted()
     {
-        return dependencyList(dependencies.sorted());
+        return dependencies(dependencies.sorted());
     }
 
     @Override

@@ -6,7 +6,7 @@ import org.junit.Test;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.value.count.Count._2;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 
 public class ArtifactListTest extends FiascoTest
 {
@@ -66,6 +66,14 @@ public class ArtifactListTest extends FiascoTest
     public void testCreation()
     {
         ensure(kivakitArtifacts().containsAll(kivakitArtifacts()));
+        ensureNotNull(new ArtifactList());
+    }
+
+    @Test
+    public void testDeduplicate()
+    {
+        ensure(artifacts(kivakitIcons(), kivakitIcons(), kivakitCore(), kivakitIcons())
+            .deduplicate().equals(artifacts(kivakitIcons(), kivakitCore())));
     }
 
     @Test
@@ -79,13 +87,13 @@ public class ArtifactListTest extends FiascoTest
     @Test
     public void testFirst()
     {
-        ensureEqual(artifactList(kivakitLogos(), kivakitImages(), kivakitApplication()).first(), kivakitLogos());
+        ensureEqual(ArtifactList.artifacts(kivakitLogos(), kivakitImages(), kivakitApplication()).first(), kivakitLogos());
     }
 
     @Test
     public void testGet()
     {
-        var artifacts = artifactList(kivakitLogos(), kivakitImages(), kivakitApplication());
+        var artifacts = ArtifactList.artifacts(kivakitLogos(), kivakitImages(), kivakitApplication());
         ensureEqual(artifacts.get(0), kivakitLogos());
         ensureEqual(artifacts.get(1), kivakitImages());
         ensureEqual(artifacts.get(2), kivakitApplication());
@@ -102,14 +110,14 @@ public class ArtifactListTest extends FiascoTest
     @Test
     public void testLast()
     {
-        ensureEqual(artifactList(kivakitLogos(), kivakitImages(), kivakitApplication()).last(), kivakitApplication());
+        ensureEqual(ArtifactList.artifacts(kivakitLogos(), kivakitImages(), kivakitApplication()).last(), kivakitApplication());
     }
 
     @Test
     public void testMatching()
     {
         var libraries = kivakitArtifacts().matching(at -> at instanceof Library);
-        ensure(libraries.containsAll(artifactList(kivakitCore(), kivakitApplication())));
+        ensure(libraries.containsAll(ArtifactList.artifacts(kivakitCore(), kivakitApplication())));
         ensure(kivakitArtifacts().libraries().containsAll(kivakitLibraries()));
         ensure(kivakitArtifacts().assets().containsAll(kivakitAssets()));
     }
@@ -124,8 +132,8 @@ public class ArtifactListTest extends FiascoTest
     @Test
     public void testSorted()
     {
-        var artifacts = artifactList(kivakitLogos(), kivakitImages(), kivakitApplication());
-        ensureEqual(artifacts.sorted(), artifactList(kivakitApplication(), kivakitImages(), kivakitLogos()));
+        var artifacts = ArtifactList.artifacts(kivakitLogos(), kivakitImages(), kivakitApplication());
+        ensureEqual(artifacts.sorted(), ArtifactList.artifacts(kivakitApplication(), kivakitImages(), kivakitLogos()));
     }
 
     @Test
@@ -140,9 +148,9 @@ public class ArtifactListTest extends FiascoTest
         ensure(kivakitLibraries().with(kivakitAssets())
             .equals(kivakitArtifacts()));
         ensure(kivakitArtifacts().with(kivakitResource())
-            .equals(artifactList(kivakitResource()).with(kivakitArtifacts())));
+            .equals(ArtifactList.artifacts(kivakitResource()).with(kivakitArtifacts())));
         ensure(kivakitArtifacts().with(kivakitResource(), kivakitImages())
-            .equals(artifactList(kivakitResource(), kivakitImages()).with(kivakitArtifacts())));
+            .equals(ArtifactList.artifacts(kivakitResource(), kivakitImages()).with(kivakitArtifacts())));
         ensure(kivakitArtifacts().without(at -> at instanceof Asset)
             .equals(kivakitLibraries()));
         ensure(kivakitArtifacts().without(list(kivakitApplication()))

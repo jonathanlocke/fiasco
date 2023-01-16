@@ -4,8 +4,10 @@ import com.telenav.kivakit.core.version.Version;
 import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;
 
+import static com.telenav.kivakit.core.messaging.Listener.nullListener;
 import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.parseDescriptor;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifact;
 
@@ -20,6 +22,11 @@ public class ArtifactDescriptorTest extends FiascoTest
         ensureEqual(descriptor.version(), null);
         ensureFalse(descriptor.isComplete());
         ensureEqual("x:y:", descriptor.name());
+        ensureThrows(() -> descriptor("xyz"));
+        ensureThrows(() -> descriptor("1"));
+        ensureNull(parseDescriptor(nullListener(), ""));
+        ensureNull(parseDescriptor(nullListener(), "x"));
+        ensureEqual(parseDescriptor(nullListener(), "x:y:1"), descriptor("x:y:1"));
     }
 
     @Test
@@ -150,6 +157,7 @@ public class ArtifactDescriptorTest extends FiascoTest
         ensureEqual(descriptor.version(), version("1.5.9"));
         ensureFalse(descriptor.isComplete());
         ensureEqual("x::1.5.9", descriptor.name());
+        ensureEqual(descriptor.version(version("1.1.1")).version(), version("1.1.1"));
     }
 
     @Test

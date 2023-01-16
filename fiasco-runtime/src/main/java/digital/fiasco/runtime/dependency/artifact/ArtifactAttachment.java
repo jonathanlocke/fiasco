@@ -40,12 +40,7 @@ import static com.telenav.kivakit.core.language.Objects.areEqualPairs;
  * @param content The attached content
  * @see ArtifactAttachment
  */
-@TypeQuality
-    (
-        documentation = DOCUMENTED,
-        testing = TESTED,
-        stability = STABLE
-    )
+@TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public record ArtifactAttachment
     (
         Artifact<?> artifact,

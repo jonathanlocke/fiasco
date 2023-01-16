@@ -9,9 +9,22 @@ import static com.telenav.kivakit.core.value.count.Bytes.bytes;
 public class ArtifactContentTest extends FiascoTest
 {
     @Test
+    public void testResource()
+    {
+        {
+            var resource = packageContent().resource();
+            ensure(resource.lastModified().equals(packageContent().lastModified()));
+        }
+        {
+            var resource = fileContent().resource();
+            ensure(resource.lastModified().equals(fileContent().lastModified()));
+        }
+    }
+
+    @Test
     public void testWith()
     {
-        var content = content();
+        var content = packageContent();
 
         {
             content = content.withName("shibo");

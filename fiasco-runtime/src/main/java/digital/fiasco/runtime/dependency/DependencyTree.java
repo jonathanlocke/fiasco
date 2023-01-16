@@ -8,7 +8,6 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
-import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 
 /**
  * Tree of dependencies created by traversing dependencies in depth-first order from the root, resulting in a list of
@@ -36,12 +35,7 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused", "unchecked" })
-@TypeQuality
-    (
-        documentation = DOCUMENTED,
-        testing = TESTED,
-        stability = STABLE
-    )
+@TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public class DependencyTree<T extends Dependency>
 {
     /**
@@ -67,7 +61,7 @@ public class DependencyTree<T extends Dependency>
         this.root = root;
         this.type = type;
 
-        depthFirst = depthFirst(root, dependencyList()).with((T) root);
+        depthFirst = depthFirst(root, DependencyList.dependencies()).with((T) root);
     }
 
     /**

@@ -19,7 +19,7 @@ import java.net.URI;
 import java.util.Objects;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 
 /**
  * Base class for repositories of artifacts and their metadata. Subclasses include:
@@ -193,6 +193,6 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
 
     protected ArtifactList resolve(Iterable<ArtifactDescriptor> descriptors)
     {
-        return artifactList(list(descriptors).map(artifacts::get));
+        return ArtifactList.artifacts(list(descriptors).map(artifacts::get));
     }
 }

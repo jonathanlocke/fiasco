@@ -4,12 +4,12 @@ import digital.fiasco.runtime.FiascoTest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.DependencyList.dependencies;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.artifact.Library.libraries;
 
 public class LibraryTest extends FiascoTest
@@ -81,7 +81,7 @@ public class LibraryTest extends FiascoTest
     public void testDependencies()
     {
         var library = library()
-            .withDependencies(artifactList(Library.library("a:b:1.0")));
+            .withDependencies(ArtifactList.artifacts(Library.library("a:b:1.0")));
         ensureEqual(library.dependencies().size(), 1);
         ensureEqual(library.dependencies().get(0).descriptor(), descriptor("a:b:1.0"));
     }
@@ -97,16 +97,16 @@ public class LibraryTest extends FiascoTest
     public void testWith()
     {
         {
-            var library = library().withSources(content());
-            ensure(library.sources().equals(content()));
+            var library = library().withSources(packageContent());
+            ensure(library.sources().equals(packageContent()));
         }
         {
-            var library = library().withJavadoc(content());
-            ensure(library.javadoc().equals(content()));
+            var library = library().withJavadoc(packageContent());
+            ensure(library.javadoc().equals(packageContent()));
         }
         {
-            var library = library().withJar(content());
-            ensure(library.jar().equals(content()));
+            var library = library().withJar(packageContent());
+            ensure(library.jar().equals(packageContent()));
         }
     }
 

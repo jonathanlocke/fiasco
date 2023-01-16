@@ -26,12 +26,7 @@ import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
  * @param size The size of the content
  */
 @SuppressWarnings("unused")
-@TypeQuality
-    (
-        documentation = DOCUMENTED,
-        testing = TESTED,
-        stability = STABLE
-    )
+@TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public record ArtifactContent
     (
         @FormatProperty @Expose String name,

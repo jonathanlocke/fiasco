@@ -21,6 +21,7 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.language.Arrays.arrayContains;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 
 /**
@@ -220,14 +221,6 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
     ArtifactList dependenciesMatching(String pattern);
 
     /**
-     * Returns the dependency matching the given dependency pattern
-     *
-     * @param pattern The pattern to match, like "a:b:" or "a::"
-     * @return Any matching dependency
-     */
-    Artifact<?> dependencyMatching(String pattern);
-
-    /**
      * Returns the named dependency of this artifact
      *
      * @param name The name of the dependency
@@ -241,7 +234,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @param dependencies The new dependencies
      * @return The new artifact
      */
-    T dependsOn(T[] dependencies);
+    <D extends Artifact<D>> T dependsOn(D[] dependencies);
 
     /**
      * Returns the descriptor for this artifact
@@ -260,20 +253,19 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default T excluding(ArtifactDescriptor... exclude)
     {
-        return excluding(library -> arrayContains(exclude, library));
+        return excluding(at -> arrayContains(exclude, at));
     }
 
     /**
      * Returns a copy of this artifact that excludes the given descriptors from its dependencies
      *
-     * @param exclude The descriptors to exclude
+     * @param exclusions The descriptors to exclude
      * @return The new artifact
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default T excluding(String... exclude)
+    default T excluding(String... exclusions)
     {
-        var descriptors = list(exclude).map(ArtifactDescriptor::descriptor);
-        return excluding(descriptors::contains);
+        return excluding(list(exclusions).map(ArtifactDescriptor::descriptor));
     }
 
     /**
@@ -415,9 +407,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default T withContent(ArtifactContent content)
     {
-        var copy = copy();
-        copy.withAttachment(new ArtifactAttachment(this, JAR_ATTACHMENT, content));
-        return copy;
+        return copy().withAttachment(attachment(JAR_ATTACHMENT, content));
     }
 
     /**
@@ -435,6 +425,18 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @return The new artifact
      */
     T withDescriptor(ArtifactDescriptor descriptor);
+
+    /**
+     * Returns a copy of this library with the given Javadoc attachment
+     *
+     * @param jar The Javadoc content
+     * @return The new library
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    default T withJar(ArtifactContent jar)
+    {
+        return copy().withAttachment(attachment(JAR_ATTACHMENT, jar));
+    }
 
     /**
      * Returns a copy of this artifact with the given repository

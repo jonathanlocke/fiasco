@@ -1,6 +1,5 @@
 package digital.fiasco.runtime;
 
-import com.telenav.kivakit.core.time.Time;
 import com.telenav.kivakit.testing.UnitTest;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
@@ -12,16 +11,12 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.serialization.FiascoGsonFactory;
 
 import static com.telenav.kivakit.core.os.Console.console;
-import static com.telenav.kivakit.core.time.Day.dayOfMonth;
-import static com.telenav.kivakit.core.time.Hour.hourOfDay;
-import static com.telenav.kivakit.core.time.Meridiem.AM;
-import static com.telenav.kivakit.core.time.Month.JANUARY;
-import static com.telenav.kivakit.core.time.Year.year;
+import static com.telenav.kivakit.filesystem.File.file;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
@@ -30,22 +25,6 @@ public class FiascoTest extends UnitTest
     public FiascoTest()
     {
         register(new FiascoGsonFactory(this));
-    }
-
-    protected ArtifactContent content()
-    {
-        var resource = packageFor(FiascoTest.class).resource("content.txt");
-        return ArtifactContent.content()
-            .withResource(resource)
-            .withLastModified(Time.utcTime(
-                year(2023),
-                JANUARY,
-                dayOfMonth(12),
-                hourOfDay(6, AM)).asLocalTime())
-            .withSize(resource.sizeInBytes())
-            .withOffset(0)
-            .withName(resource.fileName().name())
-            .withSignatures(signatures());
     }
 
     protected ArtifactDescriptor descriptorA()
@@ -88,29 +67,46 @@ public class FiascoTest extends UnitTest
         return ArtifactDescriptor.descriptor("x:y:1.2.3");
     }
 
+    protected ArtifactContent fileContent()
+    {
+        var resource = file("src/test/java/digital/fiasco/runtime/content.txt");
+        ensure(resource.exists());
+
+        return ArtifactContent.content()
+            .withResource(resource)
+            .withLastModified(resource.lastModified().asLocalTime())
+            .withSize(resource.sizeInBytes())
+            .withOffset(0)
+            .withName(resource.fileName().name())
+            .withSignatures(signatures());
+    }
+
     protected ArtifactAttachment jarAttachment()
     {
-        return attachment(JAR_ATTACHMENT, content());
+        return attachment(JAR_ATTACHMENT, packageContent());
     }
 
     protected ArtifactAttachment javadocAttachment()
     {
-        return attachment(JAVADOC_ATTACHMENT, content());
+        return attachment(JAVADOC_ATTACHMENT, packageContent());
     }
 
     protected Library kivakitApplication()
     {
-        return library("com.telenav.kivakit:kivakit-application:1.8.5");
+        return library("com.telenav.kivakit:kivakit-application:1.8.5")
+            .dependsOn(kivakitCore(), kivakitResource())
+            .dependsOn(kivakitIcons())
+            .dependsOn(kivakitLogos());
     }
 
     protected ArtifactList kivakitArtifacts()
     {
-        return artifactList(kivakitCore(), kivakitIcons(), kivakitApplication(), kivakitLogos());
+        return ArtifactList.artifacts(kivakitCore(), kivakitIcons(), kivakitApplication(), kivakitLogos());
     }
 
     protected ArtifactList kivakitAssets()
     {
-        return artifactList(kivakitLogos(), kivakitIcons());
+        return ArtifactList.artifacts(kivakitLogos(), kivakitIcons());
     }
 
     protected Library kivakitCore()
@@ -130,7 +126,7 @@ public class FiascoTest extends UnitTest
 
     protected ArtifactList kivakitLibraries()
     {
-        return artifactList(kivakitApplication(), kivakitCore());
+        return ArtifactList.artifacts(kivakitApplication(), kivakitCore());
     }
 
     protected Asset kivakitLogos()
@@ -141,6 +137,20 @@ public class FiascoTest extends UnitTest
     protected Library kivakitResource()
     {
         return library("com.telenav.kivakit:kivakit-resource:1.8.5");
+    }
+
+    protected ArtifactContent packageContent()
+    {
+        var resource = packageFor(FiascoTest.class)
+            .resource("content.txt");
+
+        return ArtifactContent.content()
+            .withResource(resource)
+            .withLastModified(resource.lastModified().asLocalTime())
+            .withSize(resource.sizeInBytes())
+            .withOffset(0)
+            .withName(resource.fileName().name())
+            .withSignatures(signatures());
     }
 
     protected void println(String message, Object... arguments)
@@ -158,6 +168,6 @@ public class FiascoTest extends UnitTest
 
     protected ArtifactAttachment sourcesAttachment()
     {
-        return attachment(SOURCES_ATTACHMENT, content());
+        return attachment(SOURCES_ATTACHMENT, packageContent());
     }
 }

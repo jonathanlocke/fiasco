@@ -10,7 +10,7 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 
 import java.io.InputStream;
 
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 
 /**
  * The response header for a {@link FiascoRepositoryRequest} containing the {@link ArtifactContent} metadata for each
@@ -49,7 +49,7 @@ public class FiascoRepositoryResponse
     }
 
     /** The list of artifact content metadata */
-    private transient ArtifactList artifacts = artifactList();
+    private transient ArtifactList artifacts = ArtifactList.artifacts();
 
     /**
      * Returns the artifacts that have been added to this response

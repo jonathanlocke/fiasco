@@ -7,13 +7,14 @@ import com.telenav.kivakit.resource.resources.DataResource;
 import com.telenav.kivakit.resource.resources.InputResource;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType;
+import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
 
 import java.net.URI;
 
 import static com.telenav.kivakit.core.ensure.Ensure.ensureEqual;
 import static com.telenav.kivakit.resource.Uris.uri;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 import static digital.fiasco.runtime.repository.fiasco.server.FiascoRepositoryResponse.responseFromJson;
 import static digital.fiasco.runtime.repository.fiasco.server.FiascoServer.FIASCO_PORT;
 
@@ -42,7 +43,7 @@ public class FiascoClient extends BaseComponent
             var response = responseFromJson(new InputResource(in));
 
             // Then, for each artifact,
-            var resolved = artifactList();
+            var resolved = ArtifactList.artifacts();
             for (var artifact : response.artifacts())
             {
                 // and attachment,

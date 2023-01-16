@@ -1,11 +1,15 @@
 package digital.fiasco.runtime.dependency;
 
+import com.telenav.kivakit.annotations.code.quality.MethodQuality;
+import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.thread.Monitor;
 import digital.fiasco.runtime.repository.fiasco.RemoteRepository;
 import digital.fiasco.runtime.repository.fiasco.server.FiascoClient;
 import digital.fiasco.runtime.repository.fiasco.server.FiascoServer;
 
-import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
+import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 
 /**
  * A queue that tracks the resolution state of dependencies.
@@ -30,16 +34,17 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
  * @param <T> The dependency type
  */
 @SuppressWarnings("unused")
+@TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public class DependencyResolutionQueue<T extends Dependency>
 {
     /** The resolved dependencies */
-    private DependencyList<T> resolved = dependencyList();
+    private DependencyList<T> resolved = DependencyList.dependencies();
 
     /** The unresolved dependencies */
     private DependencyList<T> unresolved;
 
     /** The dependencies being processed */
-    private DependencyList<T> processing = dependencyList();
+    private DependencyList<T> processing = DependencyList.dependencies();
 
     /** The dependency type */
     private final Class<T> type;
@@ -53,6 +58,7 @@ public class DependencyResolutionQueue<T extends Dependency>
      * @param dependencies The dependencies to enqueue
      * @param type The type of dependnecy
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyResolutionQueue(DependencyList<T> dependencies, Class<T> type)
     {
         this.unresolved = dependencies;
@@ -62,6 +68,7 @@ public class DependencyResolutionQueue<T extends Dependency>
     /**
      * Returns the next unresolved dependency with no unresolved dependencies of its own.
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T nextReady()
     {
         synchronized (resolution)
@@ -79,6 +86,7 @@ public class DependencyResolutionQueue<T extends Dependency>
     /**
      * Returns a list of all ready dependencies
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyList<T> nextReadyGroup()
     {
         synchronized (resolution)
@@ -99,6 +107,7 @@ public class DependencyResolutionQueue<T extends Dependency>
      *
      * @param dependency The dependency
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public void resolve(T dependency)
     {
         synchronized (resolution)
@@ -117,6 +126,7 @@ public class DependencyResolutionQueue<T extends Dependency>
      *
      * @param dependencies The dependencies
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public void resolveGroup(DependencyList<T> dependencies)
     {
         synchronized (resolution)
@@ -137,6 +147,7 @@ public class DependencyResolutionQueue<T extends Dependency>
      * @param dependency The dependency
      * @return True if the dependency is ready for processing
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     private boolean isReady(T dependency)
     {
         for (var at : dependency.dependencies(type))
@@ -166,7 +177,6 @@ public class DependencyResolutionQueue<T extends Dependency>
                 }
             }
             while (ready.isEmpty());
-
             return ready;
         }
     }

@@ -37,7 +37,7 @@ import static com.telenav.kivakit.core.string.Paths.pathTail;
 import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
 import static digital.fiasco.runtime.build.BuildOption.HELP;
-import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
+import static digital.fiasco.runtime.dependency.DependencyList.dependencies;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifact;
 
@@ -262,7 +262,7 @@ public class Builder extends BaseRepeater implements
     public Builder(Build build)
     {
         this.build = build;
-        this.dependencies = dependencyList();
+        this.dependencies = DependencyList.dependencies();
     }
 
     /**
@@ -377,7 +377,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder dependsOn(Dependency... dependencies)
     {
-        return withDependencies(dependencyList(dependencies));
+        return withDependencies(DependencyList.dependencies(dependencies));
     }
 
     /**

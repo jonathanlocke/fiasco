@@ -9,7 +9,6 @@ import com.telenav.kivakit.interfaces.naming.Named;
 
 import java.util.regex.Pattern;
 
-import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
@@ -75,12 +74,7 @@ import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
  * @see Version
  */
 @SuppressWarnings("unused")
-@TypeQuality
-    (
-        documentation = DOCUMENTED,
-        testing = TESTED,
-        stability = STABLE
-    )
+@TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public record ArtifactDescriptor(ArtifactGroup group,
                                  ArtifactName artifact,
                                  Version version) implements Named
@@ -108,45 +102,6 @@ public record ArtifactDescriptor(ArtifactGroup group,
     public static ArtifactDescriptor descriptor(String text)
     {
         return parseDescriptor(throwingListener(), text);
-    }
-
-    /**
-     * Creates a descriptor for the given group and artifact name
-     *
-     * @param group The group
-     * @param artifact The artifact
-     * @return The descriptor
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static ArtifactDescriptor descriptor(ArtifactGroup group, ArtifactName artifact)
-    {
-        return descriptor(group, artifact, null);
-    }
-
-    /**
-     * Creates a descriptor for the given group
-     *
-     * @param group The group
-     * @return The descriptor
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static ArtifactDescriptor descriptor(ArtifactGroup group)
-    {
-        return descriptor(group, null, null);
-    }
-
-    /**
-     * Creates a descriptor for the given group, artifact name, and version.
-     *
-     * @param group The group
-     * @param artifact The artifact
-     * @param version The version
-     * @return The descriptor
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static ArtifactDescriptor descriptor(ArtifactGroup group, ArtifactName artifact, Version version)
-    {
-        return new ArtifactDescriptor(group, artifact, version);
     }
 
     /**

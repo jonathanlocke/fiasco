@@ -69,6 +69,8 @@ public class AssetTest extends FiascoTest
             ensureEqual(assets.size(), 2);
             ensureEqual(assets.get(0), Asset.asset("x:y:1.0"));
         }
+
+        ensure(Asset.asset(kivakitIcons()).equals(kivakitIcons()));
     }
 
     @Test

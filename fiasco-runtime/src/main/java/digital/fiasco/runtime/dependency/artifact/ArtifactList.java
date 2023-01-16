@@ -18,8 +18,8 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  * <p><b>Creation</b></p>
  *
  * <ul>
- *     <li>{@link #artifactList(Artifact[])}</li>
- *     <li>{@link #artifactList(Collection)}</li>
+ *     <li>{@link #artifacts(Artifact[])}</li>
+ *     <li>{@link #artifacts(Collection)}</li>
  * </ul>
  *
  * <p><b>Matching</b></p>
@@ -72,12 +72,7 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  * @see Asset
  * @see DependencyList
  */
-@TypeQuality
-    (
-        documentation = DOCUMENTED,
-        testing = TESTED,
-        stability = STABLE
-    )
+@TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 @SuppressWarnings("rawtypes")
 public class ArtifactList extends DependencyList<Artifact>
 {
@@ -88,7 +83,7 @@ public class ArtifactList extends DependencyList<Artifact>
      * @return The dependency list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static ArtifactList artifactList(Collection<Artifact> artifacts)
+    public static ArtifactList artifacts(Collection<Artifact> artifacts)
     {
         return new ArtifactList(artifacts);
     }
@@ -100,12 +95,12 @@ public class ArtifactList extends DependencyList<Artifact>
      * @return The dependency list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static ArtifactList artifactList(Artifact... artifacts)
+    public static ArtifactList artifacts(Artifact... artifacts)
     {
         return new ArtifactList(list(artifacts));
     }
 
-    protected ArtifactList()
+    public ArtifactList()
     {
     }
 
@@ -136,6 +131,20 @@ public class ArtifactList extends DependencyList<Artifact>
     public ArtifactList copy()
     {
         return new ArtifactList(this);
+    }
+
+    @Override
+    public ArtifactList deduplicate()
+    {
+        var deduplicated = artifacts();
+        for (var at : this)
+        {
+            if (!deduplicated.contains(at))
+            {
+                deduplicated = deduplicated.with(at);
+            }
+        }
+        return deduplicated;
     }
 
     /**

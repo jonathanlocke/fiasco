@@ -10,7 +10,6 @@ import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
-import com.telenav.kivakit.interfaces.string.StringFormattable;
 import digital.fiasco.runtime.repository.Repository;
 
 import java.util.LinkedHashMap;
@@ -27,9 +26,7 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.interfaces.comparison.Filter.acceptNone;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
 
 /**
  * Represents an artifact, either an {@link Asset} or a {@link Library}
@@ -104,12 +101,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactLi
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-@TypeQuality
-    (
-        documentation = DOCUMENTED,
-        testing = TESTED,
-        stability = STABLE
-    )
+@TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifact<T>
 {
     /** The repository where this artifact is hosted */
@@ -124,7 +116,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
 
     /** List of dependent artifacts */
     @Expose
-    protected ArtifactList dependencies = artifactList();
+    protected ArtifactList dependencies = ArtifactList.artifacts();
 
     /** Dependency exclusions for this artifact */
     protected transient ObjectList<Matcher<ArtifactDescriptor>> exclusions = list(acceptNone());
@@ -138,12 +130,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      *
      * @param descriptor The artifact descriptor
      */
-    @MethodQuality
-        (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(audience = AUDIENCE_INTERNAL, documentation = DOCUMENTED, testing = TESTED)
     protected BaseArtifact(ArtifactDescriptor descriptor)
     {
         this.descriptor = descriptor;
@@ -154,12 +141,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      *
      * @param that The artifact to copy
      */
-    @MethodQuality
-        (
-            audience = AUDIENCE_INTERNAL,
-            documentation = DOCUMENTED,
-            testing = TESTED
-        )
+    @MethodQuality(audience = AUDIENCE_INTERNAL, documentation = DOCUMENTED, testing = TESTED)
     protected BaseArtifact(BaseArtifact<T> that)
     {
         this.repository = that.repository();
@@ -167,10 +149,6 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
         this.dependencies = that.dependencies.copy();
         this.exclusions = that.exclusions.copy();
         this.typeToAttachment = that.typeToAttachment.copy();
-    }
-
-    protected BaseArtifact()
-    {
     }
 
     /**
@@ -188,7 +166,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * {@inheritDoc}
      */
     @Override
-    public String asString(StringFormattable.Format format)
+    public String asString(Format format)
     {
         return switch (format)
             {
@@ -253,7 +231,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactList dependenciesMatching(String pattern)
     {
-        var matches = artifactList();
+        var matches = ArtifactList.artifacts();
         var matcher = ArtifactDescriptor.descriptor(pattern);
         for (var at : dependencies)
         {
@@ -266,30 +244,11 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     }
 
     /**
-     * Returns the dependency matching the given dependency pattern
-     *
-     * @param pattern The pattern to match, like "a:b:" or "a::"
-     * @return Any matching dependency
-     */
-    @Override
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public Artifact<?> dependencyMatching(String pattern)
-    {
-        for (var at : dependencies)
-        {
-            if (ArtifactDescriptor.descriptor(pattern).matches(at.descriptor()))
-            {
-                return at;
-            }
-        }
-        return illegalState("No dependency $ found", pattern);
-    }
-
-    /**
      * Returns the named dependency of this artifact
      *
      * @param name The name of the dependency
      * @return The dependency
+     * @throws RuntimeException Thrown if the named dependency cannot be found
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
@@ -314,9 +273,9 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @SafeVarargs
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public final T dependsOn(T... dependencies)
+    public final <D extends Artifact<D>> T dependsOn(D... dependencies)
     {
-        return withDependencies(artifactList(dependencies));
+        return withDependencies(ArtifactList.artifacts(dependencies));
     }
 
     /**
@@ -363,29 +322,6 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public T excluding(ArtifactDescriptor... exclusions)
-    {
-        return excluding(at ->
-        {
-            for (var exclusion : exclusions)
-            {
-                if (exclusion.matches(at))
-                {
-                    return true;
-                }
-            }
-            return false;
-        });
-    }
-
-    /**
-     * Returns a copy of this artifact that excludes the given descriptors from its dependencies
-     *
-     * @param exclusions The descriptors to exclude
-     * @return The new artifact
-     */
-    @Override
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public T excluding(ObjectList<ArtifactDescriptor> exclusions)
     {
         return excluding(at ->
@@ -399,19 +335,6 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
             }
             return false;
         });
-    }
-
-    /**
-     * Returns a copy of this artifact that excludes the given descriptors from its dependencies
-     *
-     * @param exclusions The descriptors to exclude
-     * @return The new artifact
-     */
-    @Override
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public T excluding(String... exclusions)
-    {
-        return excluding(list(exclusions).map(ArtifactDescriptor::descriptor));
     }
 
     @Override
@@ -428,14 +351,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean isExcluded(ArtifactDescriptor descriptor)
     {
-        for (var at : exclusions)
-        {
-            if (at.matches(descriptor))
-            {
-                return true;
-            }
-        }
-        return false;
+        return exclusions.stream().anyMatch(at -> at.matches(descriptor));
     }
 
     /**
@@ -561,18 +477,6 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     }
 
     /**
-     * Returns primary content attachment for this asset
-     *
-     * @return The content
-     */
-    @Override
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public T withContent(ArtifactContent content)
-    {
-        return copy().withAttachment(attachment(JAR_ATTACHMENT, content));
-    }
-
-    /**
      * Returns a copy of this artifact with the given dependencies
      *
      * @param dependencies The new dependencies
@@ -583,7 +487,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     public T withDependencies(ArtifactList dependencies)
     {
         var copy = copy();
-        copy.dependencies = dependencies.copy();
+        copy.dependencies = this.dependencies.with(dependencies).deduplicate();
         return copy;
     }
 
@@ -600,18 +504,6 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
         var copy = copy();
         copy.descriptor = descriptor;
         return copy;
-    }
-
-    /**
-     * Returns a copy of this library with the given Javadoc attachment
-     *
-     * @param jar The Javadoc content
-     * @return The new library
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public T withJar(ArtifactContent jar)
-    {
-        return copy().withAttachment(attachment(JAR_ATTACHMENT, jar));
     }
 
     /**

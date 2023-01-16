@@ -19,7 +19,7 @@ import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.UNTESTED;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 
 /**
  * An asset is an artifact having only a single content attachment
@@ -36,12 +36,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactLi
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-@TypeQuality
-    (
-        documentation = DOCUMENTED,
-        testing = TESTED,
-        stability = STABLE
-    )
+@TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public class Asset extends BaseArtifact<Asset> implements RegistryTrait
 {
     /**
@@ -89,7 +84,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactList assets(String... descriptors)
     {
-        return artifactList(stringList(descriptors).map(Asset::asset));
+        return artifacts(stringList(descriptors).map(Asset::asset));
     }
 
     /**
@@ -101,7 +96,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactList assets(Asset... assets)
     {
-        return artifactList(assets);
+        return ArtifactList.artifacts(assets);
     }
 
     @MethodQuality
@@ -110,7 +105,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
             documentation = DOCUMENTATION_NOT_NEEDED,
             testing = TESTED
         )
-    protected Asset(ArtifactDescriptor descriptor)
+    public Asset(ArtifactDescriptor descriptor)
     {
         super(descriptor);
     }

@@ -30,12 +30,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.desc
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-@TypeQuality
-    (
-        documentation = DOCUMENTED,
-        testing = TESTED,
-        stability = STABLE
-    )
+@TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public record ArtifactGroup(String name) implements Named
 {
     /**

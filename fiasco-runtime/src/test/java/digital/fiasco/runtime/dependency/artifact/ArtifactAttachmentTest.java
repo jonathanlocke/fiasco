@@ -4,10 +4,31 @@ import com.telenav.kivakit.core.collections.map.ObjectMap;
 import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;
 
+import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 
 public class ArtifactAttachmentTest extends FiascoTest
 {
+    @Test
+    public void testAttachment()
+    {
+        var attachment = attachment(JAR_ATTACHMENT);
+        ensureEqual(attachment.attachmentType(), JAR_ATTACHMENT);
+    }
+
+    @Test
+    public void testAttachmentOfType()
+    {
+        var attachment = jarAttachment()
+            .withContent(packageContent())
+            .withType(JAR_ATTACHMENT);
+
+        var application = kivakitApplication()
+            .withAttachment(attachment);
+
+        ensure(application.attachmentOfType(JAR_ATTACHMENT).equals(attachment));
+    }
+
     @Test
     public void testEqualsHashCode()
     {
@@ -20,6 +41,9 @@ public class ArtifactAttachmentTest extends FiascoTest
         ensureEqual(map.get(jarAttachment()), 1);
         ensureEqual(map.get(sourcesAttachment()), 2);
         ensureEqual(map.get(javadocAttachment()), 3);
+
+        ensureNotEqual(jarAttachment(), 5);
+        ensureEqual(jarAttachment(), jarAttachment());
     }
 
     @Test
@@ -43,11 +67,11 @@ public class ArtifactAttachmentTest extends FiascoTest
     {
         var attachment = jarAttachment()
             .withArtifact(null)
-            .withContent(content())
+            .withContent(packageContent())
             .withType(JAR_ATTACHMENT);
 
         ensureEqual(attachment.attachmentType(), JAR_ATTACHMENT);
         ensureEqual(attachment.artifact(), null);
-        ensureEqual(attachment.content(), content());
+        ensureEqual(attachment.content(), packageContent());
     }
 }

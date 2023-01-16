@@ -22,7 +22,7 @@ import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifact;
 
 /**
@@ -130,7 +130,7 @@ public class BuildSettings
     {
         this.builder = builder;
         this.phases = new StandardPhases(builder);
-        this.dependencies = artifactList();
+        this.dependencies = ArtifactList.artifacts();
         this.librarian = builder.newLibrarian();
         this.rootFolder = currentFolder();
     }

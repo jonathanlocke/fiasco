@@ -16,7 +16,6 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
-import static digital.fiasco.runtime.dependency.DependencyList.dependencyList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
@@ -44,12 +43,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  *
  * @author Jonathan Locke
  */
-@TypeQuality
-    (
-        documentation = DOCUMENTED,
-        testing = TESTED,
-        stability = STABLE
-    )
+@TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 @SuppressWarnings("unused")
 public class Library extends BaseArtifact<Library> implements RegistryTrait
 {
@@ -75,7 +69,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static DependencyList<Library> libraries(Library... libraries)
     {
-        return dependencyList(libraries);
+        return DependencyList.dependencies(libraries);
     }
 
     /**
@@ -102,7 +96,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
         return new Library(descriptor);
     }
 
-    protected Library(ArtifactDescriptor descriptor)
+    public Library(ArtifactDescriptor descriptor)
     {
         super(descriptor);
     }

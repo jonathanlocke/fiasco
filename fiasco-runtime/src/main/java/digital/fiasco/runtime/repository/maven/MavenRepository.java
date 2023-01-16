@@ -38,7 +38,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.POM_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactContent.content;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
@@ -121,7 +121,7 @@ public class MavenRepository extends BaseRepository
     {
         return lock().read(() ->
         {
-            var resolved = artifactList();
+            var resolved = ArtifactList.artifacts();
 
             // Go through each descriptor,
             for (var descriptor : descriptors)

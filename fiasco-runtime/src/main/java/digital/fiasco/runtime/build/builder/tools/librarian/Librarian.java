@@ -28,7 +28,7 @@ import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressRe
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.resource.Uris.uri;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 
 /**
  * Manages {@link Artifact}s and their dependencies. Searches the list of repositories added to this librarian with
@@ -75,7 +75,7 @@ public class Librarian extends BaseTool
      */
     public ArtifactList dependencies(Artifact<?> artifact)
     {
-        var dependencies = artifactList();
+        var dependencies = ArtifactList.artifacts();
 
         // Go through the library's dependencies,
         for (var dependency : artifact.dependencies())
@@ -218,7 +218,7 @@ public class Librarian extends BaseTool
      */
     public ArtifactList resolve(ObjectList<ArtifactDescriptor> descriptors)
     {
-        var artifacts = artifactList();
+        var artifacts = ArtifactList.artifacts();
 
         var progress = progressReporter(this, "dependency", descriptors.count());
         progress.start("Resolving $ artifacts", descriptors.count());

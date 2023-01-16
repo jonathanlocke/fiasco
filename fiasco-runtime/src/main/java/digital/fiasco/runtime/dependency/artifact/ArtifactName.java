@@ -14,12 +14,7 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-@TypeQuality
-    (
-        documentation = DOCUMENTED,
-        testing = TESTED,
-        stability = STABLE
-    )
+@TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public record ArtifactName(String name) implements Comparable<ArtifactName>
 {
     /**

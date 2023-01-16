@@ -3,7 +3,7 @@ package digital.fiasco.runtime.build.execution;
 import com.telenav.kivakit.core.thread.Monitor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactList;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 
 /**
  * Holds a set of artifacts resolved from repositories by background threads. When a new set of artifacts is resolved,
@@ -15,7 +15,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifactLi
 public class ResolvedArtifactSet
 {
     /** The set of artifacts that have been resolved */
-    private ArtifactList resolved = artifactList();
+    private ArtifactList resolved = ArtifactList.artifacts();
 
     /** A monitor that is signaled when artifacts are resolved */
     private final Monitor updated = new Monitor();

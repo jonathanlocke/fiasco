@@ -15,12 +15,7 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
  * @author jonathanl (shibo)
  * @see ArtifactAttachment
  */
-@TypeQuality
-    (
-        documentation = DOCUMENTED,
-        testing = TESTED,
-        stability = STABLE
-    )
+@TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public enum ArtifactAttachmentType
 {
     NO_ATTACHMENT(""),

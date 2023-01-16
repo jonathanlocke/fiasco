@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.dependency;
 
+import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.interfaces.naming.Named;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
@@ -10,6 +11,9 @@ import digital.fiasco.runtime.dependency.artifact.Asset;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
+
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 
 /**
  * A dependency is either a {@link Builder}, or an {@link Artifact} with an associated {@link #repository()}. An
@@ -53,6 +57,7 @@ public interface Dependency extends
      *
      * @return The dependencies
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default ArtifactList artifactDependencies()
     {
         return dependencies().asArtifactList();
@@ -63,6 +68,7 @@ public interface Dependency extends
      *
      * @return The dependencies
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default DependencyList<Asset> assetDependencies()
     {
         var dependencies = new DependencyList<Asset>();
@@ -76,7 +82,11 @@ public interface Dependency extends
         return dependencies;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default int compareTo(@NotNull Dependency that)
     {
         return name().compareTo(that.name());
@@ -87,6 +97,7 @@ public interface Dependency extends
      *
      * @return The dependencies
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default <T extends Dependency> DependencyList<T> dependencies(Class<T> type)
     {
         var dependencies = new DependencyList<T>();
@@ -116,6 +127,7 @@ public interface Dependency extends
      *
      * @return The dependencies
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default DependencyList<Library> libraryDependencies()
     {
         var dependencies = new DependencyList<Library>();
