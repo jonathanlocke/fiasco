@@ -5,7 +5,6 @@ import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
-import com.telenav.kivakit.core.string.AsciiArt;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.core.version.Version;
@@ -370,19 +369,30 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     public String mavenPom()
     {
         var dependencies = stringList();
-        for (var artifact : dependencies())
+        if (dependencies().isNonEmpty())
         {
-            var descriptor = artifact.descriptor();
-            dependencies.addAll(split(format("""
-                       <dependency>
-                           <groupId>$</groupId>
-                           <artifactId>$</artifactId>
-                           <version>$</version>
-                       </dependency>
-                    """,
-                descriptor.group(),
-                descriptor.artifact(),
-                descriptor.version()), "\n"));
+            for (var artifact : dependencies())
+            {
+                var descriptor = artifact.descriptor();
+                dependencies.addAll(split(format("""
+                        <dependency>
+                            <groupId>$</groupId>
+                            <artifactId>$</artifactId>
+                            <version>$</version>
+                        </dependency>
+                        """,
+                    descriptor.group(),
+                    descriptor.artifact(),
+                    descriptor.version()), "\n"));
+            }
+
+            dependencies = dependencies.indented(4);
+            dependencies = dependencies.prepending("");
+            dependencies = dependencies.prepending("<dependencies>");
+            dependencies = dependencies.prepending("");
+            dependencies = dependencies.appending("</dependencies>");
+            dependencies = dependencies.appending("");
+            dependencies = dependencies.indented(4);
         }
 
         return format("""
@@ -390,25 +400,19 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
                   xmlns="http://maven.apache.org/POM/4.0.0"
                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                   xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-                   <modelVersion>4.0.0</modelVersion>
-                   <groupId>$</groupId>
-                   <artifactId>$</artifactId>
-                   <version>$</version>
-                 
-                   <dependencies>
-                 
-                       $
-                   </dependencies>
-                     
+                  
+                    <modelVersion>4.0.0</modelVersion>
+                   
+                    <groupId>$</groupId>
+                    <artifactId>$</artifactId>
+                    <version>$</version>
+                $
                 </project>
                   """,
             descriptor.group(),
             descriptor.artifact(),
             descriptor.version(),
-            dependencies
-                .prefixedWith("    ")
-                .join("\n")
-                .replaceFirst(AsciiArt.repeat(7, ' '), ""));
+            dependencies.join("\n"));
     }
 
     @Override
@@ -472,7 +476,9 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     public T withDependencies(ArtifactList dependencies)
     {
         var copy = copy();
-        copy.dependencies = this.dependencies.with(dependencies).deduplicate();
+        copy.dependencies = this.dependencies
+            .with(dependencies)
+            .deduplicate();
         return copy;
     }
 

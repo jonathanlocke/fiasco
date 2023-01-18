@@ -74,7 +74,7 @@ public class FiascoTest extends UnitTest
 
         return ArtifactContent.content()
             .withResource(resource)
-            .withLastModified(resource.lastModified().asLocalTime())
+            .withLastModified(resource.lastModified())
             .withSize(resource.sizeInBytes())
             .withOffset(0)
             .withName(resource.fileName().name())
@@ -146,7 +146,7 @@ public class FiascoTest extends UnitTest
 
         return ArtifactContent.content()
             .withResource(resource)
-            .withLastModified(resource.lastModified().asLocalTime())
+            .withLastModified(resource.lastModified())
             .withSize(resource.sizeInBytes())
             .withOffset(0)
             .withName(resource.fileName().name())
@@ -161,7 +161,7 @@ public class FiascoTest extends UnitTest
     protected ArtifactContentSignatures signatures()
     {
         return ArtifactContentSignatures.signatures()
-            .withPgp("1769187598761516661")
+            .withAsc("1769187598761516661")
             .withMd5("12983791826501")
             .withSha1("120378019821");
     }

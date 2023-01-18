@@ -1,12 +1,51 @@
 package digital.fiasco.runtime.repository;
 
 import digital.fiasco.runtime.FiascoTest;
+import digital.fiasco.runtime.repository.maven.MavenRepository;
 import org.junit.Test;
+
+import static com.telenav.kivakit.filesystem.Folders.currentFolder;
+import static digital.fiasco.runtime.build.BuildRepositories.MAVEN_CENTRAL;
+import static digital.fiasco.runtime.build.BuildRepositories.MAVEN_CENTRAL_STAGING;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptors;
+import static digital.fiasco.runtime.dependency.artifact.Library.libraries;
 
 public class MavenRepositoryTest extends FiascoTest
 {
     @Test
-    public void test()
+    public void testInstallArtifact()
     {
+        var artifact = kivakitApplication()
+            .withContent(packageContent());
+
+        var repositoryFolder = currentFolder().folder("target/.fiasco/maven-repository");
+
+        var repository = new MavenRepository("test", repositoryFolder);
+        repository.installArtifact(artifact);
+
+        var folder = repositoryFolder.folder("com/telenav/kivakit/kivakit-application/1.8.5");
+        ensure(folder.file("kivakit-application-1.8.5.jar").exists());
+        ensure(folder.file("kivakit-application-1.8.5.jar.asc").exists());
+        ensure(folder.file("kivakit-application-1.8.5.jar.md5").exists());
+        ensure(folder.file("kivakit-application-1.8.5.jar.sha1").exists());
+        ensure(folder.file("kivakit-application-1.8.5.pom").exists());
+    }
+
+    @Test
+    public void testIsRemote()
+    {
+        ensure(MAVEN_CENTRAL.isRemote());
+        ensure(MAVEN_CENTRAL_STAGING.isRemote());
+    }
+
+    @Test
+    public void testResolveArtifacts()
+    {
+        var artifacts = MAVEN_CENTRAL.resolveArtifacts(descriptors("com.telenav.kivakit:kivakit-interfaces:1.10.0"));
+        ensureEqual(artifacts, libraries(
+            "com.telenav.kivakit:kivakit-interfaces:1.10.0",
+            "com.telenav.kivakit:kivakit-annotations:1.10.0",
+            "com.telenav.lexakai.annotations:lexakai-annotations:1.0.9",
+            "org.jetbrains:annotations:23.0.0"));
     }
 }

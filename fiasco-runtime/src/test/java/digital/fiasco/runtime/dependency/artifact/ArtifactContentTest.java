@@ -40,12 +40,12 @@ public class ArtifactContentTest extends FiascoTest
         }
         {
             var now = Time.now();
-            content = content.withLastModified(now.asLocalTime());
+            content = content.withLastModified(now);
             ensureEqual(content.lastModified(), now);
         }
         {
             var signatures = signatures()
-                .withPgp("pgp")
+                .withAsc("asc")
                 .withMd5("md5")
                 .withSha1("sha1");
 

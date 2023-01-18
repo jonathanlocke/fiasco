@@ -1,7 +1,7 @@
 package digital.fiasco.runtime.build.builder.tools.stamper;
 
 import com.telenav.cactus.metadata.BuildName;
-import com.telenav.kivakit.conversion.core.time.TimeConverter;
+import com.telenav.kivakit.conversion.core.time.kivakit.KivaKitLocalDateConverter;
 import com.telenav.kivakit.core.collections.list.StringList;
 import com.telenav.kivakit.core.string.Formatter;
 import digital.fiasco.runtime.build.BuildStructured;
@@ -13,7 +13,6 @@ import java.time.LocalDate;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.time.Time.now;
-import static java.time.format.DateTimeFormatter.ISO_ZONED_DATE_TIME;
 
 /**
  * Creates files in the root of the classes folder containing information about the project and the build. Both project
@@ -108,7 +107,7 @@ public class BuildStamper extends BaseTool implements
             : "[unknown]";
 
         git.commitTime().run();
-        var commitTime = new TimeConverter(this, ISO_ZONED_DATE_TIME)
+        var commitTime = new KivaKitLocalDateConverter()
             .convert(git.output());
 
         return stringList("build.time = " + now().asString(),

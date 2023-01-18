@@ -9,6 +9,7 @@ package digital.fiasco.runtime.dependency.artifact;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.registry.RegistryTrait;
 import digital.fiasco.runtime.dependency.DependencyList;
 
@@ -58,6 +59,17 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
     {
         var libraries = stringList(descriptors).map(Library::library);
         return libraries(libraries.asArray(Library.class));
+    }
+
+    /**
+     * Creates a list of libraries from the given variable-argument list of descriptors
+     *
+     * @param descriptors The library descriptors
+     * @return The library dependency list
+     */
+    public static DependencyList<Library> libraries(ObjectList<ArtifactDescriptor> descriptors)
+    {
+        return DependencyList.dependencies(descriptors.map(Library::library));
     }
 
     /**

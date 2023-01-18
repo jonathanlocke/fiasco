@@ -137,7 +137,7 @@ public class LocalRepository extends BaseRepository
      * <p><b>Steps</b></p>
      * <ol>
      *     <li>Adds the {@link Artifact} metadata to artifacts.txt in JSON format</li>
-     *     <li>Adds the artifact to the {@link #descriptorToArtifactMap()}</li>
+     *     <li>Resolves the artifact in the repository</li>
      *     <li>Saves the artifact's content by calling {@link #saveAttachment(ArtifactAttachment)}</li>
      * </ol>
      *
@@ -165,7 +165,7 @@ public class LocalRepository extends BaseRepository
                     saveArtifactMetadata(source);
 
                     // and add the artifact to the map.
-                    descriptorToArtifactMap().put(artifact.descriptor(), artifact);
+                    resolve(artifact.descriptor(), artifact);
                 }
                 catch (Exception e)
                 {
@@ -304,7 +304,7 @@ public class LocalRepository extends BaseRepository
                     var entry = artifactFromJson(at);
 
                     // and put the entry into the entries map.
-                    descriptorToArtifactMap().put(entry.descriptor(), entry);
+                    resolve(entry.descriptor(), entry);
                 }
             }
         });
@@ -334,10 +334,10 @@ public class LocalRepository extends BaseRepository
     {
         var artifact = attachment.artifact();
         var content = attachment.content();
-        var pgp = readSignature(artifact, content, "pgp");
+        var asc = readSignature(artifact, content, "asc");
         var md5 = readSignature(artifact, content, "md5");
         var sha1 = readSignature(artifact, content, "sha1");
-        return new ArtifactContentSignatures(pgp, md5, sha1);
+        return new ArtifactContentSignatures(asc, md5, sha1);
     }
 
     /**

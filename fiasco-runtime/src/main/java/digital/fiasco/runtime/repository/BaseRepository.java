@@ -128,6 +128,11 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
         this.uri = uri;
     }
 
+    public Artifact<?> artifact(ArtifactDescriptor descriptor)
+    {
+        return descriptorToArtifact.get(descriptor);
+    }
+
     /**
      * Returns true if this repository contains the given artifact
      *
@@ -185,19 +190,16 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     }
 
     /**
-     * Returns the map from descriptor to artifact
-     */
-    protected ObjectMap<ArtifactDescriptor, Artifact<?>> descriptorToArtifactMap()
-    {
-        return descriptorToArtifact;
-    }
-
-    /**
      * Returns the read/write lock for this repository
      */
     protected ReadWriteLock lock()
     {
         return lock;
+    }
+
+    protected void resolve(ArtifactDescriptor descriptor, Artifact<?> artifact)
+    {
+        descriptorToArtifact.put(descriptor, artifact);
     }
 
     protected ArtifactList resolve(Iterable<ArtifactDescriptor> descriptors)
@@ -213,7 +215,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     private ArtifactList matching(ArtifactDescriptor descriptor)
     {
         var matches = artifacts();
-        for (var at : descriptorToArtifactMap().values())
+        for (var at : descriptorToArtifact.values())
         {
             if (descriptor.matches(at.descriptor()))
             {

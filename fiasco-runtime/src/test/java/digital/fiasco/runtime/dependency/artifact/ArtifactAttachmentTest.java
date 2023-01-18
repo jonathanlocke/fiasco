@@ -56,7 +56,7 @@ public class ArtifactAttachmentTest extends FiascoTest
         ensure(text.contains("offset"));
         ensure(text.contains("signatures"));
         ensure(text.contains("md5"));
-        ensure(text.contains("pgp"));
+        ensure(text.contains("asc"));
         ensure(text.contains("sha1"));
         ensure(text.contains("size"));
         ensure(text.contains("attachmentType"));

@@ -10,8 +10,8 @@ import com.telenav.kivakit.resource.resources.OutputResource;
 import com.telenav.kivakit.resource.writing.WritableResource;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.repository.local.CacheRepository;
 import digital.fiasco.runtime.repository.Repository;
+import digital.fiasco.runtime.repository.local.CacheRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.Socket;

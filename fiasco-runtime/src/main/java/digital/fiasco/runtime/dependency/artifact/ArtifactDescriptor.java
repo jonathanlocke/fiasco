@@ -3,6 +3,7 @@ package digital.fiasco.runtime.dependency.artifact;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.conversion.BaseStringConverter;
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.Listener;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.naming.Named;
@@ -102,6 +103,28 @@ public record ArtifactDescriptor(ArtifactGroup group,
     public static ArtifactDescriptor descriptor(String text)
     {
         return parseDescriptor(throwingListener(), text);
+    }
+
+    /**
+     * Returns a list of artifact descriptors for the given strings. The text format for an artifact descriptor is
+     * [group:artifact:version], for example "com.telenav.kivakit:kivakit-core:1.8.0". The group is always required, but
+     * the artifact name and version are both optional. For example, "com.telenav.kivakit:kivakit-core:" or
+     * "com.telenav.kivakit::". If the artifact name or version (or both) is missing, that portion of the descriptor
+     * functions like a wildcard, and can take on any value in calls to {@link #matches(ArtifactDescriptor)}.
+     *
+     * @param text The descriptor strings
+     * @return The new artifact descriptors
+     * @throws RuntimeException Throws a subclass of {@link RuntimeException} if parsing fails
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public static ObjectList<ArtifactDescriptor> descriptors(String... text)
+    {
+        var descriptors = new ObjectList<ArtifactDescriptor>();
+        for (var at : text)
+        {
+            descriptors.add(descriptor(at));
+        }
+        return descriptors;
     }
 
     /**

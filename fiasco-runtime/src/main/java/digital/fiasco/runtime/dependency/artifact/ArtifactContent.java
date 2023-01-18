@@ -4,12 +4,11 @@ import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
-import com.telenav.kivakit.core.time.LocalTime;
+import com.telenav.kivakit.core.time.Time;
 import com.telenav.kivakit.core.value.count.Bytes;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.ResourceIdentifier;
 
-import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
@@ -33,7 +32,7 @@ public record ArtifactContent
         @FormatProperty @Expose ArtifactContentSignatures signatures,
         @FormatProperty @Expose ResourceIdentifier resourceIdentifier,
         @FormatProperty @Expose long offset,
-        @FormatProperty @Expose LocalTime lastModified,
+        @FormatProperty @Expose Time lastModified,
         @FormatProperty @Expose Bytes size
     )
 {
@@ -59,7 +58,7 @@ public record ArtifactContent
      * @param lastModified The new last modified time
      * @return The new artifact content
      */
-    public ArtifactContent withLastModified(LocalTime lastModified)
+    public ArtifactContent withLastModified(Time lastModified)
     {
         return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
     }

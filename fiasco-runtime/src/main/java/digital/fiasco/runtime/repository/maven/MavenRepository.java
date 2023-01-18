@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.repository.maven;
 
+import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.filesystem.File;
@@ -12,26 +13,31 @@ import com.telenav.kivakit.resource.ResourceFolder;
 import com.telenav.kivakit.resource.ResourcePath;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
+import digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContentSignatures;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
-import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.maven.resolver.MavenDependency;
 import digital.fiasco.runtime.repository.maven.resolver.MavenResolver;
+import org.eclipse.aether.repository.LocalRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 
+import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
+import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.ensure.Ensure.fail;
+import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
+import static com.telenav.kivakit.resource.Extension.ASC;
 import static com.telenav.kivakit.resource.Extension.MD5;
-import static com.telenav.kivakit.resource.Extension.POM;
 import static com.telenav.kivakit.resource.Extension.SHA1;
 import static com.telenav.kivakit.resource.FileName.parseFileName;
 import static com.telenav.kivakit.resource.ResourcePath.parseResourcePath;
 import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
+import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
@@ -40,6 +46,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
 import static digital.fiasco.runtime.dependency.artifact.ArtifactContent.content;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
+import static digital.fiasco.runtime.dependency.artifact.Library.libraries;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
 /**
@@ -70,22 +77,51 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
 @SuppressWarnings({ "JavadocLinkAsPlainText", "unused" })
 public class MavenRepository extends BaseRepository
 {
+    public static Folder LOCAL_MAVEN_REPOSITORY_FOLDER = fiascoCacheFolder().folder("maven-repository");
+
     /** Resolves artifacts from maven repositories */
-    private static MavenResolver mavenResolver = new MavenResolver();
+    private final MavenResolver mavenResolver;
 
     /** The root folder for this repository */
     @FormatProperty
     private final ResourceFolder<?> rootFolder;
 
+    /** The local repository where resolved artifacts should be saved */
+    private final LocalRepository localRepository;
+
+    /** The local repository folder where resolved artifacts should be saved */
+    private final Folder localRepositoryFolder;
+
     /**
      * Creates a maven repository
      */
-    public MavenRepository(String name, URI uri)
+    public MavenRepository(String name, URI uri, Folder localRepositoryFolder)
     {
         super(name, uri);
 
         this.rootFolder = new HttpResourceFolder(uri);
-        mavenResolver = mavenResolver.withRepository(this);
+        this.localRepositoryFolder = localRepositoryFolder.mkdirs();
+        this.localRepository = new LocalRepository(localRepositoryFolder.asJavaFile());
+
+        mavenResolver = new MavenResolver(localRepositoryFolder)
+            .withMavenRepository(this)
+            .withLocalRepository(localRepository);
+    }
+
+    /**
+     * Creates a maven repository
+     */
+    public MavenRepository(String name, Folder localRepositoryFolder)
+    {
+        super(name, localRepositoryFolder.asUri());
+
+        this.rootFolder = localRepositoryFolder.mkdirs();
+        this.localRepositoryFolder = localRepositoryFolder.mkdirs();
+        this.localRepository = new LocalRepository(localRepositoryFolder.asJavaFile());
+
+        mavenResolver = new MavenResolver(localRepositoryFolder)
+            .withMavenRepository(this)
+            .withLocalRepository(localRepository);
     }
 
     /**
@@ -96,18 +132,20 @@ public class MavenRepository extends BaseRepository
     {
         lock().write(() ->
         {
-            var descriptor = artifact.descriptor();
-            mavenWriteContent(artifact.attachmentOfType(JAR_ATTACHMENT));
-            if (artifact instanceof Library library)
+            if (!isRemote())
             {
-                mavenWriteContent(artifact.attachmentOfType(JAVADOC_ATTACHMENT));
-                mavenWriteContent(artifact.attachmentOfType(SOURCES_ATTACHMENT));
+                var descriptor = artifact.descriptor();
+                artifact.attachments().forEach(this::mavenWriteContent);
+                mavenWritePom(artifact);
             }
-            mavenWritePom(artifact);
         });
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean isRemote()
     {
         return !uri().getScheme().equals("file");
@@ -117,54 +155,10 @@ public class MavenRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactList resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
     {
-        return lock().read(() ->
-        {
-            var resolved = ArtifactList.artifacts();
-
-            // Go through each descriptor,
-            for (var descriptor : descriptors)
-            {
-                var artifact = descriptorToArtifactMap().get(descriptor);
-
-                // read any artifact jar attachment (if the repository does not contain the artifact,
-                // the return value assigned to jar will be null),
-                var jar = mavenReadContent(attachment(JAR_ATTACHMENT));
-                if (jar != null)
-                {
-                    // then read any Javadoc or source code attachments,
-                    var javadoc = mavenReadContent(attachment(JAVADOC_ATTACHMENT));
-                    var source = mavenReadContent(attachment(SOURCES_ATTACHMENT));
-
-                    // and resolve dependencies for the artifact from remote repositories.
-                    var dependencyDescriptors = mavenResolver
-                        .resolveDependencies(descriptor)
-                        .map(MavenDependency::descriptor);
-
-                    var resolvedArtifacts = resolveArtifacts(dependencyDescriptors);
-
-                    // If the artifact has source code,
-                    if (source != null)
-                    {
-                        // return it as a library,
-                        resolved = resolved.with(library(descriptor)
-                            .withDependencies(resolvedArtifacts)
-                            .withContent(jar)
-                            .withJavadoc(javadoc)
-                            .withSources(source));
-                    }
-                    else
-                    {
-                        // otherwise, return it as an asset.
-                        resolved = resolved.with(asset(descriptor)
-                            .withDependencies(resolvedArtifacts)
-                            .withContent(jar));
-                    }
-                }
-            }
-            return resolved;
-        });
+        return resolveArtifacts(descriptors, artifacts());
     }
 
     /**
@@ -176,7 +170,7 @@ public class MavenRepository extends BaseRepository
     private FileName mavenFileName(Artifact<?> artifact, String suffix)
     {
         var descriptor = artifact.descriptor();
-        return parseFileName(throwingListener(), descriptor.group()
+        return parseFileName(throwingListener(), descriptor.artifact()
             + "-" + descriptor.version() + suffix);
     }
 
@@ -189,7 +183,12 @@ public class MavenRepository extends BaseRepository
      */
     private ResourceFolder<?> mavenFolder(ResourceFolder<?> root, Artifact<?> artifact)
     {
-        return root.folder(mavenPath(artifact).join("/"));
+        var artifactFolder = root.folder(mavenPath(artifact).join("/"));
+        if (artifactFolder instanceof Folder folder)
+        {
+            artifactFolder.mkdirs();
+        }
+        return artifactFolder;
     }
 
     /**
@@ -213,6 +212,7 @@ public class MavenRepository extends BaseRepository
      *
      * @param attachment The artifact attachment
      * @return The artifact content
+     * @throws RuntimeException Thrown if the attachment resource doesn't exist
      */
     private ArtifactContent mavenReadContent(ArtifactAttachment attachment)
     {
@@ -220,36 +220,36 @@ public class MavenRepository extends BaseRepository
         if (resource.exists())
         {
             var type = attachment.attachmentType();
-            var pgp = mavenResource(rootFolder, attachment.withType(type), Extension.PGP).reader().readText();
+            var asc = mavenResource(rootFolder, attachment.withType(type), ASC).reader().readText();
             var md5 = mavenResource(rootFolder, attachment.withType(type), MD5).reader().readText();
             var sha1 = mavenResource(rootFolder, attachment.withType(type), SHA1).reader().readText();
-            var signatures = new ArtifactContentSignatures(pgp, md5, sha1);
+            var signatures = new ArtifactContentSignatures(asc, md5, sha1);
 
             return content()
-                .withName(attachment.content().name())
+                .withName(resource.fileName().name())
                 .withSignatures(signatures)
                 .withResource(resource)
-                .withLastModified(resource.lastModified().asLocalTime())
+                .withLastModified(resource.lastModified())
                 .withSize(resource.sizeInBytes());
         }
-        return null;
+        return illegalState("Content does not exist: $", resource);
     }
 
     /**
      * Returns a file under the given target folder for the given descriptor and file type
      *
-     * @param target The target folder
+     * @param rootFolder The root repository folder
      * @param attachment The artifact attachment
      * @param signatureExtension The extension of the type of signature, like ".sha1"
      * @return The file
      */
-    private Resource mavenResource(ResourceFolder<?> target,
+    private Resource mavenResource(ResourceFolder<?> rootFolder,
                                    ArtifactAttachment attachment,
                                    Extension signatureExtension)
     {
         var artifact = attachment.artifact();
-        var folder = mavenFolder(target, artifact);
-        return folder.resource(mavenFileName(artifact, attachment.attachmentType().fileSuffix() +
+        var target = mavenFolder(rootFolder, artifact);
+        return target.resource(mavenFileName(artifact, attachment.attachmentType().fileSuffix() +
             (signatureExtension == null
                 ? ""
                 : signatureExtension)));
@@ -269,13 +269,10 @@ public class MavenRepository extends BaseRepository
     private void mavenWriteContent(@NotNull ArtifactAttachment attachment)
     {
         // If we can write to the folder,
-        if (rootFolder instanceof Folder targetFolder)
+        if (rootFolder instanceof Folder folder)
         {
-            // get the target sub-folder,
-            targetFolder = (Folder) mavenFolder(targetFolder, attachment.artifact());
-
             // and the target file in that folder,
-            var targetFile = (File) mavenResource(targetFolder, attachment, null);
+            var targetFile = (File) mavenResource(folder, attachment, null);
 
             // and copy the content to that file.
             attachment.content().resource().safeCopyTo(targetFile, OVERWRITE);
@@ -285,9 +282,13 @@ public class MavenRepository extends BaseRepository
 
             // and write them to the folder.
             var type = attachment.attachmentType();
-            ((File) mavenResource(targetFolder, attachment.withType(type), Extension.ASC)).saveText(signature.pgp());
-            ((File) mavenResource(targetFolder, attachment.withType(type), MD5)).saveText(signature.md5());
-            ((File) mavenResource(targetFolder, attachment.withType(type), SHA1)).saveText(signature.sha1());
+            ((File) mavenResource(folder, attachment.withType(type), ASC)).saveText(signature.asc());
+            ((File) mavenResource(folder, attachment.withType(type), MD5)).saveText(signature.md5());
+            ((File) mavenResource(folder, attachment.withType(type), SHA1)).saveText(signature.sha1());
+        }
+        else
+        {
+            illegalState("Cannot write content to non-folder: $", rootFolder);
         }
     }
 
@@ -321,12 +322,88 @@ public class MavenRepository extends BaseRepository
         if (rootFolder instanceof Folder target)
         {
             // get the file to write to
-            var file = (File) mavenResource(target, attachment(POM_ATTACHMENT), POM);
+            var attachment = attachment(POM_ATTACHMENT)
+                .withArtifact(artifact);
+            var file = (File) mavenResource(rootFolder, attachment, null);
             file.saveText(artifact.mavenPom());
         }
         else
         {
-            fail("Cannot write pom to: $", rootFolder);
+            fail("Cannot write pom to non-folder: $", rootFolder);
         }
+    }
+
+    private ArtifactContent readAttachment(Artifact<?> artifact, ArtifactAttachmentType type)
+    {
+        var attachment = attachment(type).withArtifact(artifact);
+        return mavenReadContent(attachment);
+    }
+
+    private ArtifactList resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors,
+                                          ArtifactList resolvedFinal)
+    {
+        return lock().read(() ->
+        {
+            var resolved = resolvedFinal;
+
+            // Go through each descriptor,
+            for (var descriptor : descriptors)
+            {
+                // create a new library artifact,
+                var artifact = library(descriptor);
+
+                // and if we have not already resolved it,
+                if (!resolved.contains(artifact))
+                {
+                    // read any JAR attachment,
+                    var jar = readAttachment(artifact, JAR_ATTACHMENT);
+                    if (jar != null)
+                    {
+                        // and source and javadoc attachments (if they exist),
+                        var sources = readAttachment(artifact, SOURCES_ATTACHMENT);
+                        var javadoc = readAttachment(artifact, JAVADOC_ATTACHMENT);
+
+                        // then resolve dependencies for the artifact from remote repositories.
+                        var dependencyDescriptors = mavenResolver
+                            .resolveDependencies(descriptor)
+                            .map(MavenDependency::descriptor)
+                            .without(resolved.asArtifactDescriptors());
+                        var dependencies = libraries(dependencyDescriptors)
+                            .asArtifactList();
+
+                        // If the artifact has source code,
+                        if (sources != null)
+                        {
+                            // return it as a library,
+                            resolved = resolved.with(artifact
+                                .withDependencies(dependencies)
+                                .withContent(jar)
+                                .withJavadoc(javadoc)
+                                .withSources(sources));
+                        }
+                        else
+                        {
+                            // otherwise, return it as an asset.
+                            resolved = resolved.with(asset(descriptor)
+                                .withDependencies(dependencies)
+                                .withContent(jar));
+                        }
+
+                        // If there are dependencies,
+                        if (dependencyDescriptors.isNonEmpty())
+                        {
+                            var children = resolveArtifacts(dependencyDescriptors, resolved)
+                                .without(resolved);
+                            resolved = resolved.with(children);
+                        }
+                    }
+                    else
+                    {
+                        illegalState("Cannot resolve JAR attachment for: $", artifact);
+                    }
+                }
+            }
+            return resolved;
+        });
     }
 }
