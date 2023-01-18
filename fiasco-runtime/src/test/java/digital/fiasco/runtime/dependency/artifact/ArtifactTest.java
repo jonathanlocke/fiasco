@@ -303,27 +303,29 @@ public class ArtifactTest extends FiascoTest
               xmlns="http://maven.apache.org/POM/4.0.0"
               xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
               xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-               <modelVersion>4.0.0</modelVersion>
-               <groupId>com.telenav.kivakit</groupId>
-               <artifactId>kivakit-application</artifactId>
-               <version>1.8.5</version>
 
-               <dependencies>
+                <modelVersion>4.0.0</modelVersion>
 
-                   <dependency>
-                       <groupId>com.telenav.kivakit</groupId>
-                       <artifactId>kivakit-core</artifactId>
-                       <version>1.8.5</version>
-                   </dependency>
+                <groupId>com.telenav.kivakit</groupId>
+                <artifactId>kivakit-application</artifactId>
+                <version>1.8.5</version>
                \s
-                   <dependency>
-                       <groupId>com.telenav.kivakit</groupId>
-                       <artifactId>kivakit-resource</artifactId>
-                       <version>1.8.5</version>
-                   </dependency>
+                <dependencies>
                \s
-               </dependencies>
-
+                    <dependency>
+                        <groupId>com.telenav.kivakit</groupId>
+                        <artifactId>kivakit-core</artifactId>
+                        <version>1.8.5</version>
+                    </dependency>
+                   \s
+                    <dependency>
+                        <groupId>com.telenav.kivakit</groupId>
+                        <artifactId>kivakit-resource</artifactId>
+                        <version>1.8.5</version>
+                    </dependency>
+                   \s
+                </dependencies>
+               \s
             </project>""".trim());
     }
 
