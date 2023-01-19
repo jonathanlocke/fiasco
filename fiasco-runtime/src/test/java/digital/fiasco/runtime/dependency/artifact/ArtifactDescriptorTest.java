@@ -9,58 +9,58 @@ import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.parseDescriptor;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifact;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifactName;
 
 public class ArtifactDescriptorTest extends FiascoTest
 {
     @Test
     public void testCreation()
     {
-        var descriptor = descriptor("x:y:");
+        var descriptor = descriptor("library:x:y:");
         ensureEqual(descriptor.group(), group("x"));
-        ensureEqual(descriptor.artifact(), artifact("y"));
+        ensureEqual(descriptor.artifact(), artifactName("y"));
         ensureEqual(descriptor.version(), null);
         ensureFalse(descriptor.isComplete());
-        ensureEqual("x:y:", descriptor.name());
+        ensureEqual("library:x:y:", descriptor.name());
         ensureThrows(() -> descriptor("xyz"));
         ensureThrows(() -> descriptor("1"));
         ensureNull(parseDescriptor(nullListener(), ""));
         ensureNull(parseDescriptor(nullListener(), "x"));
-        ensureEqual(parseDescriptor(nullListener(), "x:y:1"), descriptor("x:y:1"));
+        ensureEqual(parseDescriptor(nullListener(), "library:x:y:1"), descriptor("library:x:y:1"));
     }
 
     @Test
     public void testGroup()
     {
-        var descriptor = descriptor("x::");
+        var descriptor = descriptor("library:x::");
         ensureEqual(descriptor.group(), group("x"));
         ensureEqual(descriptor.artifact(), null);
         ensureEqual(descriptor.version(), null);
         ensureFalse(descriptor.isComplete());
-        ensureEqual("x::", descriptor.name());
+        ensureEqual("library:x::", descriptor.name());
     }
 
     @Test
     public void testIsComplete()
     {
-        var descriptor = descriptor("x:y:1.5");
+        var descriptor = descriptor("library:x:y:1.5");
         ensureEqual(descriptor.group(), group("x"));
-        ensureEqual(descriptor.artifact(), artifact("y"));
+        ensureEqual(descriptor.artifact(), artifactName("y"));
         ensureEqual(descriptor.version(), version("1.5"));
         ensure(descriptor.isComplete());
-        ensureEqual("x:y:1.5", descriptor.name());
+        ensureEqual("library:x:y:1.5", descriptor.name());
     }
 
     @Test
     public void testMatching()
     {
-        ensure(descriptor("x::").matches(descriptor("x:y:1.0")));
-        ensure(descriptor("x:y:").matches(descriptor("x:y:1.0")));
-        ensure(descriptor("x::1.0").matches(descriptor("x:y:1.0")));
+        ensure(descriptor("library:x::").matches(descriptor("library:x:y:1.0")));
+        ensure(descriptor("library:x:y:").matches(descriptor("library:x:y:1.0")));
+        ensure(descriptor("library:x::1.0").matches(descriptor("library:x:y:1.0")));
 
-        ensureFalse(descriptor("x::").matches(descriptor("z:y:1.0")));
-        ensureFalse(descriptor("x:y:").matches(descriptor("x:z:1.0")));
-        ensureFalse(descriptor("x::1.0").matches(descriptor("x:y:9.9")));
+        ensureFalse(descriptor("library:x::").matches(descriptor("library:z:y:1.0")));
+        ensureFalse(descriptor("library:x:y:").matches(descriptor("library:x:z:1.0")));
+        ensureFalse(descriptor("library:x::1.0").matches(descriptor("library:x:y:9.9")));
     }
 
     @Test
@@ -128,73 +128,73 @@ public class ArtifactDescriptorTest extends FiascoTest
     @Test
     public void testName()
     {
-        ensureEqual(descriptorX().name(), "x::");
-        ensureEqual(descriptorXy().name(), "x:y:");
-        ensureEqual(descriptorXv().name(), "x::1.2.3");
-        ensureEqual(descriptorXyv().name(), "x:y:1.2.3");
+        ensureEqual(descriptorX().name(), "library:x::");
+        ensureEqual(descriptorXy().name(), "library:x:y:");
+        ensureEqual(descriptorXv().name(), "library:x::1.2.3");
+        ensureEqual(descriptorXyv().name(), "library:x:y:1.2.3");
 
-        ensureEqual(descriptorA().name(), "a::");
-        ensureEqual(descriptorAb().name(), "a:b:");
-        ensureEqual(descriptorAv().name(), "a::1.2.3");
-        ensureEqual(descriptorAbv().name(), "a:b:1.2.3");
+        ensureEqual(descriptorA().name(), "library:a::");
+        ensureEqual(descriptorAb().name(), "library:a:b:");
+        ensureEqual(descriptorAv().name(), "library:a::1.2.3");
+        ensureEqual(descriptorAbv().name(), "library:a:b:1.2.3");
     }
 
     @Test
     public void testParsing()
     {
-        ensureNotNull(descriptor("x:y:1.0"));
-        ensureThrows(() -> descriptor("x:y:?"));
-        ensureThrows(() -> descriptor(":y:1.0"));
-        ensureThrows(() -> descriptor("::"));
+        ensureNotNull(descriptor("library:x:y:1.0"));
+        ensureThrows(() -> descriptor("library:x:y:?"));
+        ensureThrows(() -> descriptor("::y:1.0"));
+        ensureThrows(() -> descriptor(":::"));
     }
 
     @Test
     public void testVersion()
     {
-        var descriptor = descriptor("x::1.5.9");
+        var descriptor = descriptor("library:x::1.5.9");
         ensureEqual(descriptor.group(), group("x"));
         ensureEqual(descriptor.artifact(), null);
         ensureEqual(descriptor.version(), version("1.5.9"));
         ensureFalse(descriptor.isComplete());
-        ensureEqual("x::1.5.9", descriptor.name());
+        ensureEqual("library:x::1.5.9", descriptor.name());
         ensureEqual(descriptor.version(version("1.1.1")).version(), version("1.1.1"));
     }
 
     @Test
     public void testWith()
     {
-        ensureEqual(descriptor("x::1.5.9")
-            .withGroup("y").toString(), "y::1.5.9");
+        ensureEqual(descriptor("library:x::1.5.9")
+            .withGroup("y").toString(), "library:y::1.5.9");
 
-        ensureEqual(descriptor("x::1.5.9")
-            .withArtifact("y").toString(), "x:y:1.5.9");
+        ensureEqual(descriptor("library:x::1.5.9")
+            .withArtifact("y").toString(), "library:x:y:1.5.9");
 
-        ensureEqual(descriptor("x::1.5.9")
-            .withVersion("1.0").toString(), "x::1.0");
+        ensureEqual(descriptor("library:x::1.5.9")
+            .withVersion("1.0").toString(), "library:x::1.0");
 
-        ensureEqual(descriptor("x::1.5.9")
-            .withVersion((Version) null).toString(), "x::");
+        ensureEqual(descriptor("library:x::1.5.9")
+            .withVersion((Version) null).toString(), "library:x::");
 
-        ensureEqual(descriptor("x::")
-            .withVersion("6.0").toString(), "x::6.0");
+        ensureEqual(descriptor("library:x::")
+            .withVersion("6.0").toString(), "library:x::6.0");
 
-        ensureEqual(descriptor("x::")
+        ensureEqual(descriptor("library:x::")
             .withArtifact("y")
-            .withVersion("6.0").toString(), "x:y:6.0");
+            .withVersion("6.0").toString(), "library:x:y:6.0");
     }
 
     @Test
     public void testWithout()
     {
-        ensureEqual(descriptor("x:y:1.5.9")
-            .withoutArtifact().toString(), "x::1.5.9");
+        ensureEqual(descriptor("library:x:y:1.5.9")
+            .withoutArtifact().toString(), "library:x::1.5.9");
 
-        ensureEqual(descriptor("x:y:1.5.9")
-            .withoutVersion().toString(), "x:y:");
+        ensureEqual(descriptor("library:x:y:1.5.9")
+            .withoutVersion().toString(), "library:x:y:");
 
-        ensureEqual(descriptor("x:y:1.5.9")
+        ensureEqual(descriptor("library:x:y:1.5.9")
             .withoutArtifact()
-            .withoutVersion().toString(), "x::");
+            .withoutVersion().toString(), "library:x::");
     }
 
     private void ensureMatches(ArtifactDescriptor x, ArtifactDescriptor... y)

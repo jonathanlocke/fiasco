@@ -10,7 +10,6 @@ package digital.fiasco.runtime.dependency.artifact;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.registry.RegistryTrait;
-import digital.fiasco.runtime.dependency.DependencyList;
 
 import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_INTERNAL;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
@@ -18,8 +17,6 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.UNTESTED;
-import static com.telenav.kivakit.core.collections.list.StringList.stringList;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 
 /**
  * An asset is an artifact having only a single content attachment
@@ -27,10 +24,9 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
  * <p><b>Creation</b></p>
  *
  * <ul>
- *     <li>{@link #asset(String)} - Returns an asset with the given artifact descriptor</li>
- *     <li>{@link #asset(ArtifactDescriptor)} - Returns an asset with the given artifact descriptor</li>
- *     <li>{@link #assets(Asset...)} - Returns a {@link DependencyList} with the given assets</li>
- *     <li>{@link #assets(String...)} - Returns a {@link DependencyList} with assets for each of the given artifact descriptors</li>
+ *     <li>{@link #asset(String)}</li>
+ *     <li>{@link #asset(ArtifactDescriptor)}</li>
+ *     <li>{@link #asset(Artifact)}</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -48,7 +44,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static Asset asset(String descriptor)
     {
-        return asset(ArtifactDescriptor.descriptor(descriptor));
+        return asset(ArtifactDescriptor.descriptor("asset:" + descriptor));
     }
 
     /**
@@ -73,30 +69,6 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
     public static Asset asset(Artifact<?> artifact)
     {
         return asset(artifact.descriptor());
-    }
-
-    /**
-     * Creates a list of libraries from the given variable-argument list of descriptors
-     *
-     * @param descriptors The artifact descriptors
-     * @return The asset dependency list
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static ArtifactList assets(String... descriptors)
-    {
-        return artifacts(stringList(descriptors).map(Asset::asset));
-    }
-
-    /**
-     * Creates a list of assets from the given variable-argument list of libraries
-     *
-     * @param assets The assets
-     * @return The asset dependency list
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static ArtifactList assets(Asset... assets)
-    {
-        return ArtifactList.artifacts(assets);
     }
 
     @MethodQuality

@@ -23,7 +23,7 @@ public class CacheRepositoryTest extends FiascoTest
         var funky = new CacheRepository("funky", root().mkdirs().clearAll().asUri());
         funky.installArtifact(core);
 
-        var resolved = funky.resolveArtifacts(descriptors("com.telenav.kivakit::"));
+        var resolved = funky.resolveArtifacts(descriptors(":com.telenav.kivakit::"));
         ensure(resolved.size() == 1);
         ensureEqual(resolved.first(), core);
     }
@@ -121,14 +121,14 @@ public class CacheRepositoryTest extends FiascoTest
             ensure(resolved.first().equals(icons));
         }
         {
-            var resolved = repository.resolveArtifacts(descriptors("com.telenav.kivakit::"));
+            var resolved = repository.resolveArtifacts(descriptors(":com.telenav.kivakit::")).sorted();
             ensure(resolved.size() == 3);
-            ensure(resolved.first().equals(core));
-            ensure(resolved.get(1).equals(icons));
-            ensure(resolved.get(2).equals(logos));
+            ensure(resolved.get(0).equals(icons));
+            ensure(resolved.get(1).equals(logos));
+            ensure(resolved.get(2).equals(core));
         }
         {
-            var resolved = repository.resolveArtifacts(descriptors("com.telenav.x::"));
+            var resolved = repository.resolveArtifacts(descriptors(":com.telenav.x::"));
             ensure(resolved.size() == 0);
         }
     }

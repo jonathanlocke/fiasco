@@ -6,5 +6,5 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 @SuppressWarnings("unused")
 public interface ApacheCommonsLang extends LibraryGroups
 {
-    Library apache_commons_lang3 = apache_commons_group.library("commons-lang3");
+    Library apache_commons_lang3 = apache_commons_group.library("commons-lang3").asLibrary();
 }

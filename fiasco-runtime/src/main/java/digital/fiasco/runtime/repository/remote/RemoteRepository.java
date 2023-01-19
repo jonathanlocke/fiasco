@@ -6,8 +6,8 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
-import digital.fiasco.runtime.repository.local.CacheRepository;
 import digital.fiasco.runtime.repository.Repository;
+import digital.fiasco.runtime.repository.local.CacheRepository;
 
 import java.net.URI;
 
@@ -55,6 +55,13 @@ public class RemoteRepository extends BaseRepository
     public RemoteRepository(String name, URI uri)
     {
         super(name, uri);
+    }
+
+    @Override
+    public RemoteRepository clear()
+    {
+        unsupported();
+        return this;
     }
 
     /**

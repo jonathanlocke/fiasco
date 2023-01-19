@@ -25,7 +25,7 @@ public class ArtifactListTest extends FiascoTest
     public void testAsString()
     {
         var joined = kivakitArtifacts().asString();
-        ensureEqual(joined, "com.telenav.kivakit:kivakit-core:1.8.5, com.telenav.kivakit:kivakit-icons:1.8.5, com.telenav.kivakit:kivakit-application:1.8.5, com.telenav.kivakit:kivakit-logos:1.8.5");
+        ensureEqual(joined, "library:com.telenav.kivakit:kivakit-core:1.8.5, asset:com.telenav.kivakit:kivakit-icons:1.8.5, library:com.telenav.kivakit:kivakit-application:1.8.5, asset:com.telenav.kivakit:kivakit-logos:1.8.5");
     }
 
     @Test
@@ -33,8 +33,8 @@ public class ArtifactListTest extends FiascoTest
     {
         ensure(kivakitLibraries().asStringList()
             .equals(stringList(
-                "com.telenav.kivakit:kivakit-application:1.8.5",
-                "com.telenav.kivakit:kivakit-core:1.8.5"
+                "library:com.telenav.kivakit:kivakit-application:1.8.5",
+                "library:com.telenav.kivakit:kivakit-core:1.8.5"
             )));
     }
 
@@ -87,13 +87,13 @@ public class ArtifactListTest extends FiascoTest
     @Test
     public void testFirst()
     {
-        ensureEqual(ArtifactList.artifacts(kivakitLogos(), kivakitImages(), kivakitApplication()).first(), kivakitLogos());
+        ensureEqual(artifacts(kivakitLogos(), kivakitImages(), kivakitApplication()).first(), kivakitLogos());
     }
 
     @Test
     public void testGet()
     {
-        var artifacts = ArtifactList.artifacts(kivakitLogos(), kivakitImages(), kivakitApplication());
+        var artifacts = artifacts(kivakitLogos(), kivakitImages(), kivakitApplication());
         ensureEqual(artifacts.get(0), kivakitLogos());
         ensureEqual(artifacts.get(1), kivakitImages());
         ensureEqual(artifacts.get(2), kivakitApplication());
@@ -104,22 +104,22 @@ public class ArtifactListTest extends FiascoTest
     public void testJoin()
     {
         var joined = kivakitArtifacts().join(", ");
-        ensureEqual(joined, "com.telenav.kivakit:kivakit-core:1.8.5, com.telenav.kivakit:kivakit-icons:1.8.5, com.telenav.kivakit:kivakit-application:1.8.5, com.telenav.kivakit:kivakit-logos:1.8.5");
+        ensureEqual(joined, "library:com.telenav.kivakit:kivakit-core:1.8.5, asset:com.telenav.kivakit:kivakit-icons:1.8.5, library:com.telenav.kivakit:kivakit-application:1.8.5, asset:com.telenav.kivakit:kivakit-logos:1.8.5");
     }
 
     @Test
     public void testLast()
     {
-        ensureEqual(ArtifactList.artifacts(kivakitLogos(), kivakitImages(), kivakitApplication()).last(), kivakitApplication());
+        ensureEqual(artifacts(kivakitLogos(), kivakitImages(), kivakitApplication()).last(), kivakitApplication());
     }
 
     @Test
     public void testMatching()
     {
         var libraries = kivakitArtifacts().matching(at -> at instanceof Library);
-        ensure(libraries.containsAll(ArtifactList.artifacts(kivakitCore(), kivakitApplication())));
-        ensure(kivakitArtifacts().libraries().containsAll(kivakitLibraries()));
-        ensure(kivakitArtifacts().assets().containsAll(kivakitAssets()));
+        ensure(libraries.containsAll(artifacts(kivakitCore(), kivakitApplication())));
+        ensure(kivakitArtifacts().asLibraryList().containsAll(kivakitLibraries().asLibraryList()));
+        ensure(kivakitArtifacts().asAssetList().containsAll(kivakitAssets().asAssetList()));
     }
 
     @Test
@@ -132,8 +132,8 @@ public class ArtifactListTest extends FiascoTest
     @Test
     public void testSorted()
     {
-        var artifacts = ArtifactList.artifacts(kivakitLogos(), kivakitImages(), kivakitApplication());
-        ensureEqual(artifacts.sorted(), ArtifactList.artifacts(kivakitApplication(), kivakitImages(), kivakitLogos()));
+        var artifacts = artifacts(kivakitLogos(), kivakitImages(), kivakitApplication());
+        ensureEqual(artifacts.sorted().asArtifactList(), artifacts(kivakitApplication(), kivakitImages(), kivakitLogos()));
     }
 
     @Test
@@ -148,9 +148,9 @@ public class ArtifactListTest extends FiascoTest
         ensure(kivakitLibraries().with(kivakitAssets())
             .equals(kivakitArtifacts()));
         ensure(kivakitArtifacts().with(kivakitResource())
-            .equals(ArtifactList.artifacts(kivakitResource()).with(kivakitArtifacts())));
-        ensure(kivakitArtifacts().with(kivakitResource(), kivakitImages())
-            .equals(ArtifactList.artifacts(kivakitResource(), kivakitImages()).with(kivakitArtifacts())));
+            .equals(artifacts(kivakitResource()).with(kivakitArtifacts())));
+        ensure(kivakitArtifacts().with(artifacts(kivakitResource(), kivakitImages()))
+            .equals(artifacts(kivakitResource(), kivakitImages()).with(kivakitArtifacts())));
         ensure(kivakitArtifacts().without(at -> at instanceof Asset)
             .equals(kivakitLibraries()));
         ensure(kivakitArtifacts().without(list(kivakitApplication()))

@@ -8,7 +8,7 @@ import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.build.BuildRepositories.MAVEN_CENTRAL;
 import static digital.fiasco.runtime.build.BuildRepositories.MAVEN_CENTRAL_STAGING;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptors;
-import static digital.fiasco.runtime.dependency.artifact.Library.libraries;
+import static digital.fiasco.runtime.dependency.artifact.LibraryList.libraries;
 
 public class MavenRepositoryTest extends FiascoTest
 {
@@ -41,10 +41,10 @@ public class MavenRepositoryTest extends FiascoTest
     @Test
     public void testResolveArtifacts()
     {
-        var artifacts = MAVEN_CENTRAL.resolveArtifacts(descriptors("com.telenav.kivakit:kivakit-interfaces:1.10.0"));
+        var artifacts = MAVEN_CENTRAL.resolveArtifacts(descriptors("library:com.telenav.kivakit:kivakit-interfaces:1.10.0")).sorted();
         ensureEqual(artifacts, libraries(
-            "com.telenav.kivakit:kivakit-interfaces:1.10.0",
             "com.telenav.kivakit:kivakit-annotations:1.10.0",
+            "com.telenav.kivakit:kivakit-interfaces:1.10.0",
             "com.telenav.lexakai.annotations:lexakai-annotations:1.0.9",
             "org.jetbrains:annotations:23.0.0"));
     }

@@ -23,7 +23,7 @@ import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifact;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifactName;
 
 /**
  * Settings used by {@link Builder} to modify the way that it builds.
@@ -410,7 +410,7 @@ public class BuildSettings
      */
     public BuildSettings withArtifact(String artifact)
     {
-        return withArtifact(artifact(artifact));
+        return withArtifact(artifactName(artifact));
     }
 
     /**

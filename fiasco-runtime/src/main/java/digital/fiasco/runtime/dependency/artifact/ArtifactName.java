@@ -3,7 +3,6 @@ package digital.fiasco.runtime.dependency.artifact;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 
-import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
@@ -24,7 +23,7 @@ public record ArtifactName(String name) implements Comparable<ArtifactName>
      * @return The new instance of {@link ArtifactName}
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static ArtifactName artifact(String name)
+    public static ArtifactName artifactName(String name)
     {
         return new ArtifactName(name);
     }

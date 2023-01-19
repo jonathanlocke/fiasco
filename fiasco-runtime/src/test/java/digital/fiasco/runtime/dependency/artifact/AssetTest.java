@@ -8,7 +8,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
-import static digital.fiasco.runtime.dependency.artifact.Asset.assets;
+import static digital.fiasco.runtime.dependency.artifact.AssetList.assets;
 
 public class AssetTest extends FiascoTest
 {
@@ -77,16 +77,16 @@ public class AssetTest extends FiascoTest
     public void testDependencies()
     {
         var asset = asset()
-            .withDependencies(assets("a:b:1.0"));
+            .withDependencies(assets("a:b:1.0").asArtifactList());
         ensureEqual(asset.dependencies().size(), 1);
-        ensureEqual(asset.dependencies().get(0).descriptor(), descriptor("a:b:1.0"));
+        ensureEqual(asset.dependencies().get(0).descriptor(), descriptor("asset:a:b:1.0"));
     }
 
     @Test
     public void testDescriptor()
     {
         var asset = asset();
-        ensureEqual(asset.descriptor(), descriptor("x:y:1.0"));
+        ensureEqual(asset.descriptor(), descriptor("asset:x:y:1.0"));
     }
 
     @NotNull

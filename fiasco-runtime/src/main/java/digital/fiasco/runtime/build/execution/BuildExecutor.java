@@ -15,7 +15,6 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import java.util.concurrent.Future;
 
 import static com.telenav.kivakit.core.thread.Threads.threadPool;
-import static digital.fiasco.runtime.dependency.DependencyTree.dependencyTree;
 
 /**
  * Runs a build.
@@ -91,21 +90,21 @@ public class BuildExecutor extends BaseComponent implements TryTrait
     private ObjectList<Result<Builder>> build(ResolvedArtifactSet resolved)
     {
         // Create a queue of builders from the given root,
-        var queue = dependencyTree(root, Builder.class).asQueue();
+        var queue = new DependencyTree(root).asQueue();
 
         // create a thread pool,
         var executor = threadPool("FiascoBuildPool", root.settings().builderThreads());
 
         // and while there are builders yet to run,
         var futures = new ObjectList<Future<Result<Builder>>>();
-        for (var builder = queue.nextReady(); builder != null; builder = queue.nextReady())
+        for (var builder = queue.nextReady(Builder.class); builder != null; builder = queue.nextReady(Builder.class))
         {
             // submit the builder to the executor,
             var finalBuilder = builder;
             var future = (Future<Result<Builder>>) executor.submit(() ->
             {
                 // Wait for artifact dependencies to be resolved,
-                resolved.waitForResolutionOf(finalBuilder.artifactDependencies());
+                resolved.waitForResolutionOf(finalBuilder.artifacts());
 
                 // run the builder,
                 finalBuilder.build();

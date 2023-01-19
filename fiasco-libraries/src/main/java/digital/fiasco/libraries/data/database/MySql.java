@@ -6,5 +6,5 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 @SuppressWarnings("unused")
 public interface MySql extends LibraryGroups
 {
-    Library mysql_connector = mysql_group.library("mysql-connector-java");
+    Library mysql_connector = mysql_group.library("mysql-connector-java").asLibrary();
 }

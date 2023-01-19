@@ -103,7 +103,6 @@ public class LocalRepository extends BaseRepository
         super(name, uri);
         this.rootFolder = folder(uri);
         metadataFile = repositoryFile("artifacts.txt");
-        loadAllArtifactMetadata();
     }
 
     /**
@@ -130,6 +129,15 @@ public class LocalRepository extends BaseRepository
             .folder(name)
             .mkdirs()
             .ensureExists());
+    }
+
+    @Override
+    public LocalRepository clear()
+    {
+        super.clear();
+        metadataFile.delete();
+        rootFolder.clearAllAndDelete();
+        return this;
     }
 
     /**
@@ -165,7 +173,7 @@ public class LocalRepository extends BaseRepository
                     saveArtifactMetadata(source);
 
                     // and add the artifact to the map.
-                    resolve(artifact.descriptor(), artifact);
+                    add(artifact.descriptor(), artifact);
                 }
                 catch (Exception e)
                 {
@@ -205,6 +213,29 @@ public class LocalRepository extends BaseRepository
             // Return the resolved artifacts with their content attached.
             return artifacts(resolvedArtifacts.map(this::loadAttachments));
         });
+    }
+
+    /**
+     * Loads the metadata in <i>artifacts.txt</i> into the artifacts map
+     */
+    @Override
+    protected void loadAllArtifactMetadata()
+    {
+        if (metadataFile.exists())
+        {
+            // Read the file,
+            var text = metadataFile.reader().readText();
+
+            // split it into chunks,
+            for (var at : text.split(ARTIFACT_SEPARATOR))
+            {
+                // convert the chunk to a cache entry,
+                var entry = artifactFromJson(at);
+
+                // and put the entry into the entries map.
+                add(entry.descriptor(), entry);
+            }
+        }
     }
 
     /**
@@ -283,31 +314,6 @@ public class LocalRepository extends BaseRepository
         var descriptor = artifact.descriptor();
         var file = descriptor.artifact() + "-" + descriptor.version() + attachment.attachmentType().fileSuffix();
         return repositoryFolder(artifact).file(file);
-    }
-
-    /**
-     * Loads the metadata in <i>artifacts.txt</i> into the artifacts map
-     */
-    private void loadAllArtifactMetadata()
-    {
-        lock().write(() ->
-        {
-            if (metadataFile.exists())
-            {
-                // Read the file,
-                var text = metadataFile.reader().readText();
-
-                // split it into chunks,
-                for (var at : text.split(ARTIFACT_SEPARATOR))
-                {
-                    // convert the chunk to a cache entry,
-                    var entry = artifactFromJson(at);
-
-                    // and put the entry into the entries map.
-                    resolve(entry.descriptor(), entry);
-                }
-            }
-        });
     }
 
     /**

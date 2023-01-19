@@ -8,6 +8,7 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
+import static digital.fiasco.runtime.dependency.DependencyList.dependencies;
 
 /**
  * Tree of dependencies created by traversing dependencies in depth-first order from the root, resulting in a list of
@@ -17,7 +18,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.ensure;
  * <p><b>Creation</b></p>
  *
  * <ul>
- *     <li>{@link #dependencyTree(Dependency, Class)}</li>
+ *     <li>{@link #DependencyTree(Dependency)}</li>
  * </ul>
  *
  * <p><b>Properties</b></p>
@@ -34,50 +35,37 @@ import static com.telenav.kivakit.core.ensure.Ensure.ensure;
  *
  * @author Jonathan Locke
  */
-@SuppressWarnings({ "unused", "unchecked" })
+@SuppressWarnings({ "unused", "rawtypes", "unchecked" })
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
-public class DependencyTree<T extends Dependency>
+public class DependencyTree
 {
-    /**
-     * @return The dependency graph formed by traversing dependencies starting at the given root
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static <T extends Dependency> DependencyTree<T> dependencyTree(Dependency root, Class<T> type)
-    {
-        return new DependencyTree<>(root, type);
-    }
-
     /** The root of this dependency graph */
     private final Dependency root;
 
-    /** The type of dependencies in this tree */
-    private final Class<T> type;
-
     /** The dependencies of this graph in depth-first-order */
-    private final DependencyList<T> depthFirst;
+    private final DependencyList depthFirst;
 
-    private DependencyTree(Dependency root, Class<T> type)
+    public DependencyTree(Dependency root)
     {
         this.root = root;
-        this.type = type;
 
-        depthFirst = depthFirst(root, DependencyList.dependencies()).with((T) root);
+        depthFirst = depthFirst(root, dependencies()).with(root);
     }
 
     /**
      * Returns this dependency tree as a queue
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyResolutionQueue<T> asQueue()
+    public DependencyResolutionQueue asQueue()
     {
-        return new DependencyResolutionQueue<>(depthFirst(), type);
+        return new DependencyResolutionQueue(depthFirst());
     }
 
     /**
      * @return The dependencies in this graph in depth-first order
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyList<T> depthFirst()
+    public DependencyList depthFirst()
     {
         return depthFirst;
     }
@@ -94,10 +82,10 @@ public class DependencyTree<T extends Dependency>
     /**
      * @return List of dependencies in depth-first order
      */
-    private DependencyList<T> depthFirst(Dependency root, DependencyList<T> explored)
+    private DependencyList depthFirst(Dependency root, DependencyList explored)
     {
         // Go through each child of the root,
-        for (var child : root.dependencies(type))
+        for (var child : root.dependencies())
         {
             // check for cycles (which should not be possible in our functional api),
             ensure(!explored.contains(child), "The dependency tree is cyclic:", root);

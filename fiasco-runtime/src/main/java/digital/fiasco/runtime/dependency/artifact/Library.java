@@ -9,14 +9,11 @@ package digital.fiasco.runtime.dependency.artifact;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.registry.RegistryTrait;
-import digital.fiasco.runtime.dependency.DependencyList;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
-import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
@@ -29,8 +26,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  * <ul>
  *     <li>{@link #library(String)} - Returns a library with the given artifact descriptor</li>
  *     <li>{@link #library(ArtifactDescriptor)} - Returns a library with the given artifact descriptor</li>
- *     <li>{@link #libraries(Library...)} - Returns a {@link DependencyList} with the given libraries</li>
- *     <li>{@link #libraries(String...)} - Returns a {@link DependencyList} with libraries for each of the given artifact descriptors</li>
+ *     <li>{@link #library(Artifact) - Returns a library with the given artifact's descriptor}</li>
  * </ul>
  *
  * <p><b>Attached Content</b></p>
@@ -49,42 +45,6 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
 public class Library extends BaseArtifact<Library> implements RegistryTrait
 {
     /**
-     * Creates a list of libraries from the given variable-argument list of descriptors
-     *
-     * @param descriptors The library descriptors
-     * @return The library dependency list
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static DependencyList<Library> libraries(String... descriptors)
-    {
-        var libraries = stringList(descriptors).map(Library::library);
-        return libraries(libraries.asArray(Library.class));
-    }
-
-    /**
-     * Creates a list of libraries from the given variable-argument list of descriptors
-     *
-     * @param descriptors The library descriptors
-     * @return The library dependency list
-     */
-    public static DependencyList<Library> libraries(ObjectList<ArtifactDescriptor> descriptors)
-    {
-        return DependencyList.dependencies(descriptors.map(Library::library));
-    }
-
-    /**
-     * Creates a list of libraries from the given variable-argument list of libraries
-     *
-     * @param libraries The libraries
-     * @return The library dependency list
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static DependencyList<Library> libraries(Library... libraries)
-    {
-        return DependencyList.dependencies(libraries);
-    }
-
-    /**
      * Creates a {@link Library} with the given artifact descriptor
      *
      * @param descriptor The artifact descriptor
@@ -93,7 +53,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static Library library(String descriptor)
     {
-        return new Library(ArtifactDescriptor.descriptor(descriptor));
+        return new Library(ArtifactDescriptor.descriptor("library:" + descriptor));
     }
 
     /**
@@ -106,6 +66,18 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
     public static Library library(ArtifactDescriptor descriptor)
     {
         return new Library(descriptor);
+    }
+
+    /**
+     * Creates a {@link Library} with the given artifact's descriptor
+     *
+     * @param artifact The artifact
+     * @return The library
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public static Library library(Artifact<?> artifact)
+    {
+        return library(artifact.descriptor());
     }
 
     public Library(ArtifactDescriptor descriptor)

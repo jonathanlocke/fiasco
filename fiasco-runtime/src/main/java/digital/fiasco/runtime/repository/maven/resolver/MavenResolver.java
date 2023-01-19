@@ -56,7 +56,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
     public static void main(String[] arguments)
     {
         console().println(new MavenResolver(LOCAL_MAVEN_REPOSITORY_FOLDER)
-            .resolveDependencies("com.telenav.kivakit:kivakit-application:1.9.0")
+            .resolveDependencies("library:com.telenav.kivakit:kivakit-application:1.9.0")
             .asStringList()
             .join("\n"));
     }
@@ -120,7 +120,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
     {
         return tryCatch(() ->
         {
-            var artifact = new DefaultArtifact(descriptor.name());
+            var artifact = new DefaultArtifact(descriptor.mavenName());
 
             var collectRequest = new CollectRequest();
             collectRequest.setRoot(new Dependency(artifact, COMPILE));
@@ -139,7 +139,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
                     + ":" + mavenArtifact.getArtifactId()
                     + ":" + mavenArtifact.getVersion();
                 var mavenRepository = repository(artifactResult.getRepository().getId());
-                var fiascoDescriptor = parseDescriptor(this, mavenArtifactDescriptor);
+                var fiascoDescriptor = parseDescriptor(this, "library:" + mavenArtifactDescriptor);
                 if (mavenRepository != null && fiascoDescriptor != null)
                 {
                     dependencies.add(new MavenDependency(mavenRepository, fiascoDescriptor));

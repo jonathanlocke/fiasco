@@ -6,5 +6,5 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 @SuppressWarnings("unused")
 public interface H2 extends LibraryGroups
 {
-    Library h2_database = h2_database_group.library("h2");
+    Library h2_database = h2_database_group.library("h2").asLibrary();
 }

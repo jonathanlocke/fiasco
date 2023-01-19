@@ -15,6 +15,7 @@ import digital.fiasco.runtime.build.BuildProfile;
 import digital.fiasco.runtime.build.BuildStructured;
 import digital.fiasco.runtime.build.builder.BuilderAssociated;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
+import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.DependencyList;
 
 /**
@@ -36,7 +37,7 @@ public interface Tool extends
      *
      * @return The dependency list
      */
-    DependencyList<?> dependencies();
+    <T extends Dependency, D extends DependencyList<T, D>> D dependencies();
 
     /**
      * Enables this tool for the given profile

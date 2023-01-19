@@ -8,7 +8,9 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.dependency.artifact.Asset;
+import digital.fiasco.runtime.dependency.artifact.AssetList;
 import digital.fiasco.runtime.dependency.artifact.Library;
+import digital.fiasco.runtime.dependency.artifact.LibraryList;
 import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
 
@@ -19,8 +21,7 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
  * A dependency is either a {@link Builder}, or an {@link Artifact} with an associated {@link #repository()}. An
  * {@link Artifact} can be either an {@link Asset} or a {@link Library}. Each dependency can have its own list of
  * {@link #dependencies()}, but circular dependencies are not allowed. Specific kinds of dependencies can be retrieved
- * with the filter methods {@link #assetDependencies()}, {@link #libraryDependencies()}, and
- * {@link #dependencies(Class)}.
+ * with the filter methods {@link #assets()}, {@link #libraries()}, and {@link #dependencies(Class)}.
  *
  * <p><b>Properties</b></p>
  *
@@ -34,8 +35,8 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
  *
  * <ul>
  *     <li>{@link #dependencies(Class)}</li>
- *     <li>{@link #assetDependencies()}</li>
- *     <li>{@link #libraryDependencies()}</li>
+ *     <li>{@link #assets()}</li>
+ *     <li>{@link #libraries()}</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -58,7 +59,7 @@ public interface Dependency extends
      * @return The dependencies
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default ArtifactList artifactDependencies()
+    default ArtifactList artifacts()
     {
         return dependencies().asArtifactList();
     }
@@ -69,9 +70,9 @@ public interface Dependency extends
      * @return The dependencies
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default DependencyList<Asset> assetDependencies()
+    default AssetList assets()
     {
-        var dependencies = new DependencyList<Asset>();
+        var dependencies = new AssetList();
         for (var at : dependencies())
         {
             if (at instanceof Asset asset)
@@ -97,10 +98,11 @@ public interface Dependency extends
      *
      * @return The dependencies
      */
+    @SuppressWarnings("unchecked")
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default <T extends Dependency> DependencyList<T> dependencies(Class<T> type)
+    default <T extends Dependency, D extends DependencyList<T, D>> D dependencies(Class<T> type)
     {
-        var dependencies = new DependencyList<T>();
+        var dependencies = new DependencyList<T, D>();
         for (var at : dependencies())
         {
             if (type.isAssignableFrom(at.getClass()))
@@ -109,13 +111,13 @@ public interface Dependency extends
                 dependencies = dependencies.with((T) at);
             }
         }
-        return dependencies;
+        return (D) dependencies;
     }
 
     /**
      * @return The objects that this depends on
      */
-    DependencyList<?> dependencies();
+    <T extends Dependency, D extends DependencyList<T, D>> D dependencies();
 
     /**
      * The artifact descriptor for this dependency
@@ -128,9 +130,9 @@ public interface Dependency extends
      * @return The dependencies
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default DependencyList<Library> libraryDependencies()
+    default LibraryList libraries()
     {
-        var dependencies = new DependencyList<Library>();
+        var dependencies = new LibraryList();
         for (var at : dependencies())
         {
             if (at instanceof Library asset)

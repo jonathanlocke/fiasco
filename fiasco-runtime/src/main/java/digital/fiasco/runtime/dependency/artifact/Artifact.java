@@ -31,9 +31,9 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  * <p><b>Artifact Descriptors</b></p>
  *
  * <p>
- * Artifacts are referenced by {@link ArtifactDescriptor}s, which take the form [group:artifact:version], for example,
- * "com.telenav.kivakit:kivakit-application:1.10.0". The descriptor for an artifact can be retrieved with
- * {@link #descriptor()}.
+ * Artifacts are referenced by {@link ArtifactDescriptor}s, which take the form
+ * <b>[type]:[group]:[artifact]:[version]</b>, for example, "library:com.telenav.kivakit:kivakit-application:1.10.0".
+ * The descriptor for an artifact can be retrieved with {@link #descriptor()}.
  * </p>
  *
  * <p><b>Artifact Content Attachments</b></p>

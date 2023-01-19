@@ -37,9 +37,8 @@ import static com.telenav.kivakit.core.string.Paths.pathTail;
 import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
 import static digital.fiasco.runtime.build.BuildOption.HELP;
-import static digital.fiasco.runtime.dependency.DependencyList.dependencies;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifact;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifactName;
 
 /**
  * <p>
@@ -252,7 +251,7 @@ public class Builder extends BaseRepeater implements
      * The dependencies that must be resolved before this builder can run. Dependencies can include both artifacts and
      * other builders.
      */
-    private DependencyList<?> dependencies;
+    private DependencyList<?, ?> dependencies;
 
     /**
      * Creates a builder for the given build
@@ -363,10 +362,11 @@ public class Builder extends BaseRepeater implements
      *
      * @return The libraries to compile against
      */
+    @SuppressWarnings("unchecked")
     @Override
-    public DependencyList<?> dependencies()
+    public <T extends Dependency, D extends DependencyList<T, D>> D dependencies()
     {
-        return settings.dependencies();
+        return (D) settings.dependencies();
     }
 
     /**
@@ -386,7 +386,7 @@ public class Builder extends BaseRepeater implements
      * @param dependencies The new dependencies
      * @return The new artifact
      */
-    public Builder dependsOn(DependencyList<?> dependencies)
+    public <T extends Dependency, D extends DependencyList<T, D>> Builder dependsOn(D dependencies)
     {
         return withDependencies(dependencies);
     }
@@ -815,7 +815,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withArtifactName(String artifact)
     {
-        return withArtifactName(artifact(artifact));
+        return withArtifactName(artifactName(artifact));
     }
 
     /**
@@ -868,7 +868,7 @@ public class Builder extends BaseRepeater implements
      * @param dependencies The new dependencies
      * @return The new artifact
      */
-    public Builder withDependencies(DependencyList<?> dependencies)
+    public Builder withDependencies(DependencyList<?, ?> dependencies)
     {
         var copy = copy();
         copy.dependencies = dependencies.copy();

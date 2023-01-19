@@ -7,9 +7,8 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.dependency.DependencyList.dependencies;
-import static digital.fiasco.runtime.dependency.DependencyTree.dependencyTree;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
+import static digital.fiasco.runtime.dependency.artifact.LibraryList.libraries;
 
 public class DependencyResolutionQueueTest extends FiascoTest
 {
@@ -30,22 +29,22 @@ public class DependencyResolutionQueueTest extends FiascoTest
     {
         var queue = queue();
 
-        ensureEqual(queue.nextReady(), c);
+        ensureEqual(queue.nextReady(Library.class), c);
         queue.resolve(c);
 
-        ensureEqual(queue.nextReady(), b);
+        ensureEqual(queue.nextReady(Library.class), b);
         queue.resolve(b);
 
-        ensureEqual(queue.nextReady(), e);
+        ensureEqual(queue.nextReady(Library.class), e);
         queue.resolve(e);
 
-        ensureEqual(queue.nextReady(), f);
+        ensureEqual(queue.nextReady(Library.class), f);
         queue.resolve(f);
 
-        ensureEqual(queue.nextReady(), d);
+        ensureEqual(queue.nextReady(Library.class), d);
         queue.resolve(d);
 
-        ensureEqual(queue.nextReady(), a);
+        ensureEqual(queue.nextReady(Library.class), a);
         queue.resolve(a);
     }
 
@@ -62,12 +61,12 @@ public class DependencyResolutionQueueTest extends FiascoTest
             queue.resolve(d);
             queue.resolve(a);
         });
-        ensureEqual(queue.nextReady(), c);
-        ensureEqual(queue.nextReady(), b);
-        ensureEqual(queue.nextReady(), e);
-        ensureEqual(queue.nextReady(), f);
-        ensureEqual(queue.nextReady(), d);
-        ensureEqual(queue.nextReady(), a);
+        ensureEqual(queue.nextReady(Library.class), c);
+        ensureEqual(queue.nextReady(Library.class), b);
+        ensureEqual(queue.nextReady(Library.class), e);
+        ensureEqual(queue.nextReady(Library.class), f);
+        ensureEqual(queue.nextReady(Library.class), d);
+        ensureEqual(queue.nextReady(Library.class), a);
     }
 
     @Test
@@ -75,16 +74,16 @@ public class DependencyResolutionQueueTest extends FiascoTest
     {
         var queue = queue();
 
-        var group1 = queue.nextReadyGroup();
-        ensure(group1.equals(dependencies(c, e, f)));
-        queue.resolveGroup(group1);
+        var group1 = queue.nextReadyGroup(Library.class);
+        ensure(group1.equals(libraries(c, e, f)));
+        queue.resolveGroup(group1.asLibraryList());
 
-        var group2 = queue.nextReadyGroup();
-        ensure(group2.equals(dependencies(b, d)));
+        var group2 = queue.nextReadyGroup(Library.class);
+        ensure(group2.equals(libraries(b, d)));
         queue.resolveGroup(group2);
 
-        var group3 = queue.nextReadyGroup();
-        ensure(group3.equals(dependencies(a)));
+        var group3 = queue.nextReadyGroup(Library.class);
+        ensure(group3.equals(libraries(a)));
         queue.resolveGroup(group3);
     }
 
@@ -95,21 +94,21 @@ public class DependencyResolutionQueueTest extends FiascoTest
         var ready = new Monitor();
         KivaKitThread.run(this, "await", () ->
         {
-            queue.resolveGroup(dependencies(c, e, f));
+            queue.resolveGroup(libraries(c, e, f));
             ready.await();
-            queue.resolveGroup(dependencies(b, d));
+            queue.resolveGroup(libraries(b, d));
             ready.await();
-            queue.resolveGroup(dependencies(a));
+            queue.resolveGroup(libraries(a));
         });
-        ensureEqual(queue.nextReadyGroup(), dependencies(c, e, f));
+        ensureEqual(queue.nextReadyGroup(Library.class), libraries(c, e, f));
         ready.signal();
-        ensureEqual(queue.nextReadyGroup(), dependencies(b, d));
+        ensureEqual(queue.nextReadyGroup(Library.class), libraries(b, d));
         ready.signal();
-        ensureEqual(queue.nextReadyGroup(), dependencies(a));
+        ensureEqual(queue.nextReadyGroup(Library.class), libraries(a));
     }
 
     @NotNull
-    private DependencyTree<Library> libraryTree()
+    private DependencyTree libraryTree()
     {
         //       a
         //      / \
@@ -121,10 +120,10 @@ public class DependencyResolutionQueueTest extends FiascoTest
         d = d.dependsOn(e, f);
         a = a.dependsOn(b, d);
 
-        return dependencyTree(a, Library.class);
+        return new DependencyTree(a);
     }
 
-    private DependencyResolutionQueue<Library> queue()
+    private DependencyResolutionQueue queue()
     {
         return libraryTree().asQueue();
     }

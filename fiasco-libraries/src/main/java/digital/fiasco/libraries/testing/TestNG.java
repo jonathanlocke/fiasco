@@ -6,5 +6,5 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 @SuppressWarnings("unused")
 public interface TestNG extends LibraryGroups
 {
-    Library test_ng = test_ng_group.library("testng");
+    Library test_ng = test_ng_group.library("testng").asLibrary();
 }

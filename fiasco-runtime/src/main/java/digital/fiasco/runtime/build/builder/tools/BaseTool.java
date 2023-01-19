@@ -6,6 +6,7 @@ import com.telenav.kivakit.filesystem.Folder;
 import digital.fiasco.runtime.build.BuildProfile;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
+import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.DependencyList;
 
 import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
@@ -50,7 +51,7 @@ public abstract class BaseTool extends BaseRepeater implements Tool
      * @return The dependency list
      */
     @Override
-    public DependencyList<?> dependencies()
+    public <T extends Dependency, D extends DependencyList<T, D>> D dependencies()
     {
         return builder.dependencies();
     }

@@ -6,5 +6,5 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 @SuppressWarnings({ "unused" })
 public interface Lombok extends LibraryGroups
 {
-    Library lombok = lombok_group.library("lombok");
+    Library lombok = lombok_group.library("lombok").asLibrary();
 }

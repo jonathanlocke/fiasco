@@ -22,6 +22,7 @@ import java.util.Objects;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
+import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 
 /**
@@ -113,7 +114,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     private final URI uri;
 
     /** The cached artifact entries */
-    private transient final ObjectMap<ArtifactDescriptor, Artifact<?>> descriptorToArtifact = new ObjectMap<>();
+    private transient ObjectMap<ArtifactDescriptor, Artifact<?>> descriptorToArtifact;
 
     /** Cache lock (filesystem locking not yet supported) */
     private transient final ReadWriteLock lock = new ReadWriteLock();
@@ -130,7 +131,14 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
 
     public Artifact<?> artifact(ArtifactDescriptor descriptor)
     {
-        return descriptorToArtifact.get(descriptor);
+        return lock.read(() -> descriptorToArtifact().get(descriptor));
+    }
+
+    @Override
+    public BaseRepository clear()
+    {
+        lock().write(() -> descriptorToArtifact = null);
+        return this;
     }
 
     /**
@@ -142,7 +150,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean contains(Artifact<?> artifact)
     {
-        return descriptorToArtifact.containsValue(artifact);
+        return lock().read(() -> descriptorToArtifact().containsValue(artifact));
     }
 
     /**
@@ -189,6 +197,15 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
         return uri;
     }
 
+    protected void add(ArtifactDescriptor descriptor, Artifact<?> artifact)
+    {
+        descriptorToArtifact().put(ensureNotNull(descriptor), ensureNotNull(artifact));
+    }
+
+    protected void loadAllArtifactMetadata()
+    {
+    }
+
     /**
      * Returns the read/write lock for this repository
      */
@@ -197,31 +214,42 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
         return lock;
     }
 
-    protected void resolve(ArtifactDescriptor descriptor, Artifact<?> artifact)
-    {
-        descriptorToArtifact.put(descriptor, artifact);
-    }
-
     protected ArtifactList resolve(Iterable<ArtifactDescriptor> descriptors)
     {
-        var resolved = artifacts();
-        for (var descriptor : descriptors)
+        return lock().read(() ->
         {
-            resolved = resolved.with(matching(descriptor));
+            var resolved = artifacts();
+            for (var descriptor : descriptors)
+            {
+                resolved = resolved.with(matching(descriptor));
+            }
+            return resolved;
+        });
+    }
+
+    private synchronized ObjectMap<ArtifactDescriptor, Artifact<?>> descriptorToArtifact()
+    {
+        if (descriptorToArtifact == null)
+        {
+            descriptorToArtifact = new ObjectMap<>();
+            loadAllArtifactMetadata();
         }
-        return resolved;
+        return descriptorToArtifact;
     }
 
     private ArtifactList matching(ArtifactDescriptor descriptor)
     {
-        var matches = artifacts();
-        for (var at : descriptorToArtifact.values())
+        return lock().read(() ->
         {
-            if (descriptor.matches(at.descriptor()))
+            var matches = artifacts();
+            for (var at : descriptorToArtifact().values())
             {
-                matches = matches.with(at);
+                if (descriptor.matches(at.descriptor()))
+                {
+                    matches = matches.with(at);
+                }
             }
-        }
-        return matches;
+            return matches;
+        });
     }
 }

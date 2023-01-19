@@ -219,7 +219,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     /**
      * Returns the dependency matching the given dependency pattern
      *
-     * @param pattern The pattern to match, like "a:b:" or "a::"
+     * @param pattern The pattern to match, like ":a:b:" or ":a::"
      * @return Any matching dependency
      */
     @Override

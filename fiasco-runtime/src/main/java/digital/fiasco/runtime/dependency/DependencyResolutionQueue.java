@@ -3,20 +3,21 @@ package digital.fiasco.runtime.dependency;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.thread.Monitor;
-import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.FiascoClient;
 import digital.fiasco.runtime.repository.remote.FiascoServer;
+import digital.fiasco.runtime.repository.remote.RemoteRepository;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
+import static digital.fiasco.runtime.dependency.DependencyList.dependencies;
 
 /**
  * A queue that tracks the resolution state of dependencies.
  *
  * <p>
- * The {@link #nextReady()} and {@link #nextReadyGroup()} methods return dependencies that are ready for processing
- * (meaning that they have no unresolved dependencies). When processing completes, the methods
+ * The {@link #nextReady(Class)} and {@link #nextReadyGroup(Class)} methods return dependencies that are ready for
+ * processing (meaning that they have no unresolved dependencies). When processing completes, the methods
  * {@link #resolve(Dependency)} {@link #resolveGroup(DependencyList)} marks the processed dependencies as complete. In
  * essence, the unresolved leaves of the dependency tree are being processed first. Each time a leaf is processed, it is
  * effectively pruned from the tree of unresolved dependencies.
@@ -30,24 +31,19 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
  * multiple dependencies in a single request, which reduces the number of requests that are required for artifact
  * resolution, which speeds up the system.
  * </p>
- *
- * @param <T> The dependency type
  */
-@SuppressWarnings("unused")
+@SuppressWarnings({ "rawtypes", "unchecked" })
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
-public class DependencyResolutionQueue<T extends Dependency>
+public class DependencyResolutionQueue
 {
     /** The resolved dependencies */
-    private DependencyList<T> resolved = DependencyList.dependencies();
+    private DependencyList resolved = dependencies();
 
     /** The unresolved dependencies */
-    private DependencyList<T> unresolved;
+    private DependencyList unresolved;
 
     /** The dependencies being processed */
-    private DependencyList<T> processing = DependencyList.dependencies();
-
-    /** The dependency type */
-    private final Class<T> type;
+    private DependencyList processing = dependencies();
 
     /** Monitor to signal the resolution of a dependency */
     private final Monitor resolution = new Monitor();
@@ -56,30 +52,28 @@ public class DependencyResolutionQueue<T extends Dependency>
      * Creates a dependency queue of the given type with the given initial elements
      *
      * @param dependencies The dependencies to enqueue
-     * @param type The type of dependnecy
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyResolutionQueue(DependencyList<T> dependencies, Class<T> type)
+    public DependencyResolutionQueue(DependencyList dependencies)
     {
         this.unresolved = dependencies;
-        this.type = type;
     }
 
     /**
      * Returns the next unresolved dependency with no unresolved dependencies of its own.
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public T nextReady()
+    public <T extends Dependency> T nextReady(Class<T> type)
     {
         synchronized (resolution)
         {
-            var next = ready().first();
+            var next = ready(type).first();
             if (next != null)
             {
                 unresolved = unresolved.without(next);
                 processing = processing.with(next);
             }
-            return next;
+            return (T) next;
         }
     }
 
@@ -87,12 +81,12 @@ public class DependencyResolutionQueue<T extends Dependency>
      * Returns a list of all ready dependencies
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyList<T> nextReadyGroup()
+    public <T extends Dependency> DependencyList nextReadyGroup(Class<T> type)
     {
         synchronized (resolution)
         {
             // Get the next group,
-            var group = ready();
+            var group = ready(type);
 
             // and move it from unresolved to processing.
             unresolved = unresolved.without(group);
@@ -107,8 +101,9 @@ public class DependencyResolutionQueue<T extends Dependency>
      *
      * @param dependency The dependency
      */
+    @SuppressWarnings("unchecked")
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public void resolve(T dependency)
+    public void resolve(Dependency dependency)
     {
         synchronized (resolution)
         {
@@ -127,7 +122,7 @@ public class DependencyResolutionQueue<T extends Dependency>
      * @param dependencies The dependencies
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public void resolveGroup(DependencyList<T> dependencies)
+    public void resolveGroup(DependencyList dependencies)
     {
         synchronized (resolution)
         {
@@ -148,9 +143,9 @@ public class DependencyResolutionQueue<T extends Dependency>
      * @return True if the dependency is ready for processing
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    private boolean isReady(T dependency)
+    private boolean isReady(Dependency dependency)
     {
-        for (var at : dependency.dependencies(type))
+        for (var at : dependency.dependencies())
         {
             if (!resolved.contains(at))
             {
@@ -163,14 +158,14 @@ public class DependencyResolutionQueue<T extends Dependency>
     /**
      * Returns a list of dependencies that are ready for processing
      */
-    private DependencyList<T> ready()
+    private <T extends Dependency> DependencyList ready(Class<T> type)
     {
         synchronized (resolution)
         {
-            DependencyList<T> ready;
+            DependencyList ready;
             do
             {
-                ready = unresolved.matching(this::isReady);
+                ready = unresolved.matching(at -> isReady((T) at) && type.isAssignableFrom(at.getClass()));
                 if (ready.isEmpty())
                 {
                     resolution.await();

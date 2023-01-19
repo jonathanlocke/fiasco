@@ -6,6 +6,6 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 @SuppressWarnings("unused")
 public interface JavaServlet extends LibraryGroups
 {
-    Library javax_servlet_api = javax_servlet_group.library("javax.servlet-api");
-    Library servlet_api       = javax_servlet_group.library("servlet-api");
+    Library javax_servlet_api = javax_servlet_group.library("javax.servlet-api").asLibrary();
+    Library servlet_api       = javax_servlet_group.library("servlet-api").asLibrary();
 }

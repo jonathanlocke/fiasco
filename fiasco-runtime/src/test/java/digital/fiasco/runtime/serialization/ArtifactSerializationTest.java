@@ -14,10 +14,10 @@ public class ArtifactSerializationTest extends FiascoTest
     {
         var converter = new ArtifactConverter(throwingListener());
         ensureThrows(() -> converter.convert("wonky/com.telenav.kivakit:kivakit-core:1.0.0"));
-        ensureEqual(converter.convert("library/" + kivakitCore().name()), kivakitCore());
-        ensureEqual(converter.convert("asset/" + kivakitIcons().name()), kivakitIcons());
-        ensureEqual(converter.unconvert(kivakitCore()), "library/" + kivakitCore().name());
-        ensureEqual(converter.unconvert(kivakitIcons()), "asset/" + kivakitIcons().name());
+        ensureEqual(converter.convert(kivakitCore().name()), kivakitCore());
+        ensureEqual(converter.convert(kivakitIcons().name()), kivakitIcons());
+        ensureEqual(converter.unconvert(kivakitCore()), kivakitCore().name());
+        ensureEqual(converter.unconvert(kivakitIcons()), kivakitIcons().name());
     }
 
     @Test

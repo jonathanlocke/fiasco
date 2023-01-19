@@ -93,6 +93,11 @@ public interface Repository extends
     Named
 {
     /**
+     * Removes all artifacts from this repository
+     */
+    Repository clear();
+
+    /**
      * Installs the given artifact in this repository
      *
      * @param artifact The artifact to install

@@ -29,42 +29,42 @@ public class FiascoTest extends UnitTest
 
     protected ArtifactDescriptor descriptorA()
     {
-        return ArtifactDescriptor.descriptor("a::");
+        return ArtifactDescriptor.descriptor("library:a::");
     }
 
     protected ArtifactDescriptor descriptorAb()
     {
-        return ArtifactDescriptor.descriptor("a:b:");
+        return ArtifactDescriptor.descriptor("library:a:b:");
     }
 
     protected ArtifactDescriptor descriptorAbv()
     {
-        return ArtifactDescriptor.descriptor("a:b:1.2.3");
+        return ArtifactDescriptor.descriptor("library:a:b:1.2.3");
     }
 
     protected ArtifactDescriptor descriptorAv()
     {
-        return ArtifactDescriptor.descriptor("a::1.2.3");
+        return ArtifactDescriptor.descriptor("library:a::1.2.3");
     }
 
     protected ArtifactDescriptor descriptorX()
     {
-        return ArtifactDescriptor.descriptor("x::");
+        return ArtifactDescriptor.descriptor("library:x::");
     }
 
     protected ArtifactDescriptor descriptorXv()
     {
-        return ArtifactDescriptor.descriptor("x::1.2.3");
+        return ArtifactDescriptor.descriptor("library:x::1.2.3");
     }
 
     protected ArtifactDescriptor descriptorXy()
     {
-        return ArtifactDescriptor.descriptor("x:y:");
+        return ArtifactDescriptor.descriptor("library:x:y:");
     }
 
     protected ArtifactDescriptor descriptorXyv()
     {
-        return ArtifactDescriptor.descriptor("x:y:1.2.3");
+        return ArtifactDescriptor.descriptor("library:x:y:1.2.3");
     }
 
     protected ArtifactContent fileContent()

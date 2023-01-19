@@ -12,9 +12,9 @@ import digital.fiasco.runtime.dependency.DependencyResolutionQueue;
 import digital.fiasco.runtime.dependency.DependencyTree;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
-import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.FiascoClient;
 import digital.fiasco.runtime.repository.remote.FiascoServer;
+import digital.fiasco.runtime.repository.remote.RemoteRepository;
 
 import java.util.concurrent.ExecutorCompletionService;
 
@@ -22,12 +22,11 @@ import static com.telenav.kivakit.core.function.Result.result;
 import static com.telenav.kivakit.core.thread.KivaKitThread.run;
 import static com.telenav.kivakit.core.thread.Threads.shutdownAndAwaitTermination;
 import static com.telenav.kivakit.core.thread.Threads.threadPool;
-import static digital.fiasco.runtime.dependency.DependencyTree.dependencyTree;
 
 /**
  * Resolves artifacts in groups by turning the given root dependency into a {@link DependencyTree}, and then turning
  * that tree into a {@link DependencyResolutionQueue}. Groups of dependencies that are ready for resolution are
- * retrieved with {@link DependencyResolutionQueue#nextReadyGroup()}, and then resolved using the {@link Librarian}
+ * retrieved with {@link DependencyResolutionQueue#nextReadyGroup(Class)}, and then resolved using the {@link Librarian}
  * found in the {@link BuildSettings}. When a group of dependencies is resolved, the given {@link Callback} is called
  * with the resolution {@link Result}.
  *
@@ -61,14 +60,14 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
         run(this, "FiascoResolver", () ->
         {
             // Build a dependency queue from the root dependency,
-            var queue = dependencyTree(root, Artifact.class).asQueue();
+            var queue = new DependencyTree(root).asQueue();
 
             // create an executor and completion service,
             var executor = threadPool("FiascoResolverPool", settings.builderThreads());
             var completion = new ExecutorCompletionService<Void>(executor);
 
             // and then go through groups of artifacts from the queue that are ready to be resolved,
-            for (var group = queue.nextReadyGroup(); group != null; group = queue.nextReadyGroup())
+            for (var group = queue.nextReadyGroup(Artifact.class); group != null; group = queue.nextReadyGroup(Artifact.class))
             {
                 // and use the completion service to resolve the group.
                 var artifacts = group.asArtifactList();

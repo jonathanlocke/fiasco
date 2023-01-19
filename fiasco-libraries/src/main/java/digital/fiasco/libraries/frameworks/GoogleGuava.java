@@ -6,10 +6,10 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 @SuppressWarnings({ "unused", "SpellCheckingInspection" })
 public interface GoogleGuava extends LibraryGroups
 {
-    Library guava                   = google_guava_group.library("guava");
-    Library guava_collections       = google_guava_group.library("guava-collections");
-    Library guava_listenable_future = google_guava_group.library("guava-listenable-future");
-    Library guava_gwt               = google_guava_group.library("guava-gwt");
-    Library guava_retrying          = google_guava_group.library("guava-retrying");
-    Library guava_test              = google_guava_group.library("guava-testlib");
+    Library guava                   = google_guava_group.library("guava").asLibrary();
+    Library guava_collections       = google_guava_group.library("guava-collections").asLibrary();
+    Library guava_listenable_future = google_guava_group.library("guava-listenable-future").asLibrary();
+    Library guava_gwt               = google_guava_group.library("guava-gwt").asLibrary();
+    Library guava_retrying          = google_guava_group.library("guava-retrying").asLibrary();
+    Library guava_test              = google_guava_group.library("guava-testlib").asLibrary();
 }

@@ -10,7 +10,6 @@ import org.junit.Test;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptors;
 
 public class LocalRepositoryTest extends FiascoTest
@@ -21,10 +20,10 @@ public class LocalRepositoryTest extends FiascoTest
         var core = kivakitCore()
             .withContent(packageContent());
 
-        var funky = new LocalRepository("funky");
+        var funky = new LocalRepository("funky").clear();
         funky.installArtifact(core);
 
-        var resolved = funky.resolveArtifacts(descriptors("com.telenav.kivakit::"));
+        var resolved = funky.resolveArtifacts(descriptors(":com.telenav.kivakit::"));
         ensure(resolved.size() == 1);
         ensureEqual(resolved.first(), core);
     }
@@ -129,14 +128,14 @@ public class LocalRepositoryTest extends FiascoTest
             ensure(resolved.first().equals(icons));
         }
         {
-            var resolved = repository.resolveArtifacts(descriptors("com.telenav.kivakit::"));
+            var resolved = repository.resolveArtifacts(descriptors(":com.telenav.kivakit::")).sorted();
             ensure(resolved.size() == 3);
-            ensure(resolved.first().equals(core));
-            ensure(resolved.get(1).equals(icons));
-            ensure(resolved.get(2).equals(logos));
+            ensure(resolved.get(0).equals(icons));
+            ensure(resolved.get(1).equals(logos));
+            ensure(resolved.get(2).equals(core));
         }
         {
-            var resolved = repository.resolveArtifacts(descriptors("com.telenav.x::"));
+            var resolved = repository.resolveArtifacts(descriptors(":com.telenav.x::"));
             ensure(resolved.size() == 0);
         }
     }

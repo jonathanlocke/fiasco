@@ -30,6 +30,7 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.ensure.Ensure.fail;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
+import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static com.telenav.kivakit.resource.Extension.ASC;
 import static com.telenav.kivakit.resource.Extension.MD5;
@@ -46,7 +47,6 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
 import static digital.fiasco.runtime.dependency.artifact.ArtifactContent.content;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
-import static digital.fiasco.runtime.dependency.artifact.Library.libraries;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
 
 /**
@@ -86,10 +86,10 @@ public class MavenRepository extends BaseRepository
     @FormatProperty
     private final ResourceFolder<?> rootFolder;
 
-    /** The local repository where resolved artifacts should be saved */
+    /** The local Maven repository */
     private final LocalRepository localRepository;
 
-    /** The local repository folder where resolved artifacts should be saved */
+    /** The local Maven repository folder */
     private final Folder localRepositoryFolder;
 
     /**
@@ -122,6 +122,23 @@ public class MavenRepository extends BaseRepository
         mavenResolver = new MavenResolver(localRepositoryFolder)
             .withMavenRepository(this)
             .withLocalRepository(localRepository);
+    }
+
+    @Override
+    public MavenRepository clear()
+    {
+        if (!isRemote())
+        {
+            if (rootFolder instanceof Folder root)
+            {
+                root.clearAllAndDelete();
+            }
+            return this;
+        }
+        else
+        {
+            return unsupported();
+        }
     }
 
     /**
@@ -367,16 +384,23 @@ public class MavenRepository extends BaseRepository
                         var dependencyDescriptors = mavenResolver
                             .resolveDependencies(descriptor)
                             .map(MavenDependency::descriptor)
-                            .without(resolved.asArtifactDescriptors());
-                        var dependencies = libraries(dependencyDescriptors)
-                            .asArtifactList();
+                            .without(descriptors);
+
+                        // If there are dependencies,
+                        var children = artifacts();
+                        if (dependencyDescriptors.isNonEmpty())
+                        {
+                            children = resolveArtifacts(dependencyDescriptors, resolved)
+                                .without(resolved);
+                            resolved = resolved.with(children);
+                        }
 
                         // If the artifact has source code,
                         if (sources != null)
                         {
                             // return it as a library,
                             resolved = resolved.with(artifact
-                                .withDependencies(dependencies)
+                                .withDependencies(children)
                                 .withContent(jar)
                                 .withJavadoc(javadoc)
                                 .withSources(sources));
@@ -385,16 +409,8 @@ public class MavenRepository extends BaseRepository
                         {
                             // otherwise, return it as an asset.
                             resolved = resolved.with(asset(descriptor)
-                                .withDependencies(dependencies)
+                                .withDependencies(children)
                                 .withContent(jar));
-                        }
-
-                        // If there are dependencies,
-                        if (dependencyDescriptors.isNonEmpty())
-                        {
-                            var children = resolveArtifacts(dependencyDescriptors, resolved)
-                                .without(resolved);
-                            resolved = resolved.with(children);
                         }
                     }
                     else

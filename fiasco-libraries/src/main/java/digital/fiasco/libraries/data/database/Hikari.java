@@ -6,5 +6,5 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 @SuppressWarnings("unused")
 public interface Hikari extends LibraryGroups
 {
-    Library hikari = zaxxer_group.library("HikariCP");
+    Library hikari = zaxxer_group.library("HikariCP").asLibrary();
 }

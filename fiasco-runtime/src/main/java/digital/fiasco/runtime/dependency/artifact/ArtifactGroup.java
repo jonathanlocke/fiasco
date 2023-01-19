@@ -4,14 +4,19 @@ import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.interfaces.naming.Named;
 
-import static com.telenav.kivakit.annotations.code.quality.Audience.AUDIENCE_PUBLIC;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
+import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifactName;
 
 /**
- * The group for an artifact, where an artifact desriptor is [group:artifact:version].
+ * The group for an artifact, where an artifact desriptor is [type:group:artifact:version].
+ *
+ * <p><b>Creation</b></p>
+ *
+ * <ul>
+ *     <li>{@link #group(String)}</li>
+ * </ul>
  *
  * <p><b>Properties</b></p>
  *
@@ -19,12 +24,14 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.desc
  *     <li>{@link #name()}</li>
  * </ul>
  *
- * <p><b>Group Artifacts</b></p>
+ * <p><b>Child Artifacts</b></p>
  *
  * <ul>
+ *     <li>{@link #artifact(Class, ArtifactName)}</li>
  *     <li>{@link #asset(String)}</li>
+ *     <li>{@link #asset(ArtifactName)}</li>
  *     <li>{@link #library(String)}</li>
- *     <li>{@link #artifact(ArtifactName)}</li>
+ *     <li>{@link #library(ArtifactName)}</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -48,13 +55,37 @@ public record ArtifactGroup(String name) implements Named
     /**
      * Returns an artifact descriptor for the given artifact in this group
      *
-     * @param artifact The artifact name
+     * @param name The artifact name
      * @return The artifact descriptor
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public ArtifactDescriptor artifact(ArtifactName artifact)
+    public ArtifactDescriptor artifact(Class<? extends Artifact<?>> type, ArtifactName name)
     {
-        return new ArtifactDescriptor(this, artifact, null);
+        return new ArtifactDescriptor(type, this, name, null);
+    }
+
+    /**
+     * Returns an artifact descriptor for the given artifact in this group
+     *
+     * @param name The artifact name
+     * @return The artifact descriptor
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public ArtifactDescriptor asset(ArtifactName name)
+    {
+        return artifact(Library.class, name);
+    }
+
+    /**
+     * Returns an artifact descriptor for the given artifact in this group
+     *
+     * @param name The artifact name
+     * @return The artifact descriptor
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public ArtifactDescriptor asset(String name)
+    {
+        return asset(artifactName(name));
     }
 
     /**
@@ -64,33 +95,21 @@ public record ArtifactGroup(String name) implements Named
      * @return The artifact descriptor
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public ArtifactDescriptor artifact(String artifact)
+    public ArtifactDescriptor library(String artifact)
     {
-        return artifact(ArtifactName.artifact(artifact));
+        return library(artifactName(artifact));
     }
 
     /**
-     * Returns the given asset in this group
+     * Returns an artifact descriptor for the given artifact in this group
      *
-     * @param asset The asset name
-     * @return The asset
+     * @param name The artifact name
+     * @return The artifact descriptor
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public Asset asset(String asset)
+    public ArtifactDescriptor library(ArtifactName name)
     {
-        return Asset.asset(descriptor(name + ":" + asset + ":"));
-    }
-
-    /**
-     * Returns the given library in this group
-     *
-     * @param library The library name
-     * @return The library
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public Library library(String library)
-    {
-        return Library.library(descriptor(name + ":" + library + ":"));
+        return artifact(Library.class, name);
     }
 
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)

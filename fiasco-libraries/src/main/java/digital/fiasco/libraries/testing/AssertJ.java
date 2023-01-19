@@ -6,6 +6,6 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 @SuppressWarnings("unused")
 public interface AssertJ extends LibraryGroups
 {
-    Library assertj_core  = assertj_group.library("assertj-core");
-    Library assertj_guava = assertj_group.library("assertj-guava");
+    Library assertj_core  = assertj_group.library("assertj-core").asLibrary();
+    Library assertj_guava = assertj_group.library("assertj-guava").asLibrary();
 }

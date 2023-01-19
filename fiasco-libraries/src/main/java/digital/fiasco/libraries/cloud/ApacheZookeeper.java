@@ -6,5 +6,5 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 @SuppressWarnings("unused")
 public interface ApacheZookeeper extends LibraryGroups
 {
-    Library apache_zookeeper = apache_zookeeper_group.library("zookeeper");
+    Library apache_zookeeper = apache_zookeeper_group.library("zookeeper").asLibrary();
 }

@@ -6,5 +6,5 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 @SuppressWarnings({ "unused", "SpellCheckingInspection" })
 public interface ApacheThrift extends LibraryGroups
 {
-    Library apache_thrift = apache_thrift_group.library("libthrift");
+    Library apache_thrift = apache_thrift_group.library("libthrift").asLibrary();
 }

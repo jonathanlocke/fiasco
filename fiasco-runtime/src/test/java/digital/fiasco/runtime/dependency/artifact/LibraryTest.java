@@ -4,13 +4,11 @@ import digital.fiasco.runtime.FiascoTest;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.dependency.DependencyList.dependencies;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
-import static digital.fiasco.runtime.dependency.artifact.Library.libraries;
+import static digital.fiasco.runtime.dependency.artifact.LibraryList.libraries;
 
 public class LibraryTest extends FiascoTest
 {
@@ -83,14 +81,14 @@ public class LibraryTest extends FiascoTest
         var library = library()
             .withDependencies(ArtifactList.artifacts(Library.library("a:b:1.0")));
         ensureEqual(library.dependencies().size(), 1);
-        ensureEqual(library.dependencies().get(0).descriptor(), descriptor("a:b:1.0"));
+        ensureEqual(library.dependencies().get(0).descriptor(), descriptor("library:a:b:1.0"));
     }
 
     @Test
     public void testDescriptor()
     {
         var library = library();
-        ensureEqual(library.descriptor(), descriptor("x:y:1.0"));
+        ensureEqual(library.descriptor(), descriptor("library:x:y:1.0"));
     }
 
     @Test
