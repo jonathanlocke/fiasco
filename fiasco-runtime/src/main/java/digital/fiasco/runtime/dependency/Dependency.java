@@ -100,24 +100,24 @@ public interface Dependency extends
      */
     @SuppressWarnings("unchecked")
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default <T extends Dependency, D extends DependencyList<T, D>> D dependencies(Class<T> type)
+    default <D extends Dependency, L extends DependencyList<D, L>> L dependencies(Class<D> type)
     {
-        var dependencies = new DependencyList<T, D>();
+        var dependencies = new DependencyList<D, L>();
         for (var at : dependencies())
         {
             if (type.isAssignableFrom(at.getClass()))
             {
                 //noinspection unchecked
-                dependencies = dependencies.with((T) at);
+                dependencies = dependencies.with((D) at);
             }
         }
-        return (D) dependencies;
+        return (L) dependencies;
     }
 
     /**
      * @return The objects that this depends on
      */
-    <T extends Dependency, D extends DependencyList<T, D>> D dependencies();
+    <D extends Dependency, L extends DependencyList<D, L>> L dependencies();
 
     /**
      * The artifact descriptor for this dependency

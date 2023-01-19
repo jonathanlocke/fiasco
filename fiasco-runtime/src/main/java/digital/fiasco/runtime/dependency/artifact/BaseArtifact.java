@@ -97,7 +97,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  */
 @SuppressWarnings("unused")
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
-public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifact<T>
+public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifact<A>
 {
     /** The repository where this artifact is hosted */
     @Expose
@@ -137,7 +137,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * @param that The artifact to copy
      */
     @MethodQuality(audience = AUDIENCE_INTERNAL, documentation = DOCUMENTED, testing = TESTED)
-    protected BaseArtifact(BaseArtifact<T> that)
+    protected BaseArtifact(BaseArtifact<A> that)
     {
         this.repository = that.repository();
         this.descriptor = that.descriptor();
@@ -195,13 +195,13 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     }
 
     /**
-     * Returns a copy of this artifact, of type T, where T is either Library or Asset.
+     * Returns a copy of this artifact, of type A, where A is either Library or Asset.
      *
      * @return The copy
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public abstract T copy();
+    public abstract A copy();
 
     /**
      * Returns a list of artifacts without any excluded artifacts
@@ -268,7 +268,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
     @SafeVarargs
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public final <D extends Artifact<D>> T dependsOn(D... dependencies)
+    public final <D extends Artifact<D>> A dependsOn(D... dependencies)
     {
         return withDependencies(ArtifactList.artifacts(dependencies));
     }
@@ -302,7 +302,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public T excluding(ArtifactDescriptor exclusion)
+    public A excluding(ArtifactDescriptor exclusion)
     {
         var copy = copy();
         copy.exclusions().add(exclusion);
@@ -317,7 +317,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public T excluding(ObjectList<ArtifactDescriptor> exclusions)
+    public A excluding(ObjectList<ArtifactDescriptor> exclusions)
     {
         var copy = copy();
         copy.exclusions.addAll(exclusions);
@@ -445,11 +445,11 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public T withAttachment(ArtifactAttachment attachment)
+    public A withAttachment(ArtifactAttachment attachment)
     {
         var copy = copy();
         attachment = attachment.withArtifact(copy);
-        ((BaseArtifact<T>) copy).typeToAttachment().put(attachment.attachmentType(), attachment);
+        ((BaseArtifact<A>) copy).typeToAttachment().put(attachment.attachmentType(), attachment);
         return copy;
     }
 
@@ -458,7 +458,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      */
     @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTED)
     @Override
-    public T withAttachments(ObjectMap<ArtifactAttachmentType, ArtifactAttachment> attachments)
+    public A withAttachments(ObjectMap<ArtifactAttachmentType, ArtifactAttachment> attachments)
     {
         var copy = copy();
         for (var entry : attachments.entrySet())
@@ -473,7 +473,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public T withDependencies(ArtifactList dependencies)
+    public A withDependencies(ArtifactList dependencies)
     {
         var copy = copy();
         copy.dependencies = this.dependencies
@@ -487,7 +487,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public T withDescriptor(ArtifactDescriptor descriptor)
+    public A withDescriptor(ArtifactDescriptor descriptor)
     {
         var copy = copy();
         copy.descriptor = descriptor;
@@ -499,7 +499,7 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public T withRepository(Repository repository)
+    public A withRepository(Repository repository)
     {
         var copy = copy();
         ((BaseArtifact<?>) copy).repository = repository;
@@ -510,10 +510,10 @@ public abstract class BaseArtifact<T extends BaseArtifact<T>> implements Artifac
      * {@inheritDoc}
      */
     @Override
-    public T withoutAttachments()
+    public A withoutAttachments()
     {
         var copy = copy();
-        ((BaseArtifact<T>) copy).typeToAttachment = new ObjectMap<>();
+        ((BaseArtifact<A>) copy).typeToAttachment = new ObjectMap<>();
         return copy;
     }
 

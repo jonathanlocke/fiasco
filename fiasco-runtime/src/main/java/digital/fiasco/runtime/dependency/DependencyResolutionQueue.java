@@ -63,7 +63,7 @@ public class DependencyResolutionQueue
      * Returns the next unresolved dependency with no unresolved dependencies of its own.
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public <T extends Dependency> T nextReady(Class<T> type)
+    public <D extends Dependency> D nextReady(Class<D> type)
     {
         synchronized (resolution)
         {
@@ -73,7 +73,7 @@ public class DependencyResolutionQueue
                 unresolved = unresolved.without(next);
                 processing = processing.with(next);
             }
-            return (T) next;
+            return (D) next;
         }
     }
 
@@ -81,7 +81,7 @@ public class DependencyResolutionQueue
      * Returns a list of all ready dependencies
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public <T extends Dependency> DependencyList nextReadyGroup(Class<T> type)
+    public <D extends Dependency> DependencyList nextReadyGroup(Class<D> type)
     {
         synchronized (resolution)
         {
@@ -158,14 +158,14 @@ public class DependencyResolutionQueue
     /**
      * Returns a list of dependencies that are ready for processing
      */
-    private <T extends Dependency> DependencyList ready(Class<T> type)
+    private <D extends Dependency> DependencyList ready(Class<D> type)
     {
         synchronized (resolution)
         {
             DependencyList ready;
             do
             {
-                ready = unresolved.matching(at -> isReady((T) at) && type.isAssignableFrom(at.getClass()));
+                ready = unresolved.matching(at -> isReady((D) at) && type.isAssignableFrom(at.getClass()));
                 if (ready.isEmpty())
                 {
                     resolution.await();

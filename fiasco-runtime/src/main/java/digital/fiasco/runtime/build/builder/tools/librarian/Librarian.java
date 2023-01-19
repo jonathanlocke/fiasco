@@ -77,7 +77,7 @@ public class Librarian extends BaseTool
         var dependencies = ArtifactList.artifacts();
 
         // Go through the library's dependencies,
-        for (var dependency : artifact.dependencies())
+        for (var dependency : artifact.dependencies(Artifact.class))
         {
             // resolve each dependency,
             for (var resolved : dependencies(dependency))

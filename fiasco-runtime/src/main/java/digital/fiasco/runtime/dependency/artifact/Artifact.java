@@ -129,7 +129,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  */
 @SuppressWarnings("unused")
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
-public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
+public interface Artifact<A extends Artifact<A>> extends Dependency, AsString
 {
     /**
      * Returns an artifact for a given JSON string
@@ -139,11 +139,11 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      */
     @SuppressWarnings("unchecked")
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    static <T extends Artifact<T>> T artifactFromJson(String json)
+    static <A extends Artifact<A>> A artifactFromJson(String json)
     {
         var serialized = new StringResource(json);
         var serializer = new GsonObjectSerializer();
-        return (T) serializer.readObject(serialized, METADATA_OBJECT_TYPE).object();
+        return (A) serializer.readObject(serialized, METADATA_OBJECT_TYPE).object();
     }
 
     /**
@@ -153,7 +153,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @return The new artifact
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default T artifact(String artifactName)
+    default A artifact(String artifactName)
     {
         return withArtifact(artifactName);
     }
@@ -165,7 +165,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @return The new artifact
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default T artifact(ArtifactName artifact)
+    default A artifact(ArtifactName artifact)
     {
         return withArtifact(artifact);
     }
@@ -201,7 +201,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      *
      * @return The new artifact
      */
-    T copy();
+    A copy();
 
     /**
      * Returns the list of dependencies for this artifact
@@ -209,7 +209,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @return The dependency list
      */
     @Override
-    ArtifactList dependencies();
+    <D extends Dependency, L extends DependencyList<D, L>> L dependencies();
 
     /**
      * Returns the dependencies matching the given dependency pattern
@@ -233,7 +233,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @param dependencies The new dependencies
      * @return The new artifact
      */
-    <D extends Artifact<D>> T dependsOn(D[] dependencies);
+    <D extends Artifact<D>> A dependsOn(D[] dependencies);
 
     /**
      * Returns the descriptor for this artifact
@@ -250,7 +250,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @return The new artifact
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default T excluding(ArtifactDescriptor... exclusions)
+    default A excluding(ArtifactDescriptor... exclusions)
     {
         return excluding(list(exclusions));
     }
@@ -262,7 +262,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @return The new artifact
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default T excluding(String... exclusions)
+    default A excluding(String... exclusions)
     {
         return excluding(list(exclusions).map(ArtifactDescriptor::descriptor));
     }
@@ -273,7 +273,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @param exclusions The descriptors to exclude
      * @return The new artifact
      */
-    T excluding(ObjectList<ArtifactDescriptor> exclusions);
+    A excluding(ObjectList<ArtifactDescriptor> exclusions);
 
     /**
      * Returns a copy of this artifact that excludes the given artifacts from its dependencies
@@ -282,7 +282,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @return The new artifact
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default T excluding(Artifact<?>... exclusions)
+    default A excluding(Artifact<?>... exclusions)
     {
         return excluding(list(exclusions).map(Artifact::descriptor));
     }
@@ -293,7 +293,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @param pattern The pattern to exclude
      * @return The new artifact
      */
-    T excluding(ArtifactDescriptor pattern);
+    A excluding(ArtifactDescriptor pattern);
 
     /**
      * Returns true if this artifact excludes the given artifact
@@ -346,7 +346,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * Convenience method for {@link #withVersion(Version)}
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default T version(Version version)
+    default A version(Version version)
     {
         return withVersion(version);
     }
@@ -355,7 +355,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * Convenience method for {@link #withVersion(Version)}
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default T version(String version)
+    default A version(String version)
     {
         return withVersion(Version.version(version));
     }
@@ -367,7 +367,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @return The new artifact
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default T withArtifact(String artifactName)
+    default A withArtifact(String artifactName)
     {
         return withDescriptor(descriptor().withArtifact(artifactName));
     }
@@ -379,7 +379,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @return The new artifact
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default T withArtifact(ArtifactName artifactName)
+    default A withArtifact(ArtifactName artifactName)
     {
         return withDescriptor(descriptor().withArtifact(artifactName));
     }
@@ -389,14 +389,14 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      *
      * @param attachment The content to attach
      */
-    T withAttachment(ArtifactAttachment attachment);
+    A withAttachment(ArtifactAttachment attachment);
 
     /**
      * Attaches the resource for the given artifact type, such as <i>.jar</i>
      *
      * @param attachments The content to attach
      */
-    T withAttachments(ObjectMap<ArtifactAttachmentType, ArtifactAttachment> attachments);
+    A withAttachments(ObjectMap<ArtifactAttachmentType, ArtifactAttachment> attachments);
 
     /**
      * Returns primary content attachment for this asset
@@ -404,7 +404,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @return The content
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default T withContent(ArtifactContent content)
+    default A withContent(ArtifactContent content)
     {
         return copy().withAttachment(attachment(JAR_ATTACHMENT, content));
     }
@@ -415,7 +415,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @param dependencies The new dependencies
      * @return The new artifact
      */
-    T withDependencies(ArtifactList dependencies);
+    A withDependencies(ArtifactList dependencies);
 
     /**
      * Returns a copy of this artifact with the given descriptor
@@ -423,7 +423,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @param descriptor The new descriptor
      * @return The new artifact
      */
-    T withDescriptor(ArtifactDescriptor descriptor);
+    A withDescriptor(ArtifactDescriptor descriptor);
 
     /**
      * Returns a copy of this library with the given Javadoc attachment
@@ -432,7 +432,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @return The new library
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default T withJar(ArtifactContent jar)
+    default A withJar(ArtifactContent jar)
     {
         return copy().withAttachment(attachment(JAR_ATTACHMENT, jar));
     }
@@ -443,7 +443,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @param repository The repository
      * @return A copy of this artifact in the given repository
      */
-    T withRepository(Repository repository);
+    A withRepository(Repository repository);
 
     /**
      * Returns a copy of this artifact with the given version
@@ -452,7 +452,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @return The new artifact
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default T withVersion(Version version)
+    default A withVersion(Version version)
     {
         return withDescriptor(descriptor().withVersion(version));
     }
@@ -464,7 +464,7 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
      * @return The new artifact
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default T withVersion(String version)
+    default A withVersion(String version)
     {
         return withDescriptor(descriptor().withVersion(version));
     }
@@ -472,5 +472,5 @@ public interface Artifact<T extends Artifact<T>> extends Dependency, AsString
     /**
      * Returns this artifact without any attachments
      */
-    T withoutAttachments();
+    A withoutAttachments();
 }

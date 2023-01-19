@@ -91,8 +91,8 @@ import static digital.fiasco.runtime.dependency.artifact.LibraryList.libraries;
         testing = TESTING_INSUFFICIENT,
         stability = STABILITY_UNDETERMINED
     )
-public class DependencyList<T extends Dependency, D extends DependencyList<T, D>> implements
-    Iterable<T>,
+public class DependencyList<D extends Dependency, L extends DependencyList<D, L>> implements
+    Iterable<D>,
     Sized
 {
     /**
@@ -103,8 +103,8 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      */
     @SafeVarargs
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static <T extends Dependency, D extends DependencyList<T, D>> DependencyList<T, D> dependencies(
-        T... dependencies)
+    public static <D extends Dependency, L extends DependencyList<D, L>> DependencyList<D, L> dependencies(
+        D... dependencies)
     {
         return new DependencyList<>(list(dependencies));
     }
@@ -116,27 +116,27 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * @return The dependency list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static <T extends Dependency, D extends DependencyList<T, D>> DependencyList<T, D> dependencies(
-        Collection<T> dependencies)
+    public static <D extends Dependency, L extends DependencyList<D, L>> DependencyList<D, L> dependencies(
+        Collection<D> dependencies)
     {
         return new DependencyList<>(dependencies);
     }
 
     /** The underlying dependencies */
     @FormatProperty
-    ObjectList<T> dependencies = list();
+    ObjectList<D> dependencies = list();
 
     @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTING_NOT_NEEDED)
     public DependencyList()
     {
     }
 
-    protected DependencyList(D that)
+    protected DependencyList(L that)
     {
         this.dependencies = that.dependencies.copy();
     }
 
-    protected DependencyList(Collection<T> dependencies)
+    protected DependencyList(Collection<D> dependencies)
     {
         this.dependencies.addAll(dependencies);
     }
@@ -193,7 +193,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * @return The list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public ObjectList<T> asList()
+    public ObjectList<D> asList()
     {
         return dependencies.copy();
     }
@@ -204,7 +204,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * @return The list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public ObjectSet<T> asSet()
+    public ObjectSet<D> asSet()
     {
         return new ObjectSet<>(new LinkedHashSet<>(dependencies.copy()));
     }
@@ -233,7 +233,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * @param dependency The dependency
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public boolean contains(T dependency)
+    public boolean contains(D dependency)
     {
         return dependencies.contains(dependency);
     }
@@ -242,7 +242,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * Returns true if this dependency list contains all the dependencies in the given list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public boolean containsAll(D dependencies)
+    public boolean containsAll(L dependencies)
     {
         return this.dependencies.containsAll(dependencies.dependencies);
     }
@@ -254,9 +254,9 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      */
     @SuppressWarnings("unchecked")
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public D copy()
+    public L copy()
     {
-        return newList((D) this);
+        return newList((L) this);
     }
 
     /**
@@ -268,7 +268,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
         return dependencies.count();
     }
 
-    public D deduplicate()
+    public L deduplicate()
     {
         var deduplicated = newList();
         for (var at : this)
@@ -299,7 +299,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * Returns the first dependency in this list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public T first()
+    public D first()
     {
         return dependencies.first();
     }
@@ -312,7 +312,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * @throws IndexOutOfBoundsException if the index is out of range ({@code index < 0 || index >= size()})
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public T get(int index)
+    public D get(int index)
     {
         return dependencies.get(index);
     }
@@ -333,7 +333,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
     @Override
     @NotNull
     @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTING_NOT_NEEDED)
-    public Iterator<T> iterator()
+    public Iterator<D> iterator()
     {
         return dependencies.iterator();
     }
@@ -354,7 +354,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * Returns the last dependency in this list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public T last()
+    public D last()
     {
         return dependencies.last();
     }
@@ -365,7 +365,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * @param mapper The mapping function
      * @return The mapped list
      */
-    public <To> ObjectList<To> map(Function<T, To> mapper)
+    public <To> ObjectList<To> map(Function<D, To> mapper)
     {
         return dependencies.map(mapper);
     }
@@ -377,7 +377,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * @return The new list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public D matching(Matcher<T> matcher)
+    public L matching(Matcher<D> matcher)
     {
         var copy = copy();
         copy.dependencies = copy.dependencies.matching(matcher);
@@ -399,9 +399,9 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      */
     @SuppressWarnings("unchecked")
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public D sorted()
+    public L sorted()
     {
-        var sorted = (D) dependencies(dependencies.sorted());
+        var sorted = (L) dependencies(dependencies.sorted());
         return newList().with(sorted);
     }
 
@@ -419,7 +419,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * @return The new list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public D with(T first, T[] rest)
+    public L with(D first, D[] rest)
     {
         var copy = copy();
         copy.dependencies.add(first);
@@ -434,7 +434,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * @return The new list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public D with(T inclusion)
+    public L with(D inclusion)
     {
         var copy = copy();
         copy.dependencies = dependencies.with(inclusion);
@@ -448,7 +448,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * @return The new list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public D with(T[] inclusions)
+    public L with(D[] inclusions)
     {
         var copy = copy();
         copy.dependencies = dependencies.with(inclusions);
@@ -462,7 +462,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * @return The new list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public D with(D inclusions)
+    public L with(L inclusions)
     {
         var copy = copy();
         copy.dependencies.addAll(inclusions);
@@ -476,7 +476,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * @return The new list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public D without(Collection<T> exclusions)
+    public L without(Collection<D> exclusions)
     {
         var copy = copy();
         copy.dependencies.removeAll(exclusions);
@@ -490,7 +490,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * @return The new list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public D without(T exclusion)
+    public L without(D exclusion)
     {
         var copy = copy();
         copy.dependencies.remove(exclusion);
@@ -504,7 +504,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * @return The new list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public D without(D exclusions)
+    public L without(L exclusions)
     {
         var copy = copy();
         copy.dependencies.removeAll(exclusions.dependencies);
@@ -518,7 +518,7 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
      * @return The new list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public D without(Matcher<T> exclusionPattern)
+    public L without(Matcher<D> exclusionPattern)
     {
         var copy = copy();
         copy.dependencies.removeIf(exclusionPattern::matches);
@@ -526,14 +526,14 @@ public class DependencyList<T extends Dependency, D extends DependencyList<T, D>
     }
 
     @SuppressWarnings("unchecked")
-    protected D newList(D that)
+    protected L newList(L that)
     {
-        return (D) new DependencyList<>(that);
+        return (L) new DependencyList<>(that);
     }
 
     @SuppressWarnings("unchecked")
-    protected D newList()
+    protected L newList()
     {
-        return (D) new DependencyList<>();
+        return (L) new DependencyList<>();
     }
 }

@@ -364,9 +364,9 @@ public class Builder extends BaseRepeater implements
      */
     @SuppressWarnings("unchecked")
     @Override
-    public <T extends Dependency, D extends DependencyList<T, D>> D dependencies()
+    public <D extends Dependency, L extends DependencyList<D, L>> L dependencies()
     {
-        return (D) settings.dependencies();
+        return (L) settings.dependencies();
     }
 
     /**
@@ -386,7 +386,7 @@ public class Builder extends BaseRepeater implements
      * @param dependencies The new dependencies
      * @return The new artifact
      */
-    public <T extends Dependency, D extends DependencyList<T, D>> Builder dependsOn(D dependencies)
+    public <D extends Dependency, L extends DependencyList<D, L>> Builder dependsOn(L dependencies)
     {
         return withDependencies(dependencies);
     }
