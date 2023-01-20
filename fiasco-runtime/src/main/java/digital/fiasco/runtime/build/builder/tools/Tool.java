@@ -37,7 +37,7 @@ public interface Tool extends
      *
      * @return The dependency list
      */
-    <T extends Dependency, D extends DependencyList<T, D>> D dependencies();
+    <D extends Dependency, L extends DependencyList<D, L>> L dependencies();
 
     /**
      * Enables this tool for the given profile

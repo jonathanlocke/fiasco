@@ -14,6 +14,18 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifactNa
 public class ArtifactDescriptorTest extends FiascoTest
 {
     @Test
+    public void testAsAsset()
+    {
+        ensureEqual(kivakitIcons(), kivakitIcons().descriptor().asAsset());
+    }
+
+    @Test
+    public void testAsLibrary()
+    {
+        ensureEqual(kivakitCore(), kivakitCore().descriptor().asLibrary());
+    }
+
+    @Test
     public void testCreation()
     {
         var descriptor = descriptor("library:x:y:");

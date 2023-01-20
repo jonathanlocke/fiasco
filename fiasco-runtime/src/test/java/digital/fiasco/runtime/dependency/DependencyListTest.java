@@ -18,8 +18,8 @@ public class DependencyListTest extends FiascoTest
     @Test
     public void testAsSet()
     {
-        dependencies(kivakitCore(), kivakitIcons(), kivakitResource()).asSet()
-            .equals(dependencies(kivakitResource(), kivakitIcons(), kivakitCore()));
+        ensureEqual(dependencies(kivakitCore(), kivakitIcons(), kivakitResource()).asSet(),
+            dependencies(kivakitResource(), kivakitIcons(), kivakitCore()).asSet());
     }
 
     @Test

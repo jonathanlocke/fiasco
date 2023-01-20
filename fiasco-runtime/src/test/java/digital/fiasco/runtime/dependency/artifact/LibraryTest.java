@@ -76,6 +76,15 @@ public class LibraryTest extends FiascoTest
     }
 
     @Test
+    public void testDeduplicate()
+    {
+        ensure(libraries(kivakitCore(), kivakitCore(), kivakitCore()).deduplicate()
+            .equals(libraries(kivakitCore())));
+        ensure(!libraries(kivakitCore(), kivakitCore(), kivakitApplication())
+            .equals(libraries(kivakitApplication(), kivakitCore())));
+    }
+
+    @Test
     public void testDependencies()
     {
         var library = library()

@@ -74,6 +74,15 @@ public class AssetTest extends FiascoTest
     }
 
     @Test
+    public void testDeduplicate()
+    {
+        ensure(assets(kivakitIcons(), kivakitIcons(), kivakitIcons()).deduplicate()
+            .equals(assets(kivakitIcons())));
+        ensure(!assets(kivakitIcons(), kivakitIcons(), kivakitIcons())
+            .equals(assets(kivakitIcons())));
+    }
+
+    @Test
     public void testDependencies()
     {
         var asset = asset()
