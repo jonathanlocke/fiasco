@@ -90,4 +90,10 @@ public class RemoteRepository extends BaseRepository
             .request(this, new FiascoRepositoryRequest().with(descriptors))
             .artifacts();
     }
+
+    @Override
+    protected void loadAllArtifactMetadata()
+    {
+        unsupported();
+    }
 }

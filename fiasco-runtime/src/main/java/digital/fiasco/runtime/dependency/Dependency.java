@@ -117,7 +117,7 @@ public interface Dependency extends
     /**
      * @return The objects that this depends on
      */
-    <D extends Dependency, L extends DependencyList<D, L>> L dependencies();
+    DependencyList<?, ?> dependencies();
 
     /**
      * The artifact descriptor for this dependency

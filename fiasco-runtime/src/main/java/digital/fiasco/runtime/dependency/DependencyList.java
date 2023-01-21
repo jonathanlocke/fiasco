@@ -432,8 +432,9 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
      * @param rest The dependencies to include
      * @return The new list
      */
+    @SuppressWarnings("unchecked")
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public L with(D first, D[] rest)
+    public L with(D first, D... rest)
     {
         var copy = copy();
         copy.dependencies.add(first);

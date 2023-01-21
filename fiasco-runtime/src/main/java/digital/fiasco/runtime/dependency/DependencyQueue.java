@@ -5,9 +5,10 @@ import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.os.ConsoleTrait;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
-import com.telenav.kivakit.core.thread.locks.ReadWriteLock;
+import com.telenav.kivakit.core.thread.locks.Lock;
 import com.telenav.kivakit.core.time.Duration;
 import com.telenav.kivakit.core.value.count.Maximum;
+import com.telenav.kivakit.interfaces.time.WakeState;
 import digital.fiasco.runtime.repository.remote.FiascoClient;
 import digital.fiasco.runtime.repository.remote.FiascoServer;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
@@ -20,7 +21,6 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.string.ObjectFormatter.ObjectFormat.MULTILINE;
 import static com.telenav.kivakit.core.time.Duration.FOREVER;
-import static com.telenav.kivakit.core.time.Duration.ZERO_DURATION;
 import static com.telenav.kivakit.core.time.Time.now;
 import static com.telenav.kivakit.core.value.count.Maximum.MAXIMUM;
 import static com.telenav.kivakit.core.value.count.Maximum._1;
@@ -40,7 +40,8 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencies;
  *     <li>When processing of one or more dependencies completes, a processor thread calls
  *         {@link #processed(Dependency)} or {@link #processed(DependencyList)} to move them from the "taken"
  *         set to the "processed" set.</li>
- *     <li>While the above steps run, a thread can wait for all processing to finish by called {@link #awaitProcessingCompletion()}</li>
+ *     <li>While the above steps run, a thread can wait for all processing to finish by called
+ *         {@link #awaitProcessingCompletion(Duration)}</li>
  * </ol>
  *
  * <p><b>Taking Dependencies for Processing</b></p>
@@ -61,7 +62,7 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencies;
  * <p><b>Waiting for Processing to Complete</b></p>
  *
  * <ul>
- *     <li>{@link #awaitProcessingCompletion()}</li>
+ *     <li>{@link #awaitProcessingCompletion(Duration)}</li>
  * </ul>
  *
  * <p><b>Example</b></p>
@@ -109,10 +110,10 @@ public class DependencyQueue implements ConsoleTrait
     private DependencyList processed;
 
     /** Read/write lock for accessing available, taken and processed lists */
-    private final ReadWriteLock data = new ReadWriteLock();
+    private final Lock lock = new Lock();
 
     /** Condition to signal/await that indicates more dependencies have been processed */
-    private final Condition processedMore = data.writeLock().newCondition();
+    private final Condition processedMore = lock.newCondition();
 
     /**
      * Creates a dependency queue with the given initial elements
@@ -131,32 +132,45 @@ public class DependencyQueue implements ConsoleTrait
 
     /**
      * Waits until all dependency processing has completed
+     *
+     * @param maximum The maximum amount of time to wait
      */
-    public void awaitProcessingCompletion(Duration duration)
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public WakeState awaitProcessingCompletion(Duration maximum)
     {
-        var beenWaiting = ZERO_DURATION;
-        var startedWaiting = now();
-        while (!isProcessingComplete())
+        var started = now();
+
+        // Grab the queue lock,
+        return lock.whileLocked(() ->
         {
-            duration.minus(beenWaiting).await(processedMore);
-            beenWaiting = startedWaiting.elapsedSince();
-        }
+            // and while we're not done processing, and we haven't timed out,
+            WakeState wake = null;
+            for (var remaining = maximum; !isProcessingComplete(); remaining = maximum.minus(started.elapsedSince()))
+            {
+                // wait for up to the maximum time remaining for more processing to complete,
+                wake = remaining.await(processedMore);
+            }
+
+            return wake;
+        });
     }
 
     /**
      * Returns true if there is work available to process
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean isWorkAvailable()
     {
-        return data.read(() -> available.isNonEmpty());
+        return lock.whileLocked(() -> available.isNonEmpty());
     }
 
     /**
      * Returns the list of dependencies that have been processed.
      */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyList processed()
     {
-        return data.read(() -> processed.copy());
+        return lock.whileLocked(() -> processed.copy());
     }
 
     /**
@@ -167,7 +181,7 @@ public class DependencyQueue implements ConsoleTrait
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public void processed(DependencyList group)
     {
-        data.write(() ->
+        lock.whileLocked(() ->
         {
             // Move the given dependencies from processing to processed,
             this.taken = this.taken.without(group);
@@ -213,9 +227,12 @@ public class DependencyQueue implements ConsoleTrait
         return new ObjectFormatter(this).asString(MULTILINE);
     }
 
+    /**
+     * Returns true if all dependencies are now in the list returned by {@link #processed()}
+     */
     private boolean isProcessingComplete()
     {
-        return data.read(() -> available.isEmpty() && taken.isEmpty());
+        return available.isEmpty() && taken.isEmpty();
     }
 
     /**
@@ -225,7 +242,6 @@ public class DependencyQueue implements ConsoleTrait
      * @param candidate The candidate dependency
      * @return True if the dependency is ready for processing
      */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     private boolean isReady(Dependency candidate)
     {
         // If any dependency of the candidate
@@ -249,7 +265,7 @@ public class DependencyQueue implements ConsoleTrait
      */
     private <D extends Dependency, L extends DependencyList<D, L>> L take(Class<D> type, Maximum maximum)
     {
-        return data.write(() ->
+        return lock.whileLocked(() ->
         {
             // While the queue is not empty,
             while (true)

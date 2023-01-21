@@ -30,4 +30,12 @@ public class DependencyListTest extends FiascoTest
         ensure(!dependencies(kivakitIcons(), kivakitIcons(), kivakitCore(), kivakitIcons())
             .equals(dependencies(kivakitIcons(), kivakitCore())));
     }
+
+    @Test
+    public void testWith()
+    {
+        var dependencies = dependencies(kivakitIcons(), kivakitCore());
+        ensureEqual(dependencies.with(kivakitImages(), kivakitApplication()),
+            dependencies(kivakitCore(), kivakitApplication(), kivakitIcons(), kivakitImages()));
+    }
 }

@@ -27,6 +27,21 @@ public class FiascoTest extends UnitTest
         register(new FiascoGsonFactory(this));
     }
 
+    protected ArtifactContent badPackageContent()
+    {
+        var resource = packageFor(FiascoTest.class)
+            .resource("content.txt");
+
+        return ArtifactContent.content()
+            .withResource(resource)
+            .withLastModified(resource.lastModified())
+            .withSize(resource.sizeInBytes())
+            .withOffset(0)
+            .withName(resource.fileName().name())
+            .withSignatures(signatures())
+            .withResource(null);
+    }
+
     protected ArtifactDescriptor descriptorA()
     {
         return ArtifactDescriptor.descriptor("library:a::");

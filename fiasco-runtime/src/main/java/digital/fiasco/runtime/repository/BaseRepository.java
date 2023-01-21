@@ -129,11 +129,6 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
         this.uri = uri;
     }
 
-    public Artifact<?> artifact(ArtifactDescriptor descriptor)
-    {
-        return lock.read(() -> descriptorToArtifact().get(descriptor));
-    }
-
     @Override
     public BaseRepository clear()
     {
@@ -202,9 +197,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
         descriptorToArtifact().put(ensureNotNull(descriptor), ensureNotNull(artifact));
     }
 
-    protected void loadAllArtifactMetadata()
-    {
-    }
+    protected abstract void loadAllArtifactMetadata();
 
     /**
      * Returns the read/write lock for this repository

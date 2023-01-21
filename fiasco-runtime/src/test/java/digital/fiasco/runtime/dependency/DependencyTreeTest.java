@@ -45,15 +45,8 @@ public class DependencyTreeTest extends FiascoTest
     public void testDepthFirst()
     {
         var tree = libraryTree();
-        var depthFirst = tree.depthFirst().asArtifactDescriptors();
+        var depthFirst = tree.asDepthFirstList().asArtifactDescriptors();
         ensureEqual(depthFirst, artifacts(c, b, e, f, d, a).asArtifactDescriptors());
-    }
-
-    @Test
-    public void testRoot()
-    {
-        var tree = libraryTree();
-        ensure(tree.root().equals(a));
     }
 
     @NotNull

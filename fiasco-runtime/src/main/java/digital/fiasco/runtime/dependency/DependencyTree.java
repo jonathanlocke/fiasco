@@ -2,7 +2,6 @@ package digital.fiasco.runtime.dependency;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
-import com.telenav.kivakit.core.messaging.messages.MessageException;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
@@ -11,9 +10,12 @@ import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static digital.fiasco.runtime.dependency.DependencyList.dependencies;
 
 /**
- * Tree of dependencies created by traversing dependencies in depth-first order from the root, resulting in a list of
- * dependencies where the leaves are first and the root is last. If the dependency graph is cyclic, a
- * {@link MessageException} will be thrown.
+ * A tree of {@link Dependency}s with the root passed to the constructor.
+ *
+ * <p>
+ * The {@link #asDepthFirstList()} method returns the dependencies in the tree as a list, in depth-first order. The
+ * {@link #asQueue()} method creates a {@link DependencyQueue} from this list. If the dependency tree is cyclic (if it's
+ * actually a graph), a {@link RuntimeException} will be thrown.
  *
  * <p><b>Creation</b></p>
  *
@@ -21,66 +23,66 @@ import static digital.fiasco.runtime.dependency.DependencyList.dependencies;
  *     <li>{@link #DependencyTree(Dependency)}</li>
  * </ul>
  *
- * <p><b>Properties</b></p>
+ * <p><b>Conversion</b></p>
  *
  * <ul>
- *     <li>{@link #root()}</li>
+ *     <li>{@link #asQueue()}</li>
  * </ul>
  *
  * <p><b>Traversal</b></p>
  *
  * <ul>
- *     <li>{@link #depthFirst()}</li>
+ *     <li>{@link #asDepthFirstList()}</li>
  * </ul>
  *
  * @author Jonathan Locke
+ * @see Dependency
+ * @see DependencyList
+ * @see DependencyQueue
  */
 @SuppressWarnings({ "unused", "rawtypes", "unchecked" })
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public class DependencyTree
 {
-    /** The root of this dependency graph */
-    private final Dependency root;
-
     /** The dependencies of this graph in depth-first-order */
     private final DependencyList depthFirst;
 
+    /**
+     * Creates a dependency tree from the given root dependency
+     *
+     * @param root The root
+     * @throws RuntimeException Thrown if the root dependency is transitively cyclic (not a tree)
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyTree(Dependency root)
     {
-        this.root = root;
-
         depthFirst = depthFirst(root, dependencies()).with(root);
     }
 
     /**
-     * Returns this dependency tree as a queue
+     * Returns the dependencies in this tree in depth-first order
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyQueue asQueue()
-    {
-        return new DependencyQueue(depthFirst());
-    }
-
-    /**
-     * @return The dependencies in this graph in depth-first order
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyList depthFirst()
+    public DependencyList asDepthFirstList()
     {
         return depthFirst;
     }
 
     /**
-     * @return The root node of this dependency graph
+     * Returns this dependency tree as a {@link DependencyQueue} that can be used for tracking dependency processing
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public Dependency root()
+    public DependencyQueue asQueue()
     {
-        return root;
+        return new DependencyQueue(asDepthFirstList());
     }
 
     /**
-     * @return List of dependencies in depth-first order
+     * Returns a list of dependencies in this tree in depth-first order
+     *
+     * @param root The root to explore
+     * @param explored The list of dependencies already explored (for cycle detection)
+     * @throws RuntimeException Thrown if a cycle is detected in the given root
      */
     private DependencyList depthFirst(Dependency root, DependencyList explored)
     {

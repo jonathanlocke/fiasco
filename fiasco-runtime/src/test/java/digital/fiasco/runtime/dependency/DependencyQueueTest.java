@@ -6,9 +6,14 @@ import digital.fiasco.runtime.dependency.artifact.Library;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import java.util.concurrent.Executors;
+
+import static com.telenav.kivakit.core.time.Duration.milliseconds;
 import static com.telenav.kivakit.core.time.Duration.minutes;
-import static com.telenav.kivakit.core.value.count.Count._100;
+import static com.telenav.kivakit.core.value.count.Count._5;
 import static com.telenav.kivakit.core.value.count.Count._6;
+import static com.telenav.kivakit.core.value.count.Minimum._10;
+import static com.telenav.kivakit.interfaces.time.WakeState.COMPLETED;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
 import static digital.fiasco.runtime.dependency.artifact.LibraryList.libraries;
 
@@ -25,6 +30,43 @@ public class DependencyQueueTest extends FiascoTest
     Library e = library("e:e:1");
 
     Library f = library("f:f:1");
+
+    @Test
+    public void testParallelProcessing()
+    {
+        _10.loop(() ->
+        {
+            var queue = testDependencyQueue();
+
+            var executor = Executors.newFixedThreadPool(5);
+
+            _5.loop(() ->
+                executor.submit(() ->
+                {
+                    while (queue.isWorkAvailable())
+                    {
+                        var next = queue.takeOne(Library.class);
+                        milliseconds(3).sleep();
+                        queue.processed(next);
+                    }
+                }));
+
+            var wake = queue.awaitProcessingCompletion(minutes(1));
+
+            ensureEqual(wake, COMPLETED);
+            ensure(!queue.isWorkAvailable());
+
+            var processed = queue.processed().asLibraryList();
+            ensure(_6.equals(processed.count()));
+
+            ensure(processed.contains(a));
+            ensure(processed.contains(b));
+            ensure(processed.contains(c));
+            ensure(processed.contains(d));
+            ensure(processed.contains(e));
+            ensure(processed.contains(f));
+        });
+    }
 
     @Test
     public void testTakeAll()
@@ -47,7 +89,7 @@ public class DependencyQueueTest extends FiascoTest
     @Test
     public void testTakeAllAndAwait()
     {
-        _100.loop(() ->
+        _10.loop(() ->
         {
             var queue = testDependencyQueue();
 
@@ -56,15 +98,18 @@ public class DependencyQueueTest extends FiascoTest
                 while (queue.isWorkAvailable())
                 {
                     var next = queue.takeAll(Library.class);
+                    milliseconds(1).sleep();
                     queue.processed(next);
                 }
             });
 
-            queue.awaitProcessingCompletion(minutes(1));
+            var wake = queue.awaitProcessingCompletion(minutes(1));
+
+            ensureEqual(wake, COMPLETED);
             ensure(!queue.isWorkAvailable());
 
             var processed = queue.processed();
-            ensureEqual(processed.count(), _6);
+            ensure(_6.equals(processed.count()));
 
             // group 1
             ensureEqual(processed.get(0), c);
@@ -83,7 +128,7 @@ public class DependencyQueueTest extends FiascoTest
     @Test
     public void testTakeOneAndAwait()
     {
-        _100.loop(() ->
+        _10.loop(() ->
         {
             var queue = testDependencyQueue();
 
@@ -92,15 +137,18 @@ public class DependencyQueueTest extends FiascoTest
                 while (queue.isWorkAvailable())
                 {
                     var next = queue.takeOne(Library.class);
+                    milliseconds(1).sleep();
                     queue.processed(next);
                 }
             });
 
-            queue.awaitProcessingCompletion(minutes(1));
+            var wake = queue.awaitProcessingCompletion(minutes(1));
+
+            ensureEqual(wake, COMPLETED);
             ensure(!queue.isWorkAvailable());
 
             var processed = queue.processed();
-            ensureEqual(processed.count(), _6);
+            ensure(_6.equals(processed.count()));
 
             ensureEqual(processed.get(0), c);
             ensureEqual(processed.get(1), b);
@@ -109,6 +157,12 @@ public class DependencyQueueTest extends FiascoTest
             ensureEqual(processed.get(4), d);
             ensureEqual(processed.get(5), a);
         });
+    }
+
+    @Test
+    public void testToString()
+    {
+        ensure(!testDependencyQueue().toString().isEmpty());
     }
 
     @NotNull

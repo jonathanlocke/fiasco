@@ -178,6 +178,12 @@ public class MavenRepository extends BaseRepository
         return resolveArtifacts(descriptors, artifacts());
     }
 
+    @Override
+    protected void loadAllArtifactMetadata()
+    {
+        unsupported();
+    }
+
     /**
      * Returns this descriptor as a filename with the given type.
      *
@@ -266,10 +272,11 @@ public class MavenRepository extends BaseRepository
     {
         var artifact = attachment.artifact();
         var target = mavenFolder(rootFolder, artifact);
-        return target.resource(mavenFileName(artifact, attachment.attachmentType().fileSuffix() +
-            (signatureExtension == null
-                ? ""
-                : signatureExtension)));
+        return throwingListener().listenTo(
+            target.resource(mavenFileName(artifact, attachment.attachmentType().fileSuffix() +
+                (signatureExtension == null
+                    ? ""
+                    : signatureExtension))));
     }
 
     /**
@@ -352,8 +359,7 @@ public class MavenRepository extends BaseRepository
 
     private ArtifactContent readAttachment(Artifact<?> artifact, ArtifactAttachmentType type)
     {
-        var attachment = attachment(type).withArtifact(artifact);
-        return mavenReadContent(attachment);
+        return mavenReadContent(attachment(type).withArtifact(artifact));
     }
 
     private ArtifactList resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors,

@@ -362,11 +362,10 @@ public class Builder extends BaseRepeater implements
      *
      * @return The libraries to compile against
      */
-    @SuppressWarnings("unchecked")
     @Override
-    public <D extends Dependency, L extends DependencyList<D, L>> L dependencies()
+    public DependencyList<?, ?> dependencies()
     {
-        return (L) settings.dependencies();
+        return settings.dependencies();
     }
 
     /**

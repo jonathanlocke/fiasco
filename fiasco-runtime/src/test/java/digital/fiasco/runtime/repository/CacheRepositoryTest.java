@@ -9,6 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptors;
 
@@ -89,6 +90,19 @@ public class CacheRepositoryTest extends FiascoTest
         repository.installArtifact(logos);
 
         testRepository(repository, core, icons, logos);
+    }
+
+    @Test
+    public void testSaveFailure()
+    {
+        ensureThrows(() ->
+        {
+            var core = kivakitCore()
+                .withContent(badPackageContent());
+
+            var repository = throwingListener().listenTo(repository());
+            repository.installArtifact(core);
+        });
     }
 
     @Test

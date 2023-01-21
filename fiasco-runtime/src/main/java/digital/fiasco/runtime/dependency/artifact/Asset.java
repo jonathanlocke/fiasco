@@ -17,6 +17,7 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.UNTESTED;
+import static com.telenav.kivakit.core.string.Strings.ensureStartsWith;
 
 /**
  * An asset is an artifact having only a single content attachment
@@ -44,7 +45,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static Asset asset(String descriptor)
     {
-        return asset(ArtifactDescriptor.descriptor("asset:" + descriptor));
+        return asset(ArtifactDescriptor.descriptor(ensureStartsWith(descriptor, "asset:")));
     }
 
     /**

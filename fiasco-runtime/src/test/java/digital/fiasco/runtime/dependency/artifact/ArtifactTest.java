@@ -222,6 +222,28 @@ public class ArtifactTest extends FiascoTest
             artifacts());
 
         ensureEqual(application
+                .excluding(kivakitCore().descriptor())
+                .dependencies(),
+            artifacts(kivakitResource(),
+                kivakitLogos(),
+                kivakitIcons()));
+
+        ensureEqual(application
+                .excluding(kivakitResource().descriptor())
+                .dependencies(),
+            artifacts(kivakitCore(),
+                kivakitLogos(),
+                kivakitIcons()));
+
+        ensureEqual(application
+                .excluding(kivakitResource().descriptor(),
+                    kivakitCore().descriptor(),
+                    kivakitIcons().descriptor(),
+                    kivakitLogos().descriptor())
+                .dependencies(),
+            artifacts());
+
+        ensureEqual(application
                 .excluding(kivakitCore())
                 .excluding(kivakitIcons())
                 .excluding(kivakitLogos())

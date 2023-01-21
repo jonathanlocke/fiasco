@@ -14,6 +14,7 @@ import com.telenav.kivakit.core.registry.RegistryTrait;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
+import static com.telenav.kivakit.core.string.Strings.ensureStartsWith;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
@@ -53,7 +54,7 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static Library library(String descriptor)
     {
-        return new Library(ArtifactDescriptor.descriptor("library:" + descriptor));
+        return new Library(ArtifactDescriptor.descriptor(ensureStartsWith(descriptor, "library:")));
     }
 
     /**

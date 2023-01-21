@@ -48,4 +48,10 @@ public class MavenRepositoryTest extends FiascoTest
             "com.telenav.lexakai.annotations:lexakai-annotations:1.0.9",
             "org.jetbrains:annotations:23.0.0"));
     }
+
+    @Test
+    public void testResolveFailure()
+    {
+        ensureThrows(() -> MAVEN_CENTRAL.resolveArtifacts("library:com.shibo:unknown:1.0.1"));
+    }
 }

@@ -22,7 +22,6 @@ import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifactName;
 
 /**

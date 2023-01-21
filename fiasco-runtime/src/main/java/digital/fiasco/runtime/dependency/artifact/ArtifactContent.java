@@ -93,7 +93,7 @@ public record ArtifactContent
      */
     public ArtifactContent withResource(Resource resource)
     {
-        return new ArtifactContent(name, signatures, resource.identifier(), offset, lastModified, size);
+        return new ArtifactContent(name, signatures, resource == null ? null : resource.identifier(), offset, lastModified, size);
     }
 
     /**

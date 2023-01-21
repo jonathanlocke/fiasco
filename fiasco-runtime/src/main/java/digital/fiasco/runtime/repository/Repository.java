@@ -16,6 +16,8 @@ import digital.fiasco.runtime.repository.remote.RemoteRepository;
 
 import java.net.URI;
 
+import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptors;
+
 /**
  * Interface to a repository that stores and resolves artifacts and their content attachments.
  * <p>
@@ -123,6 +125,18 @@ public interface Repository extends
      * @throws IllegalArgumentException Thrown if any descriptor cannot be resolved
      */
     ArtifactList resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors);
+
+    /**
+     * Convenience method to resolve a list of descriptors
+     *
+     * @param descriptors The artifact descriptors
+     * @return The resolved artifacts
+     * @throws IllegalArgumentException Thrown if any descriptor cannot be resolved
+     */
+    default ArtifactList resolveArtifacts(String... descriptors)
+    {
+        return resolveArtifacts(descriptors(descriptors));
+    }
 
     /**
      * Returns the URI of this repository

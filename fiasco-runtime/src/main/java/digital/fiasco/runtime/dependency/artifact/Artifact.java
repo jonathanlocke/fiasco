@@ -209,7 +209,7 @@ public interface Artifact<A extends Artifact<A>> extends Dependency, AsString
      * @return The dependency list
      */
     @Override
-    <D extends Dependency, L extends DependencyList<D, L>> L dependencies();
+    ArtifactList dependencies();
 
     /**
      * Returns the dependencies matching the given dependency pattern
