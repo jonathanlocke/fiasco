@@ -56,9 +56,9 @@ public class DependencyTree
      * Returns this dependency tree as a queue
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyResolutionQueue asQueue()
+    public DependencyQueue asQueue()
     {
-        return new DependencyResolutionQueue(depthFirst());
+        return new DependencyQueue(depthFirst());
     }
 
     /**

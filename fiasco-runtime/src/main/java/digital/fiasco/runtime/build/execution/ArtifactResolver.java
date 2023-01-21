@@ -8,7 +8,7 @@ import digital.fiasco.runtime.build.BuildSettings;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.Dependency;
-import digital.fiasco.runtime.dependency.DependencyResolutionQueue;
+import digital.fiasco.runtime.dependency.DependencyQueue;
 import digital.fiasco.runtime.dependency.DependencyTree;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
@@ -25,8 +25,8 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
 
 /**
  * Resolves artifacts in groups by turning the given root dependency into a {@link DependencyTree}, and then turning
- * that tree into a {@link DependencyResolutionQueue}. Groups of dependencies that are ready for resolution are
- * retrieved with {@link DependencyResolutionQueue#nextReadyGroup(Class)}, and then resolved using the {@link Librarian}
+ * that tree into a {@link DependencyQueue}. Groups of dependencies that are ready for resolution are
+ * retrieved with {@link DependencyQueue#takeAll(Class)}, and then resolved using the {@link Librarian}
  * found in the {@link BuildSettings}. When a group of dependencies is resolved, the given {@link Callback} is called
  * with the resolution {@link Result}.
  *
@@ -40,7 +40,7 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
  *
  * @author Jonathan Locke
  * @see BuildSettings
- * @see DependencyResolutionQueue
+ * @see DependencyQueue
  * @see Dependency
  * @see ArtifactList
  */
@@ -67,7 +67,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
             var completion = new ExecutorCompletionService<Void>(executor);
 
             // and then go through groups of artifacts from the queue that are ready to be resolved,
-            for (var group = queue.nextReadyGroup(Artifact.class); group != null; group = queue.nextReadyGroup(Artifact.class))
+            for (var group = queue.takeAll(Artifact.class); group != null; group = queue.takeAll(Artifact.class))
             {
                 // and use the completion service to resolve the group.
                 var artifacts = group.asArtifactList();

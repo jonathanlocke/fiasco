@@ -7,7 +7,7 @@ import com.telenav.kivakit.core.language.trait.TryTrait;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.DependencyList;
-import digital.fiasco.runtime.dependency.DependencyResolutionQueue;
+import digital.fiasco.runtime.dependency.DependencyQueue;
 import digital.fiasco.runtime.dependency.DependencyTree;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
@@ -43,7 +43,7 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
  * @see Dependency
  * @see DependencyList
  * @see DependencyTree
- * @see DependencyResolutionQueue
+ * @see DependencyQueue
  * @see Artifact
  * @see ArtifactList
  * @see ArtifactResolver
@@ -97,7 +97,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
 
         // and while there are builders yet to run,
         var futures = new ObjectList<Future<Result<Builder>>>();
-        for (var builder = queue.nextReady(Builder.class); builder != null; builder = queue.nextReady(Builder.class))
+        for (var builder = queue.takeOne(Builder.class); builder != null; builder = queue.takeOne(Builder.class))
         {
             // submit the builder to the executor,
             var finalBuilder = builder;
@@ -110,7 +110,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
                 finalBuilder.build();
 
                 // and then mark it as resolved.
-                queue.resolve(finalBuilder);
+                queue.processed(finalBuilder);
             });
 
             // and add the future to the list of results to wait for.

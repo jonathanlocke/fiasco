@@ -7,6 +7,7 @@ import com.telenav.kivakit.core.collections.list.StringList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.value.count.Count;
+import com.telenav.kivakit.core.value.count.Maximum;
 import com.telenav.kivakit.interfaces.collection.Sized;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
@@ -302,6 +303,19 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     public D first()
     {
         return dependencies.first();
+    }
+
+    /**
+     * Returns a copy of this list with up to the first N dependencies
+     *
+     * @param maximum The maximum number of dependencies to include in the copy
+     * @return The copy
+     */
+    public L first(Maximum maximum)
+    {
+        var copy = copy();
+        copy.dependencies = this.dependencies.first(maximum.count());
+        return copy;
     }
 
     /**
