@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.local;
+package digital.fiasco.runtime.repository.local.cache;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.filesystem.File;
@@ -7,7 +7,7 @@ import com.telenav.kivakit.resource.resources.ResourceSection;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
-import digital.fiasco.runtime.repository.remote.FiascoServer;
+import digital.fiasco.runtime.repository.local.LocalRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
@@ -34,8 +34,8 @@ import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
  * </p>
  *
  * <p>
- * Another instance of this repository is used by {@link FiascoServer} to respond quickly to requests to resolve one or
- * more artifact descriptors.
+ * Another instance of this repository is used by FiascoServer to respond quickly to requests to resolve one or more
+ * artifact descriptors.
  * </p>
  *
  * <p><b>Content Storage</b></p>

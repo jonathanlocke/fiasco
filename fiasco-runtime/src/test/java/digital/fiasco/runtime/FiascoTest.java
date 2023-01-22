@@ -9,7 +9,7 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.dependency.artifact.Asset;
 import digital.fiasco.runtime.dependency.artifact.Library;
-import digital.fiasco.runtime.repository.remote.serialization.FiascoGsonFactory;
+import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;
 
 import static com.telenav.kivakit.core.os.Console.console;
 import static com.telenav.kivakit.filesystem.File.file;

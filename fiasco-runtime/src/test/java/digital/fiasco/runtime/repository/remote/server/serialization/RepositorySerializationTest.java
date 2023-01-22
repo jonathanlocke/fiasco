@@ -1,8 +1,8 @@
-package digital.fiasco.runtime.repository.remote.serialization;
+package digital.fiasco.runtime.repository.remote.server.serialization;
 
 import com.telenav.kivakit.filesystem.Folders;
 import digital.fiasco.runtime.FiascoTest;
-import digital.fiasco.runtime.repository.local.CacheRepository;
+import digital.fiasco.runtime.repository.local.cache.CacheRepository;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import org.junit.Test;
 

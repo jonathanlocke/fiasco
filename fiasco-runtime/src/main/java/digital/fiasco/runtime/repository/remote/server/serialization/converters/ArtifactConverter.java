@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.remote.serialization.converters;
+package digital.fiasco.runtime.repository.remote.server.serialization.converters;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;

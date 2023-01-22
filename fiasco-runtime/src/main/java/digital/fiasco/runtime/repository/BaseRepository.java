@@ -10,12 +10,12 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
-import digital.fiasco.runtime.repository.local.CacheRepository;
+import digital.fiasco.runtime.repository.local.cache.CacheRepository;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
-import digital.fiasco.runtime.repository.remote.FiascoClient;
-import digital.fiasco.runtime.repository.remote.FiascoServer;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
+import digital.fiasco.runtime.repository.remote.server.FiascoClient;
+import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
 import java.net.URI;
 import java.util.Objects;
@@ -33,7 +33,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
  *     <li>{@link CacheRepository} - High performance artifact store</li>
  *     <li>{@link LocalRepository} - Stores artifacts on the local filesystem</li>
  *     <li>{@link MavenRepository} - A remote or local maven repository</li>
- *     <li>{@link RemoteRepository} - Fiasco repository at a remote URI</li>
+ *     <li>{@link RemoteRepository} - A Fiasco repository at a remote URI</li>
  * </ul>
  *
  * <p><b>Local Repositories</b></p>
@@ -77,7 +77,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
  * <p><b>Remote Repositories</b></p>
  *
  * <p>
- * {@link RemoteRepository} is used to access a remote Fiasco repository served by a {@link FiascoServer}.
+ * {@link RemoteRepository} is used to access a remote {@link FiascoServer} (launched by the <i>fiasco-server</i> project).
  * Internally, this repository uses {@link FiascoClient} to communicate with the server.
  * </p>
  *

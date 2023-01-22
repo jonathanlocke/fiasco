@@ -2,7 +2,6 @@ package digital.fiasco.runtime.repository.local;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.object.Lazy;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
@@ -15,9 +14,11 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.Repository;
+import digital.fiasco.runtime.repository.local.cache.CacheRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
+import java.util.Collection;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
@@ -31,6 +32,9 @@ import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
 import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJson;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
+import static digital.fiasco.runtime.repository.Repository.InstallResult.ALREADY_INSTALLED;
+import static digital.fiasco.runtime.repository.Repository.InstallResult.INSTALLATION_FAILED;
+import static digital.fiasco.runtime.repository.Repository.InstallResult.INSTALLED;
 
 /**
  * A repository of artifacts and their metadata on the local filesystem.
@@ -61,7 +65,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link Repository#resolveArtifacts(ObjectList)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(Collection)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -153,9 +157,9 @@ public class LocalRepository extends BaseRepository
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public void installArtifact(Artifact<?> artifact)
+    public InstallResult installArtifact(Artifact<?> artifact)
     {
-        lock().write(() ->
+        return lock().write(() ->
         {
             // If we don't already have this artifact installed,
             if (!contains(artifact))
@@ -174,12 +178,16 @@ public class LocalRepository extends BaseRepository
 
                     // and add the artifact to the map.
                     add(artifact.descriptor(), artifact);
+
+                    return INSTALLED;
                 }
                 catch (Exception e)
                 {
                     problem(e, "Unable to install artifact: $", artifact);
+                    return INSTALLATION_FAILED;
                 }
             }
+            return ALREADY_INSTALLED;
         });
     }
 
@@ -191,10 +199,12 @@ public class LocalRepository extends BaseRepository
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public final ArtifactList resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
+    public final ArtifactList resolveArtifacts(Collection<ArtifactDescriptor> collection)
     {
         return lock().read(() ->
         {
+            var descriptors = list(collection);
+
             // Find the artifacts that are in this repository,
             var resolvedArtifacts = resolve(descriptors);
             var resolvedDescriptors = resolvedArtifacts.asArtifactDescriptors();

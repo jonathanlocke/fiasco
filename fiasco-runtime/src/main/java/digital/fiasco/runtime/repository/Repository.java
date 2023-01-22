@@ -1,20 +1,20 @@
 package digital.fiasco.runtime.repository;
 
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.naming.Named;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
-import digital.fiasco.runtime.repository.local.CacheRepository;
 import digital.fiasco.runtime.repository.local.LocalRepository;
+import digital.fiasco.runtime.repository.local.cache.CacheRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
-import digital.fiasco.runtime.repository.remote.FiascoClient;
-import digital.fiasco.runtime.repository.remote.FiascoServer;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
+import digital.fiasco.runtime.repository.remote.server.FiascoClient;
+import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
 import java.net.URI;
+import java.util.Collection;
 
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptors;
 
@@ -27,7 +27,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.desc
  *     <li>{@link CacheRepository} - High performance artifact store</li>
  *     <li>{@link LocalRepository} - Stores artifacts on the local filesystem</li>
  *     <li>{@link MavenRepository} - A remote or local maven repository</li>
- *     <li>{@link RemoteRepository} - Fiasco repository at a remote URI</li>
+ *     <li>{@link RemoteRepository} - A Fiasco repository at a remote URI</li>
  * </ul>
  *
  * <p><b>Local Repositories</b></p>
@@ -68,17 +68,18 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.desc
  * resolve one or more artifact descriptors.
  * </p>
  *
+ *
  * <p><b>Remote Repositories</b></p>
  *
  * <p>
- * {@link RemoteRepository} is used to access a remote Fiasco repository served by a {@link FiascoServer}.
+ * {@link RemoteRepository} is used to access a remote {@link FiascoServer} (launched by the <i>fiasco-server</i> project).
  * Internally, this repository uses {@link FiascoClient} to communicate with the server.
  * </p>
  *
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(ObjectList)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link #resolveArtifacts(Collection)} - Resolves the given descriptors to a collection of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -94,6 +95,13 @@ public interface Repository extends
     Repeater,
     Named
 {
+    enum InstallResult
+    {
+        INSTALLED,
+        ALREADY_INSTALLED,
+        INSTALLATION_FAILED
+    }
+
     /**
      * Removes all artifacts from this repository
      */
@@ -105,7 +113,7 @@ public interface Repository extends
      * @param artifact The artifact to install
      * @throws IllegalStateException Thrown if the artifact cannot be installed in this repository
      */
-    void installArtifact(Artifact<?> artifact);
+    InstallResult installArtifact(Artifact<?> artifact);
 
     /**
      * Returns true if this repository is remote
@@ -124,7 +132,7 @@ public interface Repository extends
      * @return The resolved artifacts
      * @throws IllegalArgumentException Thrown if any descriptor cannot be resolved
      */
-    ArtifactList resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors);
+    ArtifactList resolveArtifacts(Collection<ArtifactDescriptor> descriptors);
 
     /**
      * Convenience method to resolve a list of descriptors

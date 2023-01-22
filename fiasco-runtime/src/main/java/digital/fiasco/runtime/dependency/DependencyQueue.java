@@ -9,9 +9,9 @@ import com.telenav.kivakit.core.thread.locks.Lock;
 import com.telenav.kivakit.core.time.Duration;
 import com.telenav.kivakit.core.value.count.Maximum;
 import com.telenav.kivakit.interfaces.time.WakeState;
-import digital.fiasco.runtime.repository.remote.FiascoClient;
-import digital.fiasco.runtime.repository.remote.FiascoServer;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
+import digital.fiasco.runtime.repository.remote.server.FiascoClient;
+import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
 import java.util.concurrent.locks.Condition;
 

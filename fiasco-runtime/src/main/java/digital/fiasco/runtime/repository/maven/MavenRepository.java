@@ -25,9 +25,11 @@ import org.eclipse.aether.repository.LocalRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
+import java.util.Collection;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.fail;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
@@ -48,6 +50,8 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactContent.content
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
+import static digital.fiasco.runtime.repository.Repository.InstallResult.INSTALLATION_FAILED;
+import static digital.fiasco.runtime.repository.Repository.InstallResult.INSTALLED;
 
 /**
  * A basic Maven repository, either on the local machine or some remote resource folder. For remote URIs, repositories
@@ -63,7 +67,7 @@ import static digital.fiasco.runtime.dependency.artifact.Library.library;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link digital.fiasco.runtime.repository.Repository#resolveArtifacts(ObjectList)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link #resolveArtifacts(Collection)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -145,15 +149,20 @@ public class MavenRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public void installArtifact(Artifact<?> artifact)
+    public InstallResult installArtifact(Artifact<?> artifact)
     {
-        lock().write(() ->
+        return lock().write(() ->
         {
-            if (!isRemote())
+            try
             {
                 var descriptor = artifact.descriptor();
                 artifact.attachments().forEach(this::mavenWriteContent);
                 mavenWritePom(artifact);
+                return INSTALLED;
+            }
+            catch (Exception e)
+            {
+                return INSTALLATION_FAILED;
             }
         });
     }
@@ -173,9 +182,9 @@ public class MavenRepository extends BaseRepository
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public ArtifactList resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
+    public ArtifactList resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
     {
-        return resolveArtifacts(descriptors, artifacts());
+        return resolveArtifacts(list(descriptors), artifacts());
     }
 
     @Override

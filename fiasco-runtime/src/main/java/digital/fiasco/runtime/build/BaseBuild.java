@@ -29,7 +29,7 @@ import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.build.execution.BuildExecutor;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
-import digital.fiasco.runtime.repository.remote.serialization.FiascoGsonFactory;
+import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;
 
 import java.util.Set;
 

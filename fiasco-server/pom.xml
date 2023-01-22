@@ -1,0 +1,122 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+ /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ //
+ // © 2011-2022 Telenav, Inc.
+ // Licensed under Apache License, Version 2.0
+ //
+ /////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+ -->
+
+<project xmlns:xsi = "http://www.w3.org/2001/XMLSchema-instance"
+         xmlns = "http://maven.apache.org/POM/4.0.0"
+         xsi:schemaLocation = "http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>digital.fiasco</groupId>
+        <artifactId>fiasco</artifactId>
+        <version>0.9.0</version>
+    </parent>
+
+    <artifactId>fiasco-server</artifactId>
+
+    <properties>
+        <maven.version>3.8.6</maven.version>
+    </properties>
+
+    <dependencies>
+
+        <!-- Fiasco -->
+
+        <dependency>
+            <groupId>digital.fiasco</groupId>
+            <artifactId>fiasco-runtime</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+
+    </dependencies>
+
+    <build>
+        <plugins>
+
+            <plugin>
+                <groupId>com.telenav.cactus.metadata</groupId>
+                <artifactId>cactus-metadata-maven-plugin</artifactId>
+                <version>${utilities.cactus.metadata.version}</version>
+                <executions>
+                    <execution>
+                        <id>project-metadata</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>project-information</goal>
+                            <goal>build-metadata</goal>
+                        </goals>
+                        <configuration>
+                            <buildPropertiesDestination>target/classes/FiascoServer-build.properties</buildPropertiesDestination>
+                            <projectPropertiesDestination>target/classes/FiascoServer-project.properties</projectPropertiesDestination>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+            <plugin>
+                <groupId>org.apache.maven.plugins</groupId>
+                <artifactId>maven-shade-plugin</artifactId>
+                <version>${maven.shade.plugin.version}</version>
+                <executions>
+                    <execution>
+                        <phase>package</phase>
+                        <goals>
+                            <goal>shade</goal>
+                        </goals>
+                        <configuration>
+                            <finalName>${project.artifactId}-${project.parent.version}</finalName>
+                            <minimizeJar>true</minimizeJar>
+                            <artifactSet>
+                                <includes>
+                                    <include>*:*</include>
+                                </includes>
+                            </artifactSet>
+                            <filters>
+                                <filter>
+                                    <artifact>*:*</artifact>
+                                    <excludes>
+                                        <exclude>**/module-info.class</exclude>
+                                        <exclude>project.properties</exclude>
+                                        <exclude>build.properties</exclude>
+                                        <exclude>LICENSE</exclude>
+                                        <exclude>META-INF/versions/9/*</exclude>
+                                        <exclude>META-INF/*.DSA</exclude>
+                                        <exclude>META-INF/*.RSA</exclude>
+                                        <exclude>META-INF/MANIFEST.MF</exclude>
+                                        <exclude>META-INF/*.SF</exclude>
+                                        <exclude>META-INF/NOTICE.txt</exclude>
+                                        <exclude>META-INF/LICENSE.txt</exclude>
+                                        <exclude>META-INF/LICENSE</exclude>
+                                        <exclude>META-INF/DEPENDENCIES</exclude>
+                                        <exclude>META-INF/NOTICE</exclude>
+                                        <exclude>META-INF/maven/**</exclude>
+                                    </excludes>
+                                </filter>
+                            </filters>
+                            <transformers>
+                                <transformer implementation = "org.apache.maven.plugins.shade.resource.ManifestResourceTransformer">
+                                    <mainClass>digital.fiasco.server.FiascoServerLauncher</mainClass>
+                                    <Implementation-Vendor>Digital Fiasco</Implementation-Vendor>
+                                    <Implementation-Title>${project.artifactId}</Implementation-Title>
+                                    <Release-Version>${project.version}</Release-Version>
+                                    <Built-By>${user.name}</Built-By>
+                                </transformer>
+                                <transformer implementation = "org.apache.maven.plugins.shade.resource.ServicesResourceTransformer"/>
+                            </transformers>
+                        </configuration>
+                    </execution>
+                </executions>
+            </plugin>
+
+        </plugins>
+    </build>
+</project>

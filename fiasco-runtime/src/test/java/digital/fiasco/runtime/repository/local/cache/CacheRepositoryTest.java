@@ -1,11 +1,11 @@
-package digital.fiasco.runtime.repository.local;
+package digital.fiasco.runtime.repository.local.cache;
 
 import com.telenav.kivakit.filesystem.Folder;
 import digital.fiasco.runtime.FiascoTest;
 import digital.fiasco.runtime.dependency.artifact.Asset;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.repository.local.CacheRepository;
+import digital.fiasco.runtime.repository.local.cache.CacheRepository;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

@@ -1,6 +1,7 @@
-package digital.fiasco.runtime.repository.remote.serialization.converters;
+package digital.fiasco.runtime.repository.remote.server.serialization.converters;
 
 import digital.fiasco.runtime.FiascoTest;
+import digital.fiasco.runtime.repository.remote.server.serialization.converters.ArtifactListConverter;
 import org.junit.Test;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;

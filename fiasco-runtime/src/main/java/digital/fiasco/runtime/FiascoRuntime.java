@@ -3,7 +3,6 @@ package digital.fiasco.runtime;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.core.project.Project;
 import com.telenav.kivakit.filesystem.Folder;
-import digital.fiasco.runtime.repository.remote.serialization.FiascoGsonFactory;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
@@ -27,11 +26,5 @@ public class FiascoRuntime extends Project
         return userHome()
             .folder(".fiasco")
             .mkdirs();
-    }
-
-    @Override
-    public void onInitialize()
-    {
-        register(new FiascoGsonFactory());
     }
 }

@@ -12,9 +12,9 @@ import digital.fiasco.runtime.dependency.DependencyQueue;
 import digital.fiasco.runtime.dependency.DependencyTree;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
-import digital.fiasco.runtime.repository.remote.FiascoClient;
-import digital.fiasco.runtime.repository.remote.FiascoServer;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
+import digital.fiasco.runtime.repository.remote.server.FiascoClient;
+import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
 import java.util.concurrent.ExecutorCompletionService;
 
@@ -25,10 +25,10 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
 
 /**
  * Resolves artifacts in groups by turning the given root dependency into a {@link DependencyTree}, and then turning
- * that tree into a {@link DependencyQueue}. Groups of dependencies that are ready for resolution are
- * retrieved with {@link DependencyQueue#takeAll(Class)}, and then resolved using the {@link Librarian}
- * found in the {@link BuildSettings}. When a group of dependencies is resolved, the given {@link Callback} is called
- * with the resolution {@link Result}.
+ * that tree into a {@link DependencyQueue}. Groups of dependencies that are ready for resolution are retrieved with
+ * {@link DependencyQueue#takeAll(Class)}, and then resolved using the {@link Librarian} found in the
+ * {@link BuildSettings}. When a group of dependencies is resolved, the given {@link Callback} is called with the
+ * resolution {@link Result}.
  *
  * <p><b>Performance</b></p>
  *

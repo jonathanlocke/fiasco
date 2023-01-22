@@ -1,6 +1,7 @@
-package digital.fiasco.runtime.repository.remote.serialization.converters;
+package digital.fiasco.runtime.repository.remote.server.serialization.converters;
 
 import digital.fiasco.runtime.FiascoTest;
+import digital.fiasco.runtime.repository.remote.server.serialization.converters.ArtifactConverter;
 import org.junit.Test;
 
 public class ArtifactConverterTest extends FiascoTest

@@ -1,16 +1,19 @@
 package digital.fiasco.runtime.repository.remote;
 
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.repository.local.CacheRepository;
+import digital.fiasco.runtime.repository.local.cache.CacheRepository;
+import digital.fiasco.runtime.repository.remote.server.FiascoClient;
+import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
 import java.net.URI;
+import java.util.Collection;
 
+import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 
 /**
@@ -28,13 +31,13 @@ import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link Repository#resolveArtifacts(ObjectList)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(Collection)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
  *
  * <ul>
- *     <li>{@link Repository#resolveArtifacts(ObjectList)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link Repository#installArtifact(Artifact)} - Installs the given artifact</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -55,6 +58,7 @@ public class RemoteRepository extends BaseRepository
     public RemoteRepository(String name, URI uri)
     {
         super(name, uri);
+        ensure(uri.getScheme().equals("https"), "HTTPS is required");
     }
 
     @Override
@@ -68,9 +72,9 @@ public class RemoteRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public void installArtifact(Artifact<?> artifact)
+    public InstallResult installArtifact(Artifact<?> artifact)
     {
-        unsupported("Cannot install artifacts in a remote Fiasco repository");
+        return new FiascoClient().installArtifact(artifact);
     }
 
     @Override
@@ -83,12 +87,10 @@ public class RemoteRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public ArtifactList resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors)
+    public ArtifactList resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
     {
         // Return resolved artifacts for the given descriptors
-        return new FiascoClient()
-            .request(this, new FiascoRepositoryRequest().with(descriptors))
-            .artifacts();
+        return new FiascoClient().resolveArtifacts(descriptors);
     }
 
     @Override
