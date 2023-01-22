@@ -1,5 +1,6 @@
 package digital.fiasco.runtime;
 
+import com.telenav.kivakit.serialization.gson.GsonFactory;
 import com.telenav.kivakit.testing.UnitTest;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
@@ -184,5 +185,12 @@ public class FiascoTest extends UnitTest
     protected ArtifactAttachment sourcesAttachment()
     {
         return attachment(SOURCES_ATTACHMENT, packageContent());
+    }
+
+    protected void testSerialization(Object object)
+    {
+        var gson = require(GsonFactory.class).gson();
+        var serialized = gson.toJson(object);
+        ensureEqual(gson.fromJson(serialized, object.getClass()), object);
     }
 }

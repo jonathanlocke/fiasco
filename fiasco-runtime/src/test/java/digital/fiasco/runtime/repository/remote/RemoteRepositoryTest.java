@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository;
+package digital.fiasco.runtime.repository.remote;
 
 import digital.fiasco.runtime.FiascoTest;
 

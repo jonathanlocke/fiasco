@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository;
+package digital.fiasco.runtime.repository.maven;
 
 import digital.fiasco.runtime.FiascoTest;
 import digital.fiasco.runtime.repository.maven.MavenRepository;

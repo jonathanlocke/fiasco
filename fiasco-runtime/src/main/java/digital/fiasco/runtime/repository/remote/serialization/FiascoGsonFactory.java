@@ -14,6 +14,7 @@ import digital.fiasco.runtime.repository.local.CacheRepository;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
+import digital.fiasco.runtime.repository.remote.serialization.converters.ArtifactListConverter;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
@@ -45,5 +46,6 @@ public class FiascoGsonFactory extends KivaKitCoreGsonFactory
             .registerSubtype(RemoteRepository.class));
 
         requireExposeAnnotation(true);
+        prettyPrinting(true);
     }
 }

@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.remote.serialization;
+package digital.fiasco.runtime.repository.remote.serialization.converters;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
@@ -33,7 +33,7 @@ public class ArtifactListConverter extends BaseStringConverter<ArtifactList>
     @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTED)
     protected String onToString(ArtifactList artifactList)
     {
-        var artifactConverter = new ArtifactConverter(this);
+        var artifactConverter = new ArtifactConverter();
         var text = stringList();
         for (var artifact : artifactList)
         {
@@ -50,9 +50,8 @@ public class ArtifactListConverter extends BaseStringConverter<ArtifactList>
     @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTED)
     protected ArtifactList onToValue(String text)
     {
-        var artifactConverter = new ArtifactConverter(this);
-        var split = splitOnPattern(text, "\\s*,\\s*");
-        var descriptors = split.rightOf(1);
+        var artifactConverter = new ArtifactConverter();
+        var descriptors = splitOnPattern(text, "\\s*,\\s*");
 
         var artifacts = ArtifactList.artifacts();
         for (var at : descriptors)

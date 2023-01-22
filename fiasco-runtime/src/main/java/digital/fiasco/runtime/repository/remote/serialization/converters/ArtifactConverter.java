@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.remote.serialization;
+package digital.fiasco.runtime.repository.remote.serialization.converters;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
@@ -12,6 +12,7 @@ import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_INSUFFICIENT;
 import static com.telenav.kivakit.core.language.Classes.newInstance;
+import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
 
 /**
@@ -27,6 +28,11 @@ public class ArtifactConverter extends BaseStringConverter<Artifact>
     public ArtifactConverter(Listener listener)
     {
         super(listener, Artifact.class);
+    }
+
+    public ArtifactConverter()
+    {
+        this(throwingListener());
     }
 
     /**

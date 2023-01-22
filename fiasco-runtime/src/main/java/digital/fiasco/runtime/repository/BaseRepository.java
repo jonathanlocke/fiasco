@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.repository;
 
+import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
@@ -108,9 +109,11 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 public abstract class BaseRepository extends BaseRepeater implements Repository
 {
     /** The name of this repository */
+    @Expose
     private final String name;
 
     /** The location of this repository */
+    @Expose
     private final URI uri;
 
     /** The cached artifact entries */
