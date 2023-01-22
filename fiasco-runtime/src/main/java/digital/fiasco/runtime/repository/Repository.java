@@ -90,15 +90,19 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.desc
  *
  * @author Jonathan Locke
  */
-@SuppressWarnings("unused")
 public interface Repository extends
     Repeater,
     Named
 {
-    enum InstallResult
+    enum InstallationResult
     {
+        /** The artifact was successfully installed */
         INSTALLED,
+
+        /** The artifact was already installed */
         ALREADY_INSTALLED,
+
+        /** The artifact could not be installed */
         INSTALLATION_FAILED
     }
 
@@ -113,7 +117,7 @@ public interface Repository extends
      * @param artifact The artifact to install
      * @throws IllegalStateException Thrown if the artifact cannot be installed in this repository
      */
-    InstallResult installArtifact(Artifact<?> artifact);
+    InstallationResult installArtifact(Artifact<?> artifact);
 
     /**
      * Returns true if this repository is remote

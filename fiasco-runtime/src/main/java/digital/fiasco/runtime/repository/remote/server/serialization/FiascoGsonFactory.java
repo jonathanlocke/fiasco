@@ -10,7 +10,7 @@ import com.telenav.kivakit.serialization.gson.KivaKitCoreGsonFactory;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.ArtifactDescriptorConverter;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.repository.Repository.InstallResult;
+import digital.fiasco.runtime.repository.Repository.InstallationResult;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.local.cache.CacheRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
@@ -33,12 +33,12 @@ public class FiascoGsonFactory extends KivaKitCoreGsonFactory
     @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTED)
     public FiascoGsonFactory()
     {
+        addSerializer(new EnumConverter<>(InstallationResult.class));
         addSerializer(new EnumConverter<>(ArtifactAttachmentType.class));
         addSerializer(new ArtifactDescriptorConverter());
         addSerializer(new ArtifactListConverter());
         addSerializer(new ResourceIdentifierConverter());
         addSerializer(new KivaKitUtcTimeConverter());
-        addSerializer(new EnumConverter<>(InstallResult.class));
 
         addGsonTypeAdapterFactory(RuntimeTypeAdapterFactory
             .of(Repository.class, "type")

@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.remote.server.api.v0_9.install;
+package digital.fiasco.runtime.repository.remote.server.api.install;
 
 import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.microservice.microservlet.BaseMicroservletRequest;

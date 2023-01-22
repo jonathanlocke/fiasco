@@ -32,9 +32,9 @@ import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
 import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJson;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
-import static digital.fiasco.runtime.repository.Repository.InstallResult.ALREADY_INSTALLED;
-import static digital.fiasco.runtime.repository.Repository.InstallResult.INSTALLATION_FAILED;
-import static digital.fiasco.runtime.repository.Repository.InstallResult.INSTALLED;
+import static digital.fiasco.runtime.repository.Repository.InstallationResult.ALREADY_INSTALLED;
+import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLATION_FAILED;
+import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLED;
 
 /**
  * A repository of artifacts and their metadata on the local filesystem.
@@ -66,6 +66,7 @@ import static digital.fiasco.runtime.repository.Repository.InstallResult.INSTALL
  *
  * <ul>
  *     <li>{@link Repository#resolveArtifacts(Collection)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(String...)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -157,7 +158,7 @@ public class LocalRepository extends BaseRepository
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public InstallResult installArtifact(Artifact<?> artifact)
+    public InstallationResult installArtifact(Artifact<?> artifact)
     {
         return lock().write(() ->
         {
@@ -194,16 +195,16 @@ public class LocalRepository extends BaseRepository
     /**
      * Gets the artifacts for the given artifact descriptors
      *
-     * @param descriptors The artifact descriptors
+     * @param descriptorCollection The artifact descriptors
      * @return The artifacts
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public final ArtifactList resolveArtifacts(Collection<ArtifactDescriptor> collection)
+    public final ArtifactList resolveArtifacts(Collection<ArtifactDescriptor> descriptorCollection)
     {
         return lock().read(() ->
         {
-            var descriptors = list(collection);
+            var descriptors = list(descriptorCollection);
 
             // Find the artifacts that are in this repository,
             var resolvedArtifacts = resolve(descriptors);

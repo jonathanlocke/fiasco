@@ -16,7 +16,8 @@ public class FiascoClientServerTest extends FiascoTest
 
         var descriptors = descriptors(
             "library:com.telenav.kivakit:kivakit-core:1.8.5",
-            "library:com.telenav.kivakit:kivakit-core:1.8.5");
+            "library:com.telenav.kivakit:kivakit-core:1.8.5"
+        );
 
         for (var at : new FiascoClient().resolveArtifacts(descriptors))
         {

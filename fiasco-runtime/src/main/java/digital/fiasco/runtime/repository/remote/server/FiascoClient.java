@@ -7,10 +7,10 @@ import com.telenav.kivakit.settings.SettingsTrait;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
-import digital.fiasco.runtime.repository.Repository.InstallResult;
+import digital.fiasco.runtime.repository.Repository.InstallationResult;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
-import digital.fiasco.runtime.repository.remote.server.api.v0_9.resolve.ResolveArtifactRequest;
-import digital.fiasco.runtime.repository.remote.server.api.v0_9.resolve.ResolveArtifactResponse;
+import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactRequest;
+import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactResponse;
 
 import java.util.Collection;
 
@@ -31,7 +31,7 @@ public class FiascoClient extends BaseComponent implements SettingsTrait
      * @param artifact The artifact to install
      * @return The result of attempting to install the artifact
      */
-    public InstallResult installArtifact(Artifact<?> artifact)
+    public InstallationResult installArtifact(Artifact<?> artifact)
     {
         return null;
     }

@@ -32,6 +32,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
  *
  * <ul>
  *     <li>{@link Repository#resolveArtifacts(Collection)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(String...)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -72,7 +73,7 @@ public class RemoteRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public InstallResult installArtifact(Artifact<?> artifact)
+    public InstallationResult installArtifact(Artifact<?> artifact)
     {
         return new FiascoClient().installArtifact(artifact);
     }
@@ -96,6 +97,5 @@ public class RemoteRepository extends BaseRepository
     @Override
     protected void loadAllArtifactMetadata()
     {
-        unsupported();
     }
 }

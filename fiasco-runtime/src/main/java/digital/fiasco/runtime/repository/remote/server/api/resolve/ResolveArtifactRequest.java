@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.remote.server.api.v0_9.resolve;
+package digital.fiasco.runtime.repository.remote.server.api.resolve;
 
 import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.core.collections.list.ObjectList;

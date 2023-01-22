@@ -19,6 +19,7 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactContentSignatures;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
+import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.maven.resolver.MavenDependency;
 import digital.fiasco.runtime.repository.maven.resolver.MavenResolver;
 import org.eclipse.aether.repository.LocalRepository;
@@ -50,8 +51,8 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactContent.content
 import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.Library.library;
-import static digital.fiasco.runtime.repository.Repository.InstallResult.INSTALLATION_FAILED;
-import static digital.fiasco.runtime.repository.Repository.InstallResult.INSTALLED;
+import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLATION_FAILED;
+import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLED;
 
 /**
  * A basic Maven repository, either on the local machine or some remote resource folder. For remote URIs, repositories
@@ -68,6 +69,7 @@ import static digital.fiasco.runtime.repository.Repository.InstallResult.INSTALL
  *
  * <ul>
  *     <li>{@link #resolveArtifacts(Collection)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(String...)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -149,7 +151,7 @@ public class MavenRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public InstallResult installArtifact(Artifact<?> artifact)
+    public InstallationResult installArtifact(Artifact<?> artifact)
     {
         return lock().write(() ->
         {
@@ -190,7 +192,6 @@ public class MavenRepository extends BaseRepository
     @Override
     protected void loadAllArtifactMetadata()
     {
-        unsupported();
     }
 
     /**

@@ -2,8 +2,8 @@ package digital.fiasco.runtime.repository.remote.server;
 
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.microservice.protocols.rest.http.RestService;
-import digital.fiasco.runtime.repository.remote.server.api.v0_9.install.InstallArtifactRequest;
-import digital.fiasco.runtime.repository.remote.server.api.v0_9.resolve.ResolveArtifactRequest;
+import digital.fiasco.runtime.repository.remote.server.api.install.InstallArtifactRequest;
+import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactRequest;
 
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.network.http.HttpMethod.POST;

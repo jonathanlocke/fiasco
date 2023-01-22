@@ -14,6 +14,7 @@ import java.util.regex.Pattern;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
+import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
@@ -150,12 +151,7 @@ public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ObjectList<ArtifactDescriptor> descriptors(String... values)
     {
-        var descriptors = new ObjectList<ArtifactDescriptor>();
-        for (var at : values)
-        {
-            descriptors.add(descriptor(at));
-        }
-        return descriptors;
+        return stringList(values).map(ArtifactDescriptor::descriptor);
     }
 
     /**
