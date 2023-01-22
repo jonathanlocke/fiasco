@@ -1,19 +1,14 @@
-package digital.fiasco.runtime.serialization;
+package digital.fiasco.runtime.repository.remote.serialization;
 
 import com.google.gson.typeadapters.RuntimeTypeAdapterFactory;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.conversion.core.language.EnumConverter;
 import com.telenav.kivakit.conversion.core.time.kivakit.KivaKitUtcTimeConverter;
-import com.telenav.kivakit.core.messaging.Listener;
-import com.telenav.kivakit.core.time.Time;
-import com.telenav.kivakit.resource.ResourceIdentifier;
 import com.telenav.kivakit.resource.converters.ResourceIdentifierConverter;
-import com.telenav.kivakit.serialization.gson.factory.KivaKitCoreGsonFactory;
+import com.telenav.kivakit.serialization.gson.KivaKitCoreGsonFactory;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.ArtifactDescriptorConverter;
-import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.local.CacheRepository;
 import digital.fiasco.runtime.repository.local.LocalRepository;
@@ -34,17 +29,15 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 public class FiascoGsonFactory extends KivaKitCoreGsonFactory
 {
     @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTED)
-    public FiascoGsonFactory(Listener listener)
+    public FiascoGsonFactory()
     {
-        super(listener);
+        addSerializer(new EnumConverter<>(ArtifactAttachmentType.class));
+        addSerializer(new ArtifactDescriptorConverter());
+        addSerializer(new ArtifactListConverter());
+        addSerializer(new ResourceIdentifierConverter());
+        addSerializer(new KivaKitUtcTimeConverter());
 
-        addConvertingSerializer(ArtifactAttachmentType.class, new EnumConverter<>(this, ArtifactAttachmentType.class));
-        addConvertingSerializer(ArtifactDescriptor.class, new ArtifactDescriptorConverter(this));
-        addConvertingSerializer(ArtifactList.class, new ArtifactListConverter(this));
-        addConvertingSerializer(ResourceIdentifier.class, new ResourceIdentifierConverter(this));
-        addConvertingSerializer(Time.class, new KivaKitUtcTimeConverter());
-
-        addTypeAdapterFactory(RuntimeTypeAdapterFactory
+        addGsonTypeAdapterFactory(RuntimeTypeAdapterFactory
             .of(Repository.class, "type")
             .registerSubtype(MavenRepository.class)
             .registerSubtype(LocalRepository.class)

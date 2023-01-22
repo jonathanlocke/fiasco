@@ -29,7 +29,7 @@ import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.build.execution.BuildExecutor;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
-import digital.fiasco.runtime.serialization.FiascoGsonFactory;
+import digital.fiasco.runtime.repository.remote.serialization.FiascoGsonFactory;
 
 import java.util.Set;
 
@@ -231,7 +231,7 @@ public abstract class BaseBuild extends Application implements Build
         var root = newBuilder().withArtifactDescriptor(metadata.descriptor());
 
         // configure and run the build,
-        var results = listenTo(new BuildExecutor(onConfigureBuild(root))). build();
+        var results = listenTo(new BuildExecutor(onConfigureBuild(root))).build();
 
         // then show the results.
         var problems = _0;
@@ -246,7 +246,7 @@ public abstract class BaseBuild extends Application implements Build
     @Override
     protected void onSerializationInitialize()
     {
-        register(new FiascoGsonFactory(this));
+        register(new FiascoGsonFactory());
     }
 
     /**

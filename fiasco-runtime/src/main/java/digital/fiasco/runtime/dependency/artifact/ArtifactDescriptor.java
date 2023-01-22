@@ -205,9 +205,9 @@ public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
 
     public static class ArtifactDescriptorConverter extends BaseStringConverter<ArtifactDescriptor>
     {
-        public ArtifactDescriptorConverter(Listener listener)
+        public ArtifactDescriptorConverter()
         {
-            super(listener, ArtifactDescriptor.class);
+            super(throwingListener(), ArtifactDescriptor.class);
         }
 
         @Override

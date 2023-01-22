@@ -8,7 +8,7 @@ import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
 import digital.fiasco.runtime.dependency.artifact.Asset;
 import digital.fiasco.runtime.dependency.artifact.Library;
-import digital.fiasco.runtime.serialization.FiascoGsonFactory;
+import digital.fiasco.runtime.repository.remote.serialization.FiascoGsonFactory;
 
 import static com.telenav.kivakit.core.os.Console.console;
 import static com.telenav.kivakit.filesystem.File.file;
@@ -24,7 +24,7 @@ public class FiascoTest extends UnitTest
 {
     public FiascoTest()
     {
-        register(new FiascoGsonFactory(this));
+        register(new FiascoGsonFactory());
     }
 
     protected ArtifactContent badPackageContent()

@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.serialization;
 
 import digital.fiasco.runtime.FiascoTest;
+import digital.fiasco.runtime.repository.remote.serialization.ArtifactConverter;
 import org.junit.Test;
 
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
