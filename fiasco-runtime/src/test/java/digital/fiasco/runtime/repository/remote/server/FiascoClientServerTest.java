@@ -1,27 +1,32 @@
 package digital.fiasco.runtime.repository.remote.server;
 
 import com.telenav.kivakit.core.thread.KivaKitThread;
+import com.telenav.kivakit.settings.SettingsTrait;
 import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptors;
+import static digital.fiasco.runtime.repository.remote.server.FiascoClient.fiascoClient;
 
-public class FiascoClientServerTest extends FiascoTest
+public class FiascoClientServerTest extends FiascoTest implements SettingsTrait
 {
     @Test
     public void test()
     {
-        KivaKitThread.run(this, "test", () ->
-            FiascoServer.main(new String[] { "-port=" + 8080 }));
+        startServer();
 
-        var descriptors = descriptors(
-            "library:com.telenav.kivakit:kivakit-core:1.8.5",
-            "library:com.telenav.kivakit:kivakit-core:1.8.5"
-        );
-
-        for (var at : new FiascoClient().resolveArtifacts(descriptors))
+        for (var at : fiascoClient().resolveArtifacts(kivakitAssets().asArtifactDescriptors()))
         {
             println("-> " + at);
         }
+    }
+
+    private void startServer()
+    {
+        registerSettings(new FiascoServerSettings()
+            .server(true)
+            .port(8080));
+
+        KivaKitThread.run(this, "test", () ->
+            FiascoServer.main(new String[] {}));
     }
 }

@@ -6,10 +6,10 @@ import com.telenav.kivakit.microservice.microservlet.BaseMicroservletRequest;
 import com.telenav.kivakit.microservice.microservlet.MicroservletResponse;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.repository.local.LocalRepository;
+import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
-import java.io.InputStream;
-import java.util.Collection;
+import java.util.List;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 
@@ -18,8 +18,7 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  *
  * <p>
  * A running {@link FiascoServer} will respond to a JSON {@link ResolveArtifactRequest} with a
- * {@link ResolveArtifactResponse}, containing the metadata for the subsequent content, which follows in the response
- * {@link InputStream}.
+ * {@link ResolveArtifactResponse}.
  * </p>
  *
  * <p><b>Descriptors</b></p>
@@ -28,15 +27,23 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  *     <li>{@link #descriptors()}</li>
  * </ul>
  *
+ * <p><b>Performance</b></p>
+ *
+ * <p>
+ * {@link ResolveArtifactRequest} allows the {@link FiascoClient} to resolve multiple {@link ArtifactDescriptor}s
+ * in a single request.
+ * </p>
+ *
  * @author Jonathan Locke
+ * @see ResolveArtifactResponse
  */
 public class ResolveArtifactRequest extends BaseMicroservletRequest
 {
     /** The artifacts to retrieve */
     @Expose
-    private final Collection<ArtifactDescriptor> descriptors;
+    private final List<ArtifactDescriptor> descriptors;
 
-    public ResolveArtifactRequest(Collection<ArtifactDescriptor> descriptors)
+    public ResolveArtifactRequest(List<ArtifactDescriptor> descriptors)
     {
         this.descriptors = descriptors;
     }

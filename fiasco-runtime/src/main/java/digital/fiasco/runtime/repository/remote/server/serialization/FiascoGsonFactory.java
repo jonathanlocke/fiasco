@@ -7,6 +7,7 @@ import com.telenav.kivakit.conversion.core.language.EnumConverter;
 import com.telenav.kivakit.conversion.core.time.kivakit.KivaKitUtcTimeConverter;
 import com.telenav.kivakit.resource.converters.ResourceIdentifierConverter;
 import com.telenav.kivakit.serialization.gson.KivaKitCoreGsonFactory;
+import com.telenav.kivakit.serialization.gson.serializers.primitive.ByteArrayGsonSerializer;
 import digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType;
 import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.ArtifactDescriptorConverter;
 import digital.fiasco.runtime.repository.Repository;
@@ -39,6 +40,7 @@ public class FiascoGsonFactory extends KivaKitCoreGsonFactory
         addSerializer(new ArtifactListConverter());
         addSerializer(new ResourceIdentifierConverter());
         addSerializer(new KivaKitUtcTimeConverter());
+        addSerializer(new ByteArrayGsonSerializer());
 
         addGsonTypeAdapterFactory(RuntimeTypeAdapterFactory
             .of(Repository.class, "type")

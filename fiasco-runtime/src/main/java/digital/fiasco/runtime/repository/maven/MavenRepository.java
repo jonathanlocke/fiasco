@@ -1,7 +1,6 @@
 package digital.fiasco.runtime.repository.maven;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
@@ -26,7 +25,7 @@ import org.eclipse.aether.repository.LocalRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
-import java.util.Collection;
+import java.util.List;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
@@ -68,7 +67,7 @@ import static digital.fiasco.runtime.repository.Repository.InstallationResult.IN
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(Collection)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link #resolveArtifacts(List)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  *     <li>{@link Repository#resolveArtifacts(String...)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
@@ -184,7 +183,7 @@ public class MavenRepository extends BaseRepository
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public ArtifactList resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
+    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors)
     {
         return resolveArtifacts(list(descriptors), artifacts());
     }
@@ -250,7 +249,7 @@ public class MavenRepository extends BaseRepository
     private ArtifactContent mavenReadContent(ArtifactAttachment attachment)
     {
         var resource = mavenResource(rootFolder, attachment, null);
-        if (resource.exists())
+        if (true) //resource.exists())
         {
             var type = attachment.attachmentType();
             var asc = mavenResource(rootFolder, attachment.withType(type), ASC).reader().readText();
@@ -372,7 +371,7 @@ public class MavenRepository extends BaseRepository
         return mavenReadContent(attachment(type).withArtifact(artifact));
     }
 
-    private ArtifactList resolveArtifacts(ObjectList<ArtifactDescriptor> descriptors,
+    private ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors,
                                           ArtifactList resolvedFinal)
     {
         return lock().read(() ->

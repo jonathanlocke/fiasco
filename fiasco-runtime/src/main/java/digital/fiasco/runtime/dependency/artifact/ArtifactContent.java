@@ -33,12 +33,13 @@ public record ArtifactContent
         @FormatProperty @Expose ResourceIdentifier resourceIdentifier,
         @FormatProperty @Expose long offset,
         @FormatProperty @Expose Time lastModified,
-        @FormatProperty @Expose Bytes size
+        @FormatProperty @Expose Bytes size,
+        @FormatProperty @Expose byte[] data
     )
 {
     public static ArtifactContent content()
     {
-        return new ArtifactContent(null, null, null, -1, null, null);
+        return new ArtifactContent(null, null, null, -1, null, null, null);
     }
 
     public Resource resource()
@@ -60,7 +61,7 @@ public record ArtifactContent
      */
     public ArtifactContent withLastModified(Time lastModified)
     {
-        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
+        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size, null);
     }
 
     /**
@@ -71,7 +72,7 @@ public record ArtifactContent
      */
     public ArtifactContent withName(String name)
     {
-        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
+        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size, data);
     }
 
     /**
@@ -82,7 +83,7 @@ public record ArtifactContent
      */
     public ArtifactContent withOffset(long offset)
     {
-        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
+        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size, data);
     }
 
     /**
@@ -93,7 +94,10 @@ public record ArtifactContent
      */
     public ArtifactContent withResource(Resource resource)
     {
-        return new ArtifactContent(name, signatures, resource == null ? null : resource.identifier(), offset, lastModified, size);
+        var data = resource.reader().readBytes();
+        return new ArtifactContent(name, signatures, resource == null
+            ? null
+            : resource.identifier(), offset, lastModified, size, data);
     }
 
     /**
@@ -104,7 +108,7 @@ public record ArtifactContent
      */
     public ArtifactContent withSignatures(ArtifactContentSignatures signatures)
     {
-        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
+        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size, data);
     }
 
     /**
@@ -115,6 +119,6 @@ public record ArtifactContent
      */
     public ArtifactContent withSize(Bytes size)
     {
-        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
+        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size, data);
     }
 }

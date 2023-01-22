@@ -1,27 +1,27 @@
 package digital.fiasco.runtime.repository.remote.server.api.resolve;
 
 import com.google.gson.annotations.Expose;
-import com.telenav.kivakit.core.progress.ProgressReporter;
 import com.telenav.kivakit.microservice.microservlet.BaseMicroservletResponse;
-import com.telenav.kivakit.resource.writing.WritableResource;
-import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
-import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.ArtifactList;
-
-import java.io.InputStream;
-
-import static com.telenav.kivakit.resource.CloseMode.LEAVE_OPEN;
-import static com.telenav.kivakit.resource.WriteMode.STREAM;
+import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 
 /**
- * The response to a {@link ResolveArtifactRequest}, containing the {@link ArtifactContent} metadata for each artifact
- * requested. The artifact content data follows the response in the {@link InputStream}.
+ * The response to a {@link ResolveArtifactRequest}, containing a list of artifacts complete with content attachments
+ * encoded in Base64.
  *
  * <p><b>Artifacts</b></p>
  *
  * <ul>
  *     <li>{@link #artifacts()}</li>
  * </ul>
+ *
+ * <p><b>Performance</b></p>
+ *
+ * <p>
+ * {@link ResolveArtifactRequest} allows the {@link FiascoClient} to resolve multiple {@link ArtifactDescriptor}s
+ * in a single request.
+ * </p>
  *
  * @author Jonathan Locke
  */
@@ -43,29 +43,5 @@ public class ResolveArtifactResponse extends BaseMicroservletResponse
     public ArtifactList artifacts()
     {
         return artifacts;
-    }
-
-    /**
-     * Writes the artifacts in the response to the given output resource
-     *
-     * @param response The response
-     * @param target The output resource
-     * @param reporter The reporter to report progress
-     */
-    private void writeArtifacts(ResolveArtifactResponse response, WritableResource target, ProgressReporter reporter)
-    {
-        // For each artifact,
-        for (var artifact : response.artifacts())
-        {
-            // and each attached piece of content,
-            for (var attachment : artifact.attachments())
-            {
-                // and copy it back to the requester.
-                ((ArtifactAttachment) attachment)
-                    .content()
-                    .resource()
-                    .copyTo(target, STREAM, LEAVE_OPEN, reporter);
-            }
-        }
     }
 }

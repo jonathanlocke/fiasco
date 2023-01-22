@@ -14,7 +14,7 @@ import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
 import java.net.URI;
-import java.util.Collection;
+import java.util.List;
 
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptors;
 
@@ -79,7 +79,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.desc
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(Collection)} - Resolves the given descriptors to a collection of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link #resolveArtifacts(List)} - Resolves the given descriptors to a collection of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -136,7 +136,7 @@ public interface Repository extends
      * @return The resolved artifacts
      * @throws IllegalArgumentException Thrown if any descriptor cannot be resolved
      */
-    ArtifactList resolveArtifacts(Collection<ArtifactDescriptor> descriptors);
+    ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors);
 
     /**
      * Convenience method to resolve a list of descriptors

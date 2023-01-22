@@ -11,7 +11,6 @@ import digital.fiasco.runtime.dependency.artifact.Asset;
 import digital.fiasco.runtime.dependency.artifact.Library;
 import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;
 
-import static com.telenav.kivakit.core.os.Console.console;
 import static com.telenav.kivakit.filesystem.File.file;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
@@ -167,11 +166,6 @@ public class FiascoTest extends UnitTest
             .withOffset(0)
             .withName(resource.fileName().name())
             .withSignatures(signatures());
-    }
-
-    protected void println(String message, Object... arguments)
-    {
-        console().println(message, arguments);
     }
 
     protected ArtifactContentSignatures signatures()

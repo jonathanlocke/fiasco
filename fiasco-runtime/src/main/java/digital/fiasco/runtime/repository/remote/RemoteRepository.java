@@ -11,7 +11,7 @@ import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
 import java.net.URI;
-import java.util.Collection;
+import java.util.List;
 
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
@@ -31,7 +31,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link Repository#resolveArtifacts(Collection)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(List)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  *     <li>{@link Repository#resolveArtifacts(String...)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
@@ -88,7 +88,7 @@ public class RemoteRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public ArtifactList resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
+    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors)
     {
         // Return resolved artifacts for the given descriptors
         return new FiascoClient().resolveArtifacts(descriptors);

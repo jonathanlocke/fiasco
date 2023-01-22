@@ -18,7 +18,7 @@ import digital.fiasco.runtime.repository.local.cache.CacheRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
-import java.util.Collection;
+import java.util.List;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
@@ -65,7 +65,7 @@ import static digital.fiasco.runtime.repository.Repository.InstallationResult.IN
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link Repository#resolveArtifacts(Collection)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(List)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  *     <li>{@link Repository#resolveArtifacts(String...)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
@@ -200,7 +200,7 @@ public class LocalRepository extends BaseRepository
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public final ArtifactList resolveArtifacts(Collection<ArtifactDescriptor> descriptorCollection)
+    public final ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptorCollection)
     {
         return lock().read(() ->
         {

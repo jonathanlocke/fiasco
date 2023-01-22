@@ -12,7 +12,7 @@ import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactRequest;
 import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactResponse;
 
-import java.util.Collection;
+import java.util.List;
 
 import static com.telenav.kivakit.network.core.LocalHost.localhost;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptors;
@@ -21,10 +21,25 @@ import static digital.fiasco.runtime.repository.remote.server.FiascoRestService.
 /**
  * Client that resolves requests to a {@link RemoteRepository} using the Fiasco repository protocol over HTTPS.
  *
+ * <p><b>Performance</b></p>
+ *
+ * <p>
+ * {@link ResolveArtifactRequest} allows the {@link FiascoClient} to resolve multiple {@link ArtifactDescriptor}s in a
+ * single request.
+ * </p>
+ *
  * @author Jonathan Locke
  */
 public class FiascoClient extends BaseComponent implements SettingsTrait
 {
+    /**
+     * Returns an instance of {@link FiascoClient}
+     */
+    public static FiascoClient fiascoClient()
+    {
+        return new FiascoClient();
+    }
+
     /**
      * Installs the given artifact on the {@link FiascoServer} specified in {@link FiascoServerSettings}
      *
@@ -55,16 +70,16 @@ public class FiascoClient extends BaseComponent implements SettingsTrait
      * @param descriptors The artifact descriptors
      * @return The list of resolved artifacts
      */
-    public ArtifactList resolveArtifacts(Collection<ArtifactDescriptor> descriptors)
+    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors)
     {
         // Get the port and version of the Fiasco server,
         var port = localhost().http(requireSettings(FiascoServerSettings.class).port());
 
         // create a client to talk to the microservice REST API,
-        var client = listenTo(new RestClient(new GsonObjectSerializer(), port, fiascoApiVersion()));
+        var restClient = listenTo(new RestClient(new GsonObjectSerializer(), port, fiascoApiVersion()));
 
         // then issue a divide request and read the response,
-        var response = client.post("0.9.0/resolve-artifacts",
+        var response = restClient.post("0.9.0/resolve-artifacts",
             ResolveArtifactResponse.class, new ResolveArtifactRequest(descriptors));
 
         // then show the response.
