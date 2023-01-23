@@ -79,7 +79,7 @@ public class FiascoClient extends BaseComponent implements SettingsTrait
         var restClient = listenTo(new RestClient(new GsonObjectSerializer(), port, fiascoApiVersion()));
 
         // then issue a divide request and read the response,
-        var response = restClient.post("0.9.0/resolve-artifacts",
+        var response = restClient.post("/api/0.9.0/resolve-artifacts",
             ResolveArtifactResponse.class, new ResolveArtifactRequest(descriptors));
 
         // then show the response.
