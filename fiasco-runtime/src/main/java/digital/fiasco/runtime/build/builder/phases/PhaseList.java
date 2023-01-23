@@ -2,6 +2,7 @@ package digital.fiasco.runtime.build.builder.phases;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
+import com.telenav.kivakit.core.collections.map.StringMap;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Iterator;
@@ -48,7 +49,7 @@ public class PhaseList implements Iterable<Phase>
     private final ObjectMap<Class<? extends Phase>, Boolean> phaseEnabled = new ObjectMap<>();
 
     /** Maps from the name of a phase to the {@link Phase} object */
-    private final ObjectMap<String, Phase> nameToPhase = new ObjectMap<>();
+    private final StringMap<Phase> nameToPhase = new StringMap<>();
 
     /**
      * Adds the given phase to this list
