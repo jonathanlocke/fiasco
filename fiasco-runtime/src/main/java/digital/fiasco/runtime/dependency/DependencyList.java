@@ -22,6 +22,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
+import java.util.List;
+import java.util.ListIterator;
 import java.util.function.Function;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
@@ -31,6 +33,7 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_INSUFFICIENT;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_NOT_NEEDED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static digital.fiasco.runtime.dependency.artifact.AssetList.assets;
 import static digital.fiasco.runtime.dependency.artifact.LibraryList.libraries;
 
@@ -93,6 +96,7 @@ import static digital.fiasco.runtime.dependency.artifact.LibraryList.libraries;
         stability = STABILITY_UNDETERMINED
     )
 public class DependencyList<D extends Dependency, L extends DependencyList<D, L>> implements
+    List<D>,
     Iterable<D>,
     Sized
 {
@@ -140,6 +144,31 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     protected DependencyList(Collection<D> dependencies)
     {
         this.dependencies.addAll(dependencies);
+    }
+
+    @Override
+    public void add(int index, D element)
+    {
+        unsupported();
+    }
+
+    @Override
+    public boolean add(D d)
+    {
+        unsupported();
+        return false;
+    }
+
+    @Override
+    public boolean addAll(@NotNull Collection<? extends D> c)
+    {
+        return false;
+    }
+
+    @Override
+    public boolean addAll(int index, @NotNull Collection<? extends D> c)
+    {
+        return false;
     }
 
     /**
@@ -228,6 +257,12 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
         return dependencies.asStringList();
     }
 
+    @Override
+    public void clear()
+    {
+
+    }
+
     /**
      * Returns true if this list contains the given dependency
      *
@@ -239,6 +274,13 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
         return dependencies.contains(dependency);
     }
 
+    @Override
+    public boolean contains(Object that)
+    {
+        unsupported();
+        return false;
+    }
+
     /**
      * Returns true if this dependency list contains all the dependencies in the given list
      */
@@ -246,6 +288,13 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     public boolean containsAll(L dependencies)
     {
         return this.dependencies.containsAll(dependencies.dependencies);
+    }
+
+    @Override
+    public boolean containsAll(@NotNull Collection<?> that)
+    {
+        unsupported();
+        return false;
     }
 
     /**
@@ -325,6 +374,7 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
      * @return The dependency at the given index
      * @throws IndexOutOfBoundsException if the index is out of range ({@code index < 0 || index >= size()})
      */
+    @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public D get(int index)
     {
@@ -339,6 +389,18 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     public int hashCode()
     {
         return dependencies.sorted().hashCode();
+    }
+
+    @Override
+    public int indexOf(Object that)
+    {
+        return unsupported();
+    }
+
+    @Override
+    public boolean isEmpty()
+    {
+        return dependencies.isEmpty();
     }
 
     /**
@@ -373,6 +435,26 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
         return dependencies.last();
     }
 
+    @Override
+    public int lastIndexOf(Object that)
+    {
+        return unsupported();
+    }
+
+    @NotNull
+    @Override
+    public ListIterator<D> listIterator()
+    {
+        return unsupported();
+    }
+
+    @NotNull
+    @Override
+    public ListIterator<D> listIterator(int index)
+    {
+        return unsupported();
+    }
+
     /**
      * Maps the dependencies in this list to values in an object list
      *
@@ -398,6 +480,39 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
         return copy;
     }
 
+    @Override
+    public D remove(int index)
+    {
+        return unsupported();
+    }
+
+    @Override
+    public boolean remove(Object that)
+    {
+        unsupported();
+        return false;
+    }
+
+    @Override
+    public boolean removeAll(@NotNull Collection<?> that)
+    {
+        unsupported();
+        return false;
+    }
+
+    @Override
+    public boolean retainAll(@NotNull Collection<?> that)
+    {
+        unsupported();
+        return false;
+    }
+
+    @Override
+    public D set(int index, D element)
+    {
+        return unsupported();
+    }
+
     /**
      * Returns the size of this list in elements
      */
@@ -417,6 +532,27 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     {
         var sorted = (L) dependencies(dependencies.sorted());
         return newList().with(sorted);
+    }
+
+    @NotNull
+    @Override
+    public List<D> subList(int fromIndex, int toIndex)
+    {
+        return unsupported();
+    }
+
+    @NotNull
+    @Override
+    public Object[] toArray()
+    {
+        return new Object[0];
+    }
+
+    @NotNull
+    @Override
+    public <T> T[] toArray(@NotNull T[] a)
+    {
+        return unsupported();
     }
 
     @Override

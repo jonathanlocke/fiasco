@@ -28,7 +28,7 @@ public class FiascoRestService extends RestService
     @Override
     public void onInitialize()
     {
-        mount(version("0.9.0"), "/resolve-artifacts", POST, ResolveArtifactRequest.class);
-        mount(version("0.9.0"), "/install-artifact", POST, InstallArtifactRequest.class);
+        mount(fiascoApiVersion(), "resolve-artifacts", POST, ResolveArtifactRequest.class);
+        mount(fiascoApiVersion(), "install-artifact", POST, InstallArtifactRequest.class);
     }
 }

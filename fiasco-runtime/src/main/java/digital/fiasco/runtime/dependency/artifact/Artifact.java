@@ -129,7 +129,9 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.
  */
 @SuppressWarnings("unused")
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
-public interface Artifact<A extends Artifact<A>> extends Dependency, AsString
+public interface Artifact<A extends Artifact<A>> extends
+    Dependency,
+    AsString
 {
     /**
      * Returns an artifact for a given JSON string

@@ -86,6 +86,11 @@ public class Library extends BaseArtifact<Library> implements RegistryTrait
         super(descriptor);
     }
 
+    public Library()
+    {
+        super((ArtifactDescriptor) null);
+    }
+
     protected Library(Library that)
     {
         super(that);

@@ -43,26 +43,6 @@
         <plugins>
 
             <plugin>
-                <groupId>com.telenav.cactus.metadata</groupId>
-                <artifactId>cactus-metadata-maven-plugin</artifactId>
-                <version>${utilities.cactus.metadata.version}</version>
-                <executions>
-                    <execution>
-                        <id>project-metadata</id>
-                        <phase>generate-resources</phase>
-                        <goals>
-                            <goal>project-information</goal>
-                            <goal>build-metadata</goal>
-                        </goals>
-                        <configuration>
-                            <buildPropertiesDestination>target/classes/FiascoServer-build.properties</buildPropertiesDestination>
-                            <projectPropertiesDestination>target/classes/FiascoServer-project.properties</projectPropertiesDestination>
-                        </configuration>
-                    </execution>
-                </executions>
-            </plugin>
-
-            <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-shade-plugin</artifactId>
                 <version>${maven.shade.plugin.version}</version>

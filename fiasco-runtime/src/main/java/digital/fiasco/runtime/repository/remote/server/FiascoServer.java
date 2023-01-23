@@ -2,11 +2,9 @@ package digital.fiasco.runtime.repository.remote.server;
 
 import com.telenav.kivakit.microservice.Microservice;
 import com.telenav.kivakit.microservice.MicroserviceMetadata;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.remote.server.api.install.InstallArtifactRequest;
 import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactRequest;
-import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactResponse;
 import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;
 
 import static digital.fiasco.runtime.repository.remote.server.FiascoRestService.fiascoApiVersion;
@@ -43,7 +41,10 @@ public class FiascoServer extends Microservice<Void>
     @Override
     public void onInitialize()
     {
-        register(new LocalRepository("server-repository"));
+        if (lookup(LocalRepository.class) == null)
+        {
+            register(new LocalRepository("server-repository"));
+        }
     }
 
     /**

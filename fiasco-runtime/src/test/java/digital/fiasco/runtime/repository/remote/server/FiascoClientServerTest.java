@@ -5,6 +5,7 @@ import com.telenav.kivakit.settings.SettingsTrait;
 import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;
 
+import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLED;
 import static digital.fiasco.runtime.repository.remote.server.FiascoClient.fiascoClient;
 
 public class FiascoClientServerTest extends FiascoTest implements SettingsTrait
@@ -22,11 +23,18 @@ public class FiascoClientServerTest extends FiascoTest implements SettingsTrait
 
     private void startServer()
     {
-        registerSettings(new FiascoServerSettings()
+        var repository = register(localRepository());
+        repository.clear();
+        ensure(repository.installArtifact(kivakitCore().withContent(packageContent())) == INSTALLED);
+        ensure(repository.installArtifact(kivakitIcons().withContent(packageContent())) == INSTALLED);
+        ensure(repository.installArtifact(kivakitLogos().withContent(packageContent())) == INSTALLED);
+
+        register(new FiascoServerSettings()
             .server(true)
             .port(8080));
 
-        KivaKitThread.run(this, "test", () ->
-            FiascoServer.main(new String[] {}));
+        var server = new FiascoServer();
+        KivaKitThread.run(this, "FiascoTest", () -> server.run(new String[] {}));
+        server.waitForReady();
     }
 }

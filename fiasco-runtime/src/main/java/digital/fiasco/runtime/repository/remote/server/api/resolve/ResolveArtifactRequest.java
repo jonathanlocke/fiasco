@@ -9,6 +9,7 @@ import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
@@ -45,7 +46,12 @@ public class ResolveArtifactRequest extends BaseMicroservletRequest
 
     public ResolveArtifactRequest(List<ArtifactDescriptor> descriptors)
     {
-        this.descriptors = descriptors;
+        this.descriptors = new ArrayList<>(descriptors);
+    }
+
+    public ResolveArtifactRequest()
+    {
+        this.descriptors = list();
     }
 
     /**

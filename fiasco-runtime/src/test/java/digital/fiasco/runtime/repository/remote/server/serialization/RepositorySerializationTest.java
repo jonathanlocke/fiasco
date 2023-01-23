@@ -1,9 +1,8 @@
 package digital.fiasco.runtime.repository.remote.server.serialization;
 
-import com.telenav.kivakit.filesystem.Folders;
 import digital.fiasco.runtime.FiascoTest;
-import digital.fiasco.runtime.repository.local.cache.CacheRepository;
 import digital.fiasco.runtime.repository.local.LocalRepository;
+import digital.fiasco.runtime.repository.local.cache.CacheRepository;
 import org.junit.Test;
 
 import static digital.fiasco.runtime.build.BuildRepositories.MAVEN_CENTRAL;
@@ -16,7 +15,7 @@ public class RepositorySerializationTest extends FiascoTest
     {
         testSerialization(MAVEN_CENTRAL);
         testSerialization(MAVEN_CENTRAL_STAGING);
-        testSerialization(new CacheRepository("cache", Folders.currentFolder()));
-        testSerialization(new LocalRepository("local", Folders.currentFolder()));
+        testSerialization(new CacheRepository("cache"));
+        testSerialization(new LocalRepository("local"));
     }
 }

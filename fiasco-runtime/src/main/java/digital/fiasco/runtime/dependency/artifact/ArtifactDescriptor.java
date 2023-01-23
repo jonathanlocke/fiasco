@@ -199,26 +199,6 @@ public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
         return null;
     }
 
-    public static class ArtifactDescriptorConverter extends BaseStringConverter<ArtifactDescriptor>
-    {
-        public ArtifactDescriptorConverter()
-        {
-            super(throwingListener(), ArtifactDescriptor.class);
-        }
-
-        @Override
-        protected String onToString(ArtifactDescriptor descriptor)
-        {
-            return descriptor.name();
-        }
-
-        @Override
-        protected ArtifactDescriptor onToValue(String text)
-        {
-            return descriptor(text);
-        }
-    }
-
     public Asset asAsset()
     {
         return asset(this);

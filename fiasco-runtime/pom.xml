@@ -218,7 +218,19 @@
                 <version>${utilities.cactus.metadata.version}</version>
                 <executions>
                     <execution>
-                        <id>project-metadata</id>
+                        <id>fiasco-server-metadata</id>
+                        <phase>generate-resources</phase>
+                        <goals>
+                            <goal>project-information</goal>
+                            <goal>build-metadata</goal>
+                        </goals>
+                        <configuration>
+                            <buildPropertiesDestination>target/classes/FiascoServer-build.properties</buildPropertiesDestination>
+                            <projectPropertiesDestination>target/classes/FiascoServer-project.properties</projectPropertiesDestination>
+                        </configuration>
+                    </execution>
+                    <execution>
+                        <id>fiasco-runtime-metadata</id>
                         <phase>generate-resources</phase>
                         <goals>
                             <goal>project-information</goal>

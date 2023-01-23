@@ -21,13 +21,13 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.desc
  *
  * @author Jonathan Locke
  */
-@SuppressWarnings("rawtypes")
+@SuppressWarnings({ "rawtypes", "unchecked" })
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
-public class ArtifactConverter extends BaseStringConverter<Artifact>
+public class ArtifactConverter<T extends Artifact> extends BaseStringConverter<T>
 {
     public ArtifactConverter(Listener listener)
     {
-        super(listener, Artifact.class);
+        super(listener, (Class<T>) Artifact.class);
     }
 
     public ArtifactConverter()
@@ -56,9 +56,9 @@ public class ArtifactConverter extends BaseStringConverter<Artifact>
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTING_INSUFFICIENT)
-    protected Artifact<?> onToValue(String text)
+    protected T onToValue(String text)
     {
         var descriptor = descriptor(text);
-        return newInstance(descriptor.type(), ArtifactDescriptor.class, descriptor);
+        return (T) newInstance(descriptor.type(), ArtifactDescriptor.class, descriptor);
     }
 }

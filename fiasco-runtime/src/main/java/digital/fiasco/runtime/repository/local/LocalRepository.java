@@ -3,6 +3,7 @@ package digital.fiasco.runtime.repository.local;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.object.Lazy;
+import com.telenav.kivakit.core.registry.Register;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.resource.resources.StringResource;
@@ -82,6 +83,7 @@ import static digital.fiasco.runtime.repository.Repository.InstallationResult.IN
  */
 @SuppressWarnings({ "unused", "SameParameterValue" })
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
+@Register
 public class LocalRepository extends BaseRepository
 {
     /** Separator to use between artifact entries in the artifacts.txt file */

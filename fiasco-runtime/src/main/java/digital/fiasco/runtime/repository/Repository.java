@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.repository;
 
 import com.telenav.kivakit.core.messaging.Repeater;
+import com.telenav.kivakit.core.registry.Register;
 import com.telenav.kivakit.interfaces.naming.Named;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
@@ -90,6 +91,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.desc
  *
  * @author Jonathan Locke
  */
+@Register
 public interface Repository extends
     Repeater,
     Named

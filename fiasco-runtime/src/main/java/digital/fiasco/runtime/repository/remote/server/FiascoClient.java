@@ -11,9 +11,11 @@ import digital.fiasco.runtime.repository.Repository.InstallationResult;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactRequest;
 import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactResponse;
+import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;
 
 import java.util.List;
 
+import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.network.core.LocalHost.localhost;
 import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptors;
 import static digital.fiasco.runtime.repository.remote.server.FiascoRestService.fiascoApiVersion;
@@ -40,6 +42,11 @@ public class FiascoClient extends BaseComponent implements SettingsTrait
         return new FiascoClient();
     }
 
+    public FiascoClient()
+    {
+        register(new FiascoGsonFactory());
+    }
+
     /**
      * Installs the given artifact on the {@link FiascoServer} specified in {@link FiascoServerSettings}
      *
@@ -48,7 +55,7 @@ public class FiascoClient extends BaseComponent implements SettingsTrait
      */
     public InstallationResult installArtifact(Artifact<?> artifact)
     {
-        return null;
+        return unsupported();
     }
 
     /**
@@ -73,13 +80,15 @@ public class FiascoClient extends BaseComponent implements SettingsTrait
     public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors)
     {
         // Get the port and version of the Fiasco server,
-        var port = localhost().http(requireSettings(FiascoServerSettings.class).port());
+        var port = localhost()
+            .http(requireSettings(FiascoServerSettings.class)
+                .port());
 
         // create a client to talk to the microservice REST API,
         var restClient = listenTo(new RestClient(new GsonObjectSerializer(), port, fiascoApiVersion()));
 
         // then issue a divide request and read the response,
-        var response = restClient.post("/api/0.9.0/resolve-artifacts",
+        var response = restClient.post("resolve-artifacts/pretty/true",
             ResolveArtifactResponse.class, new ResolveArtifactRequest(descriptors));
 
         // then show the response.

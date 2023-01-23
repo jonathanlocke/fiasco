@@ -83,6 +83,11 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
         super(descriptor);
     }
 
+    public Asset()
+    {
+        super((ArtifactDescriptor) null);
+    }
+
     @MethodQuality
         (
             audience = AUDIENCE_INTERNAL,

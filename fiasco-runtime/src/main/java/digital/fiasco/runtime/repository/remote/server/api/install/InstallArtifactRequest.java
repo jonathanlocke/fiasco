@@ -30,6 +30,11 @@ public class InstallArtifactRequest extends BaseMicroservletRequest
         this.artifact = artifact;
     }
 
+    public InstallArtifactRequest()
+    {
+        this.artifact = null;
+    }
+
     @Override
     public MicroservletResponse onRespond()
     {

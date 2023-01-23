@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
+import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.thread.locks.ReadWriteLock;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
@@ -17,7 +18,7 @@ import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
 import java.net.URI;
-import java.util.Collection;
+import java.util.List;
 import java.util.Objects;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
@@ -90,7 +91,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link Repository#resolveArtifacts(Collection)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(List)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -110,10 +111,12 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
 {
     /** The name of this repository */
     @Expose
+    @FormatProperty
     private final String name;
 
     /** The location of this repository */
     @Expose
+    @FormatProperty
     private final URI uri;
 
     /** The cached artifact entries */
@@ -210,7 +213,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
         return lock;
     }
 
-    protected ArtifactList resolve(Iterable<ArtifactDescriptor> descriptors)
+    protected ArtifactList resolve(List<ArtifactDescriptor> descriptors)
     {
         return lock().read(() ->
         {
