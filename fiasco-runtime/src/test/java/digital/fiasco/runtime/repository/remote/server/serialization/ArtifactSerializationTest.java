@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.repository.remote.server.serialization;
 
 import digital.fiasco.runtime.FiascoTest;
+import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.repository.remote.server.serialization.converters.ArtifactConverter;
 import org.junit.Test;
 
@@ -12,7 +13,7 @@ public class ArtifactSerializationTest extends FiascoTest
     @Test
     public void testArtifactConverter()
     {
-        var converter = new ArtifactConverter();
+        var converter = new ArtifactConverter<>(Artifact.class);
         ensureThrows(() -> converter.convert("wonky/com.telenav.kivakit:kivakit-core:1.0.0"));
         ensureEqual(converter.convert(kivakitCore().name()), kivakitCore());
         ensureEqual(converter.convert(kivakitIcons().name()), kivakitIcons());

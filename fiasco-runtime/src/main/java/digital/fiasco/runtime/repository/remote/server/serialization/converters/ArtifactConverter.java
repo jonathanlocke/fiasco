@@ -25,14 +25,14 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.desc
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public class ArtifactConverter<T extends Artifact> extends BaseStringConverter<T>
 {
-    public ArtifactConverter(Listener listener)
+    public ArtifactConverter(Listener listener, Class<T> type)
     {
-        super(listener, (Class<T>) Artifact.class);
+        super(listener, type);
     }
 
-    public ArtifactConverter()
+    public ArtifactConverter(Class<T> type)
     {
-        this(throwingListener());
+        this(throwingListener(), type);
     }
 
     /**

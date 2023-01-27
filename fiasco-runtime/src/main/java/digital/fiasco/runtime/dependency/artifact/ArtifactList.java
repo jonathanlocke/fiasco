@@ -11,6 +11,7 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 
 /**
  * A list of {@link Artifact}s ({@link Library}s or {@link Asset}s).
@@ -109,6 +110,16 @@ public class ArtifactList extends DependencyList<Artifact, ArtifactList>
     protected ArtifactList(Collection<Artifact> artifacts)
     {
         super(artifacts);
+    }
+
+    public String toJson()
+    {
+        var artifacts = stringList();
+        for (var at : sorted())
+        {
+            artifacts.add(at.toJson());
+        }
+        return artifacts.join("\n");
     }
 
     @Override

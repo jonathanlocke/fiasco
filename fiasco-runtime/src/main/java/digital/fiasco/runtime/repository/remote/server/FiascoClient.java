@@ -94,6 +94,6 @@ public class FiascoClient extends BaseComponent implements SettingsTrait
         // then show the response.
         trace("response => $", response);
 
-        return response.artifacts();
+        return response != null ? response.artifacts() : null;
     }
 }

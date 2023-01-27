@@ -34,7 +34,7 @@ public class ArtifactListConverter extends BaseStringConverter<ArtifactList>
     @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTED)
     protected String onToString(ArtifactList artifactList)
     {
-        var artifactConverter = new ArtifactConverter<Artifact<?>>();
+        var artifactConverter = new ArtifactConverter<>(Artifact.class);
         var text = stringList();
         for (var artifact : artifactList)
         {
@@ -55,7 +55,7 @@ public class ArtifactListConverter extends BaseStringConverter<ArtifactList>
 
         if (!text.isBlank())
         {
-            var artifactConverter = new ArtifactConverter<Artifact<?>>();
+            var artifactConverter = new ArtifactConverter<>(Artifact.class);
             var descriptors = splitOnPattern(text, "\\s*,\\s*");
 
             for (var at : descriptors)
