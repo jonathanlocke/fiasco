@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.dependency.artifact;
+package digital.fiasco.runtime.dependency.artifact.descriptor;
 
 import com.telenav.kivakit.core.version.Version;
 import digital.fiasco.runtime.FiascoTest;

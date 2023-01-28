@@ -3,7 +3,7 @@ package digital.fiasco.runtime.dependency.artifact.lists;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
-import digital.fiasco.runtime.dependency.DependencyList;
+import digital.fiasco.runtime.dependency.collections.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
 import digital.fiasco.runtime.dependency.artifact.artifacts.Library;

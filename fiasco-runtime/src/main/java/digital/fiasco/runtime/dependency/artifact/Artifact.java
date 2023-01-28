@@ -13,7 +13,7 @@ import com.telenav.kivakit.resource.serialization.SerializableObject;
 import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.dependency.Dependency;
-import digital.fiasco.runtime.dependency.DependencyList;
+import digital.fiasco.runtime.dependency.collections.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
 import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
 import digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachment;

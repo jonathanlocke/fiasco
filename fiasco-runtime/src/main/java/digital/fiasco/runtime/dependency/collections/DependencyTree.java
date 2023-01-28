@@ -1,15 +1,14 @@
-package digital.fiasco.runtime.dependency.queue;
+package digital.fiasco.runtime.dependency.collections;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import digital.fiasco.runtime.dependency.Dependency;
-import digital.fiasco.runtime.dependency.DependencyList;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
-import static digital.fiasco.runtime.dependency.DependencyList.dependencies;
+import static digital.fiasco.runtime.dependency.collections.DependencyList.dependencies;
 
 /**
  * A tree of {@link Dependency}s with the root passed to the constructor.

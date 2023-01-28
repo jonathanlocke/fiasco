@@ -11,7 +11,8 @@ import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
 import digital.fiasco.runtime.dependency.artifact.lists.AssetList;
 import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
 import digital.fiasco.runtime.dependency.artifact.lists.LibraryList;
-import digital.fiasco.runtime.dependency.queue.DependencyTree;
+import digital.fiasco.runtime.dependency.collections.DependencyList;
+import digital.fiasco.runtime.dependency.collections.DependencyTree;
 import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
 

@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.dependency.artifact;
+package digital.fiasco.runtime.dependency.artifact.descriptor;
 
 import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;

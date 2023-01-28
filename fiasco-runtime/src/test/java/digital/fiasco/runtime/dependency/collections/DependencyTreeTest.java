@@ -1,9 +1,7 @@
-package digital.fiasco.runtime.dependency;
+package digital.fiasco.runtime.dependency.collections;
 
 import digital.fiasco.runtime.FiascoTest;
 import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
-import digital.fiasco.runtime.dependency.queue.DependencyQueue;
-import digital.fiasco.runtime.dependency.queue.DependencyTree;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

@@ -6,7 +6,7 @@ import com.telenav.kivakit.filesystem.Folder;
 import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
-import digital.fiasco.runtime.dependency.DependencyList;
+import digital.fiasco.runtime.dependency.collections.DependencyList;
 
 import static digital.fiasco.runtime.build.settings.BuildOption.DESCRIBE;
 

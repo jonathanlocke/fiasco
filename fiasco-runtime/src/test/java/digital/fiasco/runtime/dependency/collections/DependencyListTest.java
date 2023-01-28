@@ -1,10 +1,10 @@
-package digital.fiasco.runtime.dependency;
+package digital.fiasco.runtime.dependency.collections;
 
 import digital.fiasco.runtime.FiascoTest;
 import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.dependency.DependencyList.dependencies;
+import static digital.fiasco.runtime.dependency.collections.DependencyList.dependencies;
 
 public class DependencyListTest extends FiascoTest
 {

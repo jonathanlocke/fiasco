@@ -6,9 +6,9 @@ import com.telenav.kivakit.core.function.Result;
 import com.telenav.kivakit.core.language.trait.TryTrait;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.dependency.Dependency;
-import digital.fiasco.runtime.dependency.DependencyList;
-import digital.fiasco.runtime.dependency.queue.DependencyQueue;
-import digital.fiasco.runtime.dependency.queue.DependencyTree;
+import digital.fiasco.runtime.dependency.collections.DependencyList;
+import digital.fiasco.runtime.dependency.collections.DependencyQueue;
+import digital.fiasco.runtime.dependency.collections.DependencyTree;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
 

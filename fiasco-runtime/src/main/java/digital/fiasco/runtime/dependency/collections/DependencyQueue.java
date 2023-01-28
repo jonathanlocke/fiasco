@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.dependency.queue;
+package digital.fiasco.runtime.dependency.collections;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
@@ -10,7 +10,6 @@ import com.telenav.kivakit.core.time.Duration;
 import com.telenav.kivakit.core.value.count.Maximum;
 import com.telenav.kivakit.interfaces.time.WakeState;
 import digital.fiasco.runtime.dependency.Dependency;
-import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
@@ -26,7 +25,7 @@ import static com.telenav.kivakit.core.time.Duration.FOREVER;
 import static com.telenav.kivakit.core.time.Time.now;
 import static com.telenav.kivakit.core.value.count.Maximum.MAXIMUM;
 import static com.telenav.kivakit.core.value.count.Maximum._1;
-import static digital.fiasco.runtime.dependency.DependencyList.dependencies;
+import static digital.fiasco.runtime.dependency.collections.DependencyList.dependencies;
 
 /**
  * A queue that tracks the processing of dependencies by one or more processors.

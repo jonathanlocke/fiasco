@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.dependency.artifact;
+package digital.fiasco.runtime.dependency.artifact.artifacts;
 
 import digital.fiasco.runtime.FiascoTest;
 import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
