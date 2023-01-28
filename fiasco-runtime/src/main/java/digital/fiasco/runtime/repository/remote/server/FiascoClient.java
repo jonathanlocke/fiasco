@@ -1,23 +1,26 @@
 package digital.fiasco.runtime.repository.remote.server;
 
 import com.telenav.kivakit.component.BaseComponent;
+import com.telenav.kivakit.core.function.Functions;
+import com.telenav.kivakit.core.progress.ProgressReporter;
 import com.telenav.kivakit.microservice.protocols.rest.http.RestClient;
 import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
 import com.telenav.kivakit.settings.SettingsTrait;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
 import digital.fiasco.runtime.repository.Repository.InstallationResult;
+import digital.fiasco.runtime.repository.RepositoryContentReader;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
-import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactRequest;
+import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactsRequest;
 import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactResponse;
 import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;
 
 import java.util.List;
 
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
+import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressReporter;
 import static com.telenav.kivakit.network.core.LocalHost.localhost;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptors;
 import static digital.fiasco.runtime.repository.remote.server.FiascoRestService.fiascoApiVersion;
 
 /**
@@ -26,7 +29,7 @@ import static digital.fiasco.runtime.repository.remote.server.FiascoRestService.
  * <p><b>Performance</b></p>
  *
  * <p>
- * {@link ResolveArtifactRequest} allows the {@link FiascoClient} to resolve multiple {@link ArtifactDescriptor}s in a
+ * {@link ResolveArtifactsRequest} allows the {@link FiascoClient} to resolve multiple {@link ArtifactDescriptor}s in a
  * single request.
  * </p>
  *
@@ -60,40 +63,43 @@ public class FiascoClient extends BaseComponent implements SettingsTrait
 
     /**
      * Resolves the given artifact descriptors by posting a request to the {@link FiascoServer} specified in
-     * {@link FiascoServerSettings}
-     *
-     * @param descriptors The artifact descriptors
-     * @return The list of resolved artifacts
-     */
-    public ArtifactList resolveArtifacts(String... descriptors)
-    {
-        return resolveArtifacts(descriptors(descriptors));
-    }
-
-    /**
-     * Resolves the given artifact descriptors by posting a request to the {@link FiascoServer} specified in
-     * {@link FiascoServerSettings}
+     * {@link FiascoServerSettings}. No content is read.
      *
      * @param descriptors The artifact descriptors
      * @return The list of resolved artifacts
      */
     public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors)
     {
-        // Get the port and version of the Fiasco server,
-        var port = localhost()
-            .http(requireSettings(FiascoServerSettings.class)
-                .port());
+        return resolveArtifacts(descriptors, nullProgressReporter(), Functions::doNothing);
+    }
 
-        // create a client to talk to the microservice REST API,
+    /**
+     * Resolves the given artifact descriptors by posting a request to the {@link FiascoServer} specified in
+     * {@link FiascoServerSettings}. Content is read by the Repository content reader, and progress is reported by the
+     * given progress reporter.
+     *
+     * @param descriptors The artifact descriptors
+     * @param reporter The progress reporter
+     * @param reader The content reader
+     * @return The list of resolved artifacts
+     */
+    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors,
+                                         ProgressReporter reporter,
+                                         RepositoryContentReader reader)
+    {
+        // Get the port of the Fiasco server,
+        var port = localhost().http(requireSettings(FiascoServerSettings.class).port());
+
+        // create a client to talk to it via REST,
         var restClient = listenTo(new RestClient(new GsonObjectSerializer(), port, fiascoApiVersion()));
 
-        // then issue a divide request and read the response,
-        var response = restClient.post("resolve-artifacts/pretty/true",
-            ResolveArtifactResponse.class, new ResolveArtifactRequest(descriptors));
-
-        // then show the response.
+        // then issue a ResolveArtifactsRequest and read the response. The reader callback will be called with the
+        // input that trails the JSON header, in this case the artifact content).
+        var response = restClient.postAndReadContent("resolve-artifacts/pretty/true",
+            new ResolveArtifactsRequest(descriptors), ResolveArtifactResponse.class, reader::read);
         trace("response => $", response);
 
+        // If we got a response, then return the artifacts.
         return response != null ? response.artifacts() : null;
     }
 }

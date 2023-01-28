@@ -4,14 +4,14 @@ import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.function.Result;
 import com.telenav.kivakit.core.language.trait.TryTrait;
 import com.telenav.kivakit.interfaces.code.Callback;
-import digital.fiasco.runtime.build.BuildSettings;
+import digital.fiasco.runtime.build.settings.BuildSettingsObject;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.Dependency;
-import digital.fiasco.runtime.dependency.DependencyQueue;
-import digital.fiasco.runtime.dependency.DependencyTree;
+import digital.fiasco.runtime.dependency.queue.DependencyQueue;
+import digital.fiasco.runtime.dependency.queue.DependencyTree;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
@@ -27,7 +27,7 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
  * Resolves artifacts in groups by turning the given root dependency into a {@link DependencyTree}, and then turning
  * that tree into a {@link DependencyQueue}. Groups of dependencies that are ready for resolution are retrieved with
  * {@link DependencyQueue#takeAll(Class)}, and then resolved using the {@link Librarian} found in the
- * {@link BuildSettings}. When a group of dependencies is resolved, the given {@link Callback} is called with the
+ * {@link BuildSettingsObject}. When a group of dependencies is resolved, the given {@link Callback} is called with the
  * resolution {@link Result}.
  *
  * <p><b>Performance</b></p>
@@ -39,7 +39,7 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
  * </p>
  *
  * @author Jonathan Locke
- * @see BuildSettings
+ * @see BuildSettingsObject
  * @see DependencyQueue
  * @see Dependency
  * @see ArtifactList

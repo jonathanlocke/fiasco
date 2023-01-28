@@ -1,11 +1,10 @@
 package digital.fiasco.runtime.repository.remote.server.serialization.converters;
 
 import digital.fiasco.runtime.FiascoTest;
-import digital.fiasco.runtime.repository.remote.server.serialization.converters.ArtifactListConverter;
 import org.junit.Test;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.artifact.lists.ArtifactList.artifacts;
 
 public class ArtifactListConverterTest extends FiascoTest
 {

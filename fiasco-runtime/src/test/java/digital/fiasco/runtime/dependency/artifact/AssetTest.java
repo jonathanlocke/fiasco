@@ -1,14 +1,15 @@
 package digital.fiasco.runtime.dependency.artifact;
 
 import digital.fiasco.runtime.FiascoTest;
+import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
-import static digital.fiasco.runtime.dependency.artifact.AssetList.assets;
+import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.JAR_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.SOURCES_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
+import static digital.fiasco.runtime.dependency.artifact.lists.AssetList.assets;
 
 public class AssetTest extends FiascoTest
 {

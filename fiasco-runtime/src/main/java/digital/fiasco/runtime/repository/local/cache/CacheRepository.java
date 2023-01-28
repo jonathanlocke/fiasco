@@ -1,12 +1,17 @@
 package digital.fiasco.runtime.repository.local.cache;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
+import com.telenav.kivakit.core.progress.ProgressReporter;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
+import com.telenav.kivakit.resource.resources.InputResource;
 import com.telenav.kivakit.resource.resources.ResourceSection;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
-import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachment;
+import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
+import digital.fiasco.runtime.repository.RepositoryContentReader;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import org.jetbrains.annotations.NotNull;
@@ -58,8 +63,7 @@ import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link Repository#resolveArtifacts(List)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
- *     <li>{@link Repository#resolveArtifacts(String...)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(List, ProgressReporter, RepositoryContentReader)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -107,6 +111,18 @@ public class CacheRepository extends LocalRepository
     public CacheRepository(@NotNull String name, @NotNull Folder folder)
     {
         super(name, folder);
+    }
+
+    @Override
+    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptorList,
+                                         ProgressReporter reporter,
+                                         RepositoryContentReader reader)
+    {
+        // Resolve artifacts and append them to the artifact content file.
+        return super.resolveArtifacts(descriptorList, reporter, (in, length) ->
+        {
+            artifactContentFile.copyFrom(new InputResource(in), APPEND, reporter.steps(length));
+        });
     }
 
     /**

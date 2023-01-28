@@ -1,7 +1,7 @@
 package digital.fiasco.runtime.dependency;
 
 import digital.fiasco.runtime.FiascoTest;
-import digital.fiasco.runtime.dependency.artifact.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
 import org.junit.Test;
 
 import static digital.fiasco.runtime.dependency.DependencyList.dependencies;

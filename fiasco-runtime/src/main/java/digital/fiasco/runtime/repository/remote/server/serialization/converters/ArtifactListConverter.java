@@ -4,7 +4,7 @@ import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.conversion.BaseStringConverter;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;

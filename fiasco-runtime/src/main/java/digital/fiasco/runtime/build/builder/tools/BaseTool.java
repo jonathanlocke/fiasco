@@ -3,12 +3,12 @@ package digital.fiasco.runtime.build.builder.tools;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.filesystem.Folder;
-import digital.fiasco.runtime.build.BuildProfile;
+import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.DependencyList;
 
-import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
+import static digital.fiasco.runtime.build.settings.BuildOption.DESCRIBE;
 
 /**
  * Base class for build {@link Tool}s. Build tools can be enabled or disabled under a given {@link BuildProfile} by

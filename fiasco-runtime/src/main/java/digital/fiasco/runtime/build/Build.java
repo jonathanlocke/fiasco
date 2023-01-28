@@ -8,6 +8,11 @@ import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
+import digital.fiasco.runtime.build.settings.BuildOption;
+import digital.fiasco.runtime.build.settings.BuildProfile;
+import digital.fiasco.runtime.build.settings.BuildSettings;
+import digital.fiasco.runtime.build.settings.BuildSettingsMixin;
+import digital.fiasco.runtime.build.settings.BuildSettingsObject;
 
 /**
  * Defines a Fiasco build.
@@ -23,9 +28,9 @@ import digital.fiasco.runtime.build.metadata.BuildMetadata;
  * <p><b>Build Settings</b></p>
  *
  * <p>
- * The {@link BuildSettings} class holds configuration information for the build. Some of this information is used to
- * initialize the root builder passed to {@link #onConfigureBuild(Builder)}. Some build settings are switched on and off
- * by the {@link BaseBuild} application's built-in switches:
+ * The {@link BuildSettingsObject} class holds configuration information for the build. Some of this information is used
+ * to initialize the root builder passed to {@link #onConfigureBuild(Builder)}. Some build settings are switched on and
+ * off by the {@link BaseBuild} application's built-in switches:
  * </p>
  *
  * <ul>
@@ -138,16 +143,16 @@ import digital.fiasco.runtime.build.metadata.BuildMetadata;
  * <p><b>Build Repositories</b></p>
  *
  * <ul>
- *     <li>{@link BuildRepositories#MAVEN_CENTRAL}</li>
- *     <li>{@link BuildRepositories#MAVEN_CENTRAL_STAGING}</li>
+ *     <li>{@link BuildRepositoriesTrait#MAVEN_CENTRAL}</li>
+ *     <li>{@link BuildRepositoriesTrait#MAVEN_CENTRAL_STAGING}</li>
  * </ul>
  *
  * @author Jonathan Locke
  * @see BuildSettings
  * @see BuildOption
  * @see BuildProfile
- * @see BuildEnvironment
- * @see BuildRepositories
+ * @see BuildEnvironmentTrait
+ * @see BuildRepositoriesTrait
  * @see Named
  * @see Described
  */
@@ -156,9 +161,18 @@ public interface Build extends
     Named,
     Described,
     Repeater,
-    BuildEnvironment,
-    BuildRepositories
+    BuildEnvironmentTrait,
+    BuildRepositoriesTrait,
+    BuildSettingsMixin
 {
+
+    /**
+     * Returns a copy of this object
+     *
+     * @return This object for method chaining
+     */
+    Build copy();
+
     /**
      * Returns the metadata for this build
      */

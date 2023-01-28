@@ -5,7 +5,7 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.repository.remote.server.serialization.converters.ArtifactConverter;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.build.BuildRepositories.MAVEN_CENTRAL;
+import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL;
 import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJson;
 
 public class ArtifactSerializationTest extends FiascoTest

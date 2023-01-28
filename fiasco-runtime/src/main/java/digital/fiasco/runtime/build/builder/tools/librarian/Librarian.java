@@ -13,8 +13,8 @@ import com.telenav.kivakit.core.version.Version;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.BaseTool;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
@@ -27,7 +27,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.core.version.Version.version;
-import static digital.fiasco.runtime.build.BuildRepositories.MAVEN_CENTRAL;
+import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL;
 
 /**
  * Manages {@link Artifact}s and their dependencies. Searches the list of repositories added to this librarian with

@@ -1,7 +1,7 @@
 package digital.fiasco.libraries.languages;
 
 import digital.fiasco.libraries.LibraryGroups;
-import digital.fiasco.runtime.dependency.artifact.Library;
+import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
 
 @SuppressWarnings({ "unused", "SpellCheckingInspection" })
 public interface Scala extends LibraryGroups

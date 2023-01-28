@@ -2,7 +2,9 @@ package digital.fiasco.runtime.dependency;
 
 import com.telenav.kivakit.core.thread.KivaKitThread;
 import digital.fiasco.runtime.FiascoTest;
-import digital.fiasco.runtime.dependency.artifact.Library;
+import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
+import digital.fiasco.runtime.dependency.queue.DependencyQueue;
+import digital.fiasco.runtime.dependency.queue.DependencyTree;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
@@ -14,8 +16,8 @@ import static com.telenav.kivakit.core.value.count.Count._5;
 import static com.telenav.kivakit.core.value.count.Count._6;
 import static com.telenav.kivakit.core.value.count.Minimum._10;
 import static com.telenav.kivakit.interfaces.time.WakeState.COMPLETED;
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
-import static digital.fiasco.runtime.dependency.artifact.LibraryList.libraries;
+import static digital.fiasco.runtime.dependency.artifact.artifacts.Library.library;
+import static digital.fiasco.runtime.dependency.artifact.lists.LibraryList.libraries;
 
 public class DependencyQueueTest extends FiascoTest
 {

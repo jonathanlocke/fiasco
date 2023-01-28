@@ -1,8 +1,8 @@
 package digital.fiasco.libraries.utilities.logging;
 
-import digital.fiasco.runtime.dependency.artifact.Library;
+import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
+import static digital.fiasco.runtime.dependency.artifact.artifacts.Library.library;
 
 @SuppressWarnings("unused")
 public interface Log4j

@@ -2,16 +2,15 @@ package digital.fiasco.runtime.repository.local;
 
 import com.telenav.kivakit.filesystem.Folder;
 import digital.fiasco.runtime.FiascoTest;
-import digital.fiasco.runtime.dependency.artifact.Asset;
-import digital.fiasco.runtime.dependency.artifact.Library;
+import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
+import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.repository.local.LocalRepository;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptors;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptors;
 
 public class LocalRepositoryTest extends FiascoTest
 {

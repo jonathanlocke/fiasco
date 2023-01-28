@@ -1,6 +1,6 @@
 package digital.fiasco.runtime.repository.maven.resolver;
 
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
 import org.jetbrains.annotations.NotNull;
 

@@ -4,7 +4,7 @@ import com.telenav.kivakit.microservice.Microservice;
 import com.telenav.kivakit.microservice.MicroserviceMetadata;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.remote.server.api.install.InstallArtifactRequest;
-import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactRequest;
+import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactsRequest;
 import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;
 
 import static digital.fiasco.runtime.repository.remote.server.FiascoRestService.fiascoApiVersion;
@@ -13,7 +13,7 @@ import static digital.fiasco.runtime.repository.remote.server.FiascoRestService.
  * A microservice that responds to JSON-encoded requests:
  *
  * <ul>
- *     <li>{@link ResolveArtifactRequest}</li>
+ *     <li>{@link ResolveArtifactsRequest}</li>
  *     <li>{@link InstallArtifactRequest}</li>
  * </ul>
  *

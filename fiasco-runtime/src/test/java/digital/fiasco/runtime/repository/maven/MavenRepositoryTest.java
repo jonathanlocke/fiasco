@@ -1,14 +1,13 @@
 package digital.fiasco.runtime.repository.maven;
 
 import digital.fiasco.runtime.FiascoTest;
-import digital.fiasco.runtime.repository.maven.MavenRepository;
 import org.junit.Test;
 
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
-import static digital.fiasco.runtime.build.BuildRepositories.MAVEN_CENTRAL;
-import static digital.fiasco.runtime.build.BuildRepositories.MAVEN_CENTRAL_STAGING;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptors;
-import static digital.fiasco.runtime.dependency.artifact.LibraryList.libraries;
+import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL;
+import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL_STAGING;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptors;
+import static digital.fiasco.runtime.dependency.artifact.lists.LibraryList.libraries;
 
 public class MavenRepositoryTest extends FiascoTest
 {
@@ -52,6 +51,6 @@ public class MavenRepositoryTest extends FiascoTest
     @Test
     public void testResolveFailure()
     {
-        ensureThrows(() -> MAVEN_CENTRAL.resolveArtifacts("library:com.shibo:unknown:1.0.1"));
+        ensureThrows(() -> MAVEN_CENTRAL.resolveArtifacts(descriptors("library:com.shibo:unknown:1.0.1")));
     }
 }

@@ -10,11 +10,10 @@ import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.Build;
-import digital.fiasco.runtime.build.BuildEnvironment;
-import digital.fiasco.runtime.build.BuildOption;
-import digital.fiasco.runtime.build.BuildProfile;
-import digital.fiasco.runtime.build.BuildSettings;
-import digital.fiasco.runtime.build.BuildStructured;
+import digital.fiasco.runtime.build.BuildEnvironmentTrait;
+import digital.fiasco.runtime.build.settings.BuildOption;
+import digital.fiasco.runtime.build.settings.BuildProfile;
+import digital.fiasco.runtime.build.settings.BuildSettingsObject;
 import digital.fiasco.runtime.build.builder.phases.BasePhase;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
@@ -24,10 +23,10 @@ import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.ArtifactGroup;
-import digital.fiasco.runtime.dependency.artifact.ArtifactList;
-import digital.fiasco.runtime.dependency.artifact.ArtifactName;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup;
+import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
 import digital.fiasco.runtime.repository.Repository;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
@@ -35,10 +34,10 @@ import static com.telenav.kivakit.core.function.Result.result;
 import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
 import static com.telenav.kivakit.core.string.Paths.pathTail;
 import static com.telenav.kivakit.core.version.Version.version;
-import static digital.fiasco.runtime.build.BuildOption.DESCRIBE;
-import static digital.fiasco.runtime.build.BuildOption.HELP;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifactName;
+import static digital.fiasco.runtime.build.settings.BuildOption.DESCRIBE;
+import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup.group;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName.artifactName;
 
 /**
  * <p>
@@ -108,7 +107,7 @@ import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifactNa
  *     <li>{@link #threads()}</li>
  *     <li>{@link #withPhases(PhaseList)}</li>
  *     <li>{@link #withRootFolder(Folder)}</li>
- *     <li>{@link #withSettings(BuildSettings)}</li>
+ *     <li>{@link #withSettings(BuildSettingsObject)}</li>
  *     <li>{@link #withBuilderThreads(Count)}</li>
  * </ul>
  *
@@ -236,7 +235,7 @@ public class Builder extends BaseRepeater implements
     Described,
     BuildStructured,
     BuilderAssociated,
-    BuildEnvironment,
+    BuildEnvironmentTrait,
     ToolFactory,
     TryCatchTrait,
     Dependency
@@ -245,7 +244,7 @@ public class Builder extends BaseRepeater implements
     private final Build build;
 
     /** The settings for this builder */
-    private BuildSettings settings;
+    private BuildSettingsObject settings;
 
     /**
      * The dependencies that must be resolved before this builder can run. Dependencies can include both artifacts and
@@ -454,7 +453,7 @@ public class Builder extends BaseRepeater implements
      */
     public void disable(Phase phase)
     {
-        settings = settings.disable(phase);
+        settings = settings.withDisabled(phase);
     }
 
     /**
@@ -465,7 +464,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder disable(BuildOption option)
     {
-        settings = settings.disable(option);
+        settings = settings.withDisabled(option);
         return this;
     }
 
@@ -477,7 +476,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder disable(BuildProfile profile)
     {
-        settings = settings.disable(profile);
+        settings = settings.withDisabled(profile);
         return this;
     }
 
@@ -488,7 +487,7 @@ public class Builder extends BaseRepeater implements
      */
     public void enable(Phase phase)
     {
-        settings = settings.enable(phase);
+        settings = settings.withEnabled(phase);
     }
 
     /**
@@ -499,7 +498,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder enable(BuildOption option)
     {
-        settings = settings.enable(option);
+        settings = settings.withEnabled(option);
         return this;
     }
 
@@ -511,7 +510,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder enable(BuildProfile profile)
     {
-        settings.enable(profile);
+        settings.withEnabled(profile);
         return this;
     }
 
@@ -520,7 +519,7 @@ public class Builder extends BaseRepeater implements
      */
     public ObjectSet<BuildProfile> enabledProfiles()
     {
-        return settings.enabledProfiles();
+        return settings.profiles();
     }
 
     /**
@@ -601,11 +600,11 @@ public class Builder extends BaseRepeater implements
             {
                 if (enable)
                 {
-                    settings.enable(option);
+                    settings.withEnabled(option);
                 }
                 else
                 {
-                    settings.disable(option);
+                    settings.withDisabled(option);
                 }
             }
             else
@@ -615,11 +614,11 @@ public class Builder extends BaseRepeater implements
                 {
                     if (enable)
                     {
-                        settings.enable(phase(value));
+                        settings.withEnabled(phase(value));
                     }
                     else
                     {
-                        settings.disable(phase(value));
+                        settings.withDisabled(phase(value));
                     }
                 }
                 else
@@ -627,11 +626,11 @@ public class Builder extends BaseRepeater implements
                     var profile = new BuildProfile(value);
                     if (enable)
                     {
-                        settings.enable(profile);
+                        settings.withEnabled(profile);
                     }
                     else
                     {
-                        settings.disable(profile);
+                        settings.withDisabled(profile);
                     }
                 }
             }
@@ -673,7 +672,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder pinVersion(Artifact<?> artifact, String version)
     {
-        settings.pinVersion(artifact, version(version));
+        settings.withPinnedVersion(artifact, version(version));
         return this;
     }
 
@@ -686,7 +685,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder pinVersion(Artifact<?> artifact, Version version)
     {
-        settings.pinVersion(artifact, version);
+        settings.withPinnedVersion(artifact, version);
         return this;
     }
 
@@ -710,7 +709,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder requires(Artifact<?> first, Artifact<?>... rest)
     {
-        settings = settings.requires(first, rest);
+        settings = settings.withDependencies(first, rest);
         return this;
     }
 
@@ -721,7 +720,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder requires(ArtifactList dependencies)
     {
-        settings = settings.requires(dependencies);
+        settings = settings.withDependencies(dependencies);
         return this;
     }
 
@@ -734,7 +733,7 @@ public class Builder extends BaseRepeater implements
     /**
      * Returns the settings for this builder
      */
-    public BuildSettings settings()
+    public BuildSettingsObject settings()
     {
         return settings;
     }
@@ -904,7 +903,7 @@ public class Builder extends BaseRepeater implements
      * @param settings The settings
      * @return The new builder
      */
-    public Builder withSettings(BuildSettings settings)
+    public Builder withSettings(BuildSettingsObject settings)
     {
         var copy = copy();
         copy.settings = settings;

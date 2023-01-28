@@ -4,8 +4,8 @@ import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;
 
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
-import static digital.fiasco.runtime.dependency.artifact.LibraryList.libraries;
+import static digital.fiasco.runtime.dependency.artifact.lists.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.artifact.lists.LibraryList.libraries;
 
 public class LibraryListTest extends FiascoTest
 {

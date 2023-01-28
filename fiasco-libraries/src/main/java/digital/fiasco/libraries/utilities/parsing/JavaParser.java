@@ -1,7 +1,7 @@
 package digital.fiasco.libraries.utilities.parsing;
 
 import digital.fiasco.libraries.LibraryGroups;
-import digital.fiasco.runtime.dependency.artifact.Library;
+import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
 
 @SuppressWarnings({ "SpellCheckingInspection", "unused" })
 public interface JavaParser extends LibraryGroups

@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.repository.maven;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
+import com.telenav.kivakit.core.progress.ProgressReporter;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
@@ -11,14 +12,14 @@ import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.ResourceFolder;
 import com.telenav.kivakit.resource.ResourcePath;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
-import digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType;
-import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
-import digital.fiasco.runtime.dependency.artifact.ArtifactContentSignatures;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachment;
+import digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType;
+import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.content.ArtifactContentSignatures;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
-import digital.fiasco.runtime.repository.Repository;
+import digital.fiasco.runtime.repository.RepositoryContentReader;
 import digital.fiasco.runtime.repository.maven.resolver.MavenDependency;
 import digital.fiasco.runtime.repository.maven.resolver.MavenResolver;
 import org.eclipse.aether.repository.LocalRepository;
@@ -41,15 +42,15 @@ import static com.telenav.kivakit.resource.FileName.parseFileName;
 import static com.telenav.kivakit.resource.ResourcePath.parseResourcePath;
 import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.POM_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactContent.content;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
-import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
+import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachment.attachment;
+import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.JAR_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.POM_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.SOURCES_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.content.ArtifactContent.content;
+import static digital.fiasco.runtime.dependency.artifact.lists.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.artifact.artifacts.Asset.asset;
+import static digital.fiasco.runtime.dependency.artifact.artifacts.Library.library;
 import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLATION_FAILED;
 import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLED;
 
@@ -68,7 +69,6 @@ import static digital.fiasco.runtime.repository.Repository.InstallationResult.IN
  *
  * <ul>
  *     <li>{@link #resolveArtifacts(List)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
- *     <li>{@link Repository#resolveArtifacts(String...)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -180,10 +180,13 @@ public class MavenRepository extends BaseRepository
 
     /**
      * {@inheritDoc}
+     *
+     * @param reader The Maven libraries write all content to the local repository, so this parameter is ignored
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors)
+    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors, final ProgressReporter reporter,
+                                         RepositoryContentReader reader)
     {
         return resolveArtifacts(list(descriptors), artifacts());
     }

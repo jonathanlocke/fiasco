@@ -3,8 +3,8 @@ package digital.fiasco.runtime.dependency;
 import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
-import static digital.fiasco.runtime.dependency.artifact.AssetList.assets;
+import static digital.fiasco.runtime.dependency.artifact.lists.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.artifact.lists.AssetList.assets;
 
 public class DependencyTest extends FiascoTest
 {

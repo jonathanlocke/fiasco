@@ -5,8 +5,8 @@ import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.local.cache.CacheRepository;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.build.BuildRepositories.MAVEN_CENTRAL;
-import static digital.fiasco.runtime.build.BuildRepositories.MAVEN_CENTRAL_STAGING;
+import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL;
+import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL_STAGING;
 
 public class RepositorySerializationTest extends FiascoTest
 {

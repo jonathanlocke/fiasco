@@ -3,24 +3,24 @@ package digital.fiasco.runtime;
 import com.telenav.kivakit.filesystem.Folders;
 import com.telenav.kivakit.serialization.gson.GsonFactory;
 import com.telenav.kivakit.testing.UnitTest;
-import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
-import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
-import digital.fiasco.runtime.dependency.artifact.ArtifactContentSignatures;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.ArtifactList;
-import digital.fiasco.runtime.dependency.artifact.Asset;
-import digital.fiasco.runtime.dependency.artifact.Library;
+import digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachment;
+import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.content.ArtifactContentSignatures;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
+import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;
 
 import static com.telenav.kivakit.filesystem.File.file;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachment.attachment;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAR_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactAttachmentType.SOURCES_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
-import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
+import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachment.attachment;
+import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.JAR_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.SOURCES_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.lists.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.artifact.artifacts.Asset.asset;
+import static digital.fiasco.runtime.dependency.artifact.artifacts.Library.library;
 
 public class FiascoTest extends UnitTest
 {

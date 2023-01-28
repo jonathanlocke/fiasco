@@ -3,17 +3,19 @@ package digital.fiasco.runtime.repository.local;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.object.Lazy;
+import com.telenav.kivakit.core.progress.ProgressReporter;
 import com.telenav.kivakit.core.registry.Register;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.resource.resources.StringResource;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactAttachment;
-import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
-import digital.fiasco.runtime.dependency.artifact.ArtifactContentSignatures;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachment;
+import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.content.ArtifactContentSignatures;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
+import digital.fiasco.runtime.repository.RepositoryContentReader;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.local.cache.CacheRepository;
 import org.jetbrains.annotations.NotNull;
@@ -32,7 +34,7 @@ import static com.telenav.kivakit.resource.WriteMode.APPEND;
 import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
 import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
 import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJson;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.artifact.lists.ArtifactList.artifacts;
 import static digital.fiasco.runtime.repository.Repository.InstallationResult.ALREADY_INSTALLED;
 import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLATION_FAILED;
 import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLED;
@@ -66,8 +68,7 @@ import static digital.fiasco.runtime.repository.Repository.InstallationResult.IN
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link Repository#resolveArtifacts(List)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
- *     <li>{@link Repository#resolveArtifacts(String...)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(List, ProgressReporter, RepositoryContentReader)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -86,6 +87,7 @@ import static digital.fiasco.runtime.repository.Repository.InstallationResult.IN
 @Register
 public class LocalRepository extends BaseRepository
 {
+
     /** Separator to use between artifact entries in the artifacts.txt file */
     private final String ARTIFACT_SEPARATOR = "\n========\n";
 
@@ -197,16 +199,18 @@ public class LocalRepository extends BaseRepository
     /**
      * Gets the artifacts for the given artifact descriptors
      *
-     * @param descriptorCollection The artifact descriptors
+     * @param descriptorList The artifact descriptors
      * @return The artifacts
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public final ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptorCollection)
+    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptorList,
+                                         ProgressReporter reporter,
+                                         RepositoryContentReader reader)
     {
         return lock().read(() ->
         {
-            var descriptors = list(descriptorCollection);
+            var descriptors = list(descriptorList);
 
             // Find the artifacts that are in this repository,
             var resolvedArtifacts = resolve(descriptors);
@@ -218,7 +222,7 @@ public class LocalRepository extends BaseRepository
             // Install and resolve any unresolved artifacts that are in the downloads cache.
             if (!(this instanceof CacheRepository))
             {
-                var downloadedArtifacts = downloads.get().resolveArtifacts(unresolvedDescriptors);
+                var downloadedArtifacts = downloads.get().resolveArtifacts(unresolvedDescriptors, reporter, reader);
                 downloadedArtifacts.forEach(this::installArtifact);
                 resolvedArtifacts = resolvedArtifacts.with(downloadedArtifacts);
             }

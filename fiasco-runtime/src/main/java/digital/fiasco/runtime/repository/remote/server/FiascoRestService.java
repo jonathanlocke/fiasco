@@ -3,7 +3,7 @@ package digital.fiasco.runtime.repository.remote.server;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.microservice.protocols.rest.http.RestService;
 import digital.fiasco.runtime.repository.remote.server.api.install.InstallArtifactRequest;
-import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactRequest;
+import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactsRequest;
 
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.network.http.HttpMethod.POST;
@@ -28,7 +28,7 @@ public class FiascoRestService extends RestService
     @Override
     public void onInitialize()
     {
-        mount(fiascoApiVersion(), "resolve-artifacts", POST, ResolveArtifactRequest.class);
+        mount(fiascoApiVersion(), "resolve-artifacts", POST, ResolveArtifactsRequest.class);
         mount(fiascoApiVersion(), "install-artifact", POST, InstallArtifactRequest.class);
     }
 }

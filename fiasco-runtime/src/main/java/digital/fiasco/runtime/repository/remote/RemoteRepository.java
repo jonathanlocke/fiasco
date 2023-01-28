@@ -1,10 +1,12 @@
 package digital.fiasco.runtime.repository.remote;
 
+import com.telenav.kivakit.core.progress.ProgressReporter;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
+import digital.fiasco.runtime.repository.RepositoryContentReader;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.local.cache.CacheRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
@@ -31,8 +33,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link Repository#resolveArtifacts(List)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
- *     <li>{@link Repository#resolveArtifacts(String...)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(List, ProgressReporter, RepositoryContentReader)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -88,10 +89,12 @@ public class RemoteRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors)
+    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors,
+                                         ProgressReporter reporter,
+                                         RepositoryContentReader reader)
     {
         // Return resolved artifacts for the given descriptors
-        return new FiascoClient().resolveArtifacts(descriptors);
+        return new FiascoClient().resolveArtifacts(descriptors, reporter, reader);
     }
 
     @Override

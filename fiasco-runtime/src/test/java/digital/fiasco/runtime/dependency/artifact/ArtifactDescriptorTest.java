@@ -2,14 +2,15 @@ package digital.fiasco.runtime.dependency.artifact;
 
 import com.telenav.kivakit.core.version.Version;
 import digital.fiasco.runtime.FiascoTest;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import org.junit.Test;
 
 import static com.telenav.kivakit.core.messaging.Listener.nullListener;
 import static com.telenav.kivakit.core.version.Version.version;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.parseDescriptor;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifactName;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.parseDescriptor;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup.group;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName.artifactName;
 
 public class ArtifactDescriptorTest extends FiascoTest
 {

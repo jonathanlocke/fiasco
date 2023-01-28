@@ -2,7 +2,7 @@ package digital.fiasco.runtime.build.metadata;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.string.FormatProperty;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 

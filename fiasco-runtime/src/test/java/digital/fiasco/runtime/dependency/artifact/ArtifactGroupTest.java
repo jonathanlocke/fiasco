@@ -1,13 +1,15 @@
 package digital.fiasco.runtime.dependency.artifact;
 
 import digital.fiasco.runtime.FiascoTest;
+import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
+import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptor;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
-import static digital.fiasco.runtime.dependency.artifact.ArtifactName.artifactName;
-import static digital.fiasco.runtime.dependency.artifact.Asset.asset;
-import static digital.fiasco.runtime.dependency.artifact.Library.library;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup.group;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName.artifactName;
+import static digital.fiasco.runtime.dependency.artifact.artifacts.Asset.asset;
+import static digital.fiasco.runtime.dependency.artifact.artifacts.Library.library;
 
 public class ArtifactGroupTest extends FiascoTest
 {

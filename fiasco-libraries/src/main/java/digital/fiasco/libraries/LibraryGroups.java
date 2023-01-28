@@ -1,8 +1,8 @@
 package digital.fiasco.libraries;
 
-import digital.fiasco.runtime.dependency.artifact.ArtifactGroup;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup;
 
-import static digital.fiasco.runtime.dependency.artifact.ArtifactGroup.group;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup.group;
 
 @SuppressWarnings("SpellCheckingInspection")
 public interface LibraryGroups

@@ -1,12 +1,14 @@
 package digital.fiasco.runtime.repository;
 
+import com.telenav.kivakit.core.function.Functions;
 import com.telenav.kivakit.core.messaging.Repeater;
+import com.telenav.kivakit.core.progress.ProgressReporter;
 import com.telenav.kivakit.core.registry.Register;
 import com.telenav.kivakit.interfaces.naming.Named;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactContent;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.local.cache.CacheRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
@@ -17,7 +19,7 @@ import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 import java.net.URI;
 import java.util.List;
 
-import static digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor.descriptors;
+import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressReporter;
 
 /**
  * Interface to a repository that stores and resolves artifacts and their content attachments.
@@ -132,25 +134,29 @@ public interface Repository extends
     }
 
     /**
+     * Resolves each artifact descriptor to an {@link Artifact} but does not resolve the content
+     *
+     * @param descriptors The artifact descriptors
+     * @return The resolved artifacts
+     * @throws IllegalArgumentException Thrown if any descriptor cannot be resolved
+     */
+    default ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors)
+    {
+        return resolveArtifacts(descriptors, nullProgressReporter(), Functions::doNothing);
+    }
+
+    /**
      * Resolves each artifact descriptor to an {@link Artifact} complete with content attachments
      *
      * @param descriptors The artifact descriptors
+     * @param reporter The progress reporter to call as content input is read
+     * @param reader Callback for reading trailing data after the initial JSON element
      * @return The resolved artifacts
      * @throws IllegalArgumentException Thrown if any descriptor cannot be resolved
      */
-    ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors);
-
-    /**
-     * Convenience method to resolve a list of descriptors
-     *
-     * @param descriptors The artifact descriptors
-     * @return The resolved artifacts
-     * @throws IllegalArgumentException Thrown if any descriptor cannot be resolved
-     */
-    default ArtifactList resolveArtifacts(String... descriptors)
-    {
-        return resolveArtifacts(descriptors(descriptors));
-    }
+    ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors,
+                                  ProgressReporter reporter,
+                                  RepositoryContentReader reader);
 
     /**
      * Returns the URI of this repository

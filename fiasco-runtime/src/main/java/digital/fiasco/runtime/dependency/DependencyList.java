@@ -11,12 +11,12 @@ import com.telenav.kivakit.core.value.count.Maximum;
 import com.telenav.kivakit.interfaces.collection.Sized;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.ArtifactList;
-import digital.fiasco.runtime.dependency.artifact.Asset;
-import digital.fiasco.runtime.dependency.artifact.AssetList;
-import digital.fiasco.runtime.dependency.artifact.Library;
-import digital.fiasco.runtime.dependency.artifact.LibraryList;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
+import digital.fiasco.runtime.dependency.artifact.lists.AssetList;
+import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
+import digital.fiasco.runtime.dependency.artifact.lists.LibraryList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -34,8 +34,8 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_INSUF
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_NOT_NEEDED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
-import static digital.fiasco.runtime.dependency.artifact.AssetList.assets;
-import static digital.fiasco.runtime.dependency.artifact.LibraryList.libraries;
+import static digital.fiasco.runtime.dependency.artifact.lists.AssetList.assets;
+import static digital.fiasco.runtime.dependency.artifact.lists.LibraryList.libraries;
 
 /**
  * An immutable, ordered list of {@link Dependency} objects.
