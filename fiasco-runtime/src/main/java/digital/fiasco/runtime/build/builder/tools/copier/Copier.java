@@ -7,12 +7,9 @@
 
 package digital.fiasco.runtime.build.builder.tools.copier;
 
-import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.BaseFileTool;
-
-import java.util.Collection;
 
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
 import static com.telenav.kivakit.core.string.Formatter.format;
@@ -24,7 +21,7 @@ import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class Copier extends BaseFileTool
+public class Copier extends BaseFileTool<Copier>
 {
     /** The folder to copy to */
     private Folder to;
@@ -105,18 +102,6 @@ public class Copier extends BaseFileTool
     }
 
     /**
-     * {@inheritDoc}
-     *
-     * @param files {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public Copier withFiles(Collection<File> files)
-    {
-        return (Copier) super.withFiles(files);
-    }
-
-    /**
      * Returns a copy of this copier with the given target folder
      *
      * @param target The target folder
@@ -127,17 +112,5 @@ public class Copier extends BaseFileTool
         var copy = copy();
         copy.to = target;
         return copy;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param files {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public Copier withoutFiles(Collection<File> files)
-    {
-        return (Copier) super.withoutFiles(files);
     }
 }

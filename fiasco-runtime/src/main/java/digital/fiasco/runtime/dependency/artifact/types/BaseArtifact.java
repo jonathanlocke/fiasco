@@ -288,7 +288,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     @SafeVarargs
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public final <D extends Artifact<D>> A dependsOn(D... dependencies)
+    public final <D extends Artifact<D>> A withDependencies(D... dependencies)
     {
         return withDependencies(ArtifactList.artifacts(dependencies));
     }

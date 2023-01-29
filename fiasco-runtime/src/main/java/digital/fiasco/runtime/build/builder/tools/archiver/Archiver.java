@@ -4,8 +4,6 @@ import com.telenav.kivakit.filesystem.File;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.BaseFileTool;
 
-import java.util.Collection;
-
 import static com.telenav.kivakit.resource.compression.archive.ZipArchive.AccessMode.WRITE;
 import static com.telenav.kivakit.resource.compression.archive.ZipArchive.zipArchive;
 
@@ -15,7 +13,7 @@ import static com.telenav.kivakit.resource.compression.archive.ZipArchive.zipArc
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class Archiver extends BaseFileTool
+public class Archiver extends BaseFileTool<Archiver>
 {
     /** The archive */
     private File archiveFile;
@@ -91,29 +89,5 @@ public class Archiver extends BaseFileTool
         var copy = copy();
         copy.archiveFile = archive;
         return copy;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param files {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public Archiver withFiles(Collection<File> files)
-    {
-        return (Archiver) super.withFiles(files);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param files {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public Archiver withoutFiles(Collection<File> files)
-    {
-        return (Archiver) super.withoutFiles(files);
     }
 }

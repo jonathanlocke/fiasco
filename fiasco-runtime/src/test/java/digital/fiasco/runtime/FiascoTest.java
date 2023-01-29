@@ -111,9 +111,9 @@ public class FiascoTest extends UnitTest
     protected Library kivakitApplication()
     {
         return library("com.telenav.kivakit:kivakit-application:1.8.5")
-            .dependsOn(kivakitCore(), kivakitResource())
-            .dependsOn(kivakitIcons())
-            .dependsOn(kivakitLogos());
+            .withDependencies(kivakitCore(), kivakitResource())
+            .withDependencies(kivakitIcons())
+            .withDependencies(kivakitLogos());
     }
 
     protected ArtifactList kivakitArtifacts()

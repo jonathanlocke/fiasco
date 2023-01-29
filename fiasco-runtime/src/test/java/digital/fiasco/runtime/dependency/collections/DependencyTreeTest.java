@@ -58,9 +58,9 @@ public class DependencyTreeTest extends FiascoTest
         //    /   / \
         //   c   e   f
 
-        b = b.dependsOn(c);
-        d = d.dependsOn(e, f);
-        a = a.dependsOn(b, d);
+        b = b.withDependencies(c);
+        d = d.withDependencies(e, f);
+        a = a.withDependencies(b, d);
 
         return new DependencyTree(a);
     }

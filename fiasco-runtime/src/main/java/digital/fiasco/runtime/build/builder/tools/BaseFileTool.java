@@ -14,10 +14,10 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
  *
  * @author Jonathan Locke
  */
-public abstract class BaseFileTool extends BaseTool<BaseFileTool>
+public abstract class BaseFileTool<T extends BaseFileTool<T>> extends BaseTool<T>
 {
     /** The files to be processed by this tool */
-    private FileList files;
+    FileList files;
 
     /**
      * Creates a tool associated with the given builder
@@ -34,10 +34,10 @@ public abstract class BaseFileTool extends BaseTool<BaseFileTool>
      *
      * @param that The tool to copy
      */
-    public BaseFileTool(BaseFileTool that)
+    public BaseFileTool(T that)
     {
         super(that);
-        this.files = that.files.copy();
+        this.files = that.files().copy();
     }
 
     /**
@@ -46,7 +46,7 @@ public abstract class BaseFileTool extends BaseTool<BaseFileTool>
      * @return {@inheritDoc}
      */
     @Override
-    public abstract BaseFileTool copy();
+    public abstract T copy();
 
     /**
      * Returns the files selected for processing by this tool
@@ -79,7 +79,7 @@ public abstract class BaseFileTool extends BaseTool<BaseFileTool>
      * @param files The files to add
      * @return This for chaining
      */
-    public BaseFileTool withFiles(Collection<File> files)
+    public T withFiles(Collection<File> files)
     {
         var copy = copy();
         copy.files = this.files.with(files);
@@ -92,7 +92,7 @@ public abstract class BaseFileTool extends BaseTool<BaseFileTool>
      * @param files The files to exclude
      * @return This for chaining
      */
-    public BaseFileTool withoutFiles(Collection<File> files)
+    public T withoutFiles(Collection<File> files)
     {
         var copy = copy();
         copy.files = this.files.without(files);

@@ -25,7 +25,7 @@ public class ArtifactSerializationTest extends FiascoTest
     public void testJsonSerialization()
     {
         var application = kivakitApplication()
-            .dependsOn(kivakitCore(), kivakitResource())
+            .withDependencies(kivakitCore(), kivakitResource())
             .withRepository(MAVEN_CENTRAL)
             .withJar(packageContent())
             .withJavadoc(packageContent());

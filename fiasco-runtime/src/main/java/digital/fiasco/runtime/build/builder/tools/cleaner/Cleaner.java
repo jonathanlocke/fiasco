@@ -1,10 +1,7 @@
 package digital.fiasco.runtime.build.builder.tools.cleaner;
 
-import com.telenav.kivakit.filesystem.File;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.BaseFileTool;
-
-import java.util.Collection;
 
 import static com.telenav.kivakit.core.string.Formatter.format;
 
@@ -14,7 +11,7 @@ import static com.telenav.kivakit.core.string.Formatter.format;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class Cleaner extends BaseFileTool
+public class Cleaner extends BaseFileTool<Cleaner>
 {
     public Cleaner(Builder builder)
     {
@@ -59,29 +56,5 @@ public class Cleaner extends BaseFileTool
                 step(parent::delete, "Deleting $", parent);
             }
         });
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param files {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public Cleaner withFiles(Collection<File> files)
-    {
-        return (Cleaner) super.withFiles(files);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param files {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public Cleaner withoutFiles(Collection<File> files)
-    {
-        return (Cleaner) super.withoutFiles(files);
     }
 }

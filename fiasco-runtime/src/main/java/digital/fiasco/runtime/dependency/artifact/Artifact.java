@@ -77,8 +77,6 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
  *
  * <ul>
  *     <li>{@link #descriptor()}</li>
- *     <li>{@link #version(String)}</li>
- *     <li>{@link #version(Version)}</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)}</li>
  *     <li>{@link #withArtifact(String)}</li>
  *     <li>{@link #withVersion(Version)}</li>
@@ -231,14 +229,6 @@ public interface Artifact<A extends Artifact<A>> extends
     Artifact<?> dependencyNamed(String name);
 
     /**
-     * Returns a copy of this artifact with the given dependencies
-     *
-     * @param dependencies The new dependencies
-     * @return The new artifact
-     */
-    <D extends Artifact<D>> A dependsOn(D[] dependencies);
-
-    /**
      * Returns the descriptor for this artifact
      *
      * @return The artifact descriptor
@@ -346,24 +336,6 @@ public interface Artifact<A extends Artifact<A>> extends
     }
 
     /**
-     * Convenience method for {@link #withVersion(Version)}
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default A version(Version version)
-    {
-        return withVersion(version);
-    }
-
-    /**
-     * Convenience method for {@link #withVersion(Version)}
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default A version(String version)
-    {
-        return withVersion(Version.version(version));
-    }
-
-    /**
      * Returns a copy of this artifact with the given name
      *
      * @param artifactName The new artifact name
@@ -411,6 +383,14 @@ public interface Artifact<A extends Artifact<A>> extends
     {
         return copy().withAttachment(attachment(JAR_ATTACHMENT, content));
     }
+
+    /**
+     * Returns a copy of this artifact with the given dependencies
+     *
+     * @param dependencies The new dependencies
+     * @return The new artifact
+     */
+    <D extends Artifact<D>> A withDependencies(D[] dependencies);
 
     /**
      * Returns a copy of this artifact with the given dependencies

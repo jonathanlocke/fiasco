@@ -84,11 +84,11 @@ public class ExampleBuild extends BaseBuild implements Libraries
     {
         var utilities = root
             .deriveBuilder("utilities")
-            .withDependencies(hamcrest_library.version("5.0"));
+            .withDependencies(hamcrest_library.withVersion("5.0"));
 
         var model = root
             .deriveBuilder("child2")
-            .withDependencies(hamcrest_library.version("5.0"))
+            .withDependencies(hamcrest_library.withVersion("5.0"))
             .withDependencies(utilities);
 
         return root
