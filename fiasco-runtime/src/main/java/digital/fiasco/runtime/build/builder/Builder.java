@@ -1,7 +1,6 @@
 package digital.fiasco.runtime.build.builder;
 
 import com.telenav.kivakit.commandline.CommandLine;
-import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.function.Result;
 import com.telenav.kivakit.core.language.trait.TryCatchTrait;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
@@ -22,6 +21,7 @@ import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.build.settings.BuildOption;
 import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.build.settings.BuildSettings;
+import digital.fiasco.runtime.build.settings.BuildSettingsMixin;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
@@ -31,15 +31,15 @@ import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.BuilderList;
 import digital.fiasco.runtime.repository.Repository;
 
+import java.util.function.Function;
+
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.function.Result.result;
 import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
 import static com.telenav.kivakit.core.string.Paths.pathTail;
 import static com.telenav.kivakit.core.version.Version.version;
-import static digital.fiasco.runtime.build.settings.BuildOption.DESCRIBE;
 import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
-import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
 
 /**
  * <p>
@@ -86,7 +86,7 @@ import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
  * </p>
  *
  * <p>
- * Phases are enabled and disabled with {@link #withEnabled(Phase)} and {@link #withDisabled(Phase)}. The {@link #parseCommandLine(CommandLine)}
+ * Phases are enabled and disabled with {@link #withEnabled(Phase)} and {@link #withDisabled(Phase)}. The {@link #withParsedCommandLine(CommandLine)}
  * method enables and disables any phases or build options that were passed in the command line. The phase name itself
  * enables the phase and any dependent phases (for example, "compile" enables the "start", "prepare" and "compile" phases).
  * If the phase name is preceded by a dash (for example, -test), the phase is disabled (but not its dependent phases).
@@ -106,7 +106,6 @@ import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
  *     <li>{@link #phases()}</li>
  *     <li>{@link #rootFolder()}</li>
  *     <li>{@link #settings()}</li>
- *     <li>{@link #threads()}</li>
  *     <li>{@link #withPhases(PhaseList)}</li>
  *     <li>{@link #withRootFolder(Folder)}</li>
  *     <li>{@link #withSettings(BuildSettings)}</li>
@@ -228,7 +227,7 @@ import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
  *
  * <ul>
  *     <li>{@link #copy()}</li>
- *     <li>{@link #parseCommandLine(CommandLine)}</li>
+ *     <li>{@link #withParsedCommandLine(CommandLine)}</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -238,7 +237,7 @@ public class Builder extends BaseRepeater implements
     Described,
     Stepped,
     Copyable<Builder>,
-    BuildSettings,
+    BuildSettingsMixin,
     BuildStructured,
     BuilderAssociated,
     BuildEnvironmentTrait,
@@ -248,9 +247,6 @@ public class Builder extends BaseRepeater implements
 {
     /** The associated build */
     private final Build build;
-
-    /** The settings for this builder */
-    private BuildSettings settings;
 
     /** The librarian to resolve dependencies for this builder */
     private Librarian librarian;
@@ -273,6 +269,7 @@ public class Builder extends BaseRepeater implements
     public Builder(Build build)
     {
         this.build = build;
+        librarian = newLibrarian();
         artifactDependencies = ArtifactList.artifacts();
         builderDependencies = BuilderList.builders();
     }
@@ -286,7 +283,6 @@ public class Builder extends BaseRepeater implements
     {
         this(that.build);
         this.librarian = that.librarian;
-        this.settings = that.settings;
         this.artifactDependencies = that.artifactDependencies;
         this.builderDependencies = that.builderDependencies;
     }
@@ -313,17 +309,6 @@ public class Builder extends BaseRepeater implements
     public ArtifactList artifactDependencies()
     {
         return artifactDependencies;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
-    @Override
-    public Count artifactResolverThreads()
-    {
-        return settings().artifactResolverThreads();
     }
 
     /**
@@ -373,7 +358,7 @@ public class Builder extends BaseRepeater implements
         return result(() ->
         {
             // go through each phase in order,
-            for (var phase : settings.phases())
+            for (var phase : settings().phases())
             {
                 // and if the phase is enabled,
                 if (isEnabled(phase))
@@ -409,17 +394,6 @@ public class Builder extends BaseRepeater implements
     public BuilderList builderDependencies()
     {
         return builderDependencies;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
-    @Override
-    public Count builderThreads()
-    {
-        return settings.builderThreads();
     }
 
     /**
@@ -484,56 +458,9 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * {@inheritDoc}
+     * Returns the librarian used to resolve dependencies for this builder
      *
-     * @return {@inheritDoc}
-     */
-    @Override
-    public ArtifactDescriptor descriptor()
-    {
-        return settings.descriptor();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param phase {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public boolean isEnabled(Phase phase)
-    {
-        return settings.isEnabled(phase);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param option {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public boolean isEnabled(BuildOption option)
-    {
-        return settings.isEnabled(option);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param profile {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public boolean isEnabled(BuildProfile profile)
-    {
-        return settings.isEnabled(profile);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
+     * @return The librarian
      */
     public Librarian librarian()
     {
@@ -565,101 +492,6 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Parses the given command line, enabling and disabling relevant phases and build options
-     *
-     * @param commandLine The command line to process
-     */
-    public Builder parseCommandLine(CommandLine commandLine)
-    {
-        for (var argument : commandLine.argumentValues())
-        {
-            var value = argument.value();
-            var enable = !value.startsWith("-");
-            var option = tryCatch(() -> BuildOption.valueOf(value));
-
-            if (option != null)
-            {
-                if (enable)
-                {
-                    return withEnabled(option);
-                }
-                else
-                {
-                    return withDisabled(option);
-                }
-            }
-            else
-            {
-                var phase = phase(value);
-                if (phase != null)
-                {
-                    if (enable)
-                    {
-                        return withEnabled(phase(value));
-                    }
-                    else
-                    {
-                        settings.withDisabled(phase(value));
-                    }
-                }
-                else
-                {
-                    var profile = new BuildProfile(value);
-                    if (enable)
-                    {
-                        settings.withEnabled(profile);
-                    }
-                    else
-                    {
-                        settings.withDisabled(profile);
-                    }
-                }
-            }
-        }
-
-        if (settings.isEnabled(HELP))
-        {
-            information(description());
-        }
-
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param name {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public Phase phase(String name)
-    {
-        return settings.phase(name);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
-    @Override
-    public PhaseList phases()
-    {
-        return settings.phases();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
-    @Override
-    public ObjectSet<BuildProfile> profiles()
-    {
-        return settings.profiles();
-    }
-
-    /**
      * {@inheritDoc}
      *
      * @return {@inheritDoc}
@@ -670,93 +502,76 @@ public class Builder extends BaseRepeater implements
         return unsupported();
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
     @Override
-    public Folder rootFolder()
+    public BuildSettings withArtifact(String artifact)
     {
-        return settings.rootFolder();
+        return withSettings(it -> it.withArtifact(artifact));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
-    public BuildSettings settings()
-    {
-        return settings;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
     @Override
-    public boolean shouldDescribe()
+    public BuildSettings withArtifactDescriptor(ArtifactDescriptor descriptor)
     {
-        return isEnabled(DESCRIBE);
+        return withSettings(it -> it.withArtifactDescriptor(descriptor));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
     @Override
-    public boolean shouldDescribeAndExecute()
+    public BuildSettings withArtifactDescriptor(String descriptor)
     {
-        return isEnabled(VERBOSE);
+        return withSettings(it -> it.withArtifactDescriptor(descriptor));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
-    public Count threads()
-    {
-        return settings.builderThreads();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param descriptor {@inheritDoc}
-     * @return {@inheritDoc}
-     */
     @Override
-    public Builder withArtifactDescriptor(ArtifactDescriptor descriptor)
+    public BuildSettings withArtifactDescriptor(Function<ArtifactDescriptor, ArtifactDescriptor> function)
     {
-        return withSettings(settings.withArtifactDescriptor(descriptor));
+        return withSettings(it -> it.withArtifactDescriptor(function));
     }
 
-    /**
-     * Returns a copy of this builder with the given thread count
-     *
-     * @param threads The number of threads this builder should use when building
-     * @return A copy of this builder with the given thread count
-     */
     @Override
-    public Builder withArtifactResolverThreads(Count threads)
+    public BuildSettings withArtifactGroup(ArtifactGroup group)
     {
-        return withSettings(settings.withArtifactResolverThreads(threads));
+        return withSettings(it -> it.withArtifactGroup(group));
     }
 
-    /**
-     * Returns a copy of this builder with the given thread count
-     *
-     * @param threads The number of threads this builder should use when building
-     * @return A copy of this builder with the given thread count
-     */
     @Override
-    public Builder withBuilderThreads(Count threads)
+    public BuildSettings withArtifactGroup(String group)
     {
-        return withSettings(settings.withBuilderThreads(threads));
+        return withSettings(it -> it.withArtifactGroup(group));
+    }
+
+    @Override
+    public BuildSettings withArtifactName(ArtifactName artifactName)
+    {
+        return withSettings(it -> it.withArtifactName(artifactName));
+    }
+
+    @Override
+    public BuildSettings withArtifactName(String artifactName)
+    {
+        return withSettings(it -> it.withArtifactName(artifactName));
+    }
+
+    @Override
+    public BuildSettings withArtifactResolverThreads(Count threads)
+    {
+        return withSettings(it -> it.withArtifactResolverThreads(threads));
+    }
+
+    @Override
+    public BuildSettings withArtifactVersion(String version)
+    {
+        return withSettings(it -> it.withArtifactVersion(version));
+    }
+
+    @Override
+    public BuildSettings withArtifactVersion(Version version)
+    {
+        return withSettings(it -> it.withArtifactVersion(version));
+    }
+
+    @Override
+    public BuildSettings withBuilderThreads(Count threads)
+    {
+        return withSettings(it -> it.withBuilderThreads(threads));
     }
 
     /**
@@ -787,91 +602,119 @@ public class Builder extends BaseRepeater implements
         return copy(it -> it.artifactDependencies = artifactDependencies.with(first, rest));
     }
 
-    /**
-     * Disables execution of the given phase
-     *
-     * @param phase The phase to disable
-     */
     @Override
-    public Builder withDisabled(Phase phase)
+    public BuildSettings withDisabled(Phase phase)
     {
-        return withSettings(settings.withDisabled(phase));
+        return withSettings(it -> withDisabled(phase));
+    }
+
+    @Override
+    public BuildSettings withDisabled(BuildProfile profile)
+    {
+        return withSettings(it -> withDisabled(profile));
+    }
+
+    @Override
+    public BuildSettings withDisabled(BuildOption option)
+    {
+        return withSettings(it -> it.withDisabled(option));
+    }
+
+    @Override
+    public BuildSettings withEnabled(Phase phase)
+    {
+        return withSettings(it -> it.withEnabled(phase));
+    }
+
+    @Override
+    public BuildSettings withEnabled(BuildOption option)
+    {
+        return withSettings(it -> it.withEnabled(option));
+    }
+
+    @Override
+    public BuildSettings withEnabled(BuildProfile profile)
+    {
+        return withSettings(it -> withEnabled(profile));
     }
 
     /**
-     * Disables the given build option
+     * Returns a copy of this builder using the given librarian
      *
-     * @param option The option
-     * @return This build for method chaining
+     * @param librarian The librarian to use
+     * @return The copy
      */
-    @Override
-    public Builder withDisabled(BuildOption option)
-    {
-        return withSettings(settings.withDisabled(option));
-    }
-
-    /**
-     * Disables the given build profile
-     *
-     * @param profile The profile
-     * @return This build for method chaining
-     */
-    @Override
-    public Builder withDisabled(BuildProfile profile)
-    {
-        return withSettings(settings.withDisabled(profile));
-    }
-
-    /**
-     * Enables execution of the given phase
-     *
-     * @param phase The phase to enables
-     */
-    @Override
-    public Builder withEnabled(Phase phase)
-    {
-        return withSettings(settings.withEnabled(phase));
-    }
-
-    /**
-     * Enables the given build option
-     *
-     * @param option The option
-     * @return This build for method chaining
-     */
-    @Override
-    public Builder withEnabled(BuildOption option)
-    {
-        return withSettings(settings.withEnabled(option));
-    }
-
-    /**
-     * Enables the given build profile
-     *
-     * @param profile The profile
-     * @return This build for method chaining
-     */
-    @Override
-    public Builder withEnabled(BuildProfile profile)
-    {
-        return withSettings(settings.withEnabled(profile));
-    }
-
     public Builder withLibrarian(Librarian librarian)
     {
         return copy(it -> it.librarian = librarian);
     }
 
     /**
-     * Returns a copy of this builder with the given phases
+     * Parses the given command line, enabling and disabling relevant phases and build options
      *
-     * @param phases The list of phases this builder should execute
-     * @return A copy of this builder with the given phases
+     * @param commandLine The command line to process
      */
-    @Override
-    public Builder withPhases(PhaseList phases)
+    public Builder withParsedCommandLine(CommandLine commandLine)
     {
-        return withSettings(settings.withPhases(phases));
+        var builder = this;
+        for (var argument : commandLine.argumentValues())
+        {
+            var value = argument.value();
+            var enable = !value.startsWith("-");
+            var option = tryCatch(() -> BuildOption.valueOf(value));
+
+            if (option != null)
+            {
+                if (enable)
+                {
+                    builder = copy(it -> it.settings().withEnabled(option));
+                }
+                else
+                {
+                    builder = copy(it -> it.settings().withDisabled(option));
+                }
+            }
+            else
+            {
+                var phase = phase(value);
+                if (phase != null)
+                {
+                    if (enable)
+                    {
+                        builder = copy(it -> it.settings().withEnabled(phase));
+                    }
+                    else
+                    {
+                        builder = copy(it -> it.settings().withDisabled(phase));
+                    }
+                }
+                else
+                {
+                    var profile = new BuildProfile(value);
+                    if (enable)
+                    {
+                        builder = copy(it -> it.settings().withEnabled(profile));
+                    }
+                    else
+                    {
+                        builder = copy(it -> it.settings().withDisabled(profile));
+                    }
+                }
+            }
+        }
+
+        if (settings().isEnabled(HELP))
+        {
+            information(description());
+        }
+
+        return builder;
+    }
+
+    @Override
+    public BuildSettings withPhases(PhaseList phases)
+    {
+        return withSettings(it -> it.withPhases(phases));
     }
 
     /**
@@ -898,16 +741,10 @@ public class Builder extends BaseRepeater implements
         return copy(it -> it.librarian = it.librarian.withPinnedVersion(artifact, version));
     }
 
-    /**
-     * {@inheritDoc}
-     *
-     * @param rootFolder {@inheritDoc}
-     * @return {@inheritDoc}
-     */
     @Override
-    public Builder withRootFolder(Folder rootFolder)
+    public BuildSettings withRootFolder(Folder rootFolder)
     {
-        return withSettings(settings.withRootFolder(rootFolder));
+        return withSettings(it -> it.withRootFolder(rootFolder));
     }
 
     /**
@@ -917,6 +754,16 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withSettings(BuildSettings settings)
     {
-        return copy(it -> it.settings = settings);
+        var copy = copy();
+        copy.attachMixin(settings);
+        return copy;
+    }
+
+    private Builder withSettings(Function<BuildSettings, BuildSettings> transformer)
+    {
+        var copy = copy();
+        BuildSettings settings = transformer.apply(copy.settings());
+        copy.attachMixin(settings);
+        return copy;
     }
 }

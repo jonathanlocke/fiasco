@@ -2,6 +2,7 @@ package digital.fiasco.runtime.build;
 
 import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.naming.Named;
+import com.telenav.kivakit.interfaces.object.Copyable;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.builder.BuildAction;
 import digital.fiasco.runtime.build.builder.Builder;
@@ -160,20 +161,13 @@ import digital.fiasco.runtime.build.settings.BuildSettingsObject;
 public interface Build extends
     Named,
     Described,
+    Copyable<Build>,
     Stepped,
     Repeater,
     BuildEnvironmentTrait,
     BuildRepositoriesTrait,
     BuildSettingsMixin
 {
-
-    /**
-     * Returns a copy of this object
-     *
-     * @return This object for method chaining
-     */
-    Build copy();
-
     /**
      * Returns the metadata for this build
      */

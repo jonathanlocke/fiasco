@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.build.settings;
 
 import com.telenav.kivakit.core.collections.set.ObjectSet;
+import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.Folder;
@@ -75,7 +76,7 @@ import static com.telenav.kivakit.filesystem.Folders.currentFolder;
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "UnusedReturnValue", "unused" })
-public class BuildSettingsObject implements BuildSettingsMixin
+public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMixin
 {
     /** The builder for these settings */
     private Builder builder;

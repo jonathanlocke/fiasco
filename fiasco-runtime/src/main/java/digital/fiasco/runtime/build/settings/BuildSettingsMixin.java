@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.build.settings;
 
 import com.telenav.kivakit.core.collections.set.ObjectSet;
+import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.mixins.Mixin;
@@ -11,7 +12,10 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
 
-public interface BuildSettingsMixin extends Mixin, BuildSettings
+public interface BuildSettingsMixin extends
+    Mixin,
+    Repeater,
+    BuildSettings
 {
     /**
      * {@inheritDoc}
@@ -144,7 +148,7 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
      *
      * @return The {@link HashMap} associated with this mixin
      */
-    default BuildSettingsObject settings()
+    default BuildSettings settings()
     {
         return mixin(BuildSettingsMixin.class, BuildSettingsObject::new);
     }
@@ -156,7 +160,7 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
      * @return {@inheritDoc}
      */
     @Override
-    default BuildSettingsObject withArtifactDescriptor(ArtifactDescriptor descriptor)
+    default BuildSettings withArtifactDescriptor(ArtifactDescriptor descriptor)
     {
         return settings().withArtifactDescriptor(descriptor);
     }
@@ -168,7 +172,7 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
      * @return {@inheritDoc}
      */
     @Override
-    default BuildSettingsObject withArtifactResolverThreads(Count threads)
+    default BuildSettings withArtifactResolverThreads(Count threads)
     {
         return settings().withArtifactResolverThreads(threads);
     }
@@ -180,7 +184,7 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
      * @return {@inheritDoc}
      */
     @Override
-    default BuildSettingsObject withBuilderThreads(Count threads)
+    default BuildSettings withBuilderThreads(Count threads)
     {
         return settings().withBuilderThreads(threads);
     }
@@ -192,7 +196,7 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
      * @return {@inheritDoc}
      */
     @Override
-    default BuildSettingsObject withDisabled(Phase phase)
+    default BuildSettings withDisabled(Phase phase)
     {
         return settings().withDisabled(phase);
     }
@@ -204,7 +208,7 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
      * @return {@inheritDoc}
      */
     @Override
-    default BuildSettingsObject withDisabled(BuildOption option)
+    default BuildSettings withDisabled(BuildOption option)
     {
         return settings().withDisabled(option);
     }
@@ -216,7 +220,7 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
      * @return {@inheritDoc}
      */
     @Override
-    default BuildSettingsObject withDisabled(BuildProfile profile)
+    default BuildSettings withDisabled(BuildProfile profile)
     {
         return settings().withDisabled(profile);
     }
@@ -228,7 +232,7 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
      * @return {@inheritDoc}
      */
     @Override
-    default BuildSettingsObject withEnabled(Phase phase)
+    default BuildSettings withEnabled(Phase phase)
     {
         return settings().withEnabled(phase);
     }
@@ -240,7 +244,7 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
      * @return {@inheritDoc}
      */
     @Override
-    default BuildSettingsObject withEnabled(BuildOption option)
+    default BuildSettings withEnabled(BuildOption option)
     {
         return settings().withEnabled(option);
     }
@@ -252,7 +256,7 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
      * @return {@inheritDoc}
      */
     @Override
-    default BuildSettingsObject withEnabled(BuildProfile profile)
+    default BuildSettings withEnabled(BuildProfile profile)
     {
         return settings().withEnabled(profile);
     }
@@ -264,7 +268,7 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
      * @return {@inheritDoc}
      */
     @Override
-    default BuildSettingsObject withPhases(PhaseList phases)
+    default BuildSettings withPhases(PhaseList phases)
     {
         return settings().withPhases(phases);
     }
@@ -276,7 +280,7 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
      * @return The copy of this settings object
      */
     @Override
-    default BuildSettingsObject withRootFolder(Folder rootFolder)
+    default BuildSettings withRootFolder(Folder rootFolder)
     {
         return settings().withRootFolder(rootFolder);
     }

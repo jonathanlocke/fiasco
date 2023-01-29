@@ -5,6 +5,7 @@ import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.Folder;
 import digital.fiasco.runtime.build.Build;
+import digital.fiasco.runtime.build.Stepped;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
@@ -15,6 +16,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Function;
 
 import static com.telenav.kivakit.core.version.Version.version;
+import static digital.fiasco.runtime.build.settings.BuildOption.DESCRIBE;
+import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName.artifactName;
 
 /**
@@ -82,7 +85,7 @@ import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName
  *
  * @author Jonathan Locke
  */
-public interface BuildSettings
+public interface BuildSettings extends Stepped
 {
     /**
      * Returns the number of threads that should be used to resolve artifacts. This is particularly important for remote
@@ -166,6 +169,28 @@ public interface BuildSettings
      * @return The root folder
      */
     Folder rootFolder();
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    default boolean shouldDescribe()
+    {
+        return isEnabled(DESCRIBE);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    default boolean shouldDescribeAndExecute()
+    {
+        return isEnabled(VERBOSE);
+    }
 
     /**
      * Returns a copy of this settings object with the given artifact
