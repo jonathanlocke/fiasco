@@ -7,7 +7,7 @@ import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL;
 import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL_STAGING;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptors;
-import static digital.fiasco.runtime.dependency.artifact.lists.LibraryList.libraries;
+import static digital.fiasco.runtime.dependency.artifact.collections.LibraryList.libraries;
 
 public class MavenRepositoryTest extends FiascoTest
 {

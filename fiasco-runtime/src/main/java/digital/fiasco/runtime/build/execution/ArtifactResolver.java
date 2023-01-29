@@ -4,14 +4,14 @@ import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.function.Result;
 import com.telenav.kivakit.core.language.trait.TryTrait;
 import com.telenav.kivakit.interfaces.code.Callback;
-import digital.fiasco.runtime.build.settings.BuildSettingsObject;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
+import digital.fiasco.runtime.build.settings.BuildSettingsObject;
 import digital.fiasco.runtime.dependency.Dependency;
+import digital.fiasco.runtime.dependency.artifact.Artifact;
+import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.DependencyQueue;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
-import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
@@ -47,13 +47,14 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
 public class ArtifactResolver extends BaseComponent implements TryTrait
 {
     /**
-     * Resolves the artifact dependencies of a build tree in groups, calling back with the results for each group
+     * Resolves the artifact dependencies of a build tree in groups, updating the given {@link ResolvedArtifacts} set
+     * for each group that is resolved.
      *
      * @param root The root of the build tree
-     * @param completed The callback to call as each group of artifacts is resolved
+     * @param resolved The set of resolved artifacts to update
      */
     public void resolveArtifacts(Builder root,
-                                 Callback<Result<ArtifactList>> completed)
+                                 ResolvedArtifacts resolved)
     {
         var settings = root.settings();
 
@@ -75,9 +76,16 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
                 {
                     // Use the librarian to resolve the requested artifacts, and call back with the result.
                     var librarian = settings.librarian();
-                    completed.call(result(librarian, () -> librarian.resolve(artifacts.asArtifactDescriptors())));
-                    return null;
-                });
+                    var result = result(librarian, () -> librarian.resolve(artifacts.asArtifactDescriptors()));
+
+                    // and for each group of artifacts that are successfully resolved,
+                    if (result.succeeded())
+                    {
+                        // mark them in the resolved set.
+                        resolved.resolve(result.get());
+                    }
+                    result.messages().broadcastTo(this);
+                }, null);
             }
 
             // Wait until all artifacts in the queue are resolved.

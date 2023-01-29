@@ -9,7 +9,7 @@ import com.telenav.kivakit.resource.converters.ResourceIdentifierConverter;
 import com.telenav.kivakit.serialization.gson.KivaKitCoreGsonFactory;
 import com.telenav.kivakit.serialization.gson.serializers.primitive.ByteArrayGsonSerializer;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType;
+import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType;
 import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
 import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
 import digital.fiasco.runtime.repository.Repository;

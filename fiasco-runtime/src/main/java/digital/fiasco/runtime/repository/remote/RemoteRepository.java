@@ -4,7 +4,7 @@ import com.telenav.kivakit.core.progress.ProgressReporter;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.RepositoryContentReader;
 import digital.fiasco.runtime.repository.Repository;

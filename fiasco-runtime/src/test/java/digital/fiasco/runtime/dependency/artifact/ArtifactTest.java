@@ -4,8 +4,8 @@ import com.telenav.kivakit.core.collections.map.ObjectMap;
 import digital.fiasco.runtime.FiascoTest;
 import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
 import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
-import digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachment;
-import digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType;
+import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment;
+import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
 import org.junit.Test;
 
@@ -16,15 +16,15 @@ import static com.telenav.kivakit.interfaces.string.StringFormattable.Format.USE
 import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL;
 import static digital.fiasco.runtime.dependency.collections.DependencyList.dependencies;
 import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJson;
-import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.JAR_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.SOURCES_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
-import static digital.fiasco.runtime.dependency.artifact.lists.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.artifact.collections.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.artifact.artifacts.Asset.asset;
-import static digital.fiasco.runtime.dependency.artifact.lists.AssetList.assets;
+import static digital.fiasco.runtime.dependency.artifact.collections.AssetList.assets;
 import static digital.fiasco.runtime.dependency.artifact.artifacts.Library.library;
-import static digital.fiasco.runtime.dependency.artifact.lists.LibraryList.libraries;
+import static digital.fiasco.runtime.dependency.artifact.collections.LibraryList.libraries;
 
 public class ArtifactTest extends FiascoTest
 {

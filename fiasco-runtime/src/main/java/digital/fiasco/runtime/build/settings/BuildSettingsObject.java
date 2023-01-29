@@ -13,7 +13,7 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
-import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
 import org.jetbrains.annotations.NotNull;
 
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;

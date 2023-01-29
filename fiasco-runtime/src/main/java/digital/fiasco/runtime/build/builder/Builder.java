@@ -11,22 +11,23 @@ import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.BuildEnvironmentTrait;
-import digital.fiasco.runtime.build.settings.BuildOption;
-import digital.fiasco.runtime.build.settings.BuildProfile;
-import digital.fiasco.runtime.build.settings.BuildSettingsObject;
+import digital.fiasco.runtime.build.Stepped;
 import digital.fiasco.runtime.build.builder.phases.BasePhase;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.build.builder.tools.Tool;
 import digital.fiasco.runtime.build.builder.tools.ToolFactory;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
+import digital.fiasco.runtime.build.settings.BuildOption;
+import digital.fiasco.runtime.build.settings.BuildProfile;
+import digital.fiasco.runtime.build.settings.BuildSettings;
 import digital.fiasco.runtime.dependency.Dependency;
-import digital.fiasco.runtime.dependency.collections.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
+import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup;
-import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
+import digital.fiasco.runtime.dependency.collections.DependencyList;
 import digital.fiasco.runtime.repository.Repository;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
@@ -36,6 +37,7 @@ import static com.telenav.kivakit.core.string.Paths.pathTail;
 import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.build.settings.BuildOption.DESCRIBE;
 import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
+import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup.group;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName.artifactName;
 
@@ -107,7 +109,7 @@ import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName
  *     <li>{@link #threads()}</li>
  *     <li>{@link #withPhases(PhaseList)}</li>
  *     <li>{@link #withRootFolder(Folder)}</li>
- *     <li>{@link #withSettings(BuildSettingsObject)}</li>
+ *     <li>{@link #withSettings(BuildSettings)}</li>
  *     <li>{@link #withBuilderThreads(Count)}</li>
  * </ul>
  *
@@ -233,6 +235,7 @@ import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
 public class Builder extends BaseRepeater implements
     Described,
+    Stepped,
     BuildStructured,
     BuilderAssociated,
     BuildEnvironmentTrait,
@@ -244,7 +247,7 @@ public class Builder extends BaseRepeater implements
     private final Build build;
 
     /** The settings for this builder */
-    private BuildSettingsObject settings;
+    private BuildSettings settings;
 
     /**
      * The dependencies that must be resolved before this builder can run. Dependencies can include both artifacts and
@@ -733,9 +736,31 @@ public class Builder extends BaseRepeater implements
     /**
      * Returns the settings for this builder
      */
-    public BuildSettingsObject settings()
+    public BuildSettings settings()
     {
         return settings;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public boolean shouldDescribe()
+    {
+        return isEnabled(DESCRIBE);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public boolean shouldDescribeAndExecute()
+    {
+        return isEnabled(VERBOSE);
     }
 
     /**
@@ -903,7 +928,7 @@ public class Builder extends BaseRepeater implements
      * @param settings The settings
      * @return The new builder
      */
-    public Builder withSettings(BuildSettingsObject settings)
+    public Builder withSettings(BuildSettings settings)
     {
         var copy = copy();
         copy.settings = settings;

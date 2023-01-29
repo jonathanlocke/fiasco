@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.dependency.artifact.attachment;
+package digital.fiasco.runtime.dependency.artifact.content;
 
 import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
@@ -6,7 +6,6 @@ import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import org.jetbrains.annotations.NotNull;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;

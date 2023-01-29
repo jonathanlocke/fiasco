@@ -2,11 +2,11 @@ package digital.fiasco.runtime.dependency.artifact.attachment;
 
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import digital.fiasco.runtime.FiascoTest;
-import digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachment;
+import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachment.attachment;
-import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.JAR_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment.attachment;
+import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
 
 public class ArtifactAttachmentTest extends FiascoTest
 {

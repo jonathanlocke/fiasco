@@ -68,11 +68,6 @@ public interface Tool extends
     Librarian librarian();
 
     /**
-     * Called to describe what this tool does (without doing it)
-     */
-    void onDescribe();
-
-    /**
      * Called after this tool has been run
      */
     void onRan();

@@ -1,16 +1,15 @@
 package digital.fiasco.runtime.dependency.artifact.artifacts;
 
 import digital.fiasco.runtime.FiascoTest;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
-import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.JAR_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.SOURCES_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
-import static digital.fiasco.runtime.dependency.artifact.lists.LibraryList.libraries;
+import static digital.fiasco.runtime.dependency.artifact.collections.LibraryList.libraries;
 
 public class LibraryTest extends FiascoTest
 {

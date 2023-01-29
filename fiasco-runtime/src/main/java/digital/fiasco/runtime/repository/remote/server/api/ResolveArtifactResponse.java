@@ -1,10 +1,10 @@
-package digital.fiasco.runtime.repository.remote.server.api.resolve;
+package digital.fiasco.runtime.repository.remote.server.api;
 
 import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.microservice.microservlet.BaseMicroservletResponse;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 
 import java.util.ArrayList;

@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.dependency.artifact.lists;
+package digital.fiasco.runtime.dependency.artifact.collections;
 
 import digital.fiasco.runtime.FiascoTest;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
@@ -9,7 +9,7 @@ import org.junit.Test;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.value.count.Count._2;
-import static digital.fiasco.runtime.dependency.artifact.lists.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.artifact.collections.ArtifactList.artifacts;
 
 public class ArtifactListTest extends FiascoTest
 {

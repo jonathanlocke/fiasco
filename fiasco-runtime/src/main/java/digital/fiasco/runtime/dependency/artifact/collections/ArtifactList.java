@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.dependency.artifact.lists;
+package digital.fiasco.runtime.dependency.artifact.collections;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;

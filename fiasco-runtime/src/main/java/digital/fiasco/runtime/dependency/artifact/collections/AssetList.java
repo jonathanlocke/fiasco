@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.dependency.artifact.lists;
+package digital.fiasco.runtime.dependency.artifact.collections;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
@@ -7,7 +7,6 @@ import digital.fiasco.runtime.dependency.collections.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
 
 import java.util.Collection;
 
@@ -18,22 +17,22 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 
 /**
- * A list of {@link Library} objects.
+ * A list of {@link Asset} objects.
  *
  * <p><b>Creation</b></p>
  *
  * <ul>
- *     <li>{@link #libraries(Library[])}</li>
- *     <li>{@link #libraries(Collection)}</li>
- *     <li>{@link #libraries(ArtifactDescriptor...)}</li>
- *     <li>{@link #libraries(String...)}</li>
+ *     <li>{@link #assets(Asset[])}</li>
+ *     <li>{@link #assets(Collection)}</li>
+ *     <li>{@link #assets(ArtifactDescriptor...)}</li>
+ *     <li>{@link #assets(String...)}</li>
  * </ul>
  *
  * <p><b>Matching</b></p>
  *
  * <ul>
  *     <li>{@link #asAssetList()}</li>
- *     <li>{@link #asLibraryList()}</li>
+ *     <li>{@link #asAssetList()}</li>
  *     <li>{@link #matching(Matcher)}</li>
  * </ul>
  *
@@ -62,107 +61,107 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
  *
  * <ul>
  *     <li>{@link #copy()}</li>
- *     <li>{@link #with(Library)}</li>
- *     <li>{@link #with(Library, Library[])}</li>
- *     <li>{@link #with(Library[])}</li>
+ *     <li>{@link #with(Asset)}</li>
+ *     <li>{@link #with(Asset, Asset[])}</li>
+ *     <li>{@link #with(Asset[])}</li>
  *     <li>{@link #without(Matcher)}</li>
  *     <li>{@link #without(Collection)}</li>
- *     <li>{@link #without(Library)}</li>
+ *     <li>{@link #without(Asset)}</li>
  * </ul>
  *
  * @author Jonathan Locke
  * @see Artifact
- * @see Library
+ * @see Asset
  * @see Asset
  * @see DependencyList
  */
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
-public class LibraryList extends DependencyList<Library, LibraryList>
+public class AssetList extends DependencyList<Asset, AssetList>
 {
     /**
-     * Creates a list of libraries
+     * Creates a list of assets
      *
-     * @param libraries The libraries to add
-     * @return The list of libraries
+     * @param assets The assets to add
+     * @return The list of assets
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static LibraryList libraries(Collection<Library> libraries)
+    public static AssetList assets(Collection<Asset> assets)
     {
-        return new LibraryList(libraries);
+        return new AssetList(assets);
     }
 
     /**
-     * Creates a list of libraries
+     * Creates a list of assets
      *
-     * @param libraries The libraries to add
-     * @return The list of libraries
+     * @param assets The assets to add
+     * @return The list of assets
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static LibraryList libraries(Library... libraries)
+    public static AssetList assets(Asset... assets)
     {
-        return new LibraryList(list(libraries));
+        return new AssetList(list(assets));
     }
 
     /**
-     * Creates a list of libraries
+     * Creates a list of assets
      *
-     * @param libraries The libraries to add
-     * @return The list of libraries
+     * @param assets The assets to add
+     * @return The list of assets
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static LibraryList libraries(Iterable<ArtifactDescriptor> libraries)
+    public static AssetList assets(ArtifactDescriptor... assets)
     {
-        return new LibraryList(list(libraries).map(Library::library));
+        return new AssetList(list(assets).map(Asset::asset));
     }
 
     /**
-     * Creates a list of libraries
+     * Creates a list of assets
      *
-     * @param libraries The libraries to add
-     * @return The list of libraries
+     * @param assets The assets to add
+     * @return The list of assets
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static LibraryList libraries(ArtifactDescriptor... libraries)
+    public static AssetList assets(Iterable<ArtifactDescriptor> assets)
     {
-        return new LibraryList(list(libraries).map(Library::library));
+        return new AssetList(list(assets).map(Asset::asset));
     }
 
     /**
-     * Creates a list of libraries from the given variable-argument list of descriptors
+     * Creates a list of assets from the given variable-argument list of descriptors
      *
-     * @param descriptors The library descriptors
-     * @return The list of libraries
+     * @param descriptors The asset descriptors
+     * @return The list of assets
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static LibraryList libraries(String... descriptors)
+    public static AssetList assets(String... descriptors)
     {
-        var libraries = stringList(descriptors).map(Library::library);
-        return libraries(libraries.asArray(Library.class));
+        var assets = stringList(descriptors).map(Asset::asset);
+        return assets(assets.asArray(Asset.class));
     }
 
-    public LibraryList()
+    public AssetList()
     {
     }
 
-    protected LibraryList(LibraryList that)
+    protected AssetList(AssetList that)
     {
         super(that);
     }
 
-    protected LibraryList(Collection<Library> libraries)
+    protected AssetList(Collection<Asset> assets)
     {
-        super(libraries);
+        super(assets);
     }
 
     @Override
-    protected LibraryList newList()
+    protected AssetList newList()
     {
-        return new LibraryList();
+        return new AssetList();
     }
 
     @Override
-    protected LibraryList newList(LibraryList that)
+    protected AssetList newList(AssetList that)
     {
-        return new LibraryList(that);
+        return new AssetList(that);
     }
 }

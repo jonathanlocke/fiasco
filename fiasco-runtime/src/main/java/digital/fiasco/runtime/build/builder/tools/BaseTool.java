@@ -9,9 +9,6 @@ import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.dependency.collections.DependencyList;
 
-import static digital.fiasco.runtime.build.settings.BuildOption.DESCRIBE;
-import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
-
 /**
  * Base class for build {@link Tool}s. Build tools can be enabled or disabled under a given {@link BuildProfile} by
  * calling {@link #enableForProfile(BuildProfile)} or .
@@ -121,15 +118,6 @@ public abstract class BaseTool extends BaseRepeater implements
     }
 
     /**
-     * Called to describe what this tool does (without doing it)
-     */
-    @Override
-    public void onDescribe()
-    {
-        announce(" \n" + description());
-    }
-
-    /**
      * Called after this tool has been run
      */
     @Override
@@ -168,16 +156,9 @@ public abstract class BaseTool extends BaseRepeater implements
     {
         if (isEnabled())
         {
-            if (shouldDescribe())
-            {
-                onDescribe();
-            }
-            else
-            {
-                onRunning();
-                onRun();
-                onRan();
-            }
+            onRunning();
+            onRun();
+            onRan();
         }
     }
 
@@ -189,7 +170,7 @@ public abstract class BaseTool extends BaseRepeater implements
     @Override
     public boolean shouldDescribe()
     {
-        return builder.isEnabled(DESCRIBE);
+        return builder.shouldDescribe();
     }
 
     /**
@@ -200,6 +181,6 @@ public abstract class BaseTool extends BaseRepeater implements
     @Override
     public boolean shouldDescribeAndExecute()
     {
-        return builder.isEnabled(VERBOSE);
+        return builder.shouldDescribeAndExecute();
     }
 }

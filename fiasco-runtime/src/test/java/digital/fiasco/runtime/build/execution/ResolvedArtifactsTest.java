@@ -5,7 +5,7 @@ import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;
 
 import static com.telenav.kivakit.core.time.Duration.seconds;
-import static digital.fiasco.runtime.dependency.artifact.lists.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.artifact.collections.ArtifactList.artifacts;
 
 public class ResolvedArtifactsTest extends FiascoTest
 {

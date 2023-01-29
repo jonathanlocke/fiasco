@@ -8,12 +8,12 @@ import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
 import com.telenav.kivakit.settings.SettingsTrait;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
 import digital.fiasco.runtime.repository.Repository.InstallationResult;
 import digital.fiasco.runtime.repository.RepositoryContentReader;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
-import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactsRequest;
-import digital.fiasco.runtime.repository.remote.server.api.resolve.ResolveArtifactResponse;
+import digital.fiasco.runtime.repository.remote.server.api.ResolveArtifactsRequest;
+import digital.fiasco.runtime.repository.remote.server.api.ResolveArtifactResponse;
 import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;
 
 import java.util.List;

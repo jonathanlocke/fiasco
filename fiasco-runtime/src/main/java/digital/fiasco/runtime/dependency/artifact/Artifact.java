@@ -16,13 +16,13 @@ import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.collections.DependencyList;
 import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
 import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
-import digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachment;
-import digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType;
+import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment;
+import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContentSignatures;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
-import digital.fiasco.runtime.dependency.artifact.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
 import digital.fiasco.runtime.repository.Repository;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
@@ -30,8 +30,8 @@ import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
-import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachment.attachment;
-import static digital.fiasco.runtime.dependency.artifact.attachment.ArtifactAttachmentType.JAR_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment.attachment;
+import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
 
 /**
  * Defines an artifact, either an {@link Asset} or a {@link Library}. Libraries are artifacts that have a source and
