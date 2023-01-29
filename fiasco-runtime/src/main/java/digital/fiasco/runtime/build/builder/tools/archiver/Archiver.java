@@ -67,9 +67,16 @@ public class Archiver extends BaseFileTool
     @Override
     public void onRun()
     {
-        try (var archive = zipArchive(this, archiveFile, WRITE))
+        if (describe())
         {
-            archive.add(files());
+            step("Archiving to $:\n$", archiveFile, files().asStringList().indented(4).join("\n"));
+        }
+        else
+        {
+            try (var archive = zipArchive(this, archiveFile, WRITE))
+            {
+                archive.add(files());
+            }
         }
     }
 

@@ -98,7 +98,7 @@ public class Copier extends BaseFileTool
             destination.parent().mkdirs();
 
             // and copy the source file to the destination location
-            source.safeCopyTo(destination, OVERWRITE, progress);
+            step(() -> source.safeCopyTo(destination, OVERWRITE, progress), "Copying $ to $", source, destination);
             progress.next();
         }
         progress.end(files.size() + " files copied");

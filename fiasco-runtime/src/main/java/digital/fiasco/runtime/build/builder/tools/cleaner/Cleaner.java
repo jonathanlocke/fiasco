@@ -3,7 +3,6 @@ package digital.fiasco.runtime.build.builder.tools.cleaner;
 import com.telenav.kivakit.filesystem.File;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.BaseFileTool;
-import digital.fiasco.runtime.build.builder.tools.archiver.Archiver;
 
 import java.util.Collection;
 
@@ -49,15 +48,15 @@ public class Cleaner extends BaseFileTool
     @Override
     public void onRun()
     {
-        information("Cleaning $ files", files().count());
+        step("Cleaning $ files", files().count());
 
         files().forEach(file ->
         {
-            file.delete();
+            step(file::delete, "Deleting $", file);
             var parent = file.parent();
             if (parent.isEmpty())
             {
-                parent.delete();
+                step(parent::delete, "Deleting $", parent);
             }
         });
     }

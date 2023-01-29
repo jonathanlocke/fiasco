@@ -14,6 +14,9 @@ public enum BuildOption
     /** Show what would be built without building it */
     DESCRIBE("describe the build rather than running it"),
 
+    /** Describe operations as well as executing them */
+    VERBOSE("describe the build rather than running it"),
+
     /** Build with minimal output */
     QUIET("build with minimal output"),
 

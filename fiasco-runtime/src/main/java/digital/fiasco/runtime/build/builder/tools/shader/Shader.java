@@ -30,6 +30,5 @@ public class Shader extends BaseTool
     @Override
     public void onRun()
     {
-
     }
 }

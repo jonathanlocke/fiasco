@@ -96,13 +96,16 @@ public class BuildStamper extends BaseTool implements
 
         var name = associatedBuilder().descriptor().name().replaceAll("\\.", "-");
 
-        targetClassesFolder()
-            .file(name + "-project.properties")
-            .saveText(projectProperties().join("\n"));
+        var projectProperties = targetClassesFolder()
+            .file(name + "-project.properties");
+        var buildProperties = targetClassesFolder()
+            .file(name + "-build.properties");
 
-        targetClassesFolder()
-            .file(name + "-build.properties")
-            .saveText(buildProperties().join("\n"));
+        step(() -> projectProperties.saveText(projectProperties().join("\n")),
+            "Writing $", projectProperties);
+
+        step(() -> buildProperties.saveText(buildProperties().join("\n")),
+            "Writing $", buildProperties);
     }
 
     /**
