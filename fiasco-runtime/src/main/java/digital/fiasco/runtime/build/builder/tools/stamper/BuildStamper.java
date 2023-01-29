@@ -44,7 +44,7 @@ import static com.telenav.kivakit.core.time.Time.now;
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused", "SpellCheckingInspection" })
-public class BuildStamper extends BaseTool implements
+public class BuildStamper extends BaseTool<BuildStamper> implements
     BuildStructured,
     ToolFactory
 {

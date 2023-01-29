@@ -8,7 +8,7 @@ import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.settings.BuildSettings;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.DependencyList;
 import digital.fiasco.runtime.dependency.collections.DependencyQueue;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
@@ -101,7 +101,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
             var future = (Future<Result<Builder>>) executor.submit(() ->
             {
                 // Wait for artifact dependencies to be resolved,
-                resolved.waitForResolutionOf(finalBuilder.artifacts());
+                resolved.waitForResolutionOf(finalBuilder.artifactDependencies());
 
                 // run the builder,
                 finalBuilder.build();

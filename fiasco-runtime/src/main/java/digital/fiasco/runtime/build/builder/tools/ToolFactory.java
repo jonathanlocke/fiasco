@@ -96,7 +96,7 @@ public interface ToolFactory extends
         return newTool(Tester.class);
     }
 
-    default <T extends Tool> T newTool(Class<T> type)
+    default <T extends Tool<T>> T newTool(Class<T> type)
     {
         return listenTo(Classes.newInstance(type, Builder.class, associatedBuilder()));
     }

@@ -4,7 +4,7 @@ import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
-import static digital.fiasco.runtime.dependency.artifact.collections.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
 
 public class ArtifactListConverterTest extends FiascoTest
 {

@@ -41,7 +41,7 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class Compiler extends BaseTool
+public class Compiler extends BaseTool<Compiler>
 {
     /**
      * Broadcasts compilation errors

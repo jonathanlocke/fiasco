@@ -7,9 +7,9 @@ import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContentSignatures;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.types.Asset;
+import digital.fiasco.runtime.dependency.artifact.types.Library;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;
 
@@ -18,9 +18,9 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.SOURCES_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.collections.ArtifactList.artifacts;
-import static digital.fiasco.runtime.dependency.artifact.artifacts.Asset.asset;
-import static digital.fiasco.runtime.dependency.artifact.artifacts.Library.library;
+import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.artifact.types.Asset.asset;
+import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
 
 public class FiascoTest extends UnitTest
 {

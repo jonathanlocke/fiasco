@@ -3,7 +3,7 @@ package digital.fiasco.runtime.build.builder.tools.shader;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.BaseTool;
 
-public class Shader extends BaseTool
+public class Shader extends BaseTool<Shader>
 {
     public Shader(Builder builder)
     {

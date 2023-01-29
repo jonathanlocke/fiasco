@@ -9,11 +9,9 @@ import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.build.builder.phases.standard.StandardPhases;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
-import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
-import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
 import org.jetbrains.annotations.NotNull;
 
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
@@ -39,17 +37,6 @@ import static com.telenav.kivakit.filesystem.Folders.currentFolder;
  *     <li>{@link #withDisabled(BuildOption)}</li>
  *     <li>{@link #withEnabled(BuildOption)}</li>
  *     <li>{@link #isEnabled(BuildOption)}</li>
- * </ul>
- *
- * <p><b>Build Dependencies</b></p>
- *
- * <ul>
- *     <li>{@link #dependencies()}</li>
- *     <li>{@link #librarian()}</li>
- *     <li>{@link #withPinnedVersion(Artifact, String)}</li>
- *     <li>{@link #withPinnedVersion(Artifact, Version)}</li>
- *     <li>{@link #withDependencies(Artifact, Artifact[])}</li>
- *     <li>{@link #withDependencies(ArtifactList)}</li>
  * </ul>
  *
  * <p><b>Build Phases</b></p>
@@ -80,7 +67,7 @@ import static com.telenav.kivakit.filesystem.Folders.currentFolder;
  *     <li>{@link #withArtifactGroup(String)}</li>
  *     <li>{@link #withArtifactGroup(ArtifactGroup)}</li>
  *     <li>{@link #withArtifact(String)}</li>
- *     <li>{@link #withArtifact(ArtifactName)}</li>
+ *     <li>{@link #withArtifactName(ArtifactName)}</li>
  *     <li>{@link #withArtifactVersion(String)}</li>
  *     <li>{@link #withArtifactVersion(Version)}</li>
  * </ul>
@@ -111,9 +98,6 @@ public class BuildSettingsObject implements BuildSettingsMixin
     /** The primary artifact being built */
     private ArtifactDescriptor descriptor;
 
-    /** Libraries to compile with */
-    private ArtifactList artifacts;
-
     /** The librarian to manage libraries */
     private Librarian librarian;
 
@@ -128,8 +112,7 @@ public class BuildSettingsObject implements BuildSettingsMixin
     {
         this.builder = builder;
         this.phases = new StandardPhases(builder);
-        this.artifacts = ArtifactList.artifacts();
-        this.librarian = builder.newLibrarian();
+        this.librarian = builder.librarian();
         this.rootFolder = currentFolder();
     }
 
@@ -147,7 +130,6 @@ public class BuildSettingsObject implements BuildSettingsMixin
         this.builderThreads = that.builderThreads;
         this.options = that.options.copy();
         this.descriptor = that.descriptor;
-        this.artifacts = that.dependencies().copy();
         this.librarian = that.librarian;
         this.profiles = that.profiles.copy();
     }
@@ -182,17 +164,6 @@ public class BuildSettingsObject implements BuildSettingsMixin
     public BuildSettingsObject copySettings()
     {
         return new BuildSettingsObject(this);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
-    @Override
-    public ArtifactList dependencies()
-    {
-        return artifacts;
     }
 
     /**
@@ -240,17 +211,6 @@ public class BuildSettingsObject implements BuildSettingsMixin
     public boolean isEnabled(BuildProfile profile)
     {
         return profiles.contains(profile);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
-    @Override
-    public Librarian librarian()
-    {
-        return librarian;
     }
 
     /**
@@ -344,35 +304,6 @@ public class BuildSettingsObject implements BuildSettingsMixin
     /**
      * {@inheritDoc}
      *
-     * @param first {@inheritDoc}
-     * @param rest {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public BuildSettingsObject withDependencies(Artifact<?> first, Artifact<?>... rest)
-    {
-        var copy = copySettings();
-        copy.artifacts = artifacts.with(first, rest);
-        return copy;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param dependencies {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public BuildSettingsObject withDependencies(ArtifactList dependencies)
-    {
-        var copy = copySettings();
-        copy.artifacts = this.artifacts.with(dependencies);
-        return copy;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @param phase {@inheritDoc}
      * @return {@inheritDoc}
      */
@@ -451,20 +382,6 @@ public class BuildSettingsObject implements BuildSettingsMixin
     {
         var copy = copySettings();
         copy.profiles.add(profile);
-        return copy;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param librarian {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public BuildSettingsObject withLibrarian(Librarian librarian)
-    {
-        var copy = copySettings();
-        copy.librarian = librarian;
         return copy;
     }
 

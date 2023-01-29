@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.dependency.artifact.artifacts;
+package digital.fiasco.runtime.dependency.artifact.types;
 
 import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
@@ -9,12 +9,13 @@ import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.core.version.Version;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
-import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.BuilderList;
 import digital.fiasco.runtime.repository.Repository;
 
 import java.util.LinkedHashMap;
@@ -29,6 +30,7 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.split;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
+import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
 
@@ -55,7 +57,7 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
  * <p><b>Dependencies</b></p>
  *
  * <ul>
- *     <li>{@link #dependencies()}</li>
+ *     <li>{@link #artifactDependencies()} ()}</li>
  *     <li>{@link #isExcluded(ArtifactDescriptor)}</li>
  *     <li>{@link #withDependencies(ArtifactList)}</li>
  *     <li>{@link #excluding(ArtifactDescriptor...)}</li>
@@ -165,6 +167,19 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     }
 
     /**
+     * Returns a list of artifacts without any excluded artifacts
+     *
+     * @return The artifacts
+     */
+    @Override
+    @FormatProperty
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public ArtifactList artifactDependencies()
+    {
+        return dependencies.matching(at -> !isExcluded(at));
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -202,6 +217,17 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     }
 
     /**
+     * Artifacts do not depend on builders
+     *
+     * @throws RuntimeException Always thrown
+     */
+    @Override
+    public BuilderList builderDependencies()
+    {
+        return unsupported();
+    }
+
+    /**
      * Returns a copy of this artifact, of type A, where A is either Library or Asset.
      *
      * @return The copy
@@ -209,19 +235,6 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public abstract A copy();
-
-    /**
-     * Returns a list of artifacts without any excluded artifacts
-     *
-     * @return The artifacts
-     */
-    @Override
-    @FormatProperty
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public ArtifactList dependencies()
-    {
-        return dependencies.matching(at -> !isExcluded(at));
-    }
 
     /**
      * Returns the dependency matching the given dependency pattern
@@ -375,13 +388,15 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public String mavenPom()
     {
-        var dependencies = stringList();
-        if (dependencies().isNonEmpty())
+        var pom = stringList();
+
+        var artifacts = artifactDependencies();
+        if (artifacts.isNonEmpty())
         {
-            for (var artifact : dependencies())
+            for (var artifact : artifacts)
             {
                 var descriptor = artifact.descriptor();
-                dependencies.addAll(split(format("""
+                pom.addAll(split(format("""
                         <dependency>
                             <groupId>$</groupId>
                             <artifactId>$</artifactId>
@@ -393,13 +408,13 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
                     descriptor.version()), "\n"));
             }
 
-            dependencies = dependencies.indented(4);
-            dependencies = dependencies.prepending("");
-            dependencies = dependencies.prepending("<dependencies>");
-            dependencies = dependencies.prepending("");
-            dependencies = dependencies.appending("</dependencies>");
-            dependencies = dependencies.appending("");
-            dependencies = dependencies.indented(4);
+            pom = pom.indented(4);
+            pom = pom.prepending("");
+            pom = pom.prepending("<dependencies>");
+            pom = pom.prepending("");
+            pom = pom.appending("</dependencies>");
+            pom = pom.appending("");
+            pom = pom.indented(4);
         }
 
         return format("""
@@ -419,7 +434,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
             descriptor.group(),
             descriptor.artifact(),
             descriptor.version(),
-            dependencies.join("\n"));
+            pom.join("\n"));
     }
 
     @Override

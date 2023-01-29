@@ -6,10 +6,7 @@ import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.mixins.Mixin;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
-import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
-import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.HashMap;
@@ -33,7 +30,7 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
      * @return {@inheritDoc}
      */
     @Override
-    default BuildSettings attach(BuildSettings that)
+    default BuildSettings attachMixin(BuildSettings that)
     {
         return mixin(BuildSettingsMixin.class, () -> (BuildSettingsObject) that);
     }
@@ -47,17 +44,6 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
     default Count builderThreads()
     {
         return settings().builderThreads();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
-    @Override
-    default ArtifactList dependencies()
-    {
-        return settings().dependencies();
     }
 
     /**
@@ -105,17 +91,6 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
     default boolean isEnabled(BuildProfile profile)
     {
         return settings().isEnabled(profile);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
-    @Override
-    default Librarian librarian()
-    {
-        return settings().librarian();
     }
 
     /**
@@ -213,31 +188,6 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
     /**
      * {@inheritDoc}
      *
-     * @param first {@inheritDoc}
-     * @param rest {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    default BuildSettingsObject withDependencies(Artifact<?> first, Artifact<?>... rest)
-    {
-        return settings().withDependencies(first, rest);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param dependencies {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    default BuildSettingsObject withDependencies(ArtifactList dependencies)
-    {
-        return settings().withDependencies(dependencies);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
      * @param phase {@inheritDoc}
      * @return {@inheritDoc}
      */
@@ -305,18 +255,6 @@ public interface BuildSettingsMixin extends Mixin, BuildSettings
     default BuildSettingsObject withEnabled(BuildProfile profile)
     {
         return settings().withEnabled(profile);
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param librarian {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    default BuildSettingsObject withLibrarian(Librarian librarian)
-    {
-        return settings().withLibrarian(librarian);
     }
 
     /**

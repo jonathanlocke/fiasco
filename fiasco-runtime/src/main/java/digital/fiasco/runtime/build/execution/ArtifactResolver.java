@@ -9,7 +9,7 @@ import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.build.settings.BuildSettingsObject;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.DependencyQueue;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
@@ -75,7 +75,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
                 completion.submit(() ->
                 {
                     // Use the librarian to resolve the requested artifacts, and call back with the result.
-                    var librarian = settings.librarian();
+                    var librarian = root.librarian();
                     var result = result(librarian, () -> librarian.resolve(artifacts.asArtifactDescriptors()));
 
                     // and for each group of artifacts that are successfully resolved,

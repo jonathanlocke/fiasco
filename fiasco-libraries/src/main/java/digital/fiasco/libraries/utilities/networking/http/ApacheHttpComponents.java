@@ -1,7 +1,7 @@
 package digital.fiasco.libraries.utilities.networking.http;
 
 import digital.fiasco.libraries.LibraryGroups;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
+import digital.fiasco.runtime.dependency.artifact.types.Library;
 
 @SuppressWarnings({ "unused", "SpellCheckingInspection" })
 public interface ApacheHttpComponents extends LibraryGroups

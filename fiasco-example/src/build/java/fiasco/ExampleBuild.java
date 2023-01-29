@@ -84,23 +84,23 @@ public class ExampleBuild extends BaseBuild implements Libraries
     {
         var utilities = root
             .deriveBuilder("utilities")
-            .requires(hamcrest_library.version("5.0"));
+            .withDependencies(hamcrest_library.version("5.0"));
 
         var model = root
             .deriveBuilder("child2")
-            .requires(hamcrest_library.version("5.0"))
-            .dependsOn(utilities);
+            .withDependencies(hamcrest_library.version("5.0"))
+            .withDependencies(utilities);
 
         return root
-            .requires(apache_ant, apache_commons_logging, kryo)
-            .pinVersion(apache_ant, "1.0.3")
-            .pinVersion(apache_commons_logging, "1.9.0")
-            .pinVersion(kryo, "4.3.1")
+            .withDependencies(apache_ant, apache_commons_logging, kryo)
+            .withPinnedVersion(apache_ant, "1.0.3")
+            .withPinnedVersion(apache_commons_logging, "1.9.0")
+            .withPinnedVersion(kryo, "4.3.1")
             .beforePhase("compile", it ->
             {
                 var cleaner = it.newCleaner();
                 cleaner.run();
             })
-            .dependsOn(model);
+            .withDependencies(model);
     }
 }

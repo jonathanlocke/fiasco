@@ -3,15 +3,15 @@ package digital.fiasco.runtime.dependency;
 import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.dependency.artifact.collections.ArtifactList.artifacts;
-import static digital.fiasco.runtime.dependency.artifact.collections.AssetList.assets;
+import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.collections.AssetList.assets;
 
 public class DependencyTest extends FiascoTest
 {
     @Test
     public void testArtifactDependencies()
     {
-        ensureEqual(kivakitApplication().artifacts(), artifacts(kivakitCore(), kivakitResource(), kivakitIcons(), kivakitLogos()));
+        ensureEqual(kivakitApplication().artifactDependencies(), artifacts(kivakitCore(), kivakitResource(), kivakitIcons(), kivakitLogos()));
     }
 
     @Test

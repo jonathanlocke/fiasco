@@ -90,7 +90,7 @@ public abstract class BaseBuild extends Application implements Build
     {
         var copy = typeForClass(getClass()).newInstance();
         copy.copyFrom(this);
-        copy.attach(this);
+        copy.attachMixin(this);
         return copy;
     }
 
@@ -181,6 +181,8 @@ public abstract class BaseBuild extends Application implements Build
     @Override
     protected void onSerializationInitialize()
     {
+        super.onSerializationInitialize();
+
         register(new FiascoGsonFactory());
     }
 

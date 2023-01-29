@@ -10,7 +10,7 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.repository.RepositoryContentReader;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.local.LocalRepository;
@@ -120,9 +120,7 @@ public class CacheRepository extends LocalRepository
     {
         // Resolve artifacts and append them to the artifact content file.
         return super.resolveArtifacts(descriptorList, reporter, (in, length) ->
-        {
-            artifactContentFile.copyFrom(new InputResource(in), APPEND, reporter.steps(length));
-        });
+            artifactContentFile.copyFrom(new InputResource(in), APPEND, reporter.steps(length)));
     }
 
     /**

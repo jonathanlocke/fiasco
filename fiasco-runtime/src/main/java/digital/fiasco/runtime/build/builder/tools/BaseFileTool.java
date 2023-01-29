@@ -14,7 +14,7 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
  *
  * @author Jonathan Locke
  */
-public abstract class BaseFileTool extends BaseTool
+public abstract class BaseFileTool extends BaseTool<BaseFileTool>
 {
     /** The files to be processed by this tool */
     private FileList files;

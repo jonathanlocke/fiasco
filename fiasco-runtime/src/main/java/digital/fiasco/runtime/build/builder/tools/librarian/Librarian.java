@@ -14,7 +14,7 @@ import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.BaseTool;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
@@ -31,25 +31,25 @@ import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL;
 
 /**
  * Manages {@link Artifact}s and their dependencies. Searches the list of repositories added to this librarian with
- * {@link #lookIn(Repository)} to resolve artifacts. When artifacts are downloaded from a {@link RemoteRepository} or a
- * remote {@link MavenRepository}, they are added to a download cache, which is first in the search order for
- * artifacts.
+ * {@link #withRepository(Repository)} to resolve artifacts. When artifacts are downloaded from a
+ * {@link RemoteRepository} or a remote {@link MavenRepository}, they are added to a download cache, which is first in
+ * the search order for artifacts.
  *
  * <p><b>Finding Libraries</b></p>
  *
  * <ul>
  *     <li>{@link #resolve(ObjectList)} - Resolves the specified artifacts</li>
- *     <li>{@link #dependencies(Artifact)} - Returns the dependencies for the given library. Dependent libraries
+ *     <li>{@link #resolve(Artifact)} - Returns the dependencies for the given library. Dependent libraries
  *                                           are resolved in depth-first order.</li>
- *     <li>{@link #lookIn(Repository)} - Adds a repository to look in when resolving libraries</li>
+ *     <li>{@link #withRepository(Repository)} - Adds a repository to look in when resolving libraries</li>
  *     <li>{@link #repositories()} - The list of repositories to search</li>
- *     <li>{@link #pinVersion(ArtifactDescriptor, Version)} - Pins the given artifact to the specified version</li>
+ *     <li>{@link #withPinnedVersion(ArtifactDescriptor, Version)} - Pins the given artifact to the specified version</li>
  * </ul>
  *
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class Librarian extends BaseTool
+public class Librarian extends BaseTool<Librarian>
 {
     /** The repositories that this librarian searches */
     private ObjectList<Repository> repositories = list();
@@ -68,67 +68,14 @@ public class Librarian extends BaseTool
     {
         super(builder);
 
-        lookIn(new LocalRepository("repository"));
-        lookIn(MAVEN_CENTRAL);
+        withRepository(new LocalRepository("repository"));
+        withRepository(MAVEN_CENTRAL);
     }
 
     @Override
     public Librarian copy()
     {
         return new Librarian(this);
-    }
-
-    /**
-     * Resolves the given artifact in the repositories managed by this librarian. Resolution of dependent artifacts
-     * occurs in depth-first order.
-     *
-     * @param artifact The artifact
-     * @return The artifact and all of its dependencies
-     */
-    public ArtifactList dependencies(Artifact<?> artifact)
-    {
-        var dependencies = ArtifactList.artifacts();
-
-        // Go through the library's dependencies,
-        for (var dependency : artifact.dependencies(Artifact.class))
-        {
-            // resolve each dependency,
-            for (var resolved : dependencies(dependency))
-            {
-                // and if it is not excluded by the library,
-                if (resolved != null && artifact.isExcluded(resolved.descriptor()))
-                {
-                    // add it to the dependencies list.
-                    dependencies = dependencies.with(resolved);
-                }
-            }
-        }
-
-        // For each repository,
-        var found = false;
-        for (var repository : repositories)
-        {
-            // resolve the library's descriptor to an artifact,
-            var descriptor = resolveArtifactVersion(artifact.descriptor());
-            var resolved = repository.resolveArtifacts(list(descriptor));
-            if (resolved != null)
-            {
-                // and if it isn't excluded,
-                if (resolved.first().isExcluded(resolved.first().descriptor()))
-                {
-                    // add it to the dependencies.
-                    dependencies = dependencies.with(resolved.first());
-                    found = true;
-                }
-            }
-        }
-
-        if (!found)
-        {
-            illegalState("Could not resolve: $", artifact);
-        }
-
-        return dependencies;
     }
 
     /**
@@ -144,74 +91,10 @@ public class Librarian extends BaseTool
             """, repositories, pinnedVersions);
     }
 
-    /**
-     * Adds a repository to the search path of the librarian
-     *
-     * @param repository The repository to search
-     */
-    public void lookIn(Repository repository)
-    {
-        repositories.add(repository);
-    }
-
     @Override
     public void onRun()
     {
         unsupported("Librarian does not need to be started");
-    }
-
-    /**
-     * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
-     * descriptor will be assigned the version.
-     *
-     * @param descriptor The group and artifact (but no version)
-     * @param version The version to enforce for the descriptor
-     */
-    public Librarian pinVersion(ArtifactDescriptor descriptor, Version version)
-    {
-        ensure(descriptor.version() == null);
-        pinnedVersions.put(descriptor, version);
-        return this;
-    }
-
-    /**
-     * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
-     * descriptor will be assigned the given version.
-     *
-     * @param artifact The group and artifact name
-     * @param version The version to enforce for the descriptor
-     */
-    public Librarian pinVersion(Artifact<?> artifact, Version version)
-    {
-        var descriptor = artifact.descriptor();
-        pinnedVersions.put(descriptor, version);
-        return this;
-    }
-
-    /**
-     * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
-     * descriptor will be assigned the version.
-     *
-     * @param artifact The artifact to pin
-     * @param version The version to enforce for the descriptor
-     */
-    public Librarian pinVersion(Artifact<?> artifact, String version)
-    {
-        pinVersion(artifact.descriptor(), version(version));
-        return this;
-    }
-
-    /**
-     * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
-     * descriptor will be assigned the version.
-     *
-     * @param descriptor The group and artifact (but no version)
-     * @param version The version to enforce for the descriptor
-     */
-    public Librarian pinVersion(String descriptor, String version)
-    {
-        pinVersion(ArtifactDescriptor.descriptor(descriptor), version(version));
-        return this;
     }
 
     /**
@@ -251,8 +134,121 @@ public class Librarian extends BaseTool
     }
 
     /**
+     * Resolves the given artifact in the repositories managed by this librarian. Resolution of dependent artifacts
+     * occurs in depth-first order.
+     *
+     * @param artifact The artifact
+     * @return The artifact and all of its dependencies
+     */
+    public ArtifactList resolve(Artifact<?> artifact)
+    {
+        var dependencies = ArtifactList.artifacts();
+
+        // Go through the library's dependencies,
+        for (var dependency : artifact.artifactDependencies())
+        {
+            // resolve each dependency,
+            for (var resolved : resolve(dependency))
+            {
+                // and if it is not excluded by the library,
+                if (resolved != null && artifact.isExcluded(resolved.descriptor()))
+                {
+                    // add it to the dependencies list.
+                    dependencies = dependencies.with(resolved);
+                }
+            }
+        }
+
+        // For each repository,
+        var found = false;
+        for (var repository : repositories)
+        {
+            // resolve the library's descriptor to an artifact,
+            var descriptor = resolveArtifactVersion(artifact.descriptor());
+            var resolved = repository.resolveArtifacts(list(descriptor));
+            if (resolved != null)
+            {
+                // and if it isn't excluded,
+                if (resolved.first().isExcluded(resolved.first().descriptor()))
+                {
+                    // add it to the dependencies.
+                    dependencies = dependencies.with(resolved.first());
+                    found = true;
+                }
+            }
+        }
+
+        if (!found)
+        {
+            illegalState("Could not resolve: $", artifact);
+        }
+
+        return dependencies;
+    }
+
+    /**
+     * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
+     * descriptor will be assigned the version.
+     *
+     * @param descriptor The group and artifact (but no version)
+     * @param version The version to enforce for the descriptor
+     */
+    public Librarian withPinnedVersion(ArtifactDescriptor descriptor, Version version)
+    {
+        ensure(descriptor.version() == null);
+
+        return copy(it -> it.pinnedVersions.put(descriptor, version));
+    }
+
+    /**
+     * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
+     * descriptor will be assigned the given version.
+     *
+     * @param artifact The group and artifact name
+     * @param version The version to enforce for the descriptor
+     */
+    public Librarian withPinnedVersion(Artifact<?> artifact, Version version)
+    {
+        return withPinnedVersion(artifact.descriptor(), version);
+    }
+
+    /**
+     * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
+     * descriptor will be assigned the version.
+     *
+     * @param artifact The artifact to pin
+     * @param version The version to enforce for the descriptor
+     */
+    public Librarian withPinnedVersion(Artifact<?> artifact, String version)
+    {
+        return withPinnedVersion(artifact.descriptor(), version(version));
+    }
+
+    /**
+     * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
+     * descriptor will be assigned the version.
+     *
+     * @param descriptor The group and artifact (but no version)
+     * @param version The version to enforce for the descriptor
+     */
+    public Librarian withPinnedVersion(String descriptor, String version)
+    {
+        return withPinnedVersion(ArtifactDescriptor.descriptor(descriptor), version(version));
+    }
+
+    /**
+     * Adds a repository to the search path of the librarian
+     *
+     * @param repository The repository to search
+     */
+    public Librarian withRepository(Repository repository)
+    {
+        return copy(it -> it.repositories.add(repository));
+    }
+
+    /**
      * Resolves the artifact descriptor's version using any pinned versions added by
-     * {@link #pinVersion(ArtifactDescriptor, Version)}
+     * {@link #withPinnedVersion(ArtifactDescriptor, Version)}
      *
      * @param descriptor The descriptor to resolve
      * @return The descriptor with the correct version resolved

@@ -60,7 +60,7 @@ import digital.fiasco.runtime.build.settings.BuildSettingsObject;
  * </p>
  *
  * <p>
- * Phases are enabled and disabled with {@link Builder#enable(Phase)} and {@link Builder#disable(Phase)}. Code can be
+ * Phases are enabled and disabled with {@link Builder#withEnabled(Phase)} and {@link Builder#withDisabled(Phase)}. Code can be
  * executed before, during or after a phase runs by calling {@link Builder#beforePhase(String, BuildAction)},
  * {@link Builder#onPhase(String, BuildAction)}, and {@link Builder#afterPhase(String, BuildAction)}. The
  * {@link BaseBuild} application enables and disables any phase names that were passed from the command line. The phase

@@ -8,14 +8,14 @@
 package digital.fiasco.runtime.build.builder.tools;
 
 import com.telenav.kivakit.core.messaging.Repeater;
+import com.telenav.kivakit.interfaces.object.Copyable;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.BaseBuild;
 import digital.fiasco.runtime.build.BuildEnvironmentTrait;
 import digital.fiasco.runtime.build.builder.BuildStructured;
 import digital.fiasco.runtime.build.builder.BuilderAssociated;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
-import digital.fiasco.runtime.build.settings.BuildProfile;
-import digital.fiasco.runtime.dependency.collections.DependencyList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
 
 /**
  * Interface for executable tools. Tools are runnable message repeaters that are associated with a {@link BaseBuild}
@@ -23,8 +23,9 @@ import digital.fiasco.runtime.dependency.collections.DependencyList;
  *
  * @author Jonathan locke
  */
-public interface Tool extends
+public interface Tool<T extends Tool<T>> extends
     Runnable,
+    Copyable<T>,
     Repeater,
     Described,
     BuilderAssociated,
@@ -32,26 +33,11 @@ public interface Tool extends
     BuildEnvironmentTrait
 {
     /**
-     * Returns a deep copy of this tool
-     *
-     * @return The copy
-     */
-    Tool copy();
-
-    /**
-     * Returns the list of dependencies from the builder associated with this tool
+     * Returns the list of artifact dependencies from the builder associated with this tool
      *
      * @return The dependency list
      */
-    DependencyList<?, ?> dependencies();
-
-    /**
-     * Enables this tool for the given profile
-     *
-     * @param profile The profile
-     * @return This tool for method chaining
-     */
-    BaseTool enableForProfile(BuildProfile profile);
+    ArtifactList artifactDependencies();
 
     /**
      * Returns true if this tool is enabled under any of the profiles it is assigned to

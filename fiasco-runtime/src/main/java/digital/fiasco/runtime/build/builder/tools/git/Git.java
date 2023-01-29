@@ -50,7 +50,7 @@ import static com.telenav.kivakit.core.string.Formatter.format;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class Git extends BaseTool
+public class Git extends BaseTool<Git>
 {
     /** The folder where git should be run */
     Folder folder;

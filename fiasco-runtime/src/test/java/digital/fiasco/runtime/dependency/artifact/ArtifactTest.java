@@ -2,8 +2,6 @@ package digital.fiasco.runtime.dependency.artifact;
 
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import digital.fiasco.runtime.FiascoTest;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
@@ -14,17 +12,17 @@ import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.interfaces.string.StringFormattable.Format.DEBUG;
 import static com.telenav.kivakit.interfaces.string.StringFormattable.Format.USER_LABEL;
 import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL;
-import static digital.fiasco.runtime.dependency.collections.DependencyList.dependencies;
 import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJson;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
-import static digital.fiasco.runtime.dependency.artifact.collections.ArtifactList.artifacts;
-import static digital.fiasco.runtime.dependency.artifact.artifacts.Asset.asset;
-import static digital.fiasco.runtime.dependency.artifact.collections.AssetList.assets;
-import static digital.fiasco.runtime.dependency.artifact.artifacts.Library.library;
-import static digital.fiasco.runtime.dependency.artifact.collections.LibraryList.libraries;
+import static digital.fiasco.runtime.dependency.artifact.types.Asset.asset;
+import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
+import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.collections.AssetList.assets;
+import static digital.fiasco.runtime.dependency.collections.DependencyList.dependencies;
+import static digital.fiasco.runtime.dependency.collections.LibraryList.libraries;
 
 public class ArtifactTest extends FiascoTest
 {
@@ -148,14 +146,12 @@ public class ArtifactTest extends FiascoTest
     {
         {
             var application = kivakitApplication();
-            ensureEqual(application.dependencies(Library.class), dependencies(kivakitCore(), kivakitResource()));
             ensureEqual(application.libraries(), dependencies(kivakitCore(), kivakitResource()));
         }
         {
             var images = kivakitImages()
                 .dependsOn(kivakitIcons(), kivakitLogos());
 
-            ensureEqual(images.dependencies(Asset.class).asAssetList(), assets(kivakitIcons(), kivakitLogos()));
             ensureEqual(images.assets(), assets(kivakitIcons(), kivakitLogos()));
         }
     }
@@ -184,7 +180,7 @@ public class ArtifactTest extends FiascoTest
         var application = kivakitApplication()
             .dependsOn(kivakitCore(), kivakitResource());
 
-        ensure(application.dependencies().containsAll(artifacts(kivakitCore(), kivakitResource())));
+        ensure(application.artifactDependencies().containsAll(artifacts(kivakitCore(), kivakitResource())));
     }
 
     @Test
@@ -218,24 +214,24 @@ public class ArtifactTest extends FiascoTest
                 .excluding(":com.telenav.kivakit:kivakit-core:")
                 .excluding(kivakitIcons())
                 .excluding(kivakitLogos())
-                .dependencies(),
+                .artifactDependencies(),
             libraries(kivakitResource()));
 
         ensureEqual(application
                 .excluding(":com.telenav.kivakit::")
-                .dependencies(),
+                .artifactDependencies(),
             artifacts());
 
         ensureEqual(application
                 .excluding(kivakitCore().descriptor())
-                .dependencies(),
+                .artifactDependencies(),
             artifacts(kivakitResource(),
                 kivakitLogos(),
                 kivakitIcons()));
 
         ensureEqual(application
                 .excluding(kivakitResource().descriptor())
-                .dependencies(),
+                .artifactDependencies(),
             artifacts(kivakitCore(),
                 kivakitLogos(),
                 kivakitIcons()));
@@ -245,35 +241,35 @@ public class ArtifactTest extends FiascoTest
                     kivakitCore().descriptor(),
                     kivakitIcons().descriptor(),
                     kivakitLogos().descriptor())
-                .dependencies(),
+                .artifactDependencies(),
             artifacts());
 
         ensureEqual(application
                 .excluding(kivakitCore())
                 .excluding(kivakitIcons())
                 .excluding(kivakitLogos())
-                .dependencies(),
+                .artifactDependencies(),
             artifacts(kivakitResource()));
 
         ensureEqual(application
                 .excluding(kivakitResource())
                 .excluding(kivakitIcons())
                 .excluding(kivakitLogos())
-                .dependencies(),
+                .artifactDependencies(),
             artifacts(kivakitCore()));
 
         ensureEqual(application
                 .excluding(kivakitResource())
                 .excluding(kivakitIcons())
                 .excluding(kivakitLogos())
-                .excluding(kivakitCore()).dependencies(),
+                .excluding(kivakitCore()).artifactDependencies(),
             artifacts());
 
         ensureEqual(application
                 .excluding(kivakitResource().descriptor(),
                     kivakitIcons().descriptor(),
                     kivakitLogos().descriptor())
-                .dependencies()
+                .artifactDependencies()
                 .asArtifactDescriptors(),
             list(kivakitCore().descriptor()));
     }

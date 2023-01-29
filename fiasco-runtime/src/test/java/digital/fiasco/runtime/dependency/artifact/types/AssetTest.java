@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.dependency.artifact.artifacts;
+package digital.fiasco.runtime.dependency.artifact.types;
 
 import digital.fiasco.runtime.FiascoTest;
 import org.jetbrains.annotations.NotNull;
@@ -8,7 +8,7 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
-import static digital.fiasco.runtime.dependency.artifact.collections.AssetList.assets;
+import static digital.fiasco.runtime.dependency.collections.AssetList.assets;
 
 public class AssetTest extends FiascoTest
 {
@@ -87,8 +87,8 @@ public class AssetTest extends FiascoTest
     {
         var asset = asset()
             .withDependencies(assets("a:b:1.0").asArtifactList());
-        ensureEqual(asset.dependencies().size(), 1);
-        ensureEqual(asset.dependencies().get(0).descriptor(), descriptor("asset:a:b:1.0"));
+        ensureEqual(asset.artifactDependencies().size(), 1);
+        ensureEqual(asset.artifactDependencies().get(0).descriptor(), descriptor("asset:a:b:1.0"));
     }
 
     @Test

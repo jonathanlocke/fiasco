@@ -15,7 +15,7 @@ import digital.fiasco.runtime.build.builder.tools.BaseTool;
  *
  * @author Jonathan Locke
  */
-public class Tester extends BaseTool
+public class Tester extends BaseTool<Tester>
 {
     public Tester(Builder builder)
     {

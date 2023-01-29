@@ -1,30 +1,27 @@
 package digital.fiasco.runtime.build.builder.tools;
 
-import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.filesystem.Folder;
+import com.telenav.kivakit.interfaces.object.Copyable;
 import digital.fiasco.runtime.build.Stepped;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.build.settings.BuildProfile;
-import digital.fiasco.runtime.dependency.collections.DependencyList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
 
 /**
- * Base class for build {@link Tool}s. Build tools can be enabled or disabled under a given {@link BuildProfile} by
- * calling {@link #enableForProfile(BuildProfile)} or .
+ * Base class for build {@link Tool}s. Build tools can be enabled or disabled under a given {@link BuildProfile}.
  *
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public abstract class BaseTool extends BaseRepeater implements
+public abstract class BaseTool<T extends BaseTool<T>> extends BaseRepeater implements
     Stepped,
-    Tool
+    Copyable<T>,
+    Tool<T>
 {
     /** The builder associated with this tool */
     private final Builder builder;
-
-    /** Any profile that this tool instance should be restricted to */
-    private ObjectSet<BuildProfile> profiles;
 
     /**
      * Creates a tool associated with the given builder
@@ -41,10 +38,20 @@ public abstract class BaseTool extends BaseRepeater implements
      *
      * @param that The tool to copy
      */
-    public BaseTool(BaseTool that)
+    public BaseTool(T that)
     {
-        this.builder = that.builder;
-        this.profiles = that.profiles.copy();
+        this.builder = that.builder();
+    }
+
+    /**
+     * Returns the list of dependencies from the builder associated with this tool
+     *
+     * @return The dependency list
+     */
+    @Override
+    public ArtifactList artifactDependencies()
+    {
+        return builder.artifactDependencies();
     }
 
     /**
@@ -56,37 +63,18 @@ public abstract class BaseTool extends BaseRepeater implements
         return builder;
     }
 
+    public Builder builder()
+    {
+        return builder;
+    }
+
     /**
      * {@inheritDoc}
      *
      * @return {@inheritDoc}
      */
     @Override
-    public abstract BaseTool copy();
-
-    /**
-     * Returns the list of dependencies from the builder associated with this tool
-     *
-     * @return The dependency list
-     */
-    @Override
-    public DependencyList<?, ?> dependencies()
-    {
-        return builder.dependencies();
-    }
-
-    /**
-     * Enables this tool for the given profile
-     *
-     * @param profile The profile
-     * @return This tool for method chaining
-     */
-    @Override
-    public BaseTool enableForProfile(BuildProfile profile)
-    {
-        this.profiles.add(profile);
-        return this;
-    }
+    public abstract T copy();
 
     /**
      * Returns true if this tool is enabled under any of the profiles it is assigned to
@@ -96,7 +84,7 @@ public abstract class BaseTool extends BaseRepeater implements
     @Override
     public boolean isEnabled()
     {
-        for (var profile : profiles)
+        for (var profile : builder.profiles())
         {
             if (builder.settings().isEnabled(profile))
             {

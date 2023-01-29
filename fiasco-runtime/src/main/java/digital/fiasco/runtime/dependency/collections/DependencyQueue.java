@@ -246,7 +246,7 @@ public class DependencyQueue implements ConsoleTrait
     private boolean isReady(Dependency candidate)
     {
         // If any dependency of the candidate
-        for (var at : candidate.dependencies())
+        for (var at : candidate.allDependencies())
         {
             // is unprocessed,
             if (!processed.contains(at))

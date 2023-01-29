@@ -1,9 +1,9 @@
 package digital.fiasco.libraries.languages;
 
 import digital.fiasco.libraries.LibraryGroups;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
+import digital.fiasco.runtime.dependency.artifact.types.Library;
 
-import static digital.fiasco.runtime.dependency.artifact.artifacts.Library.library;
+import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
 
 @SuppressWarnings("unused")
 public interface Clojure extends LibraryGroups

@@ -6,37 +6,39 @@ import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
-import digital.fiasco.runtime.dependency.artifact.collections.AssetList;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
-import digital.fiasco.runtime.dependency.artifact.collections.LibraryList;
+import digital.fiasco.runtime.dependency.artifact.types.Asset;
+import digital.fiasco.runtime.dependency.artifact.types.Library;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.AssetList;
+import digital.fiasco.runtime.dependency.collections.BuilderList;
 import digital.fiasco.runtime.dependency.collections.DependencyList;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
+import digital.fiasco.runtime.dependency.collections.LibraryList;
 import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
+import static digital.fiasco.runtime.dependency.collections.DependencyList.dependencies;
 
 /**
  * A dependency is either a {@link Builder}, or an {@link Artifact} with an associated {@link #repository()}. An
  * {@link Artifact} can be either an {@link Asset} or a {@link Library}. Each dependency can have its own list of
- * {@link #dependencies()}, but circular dependencies are not allowed. Specific kinds of dependencies can be retrieved
- * with the filter methods {@link #assets()}, {@link #libraries()}, and {@link #dependencies(Class)}.
+ * {@link #artifactDependencies()} and/or {@link #builderDependencies()}, but circular dependencies are not allowed.
+ * Specific kinds of dependencies can be retrieved with {@link #assets()}, {@link #libraries()}.
  *
  * <p><b>Properties</b></p>
  *
  * <ul>
  *     <li>{@link #descriptor()}</li>
  *     <li>{@link #repository()}</li>
- *     <li>{@link #dependencies()}</li>
+ *     <li>{@link #artifactDependencies()}</li>
+ *     <li>{@link #builderDependencies()} ()}</li>
  * </ul>
  *
  * <p><b>Filtering</b></p>
  *
  * <ul>
- *     <li>{@link #dependencies(Class)}</li>
  *     <li>{@link #assets()}</li>
  *     <li>{@link #libraries()}</li>
  * </ul>
@@ -56,15 +58,25 @@ public interface Dependency extends
     Comparable<Dependency>
 {
     /**
-     * Gets all artifact dependencies
+     * Returns all dependencies, both artifacts and builders
+     *
+     * @return The dependencies
+     */
+    default DependencyList<?, ?> allDependencies()
+    {
+        var all = dependencies();
+        all.addAll(artifactDependencies());
+        all.addAll(builderDependencies());
+        return all;
+    }
+
+    /**
+     * Gets all dependencies of the given type
      *
      * @return The dependencies
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default ArtifactList artifacts()
-    {
-        return dependencies().asArtifactList();
-    }
+    ArtifactList artifactDependencies();
 
     /**
      * Gets all asset dependencies
@@ -74,16 +86,24 @@ public interface Dependency extends
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default AssetList assets()
     {
-        var dependencies = new AssetList();
-        for (var at : dependencies())
+        var assets = new AssetList();
+        for (var at : artifactDependencies())
         {
             if (at instanceof Asset asset)
             {
-                dependencies = dependencies.with(asset);
+                assets = assets.with(asset);
             }
         }
-        return dependencies;
+        return assets;
     }
+
+    /**
+     * Gets all dependencies of the given type
+     *
+     * @return The dependencies
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    BuilderList builderDependencies();
 
     /**
      * {@inheritDoc}
@@ -94,32 +114,6 @@ public interface Dependency extends
     {
         return name().compareTo(that.name());
     }
-
-    /**
-     * Gets all dependencies of the given type
-     *
-     * @return The dependencies
-     */
-    @SuppressWarnings("unchecked")
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default <D extends Dependency, L extends DependencyList<D, L>> L dependencies(Class<D> type)
-    {
-        var dependencies = new DependencyList<D, L>();
-        for (var at : dependencies())
-        {
-            if (type.isAssignableFrom(at.getClass()))
-            {
-                //noinspection unchecked
-                dependencies = dependencies.with((D) at);
-            }
-        }
-        return (L) dependencies;
-    }
-
-    /**
-     * @return The objects that this depends on
-     */
-    DependencyList<?, ?> dependencies();
 
     /**
      * The artifact descriptor for this dependency
@@ -134,15 +128,15 @@ public interface Dependency extends
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default LibraryList libraries()
     {
-        var dependencies = new LibraryList();
-        for (var at : dependencies())
+        var libraries = new LibraryList();
+        for (var at : artifactDependencies())
         {
             if (at instanceof Library asset)
             {
-                dependencies = dependencies.with(asset);
+                libraries = libraries.with(asset);
             }
         }
-        return dependencies;
+        return libraries;
     }
 
     /**

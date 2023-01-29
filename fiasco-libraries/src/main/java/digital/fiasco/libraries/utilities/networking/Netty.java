@@ -1,7 +1,7 @@
 package digital.fiasco.libraries.utilities.networking;
 
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
+import digital.fiasco.runtime.dependency.artifact.types.Library;
 
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup.group;
 

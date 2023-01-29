@@ -88,7 +88,7 @@ public class DependencyTree
     private DependencyList depthFirst(Dependency root, DependencyList explored)
     {
         // Go through each child of the root,
-        for (var child : root.dependencies())
+        for (var child : root.allDependencies())
         {
             // check for cycles (which should not be possible in our functional api),
             ensure(!explored.contains(child), "The dependency tree is cyclic:", root);

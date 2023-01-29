@@ -11,18 +11,17 @@ import com.telenav.kivakit.resource.resources.StringOutputResource;
 import com.telenav.kivakit.resource.resources.StringResource;
 import com.telenav.kivakit.resource.serialization.SerializableObject;
 import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
-import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.dependency.Dependency;
-import digital.fiasco.runtime.dependency.collections.DependencyList;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContentSignatures;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
-import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.types.Asset;
+import digital.fiasco.runtime.dependency.artifact.types.Library;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.BuilderList;
 import digital.fiasco.runtime.repository.Repository;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
@@ -59,9 +58,9 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
  * <p><b>Dependencies</b></p>
  *
  * <p>
- * An artifact can have zero or more dependencies. The method {@link #dependencies()} returns a {@link DependencyList}
- * of {@link Artifact}s (note that there are non-artifact dependencies, such as {@link Builder}s). Artifact dependencies
- * can be filtered by excluding certain descriptors with {@link #excluding(String...)}, or
+ * An artifact can have zero or more dependencies. The method {@link #artifactDependencies()} ()} returns an
+ * {@link ArtifactList}, while the method {@link #builderDependencies()} returns a {@link BuilderList}. Artifact
+ * dependencies can be filtered by excluding certain descriptors with {@link #excluding(String...)}, or
  * {@link #excluding(ArtifactDescriptor...)}.
  * </p>
  *
@@ -88,7 +87,8 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
  * <p><b>Dependencies</b></p>
  *
  * <ul>
- *     <li>{@link #dependencies()}</li>
+ *     <li>{@link #artifactDependencies()}</li>
+ *     <li>{@link #builderDependencies()}</li>
  *     <li>{@link #isExcluded(ArtifactDescriptor)}</li>
  *     <li>{@link #withDependencies(ArtifactList)}</li>
  *     <li>{@link #excluding(ArtifactDescriptor...)}</li>
@@ -213,14 +213,6 @@ public interface Artifact<A extends Artifact<A>> extends
      * @return The new artifact
      */
     A copy();
-
-    /**
-     * Returns the list of dependencies for this artifact
-     *
-     * @return The dependency list
-     */
-    @Override
-    ArtifactList dependencies();
 
     /**
      * Returns the dependencies matching the given dependency pattern

@@ -1,7 +1,7 @@
 package digital.fiasco.libraries.data.formats;
 
 import digital.fiasco.libraries.LibraryGroups;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
+import digital.fiasco.runtime.dependency.artifact.types.Library;
 
 @SuppressWarnings({ "unused", "SpellCheckingInspection" })
 public interface ApachePoi extends LibraryGroups

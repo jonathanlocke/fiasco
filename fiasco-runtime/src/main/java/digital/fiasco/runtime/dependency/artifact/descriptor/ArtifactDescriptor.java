@@ -8,8 +8,8 @@ import com.telenav.kivakit.core.messaging.Listener;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.naming.Named;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
+import digital.fiasco.runtime.dependency.artifact.types.Asset;
+import digital.fiasco.runtime.dependency.artifact.types.Library;
 
 import java.util.regex.Pattern;
 
@@ -20,8 +20,8 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
-import static digital.fiasco.runtime.dependency.artifact.artifacts.Asset.asset;
-import static digital.fiasco.runtime.dependency.artifact.artifacts.Library.library;
+import static digital.fiasco.runtime.dependency.artifact.types.Asset.asset;
+import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
 
 /**
  * A string that uniquely identifies an artifact, including its group, artifact name and version. Artifact descriptors

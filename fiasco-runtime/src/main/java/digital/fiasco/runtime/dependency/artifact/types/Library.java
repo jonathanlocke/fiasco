@@ -5,7 +5,7 @@
 // terms of the license agreement you entered into with Telenav.                                             /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package digital.fiasco.runtime.dependency.artifact.artifacts;
+package digital.fiasco.runtime.dependency.artifact.types;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;

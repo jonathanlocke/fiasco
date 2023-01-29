@@ -1,13 +1,13 @@
 package digital.fiasco.runtime.dependency.collections;
 
 import digital.fiasco.runtime.FiascoTest;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
+import digital.fiasco.runtime.dependency.artifact.types.Library;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.dependency.artifact.collections.ArtifactList.artifacts;
-import static digital.fiasco.runtime.dependency.artifact.artifacts.Library.library;
-import static digital.fiasco.runtime.dependency.artifact.collections.LibraryList.libraries;
+import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
+import static digital.fiasco.runtime.dependency.collections.LibraryList.libraries;
 
 public class DependencyTreeTest extends FiascoTest
 {

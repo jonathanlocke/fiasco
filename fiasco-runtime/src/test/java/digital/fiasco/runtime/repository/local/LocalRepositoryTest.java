@@ -2,8 +2,8 @@ package digital.fiasco.runtime.repository.local;
 
 import com.telenav.kivakit.filesystem.Folder;
 import digital.fiasco.runtime.FiascoTest;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Asset;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
+import digital.fiasco.runtime.dependency.artifact.types.Asset;
+import digital.fiasco.runtime.dependency.artifact.types.Library;
 import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;

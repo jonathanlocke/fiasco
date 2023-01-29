@@ -1,7 +1,7 @@
 package digital.fiasco.libraries.data.search;
 
 import digital.fiasco.libraries.LibraryGroups;
-import digital.fiasco.runtime.dependency.artifact.artifacts.Library;
+import digital.fiasco.runtime.dependency.artifact.types.Library;
 
 @SuppressWarnings("unused")
 public interface ApacheLucene extends LibraryGroups

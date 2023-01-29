@@ -7,12 +7,9 @@ import com.telenav.kivakit.filesystem.Folder;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
-import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
-import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
-import digital.fiasco.runtime.dependency.artifact.collections.ArtifactList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
@@ -27,7 +24,7 @@ import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName
  *
  * <ul>
  *     <li>{@link #withArtifact(String)}</li>
- *     <li>{@link #withArtifact(ArtifactName)}</li>
+ *     <li>{@link #withArtifactName(ArtifactName)}</li>
  *     <li>{@link #withArtifactDescriptor(String)}</li>
  *     <li>{@link #withArtifactDescriptor(ArtifactDescriptor)}</li>
  *     <li>{@link #withArtifactDescriptor(Function)}</li>
@@ -41,20 +38,9 @@ import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName
  *
  * <ul>
  *     <li>{@link #descriptor()}</li>
- *     <li>{@link #dependencies()}</li>
  *     <li>{@link #profiles()}</li>
- *     <li>{@link #librarian()}</li>
  *     <li>{@link #rootFolder()}</li>
  *     <li>{@link #withRootFolder(Folder)}</li>
- * </ul>
- *
- * <p><b>Dependencies</b></p>
- *
- * <ul>
- *     <li>{@link #withPinnedVersion(Artifact, String)}</li>
- *     <li>{@link #withPinnedVersion(Artifact, Version)}</li>
- *     <li>{@link #withDependencies(ArtifactList)}</li>
- *     <li>{@link #withDependencies(Artifact, Artifact[])}</li>
  * </ul>
  *
  * <p><b>Build Options</b></p>
@@ -107,11 +93,11 @@ public interface BuildSettings
     Count artifactResolverThreads();
 
     /**
-     * Returns a copy of the build settings for this object
+     * Returns a copy of the given settings, attached to this object (if it is a mixin)
      *
      * @return This object for method chaining
      */
-    BuildSettings attach(BuildSettings that);
+    BuildSettings attachMixin(BuildSettings that);
 
     /**
      * Returns the number of threads to use when building
@@ -119,13 +105,6 @@ public interface BuildSettings
      * @return The number of threads
      */
     Count builderThreads();
-
-    /**
-     * The dependencies required by this build
-     *
-     * @return The artifacts to compile against
-     */
-    ArtifactList dependencies();
 
     /**
      * Returns the artifact descriptor for this build
@@ -157,13 +136,6 @@ public interface BuildSettings
      * @return True if the profile is enabled
      */
     boolean isEnabled(BuildProfile profile);
-
-    /**
-     * Returns the librarian for this build
-     *
-     * @return The librarian
-     */
-    Librarian librarian();
 
     /**
      * Returns the phase with the given name
@@ -203,18 +175,7 @@ public interface BuildSettings
      */
     default BuildSettings withArtifact(String artifact)
     {
-        return withArtifact(artifactName(artifact));
-    }
-
-    /**
-     * Returns a copy of this settings object with the given artifact
-     *
-     * @param artifact The artifact
-     * @return The copy
-     */
-    default BuildSettings withArtifact(ArtifactName artifact)
-    {
-        return withArtifactDescriptor(descriptor -> descriptor.withArtifact(artifact));
+        return withArtifactName(artifactName(artifact));
     }
 
     /**
@@ -271,6 +232,28 @@ public interface BuildSettings
     }
 
     /**
+     * Returns a copy of this settings object with the given artifact name
+     *
+     * @param artifactName The artifact name
+     * @return The copy
+     */
+    default BuildSettings withArtifactName(String artifactName)
+    {
+        return withArtifactName(artifactName(artifactName));
+    }
+
+    /**
+     * Returns a copy of this settings object with the given artifact name
+     *
+     * @param artifactName The artifact name
+     * @return The copy
+     */
+    default BuildSettings withArtifactName(ArtifactName artifactName)
+    {
+        return withArtifactDescriptor(descriptor -> descriptor.withArtifact(artifactName));
+    }
+
+    /**
      * Returns a copy of this settings object with the given thread count
      *
      * @param threads The number of threads
@@ -307,23 +290,6 @@ public interface BuildSettings
      * @return The copy of this settings object
      */
     BuildSettings withBuilderThreads(Count threads);
-
-    /**
-     * Returns a copy of this build settings object with more build dependencies added
-     *
-     * @param first The first dependency
-     * @param rest Any further dependencies
-     * @return The build for method chaining
-     */
-    BuildSettings withDependencies(Artifact<?> first, Artifact<?>... rest);
-
-    /**
-     * Returns a copy of this build settings object with more build dependencies added
-     *
-     * @param dependencies The dependencies to add
-     * @return This object for method chaining
-     */
-    BuildSettings withDependencies(ArtifactList dependencies);
 
     /**
      * Disables execution of the given phase
@@ -374,45 +340,12 @@ public interface BuildSettings
     BuildSettings withEnabled(BuildProfile profile);
 
     /**
-     * Returns a copy of this settings object with the given librarian
-     *
-     * @param librarian The librarian to use
-     * @return The copy of this settings object
-     */
-    BuildSettings withLibrarian(Librarian librarian);
-
-    /**
      * Returns a copy of this settings object with the given list of phases
      *
      * @param phases The phase list
      * @return The copy of this settings object
      */
     BuildSettings withPhases(PhaseList phases);
-
-    /**
-     * Globally pins all versions of the given artifact to the specified version
-     *
-     * @param artifact The artifact
-     * @param version The version to use
-     * @return The build for method chaining
-     */
-    default BuildSettings withPinnedVersion(Artifact<?> artifact, String version)
-    {
-        return withPinnedVersion(artifact, version(version));
-    }
-
-    /**
-     * Globally pins all versions of the given artifact to the specified version
-     *
-     * @param artifact The artifact
-     * @param version The version to use
-     * @return The build for method chaining
-     */
-    default BuildSettings withPinnedVersion(Artifact<?> artifact, Version version)
-    {
-        librarian().pinVersion(artifact, version);
-        return this;
-    }
 
     /**
      * Returns a copy of this settings object with the given root folder
