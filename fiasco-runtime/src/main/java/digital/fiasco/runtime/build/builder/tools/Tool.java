@@ -11,10 +11,10 @@ import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.BaseBuild;
 import digital.fiasco.runtime.build.BuildEnvironmentTrait;
-import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.build.builder.BuildStructured;
 import digital.fiasco.runtime.build.builder.BuilderAssociated;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
+import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.dependency.collections.DependencyList;
 
 /**
@@ -31,6 +31,13 @@ public interface Tool extends
     BuildStructured,
     BuildEnvironmentTrait
 {
+    /**
+     * Returns a deep copy of this tool
+     *
+     * @return The copy
+     */
+    Tool copy();
+
     /**
      * Returns the list of dependencies from the builder associated with this tool
      *

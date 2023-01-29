@@ -52,10 +52,17 @@ import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL;
 public class Librarian extends BaseTool
 {
     /** The repositories that this librarian searches */
-    private final ObjectList<Repository> repositories = list();
+    private ObjectList<Repository> repositories = list();
 
     /** A map from group:artifact-id to version */
-    private final ObjectMap<ArtifactDescriptor, Version> pinnedVersions = new ObjectMap<>();
+    private ObjectMap<ArtifactDescriptor, Version> pinnedVersions = new ObjectMap<>();
+
+    public Librarian(Librarian that)
+    {
+        super(that);
+        this.repositories = that.repositories.copy();
+        this.pinnedVersions = that.pinnedVersions.copy();
+    }
 
     public Librarian(Builder builder)
     {
@@ -63,6 +70,12 @@ public class Librarian extends BaseTool
 
         lookIn(new LocalRepository("repository"));
         lookIn(MAVEN_CENTRAL);
+    }
+
+    @Override
+    public Librarian copy()
+    {
+        return new Librarian(this);
     }
 
     /**

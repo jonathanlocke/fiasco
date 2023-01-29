@@ -93,7 +93,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
         var queue = new DependencyTree(root).asQueue();
 
         // create a thread pool,
-        var executor = threadPool("FiascoBuildPool", root.settings().builderThreads());
+        var executor = threadPool("FiascoBuild", root.settings().builderThreads());
 
         // and while there are builders yet to run,
         var futures = new ObjectList<Future<Result<Builder>>>();

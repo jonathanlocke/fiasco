@@ -7,17 +7,15 @@
 
 package digital.fiasco.runtime.build.builder.tools.copier;
 
-import com.telenav.kivakit.core.progress.ProgressReporter;
+import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.filesystem.Folder;
-import com.telenav.kivakit.filesystem.Folder.Traversal;
-import com.telenav.kivakit.interfaces.comparison.Matcher;
-import com.telenav.kivakit.resource.ResourcePathed;
 import digital.fiasco.runtime.build.builder.Builder;
-import digital.fiasco.runtime.build.builder.tools.BaseTool;
+import digital.fiasco.runtime.build.builder.tools.BaseFileTool;
+
+import java.util.Collection;
 
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
 import static com.telenav.kivakit.core.string.Formatter.format;
-import static com.telenav.kivakit.resource.ResourceGlob.glob;
 import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
 
 /**
@@ -26,25 +24,10 @@ import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class Copier extends BaseTool
+public class Copier extends BaseFileTool
 {
     /** The folder to copy to */
     private Folder to;
-
-    /** The folder to copy from */
-    private Folder source;
-
-    /** Pattern matching files to include */
-    private Matcher<ResourcePathed> includes;
-
-    /** Pattern matching files to include */
-    private Matcher<ResourcePathed> excludes;
-
-    /** Progress in copying files */
-    private final ProgressReporter progress = progressReporter(this, "files");
-
-    /** The type of traversal to use when copying */
-    private Traversal traversal;
 
     /**
      * Creates a copier associated with the given builder
@@ -65,15 +48,12 @@ public class Copier extends BaseTool
     {
         super(that.associatedBuilder());
         this.to = that.to;
-        this.source = that.source;
-        this.includes = that.includes;
-        this.excludes = that.excludes;
-        this.traversal = that.traversal;
     }
 
     /**
      * Returns a copy of this copier
      */
+    @Override
     public Copier copy()
     {
         return new Copier(this);
@@ -87,11 +67,9 @@ public class Copier extends BaseTool
     {
         return format("""
             Copier
-              from: $
               to: $
-              includes: $
-              excludes: $
-            """, source, to, includes, excludes);
+              files: $
+            """, to, files());
     }
 
     /**
@@ -100,19 +78,18 @@ public class Copier extends BaseTool
     @Override
     public void onRun()
     {
-        information("Copying from $ to $",
-            source.relativeTo(rootFolder()),
-            to.relativeTo(rootFolder()));
+        var sourceFolder = files().parent();
+        information("Copying files from $ to $", sourceFolder, to.relativeTo(sourceFolder));
 
         // For each source file in the 'from' folder that matches,
-        var files = source.files(file -> (includes == null || includes.matches(file))
-            && (excludes == null || !excludes.matches(file)), traversal);
+        var files = files();
+        var progress = progressReporter(this, "files");
         progress.steps(files.count());
         progress.start("Copying " + files.size() + " files");
         for (var source : files)
         {
             // find the path relative to the root,
-            var relative = source.relativeTo(this.source);
+            var relative = source.relativeTo(sourceFolder);
 
             // construct a file with the same path relative to the 'to' folder,
             var destination = to.file(relative);
@@ -128,40 +105,15 @@ public class Copier extends BaseTool
     }
 
     /**
-     * Returns a copy of this copier that includes resources matching the given glob
+     * {@inheritDoc}
      *
-     * @param glob The glob pattern
-     * @return The new copier
+     * @param files {@inheritDoc}
+     * @return {@inheritDoc}
      */
-    public Copier with(String glob)
+    @Override
+    public Copier withFiles(Collection<File> files)
     {
-        return with(glob(glob));
-    }
-
-    /**
-     * Returns a copy of this copier that includes resources matching the given matcher
-     *
-     * @param matcher The matcher
-     * @return The new copier
-     */
-    public Copier with(Matcher<ResourcePathed> matcher)
-    {
-        var copy = copy();
-        copy.includes = (Matcher<ResourcePathed>) includes.and(matcher);
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this copier with the given source folder
-     *
-     * @param source The source folder
-     * @return The new copier
-     */
-    public Copier withSourceFolder(Folder source)
-    {
-        var copy = copy();
-        copy.source = source;
-        return copy;
+        return (Copier) super.withFiles(files);
     }
 
     /**
@@ -178,41 +130,14 @@ public class Copier extends BaseTool
     }
 
     /**
-     * Returns a copy of this copier with the given traversal style
+     * {@inheritDoc}
      *
-     * @param traversal The traversal to use when copying recursively
-     * @return The new copier
+     * @param files {@inheritDoc}
+     * @return {@inheritDoc}
      */
-    public Copier withTraversal(Traversal traversal)
+    @Override
+    public Copier withoutFiles(Collection<File> files)
     {
-        var copy = copy();
-        copy.traversal = traversal;
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this copier that excludes the resources matching the given glob pattern
-     *
-     * @param glob The glob pattern
-     * @return The new copier
-     */
-    public Copier without(String glob)
-    {
-        var copy = copy();
-        copy.excludes = glob(glob);
-        return copy;
-    }
-
-    /**
-     * Returns a copy of this copier that excludes the resources matching the given matcher
-     *
-     * @param matcher The matcher
-     * @return The new copier
-     */
-    public Copier without(Matcher<ResourcePathed> matcher)
-    {
-        var copy = copy();
-        copy.excludes = (Matcher<ResourcePathed>) excludes.or(matcher);
-        return copy;
+        return (Copier) super.withoutFiles(files);
     }
 }

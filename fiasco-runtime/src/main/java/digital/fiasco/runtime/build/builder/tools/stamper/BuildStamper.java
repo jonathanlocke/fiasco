@@ -58,6 +58,17 @@ public class BuildStamper extends BaseTool implements
         super(builder);
     }
 
+    public BuildStamper(BuildStamper that)
+    {
+        super(that);
+    }
+
+    @Override
+    public BuildStamper copy()
+    {
+        return new BuildStamper(this);
+    }
+
     /**
      * {@inheritDoc}
      */

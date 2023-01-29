@@ -22,6 +22,17 @@ public class Tester extends BaseTool
         super(builder);
     }
 
+    public Tester(Tester that)
+    {
+        super(that);
+    }
+
+    @Override
+    public Tester copy()
+    {
+        return new Tester(this);
+    }
+
     @Override
     public String description()
     {

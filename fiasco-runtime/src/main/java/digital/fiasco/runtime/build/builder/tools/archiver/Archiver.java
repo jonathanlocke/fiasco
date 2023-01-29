@@ -1,13 +1,11 @@
 package digital.fiasco.runtime.build.builder.tools.archiver;
 
 import com.telenav.kivakit.filesystem.File;
-import com.telenav.kivakit.filesystem.FileList;
 import digital.fiasco.runtime.build.builder.Builder;
-import digital.fiasco.runtime.build.builder.tools.BaseTool;
+import digital.fiasco.runtime.build.builder.tools.BaseFileTool;
 
 import java.util.Collection;
 
-import static com.telenav.kivakit.filesystem.FileList.fileList;
 import static com.telenav.kivakit.resource.compression.archive.ZipArchive.AccessMode.WRITE;
 import static com.telenav.kivakit.resource.compression.archive.ZipArchive.zipArchive;
 
@@ -17,11 +15,8 @@ import static com.telenav.kivakit.resource.compression.archive.ZipArchive.zipArc
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class Archiver extends BaseTool
+public class Archiver extends BaseFileTool
 {
-    /** The files to archive */
-    private FileList files;
-
     /** The archive */
     private File archiveFile;
 
@@ -43,13 +38,13 @@ public class Archiver extends BaseTool
     public Archiver(Archiver that)
     {
         super(that.associatedBuilder());
-        this.files = that.files.copy();
         this.archiveFile = that.archiveFile;
     }
 
     /**
      * Returns a copy of this archiver
      */
+    @Override
     public Archiver copy()
     {
         return new Archiver(this);
@@ -57,6 +52,8 @@ public class Archiver extends BaseTool
 
     /**
      * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
      */
     @Override
     public String description()
@@ -72,21 +69,8 @@ public class Archiver extends BaseTool
     {
         try (var archive = zipArchive(this, archiveFile, WRITE))
         {
-            archive.add(files);
+            archive.add(files());
         }
-    }
-
-    /**
-     * Returns a copy of this archiver with the given files
-     *
-     * @param files The files to add to the archive
-     * @return A copy of this archive with the given files
-     */
-    public Archiver withAdditionalFiles(Collection<File> files)
-    {
-        var copy = copy();
-        copy.files.addAll(files);
-        return copy;
     }
 
     /**
@@ -103,15 +87,26 @@ public class Archiver extends BaseTool
     }
 
     /**
-     * Returns a copy of this archiver with the given files
+     * {@inheritDoc}
      *
-     * @param files The files to add to the archive
-     * @return A copy of this archive with the given files
+     * @param files {@inheritDoc}
+     * @return {@inheritDoc}
      */
+    @Override
     public Archiver withFiles(Collection<File> files)
     {
-        var copy = copy();
-        copy.files = fileList(files);
-        return copy;
+        return (Archiver) super.withFiles(files);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param files {@inheritDoc}
+     * @return {@inheritDoc}
+     */
+    @Override
+    public Archiver withoutFiles(Collection<File> files)
+    {
+        return (Archiver) super.withoutFiles(files);
     }
 }

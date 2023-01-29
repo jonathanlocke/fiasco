@@ -16,6 +16,7 @@ import static com.telenav.kivakit.core.value.count.Minimum._10;
 import static com.telenav.kivakit.interfaces.time.WakeState.COMPLETED;
 import static digital.fiasco.runtime.dependency.artifact.artifacts.Library.library;
 import static digital.fiasco.runtime.dependency.artifact.lists.LibraryList.libraries;
+import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public class DependencyQueueTest extends FiascoTest
 {
@@ -38,7 +39,7 @@ public class DependencyQueueTest extends FiascoTest
         {
             var queue = testDependencyQueue();
 
-            var executor = Executors.newFixedThreadPool(5);
+            var executor = newFixedThreadPool(5);
 
             _5.loop(() ->
                 executor.submit(() ->

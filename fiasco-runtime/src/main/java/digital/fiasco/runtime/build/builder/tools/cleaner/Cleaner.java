@@ -1,16 +1,13 @@
 package digital.fiasco.runtime.build.builder.tools.cleaner;
 
 import com.telenav.kivakit.filesystem.File;
-import com.telenav.kivakit.filesystem.FileList;
 import digital.fiasco.runtime.build.builder.Builder;
-import digital.fiasco.runtime.build.builder.tools.BaseTool;
+import digital.fiasco.runtime.build.builder.tools.BaseFileTool;
+import digital.fiasco.runtime.build.builder.tools.archiver.Archiver;
 
 import java.util.Collection;
-import java.util.List;
 
-import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.string.Formatter.format;
-import static com.telenav.kivakit.filesystem.FileList.fileList;
 
 /**
  * Removes files matching the given pattern from the build output folder
@@ -18,39 +15,32 @@ import static com.telenav.kivakit.filesystem.FileList.fileList;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class Cleaner extends BaseTool
+public class Cleaner extends BaseFileTool
 {
-    /** The files to be removed */
-    private FileList files;
-
     public Cleaner(Builder builder)
     {
         super(builder);
     }
 
+    @Override
     public Cleaner copy()
     {
-        var copy = new Cleaner(associatedBuilder());
-        copy.files = files.copy();
-        return copy;
+        return new Cleaner(associatedBuilder());
     }
 
     /**
      * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
      */
     @Override
     public String description()
     {
-        var paths = stringList();
-        for (var file : files)
-        {
-            paths.add(file.path().asString());
-        }
         return format("""
             Cleaner
               files:
             $
-            """, paths.indented(4).join("\n"));
+            """, pathsAsStringList().indented(4).join("\n"));
     }
 
     /**
@@ -59,9 +49,9 @@ public class Cleaner extends BaseTool
     @Override
     public void onRun()
     {
-        information("Cleaning $ files", files.count());
+        information("Cleaning $ files", files().count());
 
-        files.forEach(file ->
+        files().forEach(file ->
         {
             file.delete();
             var parent = file.parent();
@@ -73,28 +63,26 @@ public class Cleaner extends BaseTool
     }
 
     /**
-     * Records the list of files to remove
+     * {@inheritDoc}
      *
-     * @param files The files to remove
-     * @return This for chaining
+     * @param files {@inheritDoc}
+     * @return {@inheritDoc}
      */
-    public Cleaner withAdditionalFiles(Collection<File> files)
+    @Override
+    public Cleaner withFiles(Collection<File> files)
     {
-        var copy = copy();
-        this.files = fileList(this.files).with(files);
-        return this;
+        return (Cleaner) super.withFiles(files);
     }
 
     /**
-     * Records the list of files to remove
+     * {@inheritDoc}
      *
-     * @param files The files to remove
-     * @return This for chaining
+     * @param files {@inheritDoc}
+     * @return {@inheritDoc}
      */
-    public Cleaner withFiles(List<File> files)
+    @Override
+    public Cleaner withoutFiles(Collection<File> files)
     {
-        var copy = copy();
-        this.files = fileList(this.files.with(files));
-        return this;
+        return (Cleaner) super.withoutFiles(files);
     }
 }

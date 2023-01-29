@@ -19,6 +19,17 @@ public class ResolvedArtifacts
     private final Monitor updated = new Monitor();
 
     /**
+     * Returns true if all the artifacts in the given list have been resolved
+     *
+     * @param artifacts The artifacts
+     * @return True if the artifacts ahve been resolved
+     */
+    public boolean isResolved(ArtifactList artifacts)
+    {
+        return resolved.containsAll(artifacts);
+    }
+
+    /**
      * Marks the given artifacts as resolved
      *
      * @param artifacts The artifacts that were resolved

@@ -10,6 +10,17 @@ public class Shader extends BaseTool
         super(builder);
     }
 
+    public Shader(Shader that)
+    {
+        super(that);
+    }
+
+    @Override
+    public Shader copy()
+    {
+        return new Shader(this);
+    }
+
     @Override
     public String description()
     {

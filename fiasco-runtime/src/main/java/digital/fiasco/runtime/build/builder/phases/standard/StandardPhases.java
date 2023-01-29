@@ -92,15 +92,13 @@ public class StandardPhases extends PhaseList implements
     public void onPrepare()
     {
         newCopier()
-            .withSourceFolder(sourceMainResourcesFolder())
             .withTargetFolder(targetClassesFolder())
-            .with("**/*")
+            .withFiles(sourceMainResourcesFolder().nestedFiles())
             .run();
 
         newCopier()
-            .withSourceFolder(sourceTestResourcesFolder())
             .withTargetFolder(targetTestClassesFolder())
-            .with("**/*")
+            .withFiles(sourceTestResourcesFolder().nestedFiles())
             .run();
     }
 

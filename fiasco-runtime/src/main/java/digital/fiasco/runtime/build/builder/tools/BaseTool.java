@@ -3,9 +3,9 @@ package digital.fiasco.runtime.build.builder.tools;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.filesystem.Folder;
-import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
+import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.dependency.collections.DependencyList;
 
 import static digital.fiasco.runtime.build.settings.BuildOption.DESCRIBE;
@@ -36,6 +36,17 @@ public abstract class BaseTool extends BaseRepeater implements Tool
     }
 
     /**
+     * Creates a copy of the given tool subclass
+     *
+     * @param that The tool to copy
+     */
+    public BaseTool(BaseTool that)
+    {
+        this.builder = that.builder;
+        this.profiles = that.profiles.copy();
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -43,6 +54,14 @@ public abstract class BaseTool extends BaseRepeater implements Tool
     {
         return builder;
     }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public abstract BaseTool copy();
 
     /**
      * Returns the list of dependencies from the builder associated with this tool
