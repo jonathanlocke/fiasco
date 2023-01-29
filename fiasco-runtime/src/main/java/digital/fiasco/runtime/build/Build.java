@@ -160,6 +160,7 @@ import digital.fiasco.runtime.build.settings.BuildSettingsObject;
 public interface Build extends
     Named,
     Described,
+    Stepped,
     Repeater,
     BuildEnvironmentTrait,
     BuildRepositoriesTrait,

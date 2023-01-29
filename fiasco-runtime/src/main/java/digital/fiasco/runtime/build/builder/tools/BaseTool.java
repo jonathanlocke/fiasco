@@ -1,10 +1,9 @@
 package digital.fiasco.runtime.build.builder.tools;
 
 import com.telenav.kivakit.core.collections.set.ObjectSet;
-import com.telenav.kivakit.core.messaging.messages.status.activity.Step;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.filesystem.Folder;
-import com.telenav.kivakit.interfaces.code.Code;
+import digital.fiasco.runtime.build.Stepped;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.build.settings.BuildProfile;
@@ -20,7 +19,9 @@ import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public abstract class BaseTool extends BaseRepeater implements Tool
+public abstract class BaseTool extends BaseRepeater implements
+    Stepped,
+    Tool
 {
     /** The builder associated with this tool */
     private final Builder builder;
@@ -167,7 +168,7 @@ public abstract class BaseTool extends BaseRepeater implements Tool
     {
         if (isEnabled())
         {
-            if (describe())
+            if (shouldDescribe())
             {
                 onDescribe();
             }
@@ -181,73 +182,23 @@ public abstract class BaseTool extends BaseRepeater implements Tool
     }
 
     /**
-     * Returns true if this tool should describe what it would do rather than actually doing it
+     * {@inheritDoc}
      *
-     * @return True if the tool should describe its action
+     * @return {@inheritDoc}
      */
-    protected boolean describe()
+    @Override
+    public boolean shouldDescribe()
     {
         return builder.isEnabled(DESCRIBE);
     }
 
     /**
-     * Returns true if the tool should execute actions
+     * {@inheritDoc}
      *
-     * @return True if execution should occur
+     * @return {@inheritDoc}
      */
-    protected boolean execute()
-    {
-        return !describe();
-    }
-
-    /**
-     * Executes the given code if
-     *
-     * @param code The code to run
-     */
-    protected void step(Runnable code, String message, Object... arguments)
-    {
-        if (describe() || verbose())
-        {
-            step(message, arguments);
-        }
-        if (execute())
-        {
-            code.run();
-        }
-    }
-
-    /**
-     * Executes the given code if
-     *
-     * @param code The code to run
-     * @return The result of the operation, or null if the operation was not executed
-     */
-    protected <T> T step(Code<T> code, String message, Object... arguments)
-    {
-        if (describe() || verbose())
-        {
-            step(message, arguments);
-        }
-        if (execute())
-        {
-            return code.run();
-        }
-        return null;
-    }
-
-    /**
-     * Broadcasts a {@link Step} message
-     *
-     * @param message The message
-     * @param arguments The message arguments
-     */
-    protected void step(String message, Object... arguments)
-    {
-        transmit(new Step(message, arguments));
-    }
-
-    protected boolean verbose()
+    @Override
+    public boolean shouldDescribeAndExecute()
     {
         return builder.isEnabled(VERBOSE);
     }

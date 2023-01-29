@@ -39,6 +39,8 @@ import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
 import static com.telenav.kivakit.core.value.count.Count._0;
 import static com.telenav.kivakit.core.value.count.Count._16;
 import static com.telenav.kivakit.core.vm.JavaVirtualMachine.javaVirtualMachine;
+import static digital.fiasco.runtime.build.settings.BuildOption.DESCRIBE;
+import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
 
 /**
  * {@inheritDoc}
@@ -92,6 +94,12 @@ public abstract class BaseBuild extends Application implements Build
         return copy;
     }
 
+    @Override
+    public boolean shouldDescribe()
+    {
+        return settings().isEnabled(DESCRIBE);
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -127,6 +135,12 @@ public abstract class BaseBuild extends Application implements Build
     public Set<Project> projects()
     {
         return set(new GsonSerializationProject());
+    }
+
+    @Override
+    public boolean shouldDescribeAndExecute()
+    {
+        return settings().isEnabled(VERBOSE);
     }
 
     /**

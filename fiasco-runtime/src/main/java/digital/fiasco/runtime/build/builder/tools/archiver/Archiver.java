@@ -67,7 +67,7 @@ public class Archiver extends BaseFileTool
     @Override
     public void onRun()
     {
-        if (describe())
+        if (shouldDescribe())
         {
             step("Archiving to $:\n$", archiveFile, files().asStringList().indented(4).join("\n"));
         }
