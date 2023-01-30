@@ -58,7 +58,7 @@ public interface Dependency extends
     Comparable<Dependency>
 {
     /**
-     * Returns all dependencies, both artifacts and builders
+     * Returns all dependencies, both artifacts and builders of this dependency
      *
      * @return The dependencies
      */
@@ -71,7 +71,7 @@ public interface Dependency extends
     }
 
     /**
-     * Gets all dependencies of the given type
+     * Returns all {@link Artifact} dependencies of this dependency
      *
      * @return The dependencies
      */
@@ -98,7 +98,7 @@ public interface Dependency extends
     }
 
     /**
-     * Gets all dependencies of the given type
+     * Returns all {@link Builder} dependencies of this dependency
      *
      * @return The dependencies
      */

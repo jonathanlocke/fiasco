@@ -113,7 +113,7 @@ public interface BuildSettings extends
     Count builderThreads();
 
     /**
-     * Returns the artifact descriptor for this build
+     * Returns the artifact descriptor build setting
      *
      * @return The artifact descriptor
      */

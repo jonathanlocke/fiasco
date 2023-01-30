@@ -62,8 +62,8 @@ import digital.fiasco.runtime.build.settings.BuildSettingsObject;
  *
  * <p>
  * Phases are enabled and disabled with {@link Builder#withEnabled(Phase)} and {@link Builder#withDisabled(Phase)}. Code can be
- * executed before, during or after a phase runs by calling {@link Builder#beforePhase(String, BuildAction)},
- * {@link Builder#onPhase(String, BuildAction)}, and {@link Builder#afterPhase(String, BuildAction)}. The
+ * executed before, during or after a phase runs by calling {@link Builder#withActionBeforePhase(String, BuildAction)},
+ * {@link Builder#withActionDuringPhase(String, BuildAction)}, and {@link Builder#withActionAfterPhase(String, BuildAction)}. The
  * {@link BaseBuild} application enables and disables any phase names that were passed from the command line. The phase
  * name itself enables the phase and any dependent phases (for example, "compile" enables the "build-start", "prepare"
  * and "compile" phases). If the phase name is preceded by a dash (for example, -test), the phase is disabled (but not

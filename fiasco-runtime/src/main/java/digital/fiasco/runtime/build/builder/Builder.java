@@ -80,8 +80,8 @@ import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
  *
  * <p>
  * A phase can be retrieved by name with {@link #phase(String)} and an arbitrary {@link Runnable}
- * can be attached to run before, during or after the phase executes with {@link #beforePhase(String, BuildAction)},
- * {@link #onPhase(String, BuildAction)}, and {@link #afterPhase(String, BuildAction)}. This allows {@link Tool}s to
+ * can be attached to run before, during or after the phase executes with {@link #withActionBeforePhase(String, BuildAction)},
+ * {@link #withActionDuringPhase(String, BuildAction)}, and {@link #withActionAfterPhase(String, BuildAction)}. This allows {@link Tool}s to
  * be used at the right time to achieve different build effects.
  * </p>
  *
@@ -135,12 +135,12 @@ import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
  * <p><b>Build Phases</b></p>
  *
  * <ul>
- *     <li>{@link #afterPhase(String, BuildAction)}</li>
- *     <li>{@link #beforePhase(String, BuildAction)}</li>
+ *     <li>{@link #withActionAfterPhase(String, BuildAction)}</li>
+ *     <li>{@link #withActionBeforePhase(String, BuildAction)}</li>
  *     <li>{@link #withDisabled(Phase)}</li>
  *     <li>{@link #withEnabled(Phase)}</li>
  *     <li>{@link #isEnabled(Phase)}</li>
- *     <li>{@link #onPhase(String, BuildAction)}</li>
+ *     <li>{@link #withActionDuringPhase(String, BuildAction)}</li>
  *     <li>{@link #phase(String)}</li>
  *     <li>{@link #phases()}</li>
  *     <li>{@link #withPhases(PhaseList)}</li>
@@ -149,9 +149,9 @@ import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
  * <p><b>Build Actions</b></p>
  *
  * <ul>
- *     <li>{@link #beforePhase(String, BuildAction)}</li>
- *     <li>{@link #onPhase(String, BuildAction)}</li>
- *     <li>{@link #afterPhase(String, BuildAction)}</li>
+ *     <li>{@link #withActionBeforePhase(String, BuildAction)}</li>
+ *     <li>{@link #withActionDuringPhase(String, BuildAction)}</li>
+ *     <li>{@link #withActionAfterPhase(String, BuildAction)}</li>
  * </ul>
  *
  * <p><b>Build Profiles</b></p>
@@ -288,19 +288,6 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Runs the given code after the named phase runs
-     *
-     * @param name The phase
-     * @param code The code to run
-     * @return This builder, for chaining
-     */
-    public Builder afterPhase(String name, BuildAction code)
-    {
-        phase(name).afterPhase(code);
-        return this;
-    }
-
-    /**
      * {@inheritDoc}
      *
      * @return {@inheritDoc}
@@ -319,31 +306,6 @@ public class Builder extends BaseRepeater implements
     @Override
     public Builder associatedBuilder()
     {
-        return this;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param that {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public BuildSettings attachMixin(BuildSettings that)
-    {
-        return unsupported();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param name {@inheritDoc}
-     * @param code {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    public Builder beforePhase(String name, BuildAction code)
-    {
-        phase(name).beforePhase(code);
         return this;
     }
 
@@ -404,7 +366,9 @@ public class Builder extends BaseRepeater implements
     @Override
     public Builder copy()
     {
-        return new Builder(this);
+        var copy = new Builder(this);
+        copy.attachMixin(settings());
+        return copy;
     }
 
     /**
@@ -457,6 +421,11 @@ public class Builder extends BaseRepeater implements
         return description.titledBox("Fiasco Help");
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
     @Override
     public ArtifactDescriptor descriptor()
     {
@@ -485,19 +454,6 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Runs the given code during the named phase
-     *
-     * @param name The phase
-     * @param code The code to run
-     * @return This builder, for chaining
-     */
-    public Builder onPhase(String name, BuildAction code)
-    {
-        phase(name).duringPhase(code);
-        return this;
-    }
-
-    /**
      * {@inheritDoc}
      *
      * @return {@inheritDoc}
@@ -508,72 +464,180 @@ public class Builder extends BaseRepeater implements
         return unsupported();
     }
 
+    /**
+     * Returns a copy of this object that runs the given code after the named phase runs
+     *
+     * @param name The phase
+     * @param code The code to run
+     * @return This builder, for chaining
+     */
+    public Builder withActionAfterPhase(String name, BuildAction code)
+    {
+        return mutatedCopy(it -> it.phase(name).afterPhase(code));
+    }
+
+    /**
+     * Returns a copy of this builder with the given action to be executed before the named phase
+     *
+     * @param name The name of the phase
+     * @param code The action to execute
+     * @return The copy
+     */
+    public Builder withActionBeforePhase(String name, BuildAction code)
+    {
+        return mutatedCopy(it -> it.phase(name).beforePhase(code));
+    }
+
+    /**
+     * Runs the given code during the named phase
+     *
+     * @param name The phase
+     * @param code The code to run
+     * @return This builder, for chaining
+     */
+    public Builder withActionDuringPhase(String name, BuildAction code)
+    {
+        return mutatedCopy(it -> it.phase(name).duringPhase(code));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param artifact {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withArtifact(String artifact)
     {
         return withSettings(it -> it.withArtifact(artifact));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param descriptor {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withArtifactDescriptor(ArtifactDescriptor descriptor)
     {
         return withSettings(it -> it.withArtifactDescriptor(descriptor));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param descriptor {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withArtifactDescriptor(String descriptor)
     {
         return withSettings(it -> it.withArtifactDescriptor(descriptor));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param function {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withArtifactDescriptor(Function<ArtifactDescriptor, ArtifactDescriptor> function)
     {
         return withSettings(it -> it.withArtifactDescriptor(function));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param group {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withArtifactGroup(ArtifactGroup group)
     {
         return withSettings(it -> it.withArtifactGroup(group));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param group {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withArtifactGroup(String group)
     {
         return withSettings(it -> it.withArtifactGroup(group));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param artifactName {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withArtifactName(ArtifactName artifactName)
     {
         return withSettings(it -> it.withArtifactName(artifactName));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param artifactName {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withArtifactName(String artifactName)
     {
         return withSettings(it -> it.withArtifactName(artifactName));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param threads {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withArtifactResolverThreads(Count threads)
     {
         return withSettings(it -> it.withArtifactResolverThreads(threads));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param version {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withArtifactVersion(String version)
     {
         return withSettings(it -> it.withArtifactVersion(version));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param version {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withArtifactVersion(Version version)
     {
         return withSettings(it -> it.withArtifactVersion(version));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param threads {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withBuilderThreads(Count threads)
     {
@@ -588,12 +652,18 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withDependencies(Builder... dependencies)
     {
-        return copy(it -> it.builderDependencies = builderDependencies.with(dependencies));
+        return mutatedCopy(it -> it.builderDependencies = builderDependencies.with(dependencies));
     }
 
+    /**
+     * Returns a copy of this artifact with the given dependencies
+     *
+     * @param dependencies The new dependencies
+     * @return The new artifact
+     */
     public Builder withDependencies(ArtifactList dependencies)
     {
-        return copy(it -> it.artifactDependencies = artifactDependencies.with(dependencies));
+        return mutatedCopy(it -> it.artifactDependencies = artifactDependencies.with(dependencies));
     }
 
     /**
@@ -605,39 +675,75 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withDependencies(Artifact<?> first, Artifact<?>... rest)
     {
-        return copy(it -> it.artifactDependencies = artifactDependencies.with(first, rest));
+        return mutatedCopy(it -> it.artifactDependencies = artifactDependencies.with(first, rest));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param phase {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withDisabled(Phase phase)
     {
         return withSettings(it -> withDisabled(phase));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param profile {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withDisabled(BuildProfile profile)
     {
         return withSettings(it -> withDisabled(profile));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param option {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withDisabled(BuildOption option)
     {
         return withSettings(it -> it.withDisabled(option));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param phase {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withEnabled(Phase phase)
     {
         return withSettings(it -> it.withEnabled(phase));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param option {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withEnabled(BuildOption option)
     {
         return withSettings(it -> it.withEnabled(option));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param profile {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withEnabled(BuildProfile profile)
     {
@@ -652,7 +758,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withLibrarian(Librarian librarian)
     {
-        return copy(it -> it.librarian = librarian);
+        return mutatedCopy(it -> it.librarian = librarian);
     }
 
     /**
@@ -673,11 +779,11 @@ public class Builder extends BaseRepeater implements
             {
                 if (enable)
                 {
-                    builder = copy(it -> it.settings().withEnabled(option));
+                    builder = withSettings(it -> it.withEnabled(option));
                 }
                 else
                 {
-                    builder = copy(it -> it.settings().withDisabled(option));
+                    builder = withSettings(it -> it.withDisabled(option));
                 }
             }
             else
@@ -687,11 +793,11 @@ public class Builder extends BaseRepeater implements
                 {
                     if (enable)
                     {
-                        builder = copy(it -> it.settings().withEnabled(phase));
+                        builder = withSettings(it -> it.withEnabled(phase));
                     }
                     else
                     {
-                        builder = copy(it -> it.settings().withDisabled(phase));
+                        builder = withSettings(it -> it.withDisabled(phase));
                     }
                 }
                 else
@@ -699,11 +805,11 @@ public class Builder extends BaseRepeater implements
                     var profile = new BuildProfile(value);
                     if (enable)
                     {
-                        builder = copy(it -> it.settings().withEnabled(profile));
+                        builder = withSettings(it -> it.withEnabled(profile));
                     }
                     else
                     {
-                        builder = copy(it -> it.settings().withDisabled(profile));
+                        builder = withSettings(it -> it.withDisabled(profile));
                     }
                 }
             }
@@ -717,6 +823,12 @@ public class Builder extends BaseRepeater implements
         return builder;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param phases {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withPhases(PhaseList phases)
     {
@@ -724,11 +836,11 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a copy of this builder with the given artifact globally "pinned" to the given version.
      *
-     * @param artifact {@inheritDoc}
-     * @param version {@inheritDoc}
-     * @return {@inheritDoc}
+     * @param artifact The artifact
+     * @param version The version to enforce
+     * @return The copy
      */
     public Builder withPinnedVersion(Artifact<?> artifact, String version)
     {
@@ -736,17 +848,23 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a copy of this builder with the given artifact globally "pinned" to the given version.
      *
-     * @param artifact {@inheritDoc}
-     * @param version {@inheritDoc}
-     * @return {@inheritDoc}
+     * @param artifact The artifact
+     * @param version The version to enforce
+     * @return The copy
      */
     public Builder withPinnedVersion(Artifact<?> artifact, Version version)
     {
-        return copy(it -> it.librarian = it.librarian.withPinnedVersion(artifact, version));
+        return mutatedCopy(it -> it.librarian = librarian.withPinnedVersion(artifact, version));
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param rootFolder {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public Builder withRootFolder(Folder rootFolder)
     {
@@ -754,22 +872,24 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a copy of this builder with the given settings (attached as a {@link BuildSettingsMixin})
      *
-     * @return {@inheritDoc}
+     * @param settings The settings
+     * @return The copy
      */
     public Builder withSettings(BuildSettings settings)
     {
-        var copy = copy();
-        copy.attachMixin(settings);
-        return copy;
+        return mutatedCopy(it -> it.attachMixin(it.settings()));
     }
 
-    private Builder withSettings(Function<BuildSettings, BuildSettings> transformer)
+    /**
+     * Returns a copy of this builder with its build settings transformed by the given function
+     *
+     * @param function The transformation function
+     * @return The copy
+     */
+    private Builder withSettings(Function<BuildSettings, BuildSettings> function)
     {
-        var copy = copy();
-        BuildSettings settings = transformer.apply(copy.settings());
-        copy.attachMixin(settings);
-        return copy;
+        return withSettings(function.apply(settings()));
     }
 }

@@ -106,8 +106,6 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
  *
  * <ul>
  *     <li>{@link #copy()} - Returns a copy of this artifact</li>
- *     <li>{@link #version(String)} - Returns this artifact with the given version</li>
- *     <li>{@link #version(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #withAttachment(ArtifactAttachment)} - Attaches the given content</li>
  *     <li>{@link #withContent(ArtifactContent)}</li>
  *     <li>{@link #withDependencies(ArtifactList)} - Returns this artifact with the given dependencies</li>

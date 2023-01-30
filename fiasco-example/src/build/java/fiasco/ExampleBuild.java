@@ -96,7 +96,7 @@ public class ExampleBuild extends BaseBuild implements Libraries
             .withPinnedVersion(apache_ant, "1.0.3")
             .withPinnedVersion(apache_commons_logging, "1.9.0")
             .withPinnedVersion(kryo, "4.3.1")
-            .beforePhase("compile", it ->
+            .withActionBeforePhase("compile", it ->
             {
                 var cleaner = it.newCleaner();
                 cleaner.run();
