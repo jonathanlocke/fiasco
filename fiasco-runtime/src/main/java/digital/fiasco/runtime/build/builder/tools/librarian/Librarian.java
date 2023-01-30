@@ -197,7 +197,7 @@ public class Librarian extends BaseTool<Librarian>
     {
         ensure(descriptor.version() == null);
 
-        return copy(it -> it.pinnedVersions.put(descriptor, version));
+        return mutatedCopy(it -> it.pinnedVersions.put(descriptor, version));
     }
 
     /**
@@ -243,7 +243,7 @@ public class Librarian extends BaseTool<Librarian>
      */
     public Librarian withRepository(Repository repository)
     {
-        return copy(it -> it.repositories.add(repository));
+        return mutatedCopy(it -> it.repositories.add(repository));
     }
 
     /**
