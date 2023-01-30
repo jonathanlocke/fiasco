@@ -4,6 +4,7 @@ import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.Folder;
+import com.telenav.kivakit.filesystem.Rooted;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.Stepped;
 import digital.fiasco.runtime.build.builder.phases.Phase;
@@ -85,7 +86,9 @@ import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName
  *
  * @author Jonathan Locke
  */
-public interface BuildSettings extends Stepped
+public interface BuildSettings extends
+    Stepped,
+    Rooted
 {
     /**
      * Returns the number of threads that should be used to resolve artifacts. This is particularly important for remote
@@ -168,6 +171,7 @@ public interface BuildSettings extends Stepped
      *
      * @return The root folder
      */
+    @Override
     Folder rootFolder();
 
     /**

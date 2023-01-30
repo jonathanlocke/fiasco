@@ -457,6 +457,12 @@ public class Builder extends BaseRepeater implements
         return description.titledBox("Fiasco Help");
     }
 
+    @Override
+    public ArtifactDescriptor descriptor()
+    {
+        return BuildSettingsMixin.super.descriptor();
+    }
+
     /**
      * Returns the librarian used to resolve dependencies for this builder
      *
@@ -503,73 +509,73 @@ public class Builder extends BaseRepeater implements
     }
 
     @Override
-    public BuildSettings withArtifact(String artifact)
+    public Builder withArtifact(String artifact)
     {
         return withSettings(it -> it.withArtifact(artifact));
     }
 
     @Override
-    public BuildSettings withArtifactDescriptor(ArtifactDescriptor descriptor)
+    public Builder withArtifactDescriptor(ArtifactDescriptor descriptor)
     {
         return withSettings(it -> it.withArtifactDescriptor(descriptor));
     }
 
     @Override
-    public BuildSettings withArtifactDescriptor(String descriptor)
+    public Builder withArtifactDescriptor(String descriptor)
     {
         return withSettings(it -> it.withArtifactDescriptor(descriptor));
     }
 
     @Override
-    public BuildSettings withArtifactDescriptor(Function<ArtifactDescriptor, ArtifactDescriptor> function)
+    public Builder withArtifactDescriptor(Function<ArtifactDescriptor, ArtifactDescriptor> function)
     {
         return withSettings(it -> it.withArtifactDescriptor(function));
     }
 
     @Override
-    public BuildSettings withArtifactGroup(ArtifactGroup group)
+    public Builder withArtifactGroup(ArtifactGroup group)
     {
         return withSettings(it -> it.withArtifactGroup(group));
     }
 
     @Override
-    public BuildSettings withArtifactGroup(String group)
+    public Builder withArtifactGroup(String group)
     {
         return withSettings(it -> it.withArtifactGroup(group));
     }
 
     @Override
-    public BuildSettings withArtifactName(ArtifactName artifactName)
+    public Builder withArtifactName(ArtifactName artifactName)
     {
         return withSettings(it -> it.withArtifactName(artifactName));
     }
 
     @Override
-    public BuildSettings withArtifactName(String artifactName)
+    public Builder withArtifactName(String artifactName)
     {
         return withSettings(it -> it.withArtifactName(artifactName));
     }
 
     @Override
-    public BuildSettings withArtifactResolverThreads(Count threads)
+    public Builder withArtifactResolverThreads(Count threads)
     {
         return withSettings(it -> it.withArtifactResolverThreads(threads));
     }
 
     @Override
-    public BuildSettings withArtifactVersion(String version)
+    public Builder withArtifactVersion(String version)
     {
         return withSettings(it -> it.withArtifactVersion(version));
     }
 
     @Override
-    public BuildSettings withArtifactVersion(Version version)
+    public Builder withArtifactVersion(Version version)
     {
         return withSettings(it -> it.withArtifactVersion(version));
     }
 
     @Override
-    public BuildSettings withBuilderThreads(Count threads)
+    public Builder withBuilderThreads(Count threads)
     {
         return withSettings(it -> it.withBuilderThreads(threads));
     }
@@ -603,37 +609,37 @@ public class Builder extends BaseRepeater implements
     }
 
     @Override
-    public BuildSettings withDisabled(Phase phase)
+    public Builder withDisabled(Phase phase)
     {
         return withSettings(it -> withDisabled(phase));
     }
 
     @Override
-    public BuildSettings withDisabled(BuildProfile profile)
+    public Builder withDisabled(BuildProfile profile)
     {
         return withSettings(it -> withDisabled(profile));
     }
 
     @Override
-    public BuildSettings withDisabled(BuildOption option)
+    public Builder withDisabled(BuildOption option)
     {
         return withSettings(it -> it.withDisabled(option));
     }
 
     @Override
-    public BuildSettings withEnabled(Phase phase)
+    public Builder withEnabled(Phase phase)
     {
         return withSettings(it -> it.withEnabled(phase));
     }
 
     @Override
-    public BuildSettings withEnabled(BuildOption option)
+    public Builder withEnabled(BuildOption option)
     {
         return withSettings(it -> it.withEnabled(option));
     }
 
     @Override
-    public BuildSettings withEnabled(BuildProfile profile)
+    public Builder withEnabled(BuildProfile profile)
     {
         return withSettings(it -> withEnabled(profile));
     }
@@ -712,7 +718,7 @@ public class Builder extends BaseRepeater implements
     }
 
     @Override
-    public BuildSettings withPhases(PhaseList phases)
+    public Builder withPhases(PhaseList phases)
     {
         return withSettings(it -> it.withPhases(phases));
     }
@@ -742,7 +748,7 @@ public class Builder extends BaseRepeater implements
     }
 
     @Override
-    public BuildSettings withRootFolder(Folder rootFolder)
+    public Builder withRootFolder(Folder rootFolder)
     {
         return withSettings(it -> it.withRootFolder(rootFolder));
     }
