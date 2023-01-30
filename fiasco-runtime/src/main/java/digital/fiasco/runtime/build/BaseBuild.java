@@ -77,7 +77,7 @@ public abstract class BaseBuild extends Application implements Build
      */
     protected BaseBuild(BaseBuild that)
     {
-        copyFrom(that);
+        this.metadata = that.metadata;
     }
 
     /**
@@ -87,7 +87,7 @@ public abstract class BaseBuild extends Application implements Build
     public BaseBuild copy()
     {
         var copy = typeForClass(getClass()).newInstance();
-        copy.copyFrom(this);
+        copy.metadata = this.metadata;
         copy.attachMixin(this);
         return copy;
     }
@@ -116,6 +116,8 @@ public abstract class BaseBuild extends Application implements Build
 
     /**
      * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
      */
     @Override
     public Set<Project> projects()
@@ -175,16 +177,6 @@ public abstract class BaseBuild extends Application implements Build
         return super.switchParsers().with(
             BUILDER_THREADS,
             ARTIFACT_RESOLVER_THREADS);
-    }
-
-    /**
-     * Copies the values of the given build into this build
-     *
-     * @param that The build to copy
-     */
-    private void copyFrom(BaseBuild that)
-    {
-        this.metadata = that.metadata;
     }
 
     private Builder newBuilder()

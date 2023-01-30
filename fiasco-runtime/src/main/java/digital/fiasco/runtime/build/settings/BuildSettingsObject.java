@@ -131,7 +131,7 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
         this.builderThreads = that.builderThreads;
         this.options = that.options.copy();
         this.descriptor = that.descriptor;
-        this.librarian = that.librarian;
+        this.librarian = that.librarian.copy();
         this.profiles = that.profiles.copy();
     }
 

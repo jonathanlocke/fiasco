@@ -645,7 +645,7 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Returns a copy of this artifact with the given dependencies
+     * Returns a copy of this builder with the given dependencies
      *
      * @param dependencies The new dependencies
      * @return The new artifact
@@ -656,7 +656,7 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Returns a copy of this artifact with the given dependencies
+     * Returns a copy of this builder with the given dependencies
      *
      * @param dependencies The new dependencies
      * @return The new artifact
@@ -667,7 +667,7 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Adds one or more artifact dependencies to this builder
+     * Returns a copy of this builder with one or more artifact dependencies added
      *
      * @param first The first dependency
      * @param rest Any further dependencies
@@ -762,9 +762,11 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Parses the given command line, enabling and disabling relevant phases and build options
+     * Makes a copy of this builder, transformed by parsing the given command line, enabling and disabling relevant
+     * phases and build options.
      *
      * @param commandLine The command line to process
+     * @return A copy of this builder transformed by the given command line
      */
     public Builder withParsedCommandLine(CommandLine commandLine)
     {
