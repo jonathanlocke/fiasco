@@ -2,7 +2,7 @@ package digital.fiasco.runtime.build.builder.tools;
 
 import com.telenav.kivakit.core.language.Classes;
 import com.telenav.kivakit.core.messaging.Repeater;
-import digital.fiasco.runtime.build.builder.BuildStructured;
+import digital.fiasco.runtime.build.environment.BuildStructured;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.BuilderAssociated;
 import digital.fiasco.runtime.build.builder.tools.archiver.Archiver;

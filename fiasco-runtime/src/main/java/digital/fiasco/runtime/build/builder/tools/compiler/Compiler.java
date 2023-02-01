@@ -1,9 +1,14 @@
 package digital.fiasco.runtime.build.builder.tools.compiler;
 
+import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.FileList;
+import com.telenav.kivakit.filesystem.Folder;
+import com.telenav.kivakit.filesystem.FolderList;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.BaseTool;
+import digital.fiasco.runtime.build.builder.tools.compiler.flags.CompilerWarning;
+import digital.fiasco.runtime.build.builder.tools.compiler.flags.DebugInformation;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticListener;
@@ -11,7 +16,11 @@ import javax.tools.JavaFileObject;
 import java.nio.charset.Charset;
 import java.util.Locale;
 
+import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
+import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.string.Formatter.format;
+import static digital.fiasco.runtime.build.builder.tools.compiler.flags.DebugInformation.ALL;
+import static digital.fiasco.runtime.build.builder.tools.compiler.flags.DebugInformation.NONE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
@@ -31,8 +40,8 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
  * <p><b>Functional</b></p>
  *
  * <ul>
- *     <li>{@link #withEncoding(Charset)}</li>
- *     <li>{@link #withLocale(Locale)}</li>
+ *     <li>{@link #withSourceEncoding(Charset)}</li>
+ *     <li>{@link #withSourceLocale(Locale)}</li>
  *     <li>{@link #withSourceVersion(Version)}</li>
  *     <li>{@link #withSources(FileList)}</li>
  *     <li>{@link #withTargetVersion(Version)}</li>
@@ -43,6 +52,7 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
 public class Compiler extends BaseTool<Compiler>
 {
+
     /**
      * Broadcasts compilation errors
      */
@@ -66,11 +76,29 @@ public class Compiler extends BaseTool<Compiler>
     /** The Java virtual machine bytecode target version */
     private Version targetVersion;
 
+    /** The JVM release being targeted */
+    private Version releaseVersion;
+
     /** The source resources to compile */
     private FileList sources;
 
+    /** The class path to give to the compiler */
+    private FolderList classpath;
+
+    /** The source path to look for source code */
+    private FolderList sourcepath;
+
+    /** Folder to write class files to */
+    private Folder targetFolder;
+
     /** The source file encoding */
     private Charset sourceEncoding = UTF_8;
+
+    /** The kinds of debug information to include in compiled classes */
+    private ObjectSet<DebugInformation> debugInformation = set();
+
+    /** The compiler warnings that are enabled */
+    private ObjectSet<CompilerWarning> enabledCompilerWarnings = set();
 
     /** The source file locale */
     private Locale sourceLocale = Locale.getDefault();
@@ -93,19 +121,45 @@ public class Compiler extends BaseTool<Compiler>
     public Compiler(Compiler that)
     {
         super(that.associatedBuilder());
-        this.sourceVersion = that.sourceVersion;
-        this.targetVersion = that.targetVersion;
-        this.sources = that.sources.copy();
+        this.classpath = that.classpath.copy();
+        this.debugInformation = that.debugInformation;
+        this.enabledCompilerWarnings = that.enabledCompilerWarnings.copy();
+        this.releaseVersion = that.releaseVersion;
         this.sourceEncoding = that.sourceEncoding;
         this.sourceLocale = that.sourceLocale;
+        this.sourceVersion = that.sourceVersion;
+        this.sourcepath = that.sourcepath.copy();
+        this.sources = that.sources.copy();
+        this.targetFolder = that.targetFolder;
+        this.targetVersion = that.targetVersion;
+    }
+
+    @Override
+    public void checkConsistency()
+    {
+        ensure(debugInformation.equals(set(NONE))
+                || debugInformation.equals(set(ALL))
+                || !debugInformation.isEmpty(),
+            "Debug information can be NONE, ALL or any combination of SOURCE_FILES, LINES, and VARIABLES");
     }
 
     /**
      * Returns a copy of this compiler tool
      */
+    @Override
     public Compiler copy()
     {
         return new Compiler(this);
+    }
+
+    /**
+     * Returns the set of debug information that will be included in compiled class files
+     *
+     * @return The set of {@link DebugInformation} enum values
+     */
+    public ObjectSet<DebugInformation> debugInformation()
+    {
+        return debugInformation;
     }
 
     /**
@@ -124,6 +178,16 @@ public class Compiler extends BaseTool<Compiler>
     }
 
     /**
+     * Returns the set of enabled compiler warnings
+     *
+     * @return The set
+     */
+    public ObjectSet<CompilerWarning> enabledCompilerWarnings()
+    {
+        return enabledCompilerWarnings;
+    }
+
+    /**
      * Returns the source code encoding
      */
     public Charset encoding()
@@ -138,6 +202,22 @@ public class Compiler extends BaseTool<Compiler>
     public void onRun()
     {
         compile(sourceMainJavaSources());
+    }
+
+    /**
+     * Returns the targeted Java release
+     */
+    public Version releaseVersion()
+    {
+        return releaseVersion;
+    }
+
+    /**
+     * Returns the source code encoding
+     */
+    public Charset sourceEncoding()
+    {
+        return sourceEncoding;
     }
 
     /**
@@ -165,6 +245,17 @@ public class Compiler extends BaseTool<Compiler>
     }
 
     /**
+     * Returns the target folder this compiler will use for class file output
+     *
+     * @return The folder
+     */
+    @Override
+    public Folder targetFolder()
+    {
+        return targetFolder;
+    }
+
+    /**
      * Returns the targeted VM version
      */
     public Version targetVersion()
@@ -173,16 +264,58 @@ public class Compiler extends BaseTool<Compiler>
     }
 
     /**
+     * Returns a copy of this compiler tool with the given debug information included in class files
+     *
+     * @param information The debug information to include
+     * @return The new copy of this compiler tool
+     */
+    public Compiler withDebugInformation(DebugInformation... information)
+    {
+        return mutatedCopy(it -> it.debugInformation = set(information));
+    }
+
+    /**
+     * Returns a copy of this compiler tool with the given compiler warnings disabled
+     *
+     * @param warnings The compiler warnings
+     * @return The new copy of this compiler tool
+     */
+    public Compiler withDisabled(CompilerWarning... warnings)
+    {
+        return mutatedCopy(it -> it.enabledCompilerWarnings.without(warnings));
+    }
+
+    /**
+     * Returns a copy of this compiler tool with the given compiler warnings enabled
+     *
+     * @param warnings The compiler warnings
+     * @return The new copy of this compiler tool
+     */
+    public Compiler withEnabled(CompilerWarning... warnings)
+    {
+        return mutatedCopy(it -> it.enabledCompilerWarnings.with(warnings));
+    }
+
+    /**
+     * Returns a copy of this compiler tool with the given target Java release
+     *
+     * @param version The Java release
+     * @return The new copy of this compiler tool
+     */
+    public Compiler withReleaseVersion(Version version)
+    {
+        return mutatedCopy(it -> it.releaseVersion = version);
+    }
+
+    /**
      * Returns a copy of this compiler tool with the given source encoding
      *
      * @param sourceEncoding The new encoding
      * @return The new copy of this compiler tool
      */
-    public Compiler withEncoding(Charset sourceEncoding)
+    public Compiler withSourceEncoding(Charset sourceEncoding)
     {
-        var copy = copy();
-        copy.sourceEncoding = sourceEncoding;
-        return this;
+        return mutatedCopy(it -> it.sourceEncoding = sourceEncoding);
     }
 
     /**
@@ -191,11 +324,9 @@ public class Compiler extends BaseTool<Compiler>
      * @param sourceLocale The new locale
      * @return The new copy of this compiler tool
      */
-    public Compiler withLocale(Locale sourceLocale)
+    public Compiler withSourceLocale(Locale sourceLocale)
     {
-        var copy = copy();
-        copy.sourceLocale = sourceLocale;
-        return copy;
+        return mutatedCopy(it -> it.sourceLocale = sourceLocale);
     }
 
     /**
@@ -206,9 +337,7 @@ public class Compiler extends BaseTool<Compiler>
      */
     public Compiler withSourceVersion(Version version)
     {
-        var copy = copy();
-        copy.sourceVersion = version;
-        return copy;
+        return mutatedCopy(it -> it.sourceVersion = version);
     }
 
     /**
@@ -219,9 +348,18 @@ public class Compiler extends BaseTool<Compiler>
      */
     public Compiler withSources(FileList sources)
     {
-        var copy = copy();
-        copy.sources = sources.copy();
-        return copy;
+        return mutatedCopy(it -> it.sources = sources.copy());
+    }
+
+    /**
+     * Returns a copy of this compiler tool with the given target folder for writing class files to
+     *
+     * @param folder The target folder
+     * @return The new copy of this compiler tool
+     */
+    public Compiler withTargetFolder(Folder folder)
+    {
+        return mutatedCopy(it -> it.targetFolder = folder);
     }
 
     /**
@@ -232,9 +370,7 @@ public class Compiler extends BaseTool<Compiler>
      */
     public Compiler withTargetVersion(Version version)
     {
-        var copy = copy();
-        copy.targetVersion = version;
-        return copy;
+        return mutatedCopy(it -> it.targetVersion = version);
     }
 
     /**

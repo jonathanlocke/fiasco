@@ -27,7 +27,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.core.version.Version.version;
-import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL;
+import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MAVEN_CENTRAL;
 
 /**
  * Manages {@link Artifact}s and their dependencies. Searches the list of repositories added to this librarian with

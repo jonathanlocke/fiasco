@@ -4,8 +4,8 @@ import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;
 
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
-import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL;
-import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL_STAGING;
+import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MAVEN_CENTRAL;
+import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MAVEN_CENTRAL_STAGING;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptors;
 import static digital.fiasco.runtime.dependency.collections.LibraryList.libraries;
 

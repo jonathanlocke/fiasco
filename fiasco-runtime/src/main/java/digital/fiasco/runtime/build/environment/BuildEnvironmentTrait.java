@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.build;
+package digital.fiasco.runtime.build.environment;
 
 import com.telenav.kivakit.core.collections.map.VariableMap;
 import com.telenav.kivakit.core.os.OperatingSystem.OperatingSystemType;

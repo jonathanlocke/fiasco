@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.build;
+package digital.fiasco.runtime.build.execution;
 
 import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.core.messaging.messages.status.activity.Step;
@@ -10,7 +10,7 @@ import com.telenav.kivakit.interfaces.code.Code;
  *
  * @author Jonathan Locke
  */
-public interface Stepped extends Repeater
+public interface BuildExecutionStep extends Repeater
 {
     /**
      * Returns true if steps should describe what they would do rather than actually doing it

@@ -11,7 +11,7 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.interfaces.string.StringFormattable.Format.DEBUG;
 import static com.telenav.kivakit.interfaces.string.StringFormattable.Format.USER_LABEL;
-import static digital.fiasco.runtime.build.BuildRepositoriesTrait.MAVEN_CENTRAL;
+import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MAVEN_CENTRAL;
 import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJson;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAVADOC_ATTACHMENT;

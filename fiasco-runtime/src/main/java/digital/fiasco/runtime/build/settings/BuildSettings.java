@@ -6,7 +6,7 @@ import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.filesystem.Rooted;
 import digital.fiasco.runtime.build.Build;
-import digital.fiasco.runtime.build.Stepped;
+import digital.fiasco.runtime.build.execution.BuildExecutionStep;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
@@ -87,7 +87,7 @@ import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName
  * @author Jonathan Locke
  */
 public interface BuildSettings extends
-    Stepped,
+    BuildExecutionStep,
     Rooted
 {
     /**

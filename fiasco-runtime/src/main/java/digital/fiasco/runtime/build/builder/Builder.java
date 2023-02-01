@@ -10,8 +10,8 @@ import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.object.Copyable;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.Build;
-import digital.fiasco.runtime.build.BuildEnvironmentTrait;
-import digital.fiasco.runtime.build.Stepped;
+import digital.fiasco.runtime.build.environment.BuildEnvironmentTrait;
+import digital.fiasco.runtime.build.execution.BuildExecutionStep;
 import digital.fiasco.runtime.build.builder.phases.BasePhase;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
@@ -22,6 +22,7 @@ import digital.fiasco.runtime.build.settings.BuildOption;
 import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.build.settings.BuildSettings;
 import digital.fiasco.runtime.build.settings.BuildSettingsMixin;
+import digital.fiasco.runtime.build.environment.BuildStructured;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
@@ -235,7 +236,7 @@ import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
 public class Builder extends BaseRepeater implements
     Described,
-    Stepped,
+    BuildExecutionStep,
     Copyable<Builder>,
     BuildSettingsMixin,
     BuildStructured,

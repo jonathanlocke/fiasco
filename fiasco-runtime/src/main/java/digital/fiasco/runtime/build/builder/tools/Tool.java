@@ -11,10 +11,10 @@ import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.interfaces.object.Copyable;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.BaseBuild;
-import digital.fiasco.runtime.build.BuildEnvironmentTrait;
-import digital.fiasco.runtime.build.builder.BuildStructured;
 import digital.fiasco.runtime.build.builder.BuilderAssociated;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
+import digital.fiasco.runtime.build.environment.BuildEnvironmentTrait;
+import digital.fiasco.runtime.build.environment.BuildStructured;
 import digital.fiasco.runtime.dependency.collections.ArtifactList;
 
 /**
@@ -38,6 +38,13 @@ public interface Tool<T extends Tool<T>> extends
      * @return The dependency list
      */
     ArtifactList artifactDependencies();
+
+    /**
+     * Throws an exception if this tool has an inconsistent configuration
+     *
+     * @throws RuntimeException Thrown if the tool can't be run because its settings are invalid
+     */
+    void checkConsistency();
 
     /**
      * Returns true if this tool is enabled under any of the profiles it is assigned to

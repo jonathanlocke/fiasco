@@ -4,7 +4,7 @@ import com.telenav.cactus.metadata.BuildName;
 import com.telenav.kivakit.conversion.core.time.kivakit.KivaKitLocalDateConverter;
 import com.telenav.kivakit.core.collections.list.StringList;
 import com.telenav.kivakit.core.string.Formatter;
-import digital.fiasco.runtime.build.builder.BuildStructured;
+import digital.fiasco.runtime.build.environment.BuildStructured;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.BaseTool;
 import digital.fiasco.runtime.build.builder.tools.ToolFactory;

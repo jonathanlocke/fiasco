@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.build;
+package digital.fiasco.runtime.build.environment;
 
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;

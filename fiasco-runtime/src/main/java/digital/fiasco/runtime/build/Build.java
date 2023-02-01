@@ -8,12 +8,15 @@ import digital.fiasco.runtime.build.builder.BuildAction;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
+import digital.fiasco.runtime.build.execution.BuildExecutionStep;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
 import digital.fiasco.runtime.build.settings.BuildOption;
 import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.build.settings.BuildSettings;
 import digital.fiasco.runtime.build.settings.BuildSettingsMixin;
 import digital.fiasco.runtime.build.settings.BuildSettingsObject;
+import digital.fiasco.runtime.build.environment.BuildEnvironmentTrait;
+import digital.fiasco.runtime.build.environment.BuildRepositoriesTrait;
 
 /**
  * Defines a Fiasco build.
@@ -162,7 +165,7 @@ public interface Build extends
     Named,
     Described,
     Copyable<Build>,
-    Stepped,
+    BuildExecutionStep,
     Repeater,
     BuildEnvironmentTrait,
     BuildRepositoriesTrait,
