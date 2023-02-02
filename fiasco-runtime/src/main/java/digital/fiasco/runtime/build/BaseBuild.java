@@ -54,14 +54,19 @@ public abstract class BaseBuild extends Application implements Build
     /** Switch parser for -builder-threads=[count] */
     private final SwitchParser<Count> BUILDER_THREADS = countSwitchParser(this, "builder-threads",
         "The number of threads to use when building")
+        .optional()
         .defaultValue(javaVirtualMachine().processors())
         .build();
 
     /** Switch parser for -artifact-resolver-threads=[count] */
     private final SwitchParser<Count> ARTIFACT_RESOLVER_THREADS = countSwitchParser(this, "artifact-resolver-threads",
         "The number of threads to use when resolving artifacts")
+        .optional()
         .defaultValue(_16)
         .build();
+
+    /** The root builder for this build (once configured) */
+    private Builder rootBuilder;
 
     /**
      * Creates a build
@@ -78,6 +83,7 @@ public abstract class BaseBuild extends Application implements Build
     protected BaseBuild(BaseBuild that)
     {
         this.metadata = that.metadata;
+        this.rootBuilder = that.rootBuilder;
     }
 
     /**
@@ -126,6 +132,16 @@ public abstract class BaseBuild extends Application implements Build
     }
 
     /**
+     * Returns the root builder for this build
+     *
+     * @return The root builder
+     */
+    public Builder rootBuilder()
+    {
+        return rootBuilder;
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -145,10 +161,10 @@ public abstract class BaseBuild extends Application implements Build
     protected final void onRun()
     {
         // Create the root builder,
-        var root = newBuilder().withArtifactDescriptor(metadata.descriptor());
+        rootBuilder = newBuilder().withArtifactDescriptor(metadata.descriptor());
 
         // configure and run the build,
-        var results = listenTo(new BuildExecutor(onConfigureBuild(root))).build();
+        var results = listenTo(new BuildExecutor(onConfigureBuild(rootBuilder))).build();
 
         // then show the results.
         var problems = _0;

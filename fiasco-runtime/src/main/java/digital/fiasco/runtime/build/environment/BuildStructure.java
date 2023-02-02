@@ -48,7 +48,7 @@ import static com.telenav.kivakit.resource.ResourceGlob.glob;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public interface BuildStructured extends
+public interface BuildStructure extends
     Rooted,
     BuilderAssociated,
     Mixin

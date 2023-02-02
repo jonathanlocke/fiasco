@@ -3,9 +3,9 @@ package digital.fiasco.runtime.build.builder.tools;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.object.Copyable;
-import digital.fiasco.runtime.build.execution.BuildExecutionStep;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
+import digital.fiasco.runtime.build.execution.BuildExecutionStep;
 import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.dependency.collections.ArtifactList;
 
@@ -66,6 +66,11 @@ public abstract class BaseTool<T extends BaseTool<T>> extends BaseRepeater imple
     public Builder builder()
     {
         return builder;
+    }
+
+    @Override
+    public void checkConsistency()
+    {
     }
 
     /**

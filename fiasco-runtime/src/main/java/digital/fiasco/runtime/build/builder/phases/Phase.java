@@ -5,6 +5,18 @@ import com.telenav.kivakit.interfaces.naming.Named;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.builder.BuildAction;
 import digital.fiasco.runtime.build.builder.Builder;
+import digital.fiasco.runtime.build.builder.phases.standard.PhaseClean;
+import digital.fiasco.runtime.build.builder.phases.standard.PhaseCompile;
+import digital.fiasco.runtime.build.builder.phases.standard.PhaseDeployDocumentation;
+import digital.fiasco.runtime.build.builder.phases.standard.PhaseDeployPackages;
+import digital.fiasco.runtime.build.builder.phases.standard.PhaseDocument;
+import digital.fiasco.runtime.build.builder.phases.standard.PhaseEnd;
+import digital.fiasco.runtime.build.builder.phases.standard.PhaseInstall;
+import digital.fiasco.runtime.build.builder.phases.standard.PhaseIntegrationTest;
+import digital.fiasco.runtime.build.builder.phases.standard.PhasePackage;
+import digital.fiasco.runtime.build.builder.phases.standard.PhasePrepare;
+import digital.fiasco.runtime.build.builder.phases.standard.PhaseStart;
+import digital.fiasco.runtime.build.builder.phases.standard.PhaseTest;
 
 /**
  * Base class for phases. A phase has a name, a description, and a set of dependent phases, accessed with
@@ -25,6 +37,30 @@ public interface Phase extends
     Named,
     Described
 {
+    Phase PHASE_START = new PhaseStart();
+
+    Phase PHASE_CLEAN = new PhaseClean();
+
+    Phase PHASE_PREPARE = new PhasePrepare();
+
+    Phase PHASE_COMPILE = new PhaseCompile();
+
+    Phase PHASE_TEST = new PhaseTest();
+
+    Phase PHASE_DOCUMENT = new PhaseDocument();
+
+    Phase PHASE_PACKAGE = new PhasePackage();
+
+    Phase PHASE_INTEGRATION_TEST = new PhaseIntegrationTest();
+
+    Phase PHASE_INSTALL = new PhaseInstall();
+
+    Phase PHASE_DEPLOY_PACKAGES = new PhaseDeployPackages();
+
+    Phase PHASE_DEPLOY_DOCUMENTATION = new PhaseDeployDocumentation();
+
+    Phase PHASE_END = new PhaseEnd();
+
     /**
      * Runs the given code <i>after</i> this phase runs
      *

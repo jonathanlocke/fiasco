@@ -8,6 +8,18 @@ import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.build.builder.tools.ToolFactory;
 
 import static com.telenav.kivakit.interfaces.comparison.Matcher.matchAll;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_CLEAN;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_COMPILE;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_DEPLOY_DOCUMENTATION;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_DEPLOY_PACKAGES;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_DOCUMENT;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_END;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_INSTALL;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_INTEGRATION_TEST;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_PACKAGE;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_PREPARE;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_START;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_TEST;
 
 /**
  * Defines a standard list of phases, each with a default implementation:
@@ -49,21 +61,21 @@ public class StandardPhases extends PhaseList implements
     {
         this.builder = builder;
 
-        add(new PhaseStart());
-        add(new PhaseClean().duringPhase(it -> onClean()));
-        add(new PhasePrepare().duringPhase(it -> onPrepare()));
-        add(new PhaseCompile().duringPhase(it -> onCompile()));
-        add(new PhaseTest());
-        add(new PhaseDocument());
-        add(new PhasePackage());
-        add(new PhaseIntegrationTest());
-        add(new PhaseInstall());
-        add(new PhaseDeployPackages());
-        add(new PhaseDeployDocumentation());
-        add(new PhaseEnd());
+        add(PHASE_START);
+        add(PHASE_CLEAN.duringPhase(it -> onClean()));
+        add(PHASE_PREPARE.duringPhase(it -> onPrepare()));
+        add(PHASE_COMPILE.duringPhase(it -> onCompile()));
+        add(PHASE_TEST);
+        add(PHASE_DOCUMENT);
+        add(PHASE_PACKAGE);
+        add(PHASE_INTEGRATION_TEST);
+        add(PHASE_INSTALL);
+        add(PHASE_DEPLOY_PACKAGES);
+        add(PHASE_DEPLOY_DOCUMENTATION);
+        add(PHASE_END);
 
-        enable(phase("start"));
-        enable(phase("end"));
+        enable(PHASE_START);
+        enable(PHASE_END);
     }
 
     @Override

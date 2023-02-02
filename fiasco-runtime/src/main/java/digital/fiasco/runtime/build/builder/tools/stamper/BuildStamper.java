@@ -4,7 +4,7 @@ import com.telenav.cactus.metadata.BuildName;
 import com.telenav.kivakit.conversion.core.time.kivakit.KivaKitLocalDateConverter;
 import com.telenav.kivakit.core.collections.list.StringList;
 import com.telenav.kivakit.core.string.Formatter;
-import digital.fiasco.runtime.build.environment.BuildStructured;
+import digital.fiasco.runtime.build.environment.BuildStructure;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.BaseTool;
 import digital.fiasco.runtime.build.builder.tools.ToolFactory;
@@ -45,7 +45,7 @@ import static com.telenav.kivakit.core.time.Time.now;
  */
 @SuppressWarnings({ "unused", "SpellCheckingInspection" })
 public class BuildStamper extends BaseTool<BuildStamper> implements
-    BuildStructured,
+    BuildStructure,
     ToolFactory
 {
     /**

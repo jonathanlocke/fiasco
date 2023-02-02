@@ -50,7 +50,7 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class Compiler extends BaseTool<Compiler>
+public class JavaCompiler extends BaseTool<JavaCompiler>
 {
 
     /**
@@ -108,7 +108,7 @@ public class Compiler extends BaseTool<Compiler>
      *
      * @param builder The builder
      */
-    public Compiler(Builder builder)
+    public JavaCompiler(Builder builder)
     {
         super(builder);
     }
@@ -118,7 +118,7 @@ public class Compiler extends BaseTool<Compiler>
      *
      * @param that The compiler to copy
      */
-    public Compiler(Compiler that)
+    public JavaCompiler(JavaCompiler that)
     {
         super(that.associatedBuilder());
         this.classpath = that.classpath.copy();
@@ -147,9 +147,9 @@ public class Compiler extends BaseTool<Compiler>
      * Returns a copy of this compiler tool
      */
     @Override
-    public Compiler copy()
+    public JavaCompiler copy()
     {
-        return new Compiler(this);
+        return new JavaCompiler(this);
     }
 
     /**
@@ -269,7 +269,7 @@ public class Compiler extends BaseTool<Compiler>
      * @param information The debug information to include
      * @return The new copy of this compiler tool
      */
-    public Compiler withDebugInformation(DebugInformation... information)
+    public JavaCompiler withDebugInformation(DebugInformation... information)
     {
         return mutatedCopy(it -> it.debugInformation = set(information));
     }
@@ -280,7 +280,7 @@ public class Compiler extends BaseTool<Compiler>
      * @param warnings The compiler warnings
      * @return The new copy of this compiler tool
      */
-    public Compiler withDisabled(CompilerWarning... warnings)
+    public JavaCompiler withDisabled(CompilerWarning... warnings)
     {
         return mutatedCopy(it -> it.enabledCompilerWarnings.without(warnings));
     }
@@ -291,7 +291,7 @@ public class Compiler extends BaseTool<Compiler>
      * @param warnings The compiler warnings
      * @return The new copy of this compiler tool
      */
-    public Compiler withEnabled(CompilerWarning... warnings)
+    public JavaCompiler withEnabled(CompilerWarning... warnings)
     {
         return mutatedCopy(it -> it.enabledCompilerWarnings.with(warnings));
     }
@@ -302,7 +302,7 @@ public class Compiler extends BaseTool<Compiler>
      * @param version The Java release
      * @return The new copy of this compiler tool
      */
-    public Compiler withReleaseVersion(Version version)
+    public JavaCompiler withReleaseVersion(Version version)
     {
         return mutatedCopy(it -> it.releaseVersion = version);
     }
@@ -313,7 +313,7 @@ public class Compiler extends BaseTool<Compiler>
      * @param sourceEncoding The new encoding
      * @return The new copy of this compiler tool
      */
-    public Compiler withSourceEncoding(Charset sourceEncoding)
+    public JavaCompiler withSourceEncoding(Charset sourceEncoding)
     {
         return mutatedCopy(it -> it.sourceEncoding = sourceEncoding);
     }
@@ -324,7 +324,7 @@ public class Compiler extends BaseTool<Compiler>
      * @param sourceLocale The new locale
      * @return The new copy of this compiler tool
      */
-    public Compiler withSourceLocale(Locale sourceLocale)
+    public JavaCompiler withSourceLocale(Locale sourceLocale)
     {
         return mutatedCopy(it -> it.sourceLocale = sourceLocale);
     }
@@ -335,7 +335,7 @@ public class Compiler extends BaseTool<Compiler>
      * @param version The new source version
      * @return The new copy of this compiler tool
      */
-    public Compiler withSourceVersion(Version version)
+    public JavaCompiler withSourceVersion(Version version)
     {
         return mutatedCopy(it -> it.sourceVersion = version);
     }
@@ -346,7 +346,7 @@ public class Compiler extends BaseTool<Compiler>
      * @param sources The sources to compile
      * @return The new copy of this compiler tool
      */
-    public Compiler withSources(FileList sources)
+    public JavaCompiler withSources(FileList sources)
     {
         return mutatedCopy(it -> it.sources = sources.copy());
     }
@@ -357,7 +357,7 @@ public class Compiler extends BaseTool<Compiler>
      * @param folder The target folder
      * @return The new copy of this compiler tool
      */
-    public Compiler withTargetFolder(Folder folder)
+    public JavaCompiler withTargetFolder(Folder folder)
     {
         return mutatedCopy(it -> it.targetFolder = folder);
     }
@@ -368,7 +368,7 @@ public class Compiler extends BaseTool<Compiler>
      * @param version The new JVM version
      * @return The new copy of this compiler tool
      */
-    public Compiler withTargetVersion(Version version)
+    public JavaCompiler withTargetVersion(Version version)
     {
         return mutatedCopy(it -> it.targetVersion = version);
     }

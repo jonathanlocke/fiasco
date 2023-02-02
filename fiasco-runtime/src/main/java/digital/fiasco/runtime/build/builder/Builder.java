@@ -10,19 +10,19 @@ import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.object.Copyable;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.Build;
-import digital.fiasco.runtime.build.environment.BuildEnvironmentTrait;
-import digital.fiasco.runtime.build.execution.BuildExecutionStep;
 import digital.fiasco.runtime.build.builder.phases.BasePhase;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.build.builder.tools.Tool;
 import digital.fiasco.runtime.build.builder.tools.ToolFactory;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
+import digital.fiasco.runtime.build.environment.BuildEnvironmentTrait;
+import digital.fiasco.runtime.build.environment.BuildStructure;
+import digital.fiasco.runtime.build.execution.BuildExecutionStep;
 import digital.fiasco.runtime.build.settings.BuildOption;
 import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.build.settings.BuildSettings;
 import digital.fiasco.runtime.build.settings.BuildSettingsMixin;
-import digital.fiasco.runtime.build.environment.BuildStructured;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
@@ -41,6 +41,8 @@ import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
 import static com.telenav.kivakit.core.string.Paths.pathTail;
 import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
+import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.collections.BuilderList.builders;
 
 /**
  * <p>
@@ -239,7 +241,7 @@ public class Builder extends BaseRepeater implements
     BuildExecutionStep,
     Copyable<Builder>,
     BuildSettingsMixin,
-    BuildStructured,
+    BuildStructure,
     BuilderAssociated,
     BuildEnvironmentTrait,
     ToolFactory,
@@ -271,8 +273,8 @@ public class Builder extends BaseRepeater implements
     {
         this.build = build;
         librarian = newLibrarian();
-        artifactDependencies = ArtifactList.artifacts();
-        builderDependencies = BuilderList.builders();
+        artifactDependencies = artifacts();
+        builderDependencies = builders();
     }
 
     /**
@@ -346,6 +348,18 @@ public class Builder extends BaseRepeater implements
             }
             return this;
         });
+    }
+
+    public Builder builder(String name)
+    {
+        for (var at : builderDependencies)
+        {
+            if (at.name().equals(name))
+            {
+                return at;
+            }
+        }
+        return null;
     }
 
     /**
@@ -466,39 +480,39 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Returns a copy of this object that runs the given code after the named phase runs
+     * Returns a copy of this object that runs the given code after the given phase runs
      *
-     * @param name The phase
+     * @param phase The phase
      * @param code The code to run
      * @return This builder, for chaining
      */
-    public Builder withActionAfterPhase(String name, BuildAction code)
+    public Builder withActionAfterPhase(Phase phase, BuildAction code)
     {
-        return mutatedCopy(it -> it.phase(name).afterPhase(code));
+        return mutatedCopy(it -> it.phase(phase.name()).afterPhase(code));
     }
 
     /**
-     * Returns a copy of this builder with the given action to be executed before the named phase
+     * Returns a copy of this builder with the given action to be executed before the given phase
      *
-     * @param name The name of the phase
+     * @param phase The phase
      * @param code The action to execute
      * @return The copy
      */
-    public Builder withActionBeforePhase(String name, BuildAction code)
+    public Builder withActionBeforePhase(Phase phase, BuildAction code)
     {
-        return mutatedCopy(it -> it.phase(name).beforePhase(code));
+        return mutatedCopy(it -> it.phase(phase.name()).beforePhase(code));
     }
 
     /**
-     * Runs the given code during the named phase
+     * Runs the given code during the given phase
      *
-     * @param name The phase
+     * @param phase The phase
      * @param code The code to run
      * @return This builder, for chaining
      */
-    public Builder withActionDuringPhase(String name, BuildAction code)
+    public Builder withActionDuringPhase(Phase phase, BuildAction code)
     {
-        return mutatedCopy(it -> it.phase(name).duringPhase(code));
+        return mutatedCopy(it -> it.phase(phase.name()).duringPhase(code));
     }
 
     /**

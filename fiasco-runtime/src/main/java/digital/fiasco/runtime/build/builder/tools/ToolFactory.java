@@ -1,19 +1,20 @@
 package digital.fiasco.runtime.build.builder.tools;
 
-import com.telenav.kivakit.core.language.Classes;
 import com.telenav.kivakit.core.messaging.Repeater;
-import digital.fiasco.runtime.build.environment.BuildStructured;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.BuilderAssociated;
 import digital.fiasco.runtime.build.builder.tools.archiver.Archiver;
 import digital.fiasco.runtime.build.builder.tools.cleaner.Cleaner;
-import digital.fiasco.runtime.build.builder.tools.compiler.Compiler;
+import digital.fiasco.runtime.build.builder.tools.compiler.JavaCompiler;
 import digital.fiasco.runtime.build.builder.tools.copier.Copier;
 import digital.fiasco.runtime.build.builder.tools.git.Git;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.build.builder.tools.shader.Shader;
 import digital.fiasco.runtime.build.builder.tools.stamper.BuildStamper;
 import digital.fiasco.runtime.build.builder.tools.tester.Tester;
+import digital.fiasco.runtime.build.environment.BuildStructure;
+
+import static com.telenav.kivakit.core.language.Classes.newInstance;
 
 /**
  * @author Jonathan Locke
@@ -22,7 +23,7 @@ import digital.fiasco.runtime.build.builder.tools.tester.Tester;
 public interface ToolFactory extends
     Repeater,
     BuilderAssociated,
-    BuildStructured
+    BuildStructure
 {
     /**
      * Creates a new {@link Archiver} tool
@@ -41,11 +42,11 @@ public interface ToolFactory extends
     }
 
     /**
-     * Creates a new {@link Compiler} tool
+     * Creates a new {@link JavaCompiler} tool
      */
-    default Compiler newCompiler()
+    default JavaCompiler newCompiler()
     {
-        return newTool(Compiler.class);
+        return newTool(JavaCompiler.class);
     }
 
     /**
@@ -98,6 +99,6 @@ public interface ToolFactory extends
 
     default <T extends Tool<T>> T newTool(Class<T> type)
     {
-        return listenTo(Classes.newInstance(type, Builder.class, associatedBuilder()));
+        return listenTo(newInstance(type, Builder.class, associatedBuilder()));
     }
 }
