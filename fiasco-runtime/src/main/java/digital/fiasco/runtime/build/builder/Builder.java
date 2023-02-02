@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.build.builder;
 
+import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.commandline.CommandLine;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.function.Result;
@@ -10,6 +11,9 @@ import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.object.Copyable;
 import com.telenav.kivakit.interfaces.string.Described;
+import com.telenav.kivakit.resource.resources.StringOutputResource;
+import com.telenav.kivakit.resource.serialization.SerializableObject;
+import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.builder.phases.BasePhase;
 import digital.fiasco.runtime.build.builder.phases.Phase;
@@ -28,8 +32,8 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
-import digital.fiasco.runtime.dependency.collections.ArtifactList;
-import digital.fiasco.runtime.dependency.collections.BuilderList;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.lists.BuilderList;
 import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
 
@@ -41,10 +45,11 @@ import static com.telenav.kivakit.core.function.Result.result;
 import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
 import static com.telenav.kivakit.core.string.Paths.pathTail;
 import static com.telenav.kivakit.core.version.Version.version;
+import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
 import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
 import static digital.fiasco.runtime.build.settings.BuildSettings.buildSettings;
-import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
-import static digital.fiasco.runtime.dependency.collections.BuilderList.builders;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.collections.lists.BuilderList.builders;
 
 /**
  * <p>
@@ -256,17 +261,16 @@ public class Builder extends BaseRepeater implements
     /** The librarian to resolve dependencies for this builder */
     private Librarian librarian;
 
-    /**
-     * The dependencies that must be resolved before this builder can run.
-     */
+    /** The dependencies that must be resolved before this builder can run. */
+    @Expose
     private ArtifactList artifactDependencies;
 
-    /**
-     * The builders that this artifact is dependent on
-     */
+    /** The builders that this artifact is dependent on */
+    @Expose
     private BuilderList builderDependencies;
 
     /** The build settings for this builder */
+    @Expose
     private BuildSettings settings;
 
     /**
@@ -291,9 +295,9 @@ public class Builder extends BaseRepeater implements
     protected Builder(Builder that)
     {
         this(that.build);
-        this.librarian = that.librarian;
-        this.artifactDependencies = that.artifactDependencies;
-        this.builderDependencies = that.builderDependencies;
+        this.librarian = that.librarian.copy();
+        this.artifactDependencies = that.artifactDependencies.copy();
+        this.builderDependencies = that.builderDependencies.copy();
         this.settings = that.settings.copy();
     }
 
@@ -558,6 +562,18 @@ public class Builder extends BaseRepeater implements
     public boolean shouldDescribeAndExecute()
     {
         return settings().shouldDescribeAndExecute();
+    }
+
+    /**
+     * Returns this artifact in JSON form
+     */
+    @Override
+    public String toJson()
+    {
+        var serializer = new GsonObjectSerializer();
+        var serialized = new StringOutputResource();
+        serializer.writeObject(serialized, new SerializableObject<>(this), METADATA_OBJECT_TYPE);
+        return serialized.string();
     }
 
     /**

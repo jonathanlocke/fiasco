@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.microservice.microservlet.BaseMicroservletResponse;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 
 import java.util.ArrayList;
@@ -39,7 +39,7 @@ public class ResolveArtifactResponse extends BaseMicroservletResponse
     public ResolveArtifactResponse(ArtifactList artifacts)
     {
         this.artifacts = new ArrayList<>();
-        this.artifacts.addAll(artifacts.asList());
+        this.artifacts.addAll(artifacts.asMutableList());
     }
 
     /**

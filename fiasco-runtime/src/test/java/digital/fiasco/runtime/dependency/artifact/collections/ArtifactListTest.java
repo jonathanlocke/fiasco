@@ -4,13 +4,13 @@ import digital.fiasco.runtime.FiascoTest;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
-import digital.fiasco.runtime.dependency.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import org.junit.Test;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.value.count.Count._2;
-import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 
 public class ArtifactListTest extends FiascoTest
 {
@@ -77,7 +77,7 @@ public class ArtifactListTest extends FiascoTest
     public void testDeduplicate()
     {
         ensure(artifacts(kivakitIcons(), kivakitIcons(), kivakitCore(), kivakitIcons())
-            .deduplicate().equals(artifacts(kivakitIcons(), kivakitCore())));
+            .deduplicated().equals(artifacts(kivakitIcons(), kivakitCore())));
     }
 
     @Test
@@ -159,7 +159,7 @@ public class ArtifactListTest extends FiascoTest
             .equals(kivakitLibraries()));
         ensure(kivakitArtifacts().without(list(kivakitApplication()))
             .equals(kivakitArtifacts().without(kivakitApplication())));
-        ensure(kivakitLibraries().with(kivakitAssets().asList().asArray(Artifact.class))
+        ensure(kivakitLibraries().with(kivakitAssets().asMutableList().asArray(Artifact.class))
             .equals(kivakitArtifacts()));
     }
 }

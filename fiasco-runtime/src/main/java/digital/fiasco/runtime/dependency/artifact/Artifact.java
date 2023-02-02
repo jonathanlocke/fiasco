@@ -20,8 +20,8 @@ import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
-import digital.fiasco.runtime.dependency.collections.ArtifactList;
-import digital.fiasco.runtime.dependency.collections.BuilderList;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.lists.BuilderList;
 import digital.fiasco.runtime.repository.Repository;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;

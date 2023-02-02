@@ -5,9 +5,10 @@ import digital.fiasco.runtime.dependency.artifact.types.Library;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
-import static digital.fiasco.runtime.dependency.collections.LibraryList.libraries;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.collections.lists.DependencyList.dependencies;
+import static digital.fiasco.runtime.dependency.collections.lists.LibraryList.libraries;
 
 public class DependencyTreeTest extends FiascoTest
 {
@@ -37,7 +38,7 @@ public class DependencyTreeTest extends FiascoTest
         queue.processed(group2);
 
         var group3 = queue.takeAll(Library.class);
-        ensure(group3.equals(DependencyList.dependencies(a)));
+        ensure(group3.equals(dependencies(a)));
         queue.processed(group3);
     }
 

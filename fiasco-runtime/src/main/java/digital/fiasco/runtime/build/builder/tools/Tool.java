@@ -15,7 +15,7 @@ import digital.fiasco.runtime.build.builder.BuilderAssociated;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.build.environment.BuildEnvironmentTrait;
 import digital.fiasco.runtime.build.environment.BuildStructure;
-import digital.fiasco.runtime.dependency.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 
 /**
  * Interface for executable tools. Tools are runnable message repeaters that are associated with a {@link BaseBuild}

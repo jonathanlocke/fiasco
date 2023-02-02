@@ -7,7 +7,7 @@ import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.build.execution.BuildExecutionStep;
 import digital.fiasco.runtime.build.settings.BuildProfile;
-import digital.fiasco.runtime.dependency.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 
 /**
  * Base class for build {@link Tool}s. Build tools can be enabled or disabled under a given {@link BuildProfile}.

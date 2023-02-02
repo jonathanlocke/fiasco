@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.dependency.collections;
+package digital.fiasco.runtime.dependency.collections.lists;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
@@ -8,8 +8,10 @@ import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.core.value.count.Maximum;
+import com.telenav.kivakit.interfaces.collection.ReadOnlyList;
 import com.telenav.kivakit.interfaces.collection.Sized;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
+import com.telenav.kivakit.interfaces.object.Copyable;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
@@ -20,7 +22,6 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.LinkedHashSet;
-import java.util.List;
 import java.util.ListIterator;
 import java.util.function.Function;
 
@@ -31,19 +32,13 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_INSUFFICIENT;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_NOT_NEEDED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
-import static digital.fiasco.runtime.dependency.collections.AssetList.assets;
-import static digital.fiasco.runtime.dependency.collections.LibraryList.libraries;
+import static digital.fiasco.runtime.dependency.collections.lists.AssetList.assets;
+import static digital.fiasco.runtime.dependency.collections.lists.LibraryList.libraries;
 
 /**
- * An immutable, ordered list of {@link Dependency} objects.
- *
- * <p><b>Creation</b></p>
- *
- * <ul>
- *     <li>{@link #dependencies(Dependency[])} - Variable arguments factory method</li>
- *     <li>{@link #dependencies(Collection)} - List factory method</li>
- * </ul>
+ * A read-only list of {@link Dependency} objects.
  *
  * <p><b>Filtering</b></p>
  *
@@ -54,36 +49,51 @@ import static digital.fiasco.runtime.dependency.collections.LibraryList.librarie
  * <p><b>List Operations</b></p>
  *
  * <ul>
+ *     <li>{@link #contains(D)}</li>
+ *     <li>{@link #containsAll(Collection)}</li>
+ *     <li>{@link #containsAll(L)}</li>
  *     <li>{@link #count()}</li>
- *     <li>{@link #size()}</li>
  *     <li>{@link #first()}</li>
+ *     <li>{@link #first(Maximum)}</li>
  *     <li>{@link #get(int)}</li>
+ *     <li>{@link #indexOf(Object)}</li>
+ *     <li>{@link #isEmpty()}</li>
+ *     <li>{@link #isNonEmpty()}</li>
  *     <li>{@link #iterator()}</li>
- *     <li>{@link #containsAll(DependencyList)}</li>
- *     <li>{@link #sorted()}</li>
  *     <li>{@link #join(String)}</li>
+ *     <li>{@link #last()}</li>
+ *     <li>{@link #lastIndexOf(Object)}</li>
+ *     <li>{@link #size()}</li>
+ *     <li>{@link #sorted()}</li>
  * </ul>
  *
  * <p><b>Conversions</b></p>
  *
  * <ul>
- *     <li>{@link #asArtifactList()}</li>
  *     <li>{@link #asArtifactDescriptors()}</li>
- *     <li>{@link #asList()}</li>
- *     <li>{@link #asSet()}</li>
+ *     <li>{@link #asArtifactList()}</li>
+ *     <li>{@link #asAssetList()}</li>
+ *     <li>{@link #asDependencyList()}</li>
+ *     <li>{@link #asLibraryList()}</li>
+ *     <li>{@link #asMutableList()}</li>
+ *     <li>{@link #asMutableSet()}</li>
+ *     <li>{@link #asStringList()}</li>
  * </ul>
  *
  * <p><b>Functional</b></p>
  *
  * <ul>
  *     <li>{@link #copy()}</li>
- *     <li>{@link #with(DependencyList)}</li>
+ *     <li>{@link #deduplicated()}</li>
+ *     <li>{@link #with(BaseDependencyList)}</li>
  *     <li>{@link #with(Dependency)}</li>
  *     <li>{@link #with(Dependency, Dependency...)}</li>
  *     <li>{@link #without(Matcher)}</li>
  *     <li>{@link #without(Collection)}</li>
  * </ul>
  *
+ * @param <D> Dependency subtype
+ * @param <L> Dependency list subtype
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
@@ -93,80 +103,29 @@ import static digital.fiasco.runtime.dependency.collections.LibraryList.librarie
         testing = TESTING_INSUFFICIENT,
         stability = STABILITY_UNDETERMINED
     )
-public class DependencyList<D extends Dependency, L extends DependencyList<D, L>> implements
-    List<D>,
+public abstract class BaseDependencyList<D extends Dependency, L extends BaseDependencyList<D, L>> implements
+    ReadOnlyList<D>,
     Iterable<D>,
-    Sized
+    Sized,
+    Copyable<L>
 {
-    /**
-     * Creates a list of dependencies
-     *
-     * @param dependencies The dependencies to add
-     * @return The dependency list
-     */
-    @SafeVarargs
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static <D extends Dependency, L extends DependencyList<D, L>> DependencyList<D, L> dependencies(
-        D... dependencies)
-    {
-        return new DependencyList<>(list(dependencies));
-    }
-
-    /**
-     * Creates a list of dependencies
-     *
-     * @param dependencies The dependencies to add
-     * @return The dependency list
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static <D extends Dependency, L extends DependencyList<D, L>> DependencyList<D, L> dependencies(
-        Collection<D> dependencies)
-    {
-        return new DependencyList<>(dependencies);
-    }
-
     /** The underlying dependencies */
     @FormatProperty
     ObjectList<D> dependencies = list();
 
     @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTING_NOT_NEEDED)
-    public DependencyList()
+    public BaseDependencyList()
     {
     }
 
-    protected DependencyList(L that)
+    protected BaseDependencyList(L that)
     {
         this.dependencies = that.dependencies.copy();
     }
 
-    protected DependencyList(Collection<D> dependencies)
+    protected BaseDependencyList(Collection<D> dependencies)
     {
         this.dependencies.addAll(dependencies);
-    }
-
-    @Override
-    public void add(int index, D element)
-    {
-        unsupported();
-    }
-
-    @Override
-    public boolean add(D d)
-    {
-        unsupported();
-        return false;
-    }
-
-    @Override
-    public boolean addAll(@NotNull Collection<? extends D> c)
-    {
-        return false;
-    }
-
-    @Override
-    public boolean addAll(int index, @NotNull Collection<? extends D> c)
-    {
-        return false;
     }
 
     /**
@@ -207,6 +166,21 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     }
 
     /**
+     * Converts this list to a dependency list
+     *
+     * @return The dependency list
+     */
+    public DependencyList asDependencyList()
+    {
+        var dependencies = new DependencyList();
+        for (var at : this)
+        {
+            dependencies = dependencies.with(at);
+        }
+        return dependencies;
+    }
+
+    /**
      * Returns the {@link Library} artifacts in this list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
@@ -221,7 +195,7 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
      * @return The list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public ObjectList<D> asList()
+    public ObjectList<D> asMutableList()
     {
         return dependencies.copy();
     }
@@ -232,7 +206,7 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
      * @return The list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public ObjectSet<D> asSet()
+    public ObjectSet<D> asMutableSet()
     {
         return new ObjectSet<>(new LinkedHashSet<>(dependencies.copy()));
     }
@@ -255,12 +229,6 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
         return dependencies.asStringList();
     }
 
-    @Override
-    public void clear()
-    {
-
-    }
-
     /**
      * Returns true if this list contains the given dependency
      *
@@ -275,8 +243,7 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     @Override
     public boolean contains(Object that)
     {
-        unsupported();
-        return false;
+        return dependencies.contains(that);
     }
 
     /**
@@ -291,8 +258,7 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     @Override
     public boolean containsAll(@NotNull Collection<?> that)
     {
-        unsupported();
-        return false;
+        return this.dependencies.containsAll(that);
     }
 
     /**
@@ -300,6 +266,7 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
      *
      * @return The copy
      */
+    @Override
     @SuppressWarnings("unchecked")
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L copy()
@@ -316,7 +283,7 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
         return dependencies.count();
     }
 
-    public L deduplicate()
+    public L deduplicated()
     {
         var deduplicated = newList();
         for (var at : this)
@@ -334,7 +301,7 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTED)
     public boolean equals(Object object)
     {
-        if (object instanceof DependencyList<?, ?> that)
+        if (object instanceof BaseDependencyList<?, ?> that)
         {
             return this.dependencies.size() == that.dependencies.size()
                 && this.dependencies.containsAll(that.dependencies)
@@ -389,12 +356,27 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
         return dependencies.sorted().hashCode();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param that {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public int indexOf(Object that)
     {
-        return unsupported();
+        if (that instanceof Dependency dependency)
+        {
+            return dependencies.indexOf(dependency);
+        }
+        return -1;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
     @Override
     public boolean isEmpty()
     {
@@ -433,10 +415,20 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
         return dependencies.last();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @param that {@inheritDoc}
+     * @return {@inheritDoc}
+     */
     @Override
     public int lastIndexOf(Object that)
     {
-        return unsupported();
+        if (that instanceof Dependency dependency)
+        {
+            return dependencies.lastIndexOf(dependency);
+        }
+        return -1;
     }
 
     @NotNull
@@ -473,42 +465,7 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L matching(Matcher<D> matcher)
     {
-        var copy = copy();
-        copy.dependencies = copy.dependencies.matching(matcher);
-        return copy;
-    }
-
-    @Override
-    public D remove(int index)
-    {
-        return unsupported();
-    }
-
-    @Override
-    public boolean remove(Object that)
-    {
-        unsupported();
-        return false;
-    }
-
-    @Override
-    public boolean removeAll(@NotNull Collection<?> that)
-    {
-        unsupported();
-        return false;
-    }
-
-    @Override
-    public boolean retainAll(@NotNull Collection<?> that)
-    {
-        unsupported();
-        return false;
-    }
-
-    @Override
-    public D set(int index, D element)
-    {
-        return unsupported();
+        return mutatedCopy(it -> it.dependencies = dependencies.matching(matcher));
     }
 
     /**
@@ -524,33 +481,41 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     /**
      * Returns a copy of this list in natural sorted order
      */
-    @SuppressWarnings("unchecked")
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L sorted()
     {
-        var sorted = (L) dependencies(dependencies.sorted());
+        var sorted = (L) newList().with(dependencies.sorted());
         return newList().with(sorted);
     }
 
     @NotNull
     @Override
-    public List<D> subList(int fromIndex, int toIndex)
+    public Object @NotNull [] toArray()
     {
-        return unsupported();
+        unsupported();
+        return null;
     }
 
     @NotNull
     @Override
-    public Object[] toArray()
-    {
-        return new Object[0];
-    }
-
-    @NotNull
-    @Override
-    public <T> T[] toArray(@NotNull T[] a)
+    public <T> T @NotNull [] toArray(T @NotNull [] ignored)
     {
         return unsupported();
+    }
+
+    /**
+     * Returns the JSON for this list
+     *
+     * @return JSON text
+     */
+    public String toJson()
+    {
+        var json = stringList();
+        for (var at : sorted())
+        {
+            json.add(at.toJson());
+        }
+        return json.join("\n");
     }
 
     @Override
@@ -570,10 +535,11 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L with(D first, D... rest)
     {
-        var copy = copy();
-        copy.dependencies.add(first);
-        copy.dependencies.addAll(rest);
-        return copy;
+        return mutatedCopy(it ->
+        {
+            it.dependencies.add(first);
+            it.dependencies.addAll(rest);
+        });
     }
 
     /**
@@ -585,9 +551,7 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L with(D inclusion)
     {
-        var copy = copy();
-        copy.dependencies = dependencies.with(inclusion);
-        return copy;
+        return mutatedCopy(it -> it.dependencies.add(inclusion));
     }
 
     /**
@@ -599,9 +563,7 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L with(D[] inclusions)
     {
-        var copy = copy();
-        copy.dependencies = dependencies.with(inclusions);
-        return copy;
+        return mutatedCopy(it -> it.dependencies.addAll(inclusions));
     }
 
     /**
@@ -613,9 +575,19 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L with(L inclusions)
     {
-        var copy = copy();
-        copy.dependencies.addAll(inclusions);
-        return copy;
+        return mutatedCopy(it -> it.dependencies.addAll(inclusions));
+    }
+
+    /**
+     * Returns a copy of this list with the given dependencies
+     *
+     * @param inclusions The dependencies to include
+     * @return The new list
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public L with(Collection<D> inclusions)
+    {
+        return mutatedCopy(it -> it.dependencies.addAll(inclusions));
     }
 
     /**
@@ -627,9 +599,7 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L without(Collection<D> exclusions)
     {
-        var copy = copy();
-        copy.dependencies.removeAll(exclusions);
-        return copy;
+        return mutatedCopy(it -> it.dependencies.removeAll(exclusions));
     }
 
     /**
@@ -641,9 +611,7 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L without(D exclusion)
     {
-        var copy = copy();
-        copy.dependencies.remove(exclusion);
-        return copy;
+        return mutatedCopy(it -> it.dependencies.remove(exclusion));
     }
 
     /**
@@ -655,9 +623,7 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L without(L exclusions)
     {
-        var copy = copy();
-        copy.dependencies.removeAll(exclusions.dependencies);
-        return copy;
+        return mutatedCopy(it -> it.dependencies.removeAll(exclusions));
     }
 
     /**
@@ -669,20 +635,10 @@ public class DependencyList<D extends Dependency, L extends DependencyList<D, L>
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L without(Matcher<D> exclusionPattern)
     {
-        var copy = copy();
-        copy.dependencies.removeIf(exclusionPattern::matches);
-        return copy;
+        return mutatedCopy(it -> it.dependencies.removeIf(exclusionPattern::matches));
     }
 
-    @SuppressWarnings("unchecked")
-    protected L newList(L that)
-    {
-        return (L) new DependencyList<>(that);
-    }
+    protected abstract L newList(L that);
 
-    @SuppressWarnings("unchecked")
-    protected L newList()
-    {
-        return (L) new DependencyList<>();
-    }
+    protected abstract L newList();
 }

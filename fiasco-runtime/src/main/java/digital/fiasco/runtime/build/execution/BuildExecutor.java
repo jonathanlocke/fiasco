@@ -8,8 +8,8 @@ import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.settings.BuildSettings;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.collections.ArtifactList;
-import digital.fiasco.runtime.dependency.collections.DependencyList;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
 import digital.fiasco.runtime.dependency.collections.DependencyQueue;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +46,7 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
  * @see Result
  * @see Builder
  * @see Dependency
- * @see DependencyList
+ * @see BaseDependencyList
  * @see DependencyTree
  * @see DependencyQueue
  * @see Artifact

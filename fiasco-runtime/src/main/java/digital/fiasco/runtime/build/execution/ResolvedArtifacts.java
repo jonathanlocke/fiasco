@@ -1,7 +1,7 @@
 package digital.fiasco.runtime.build.execution;
 
 import com.telenav.kivakit.core.thread.Monitor;
-import digital.fiasco.runtime.dependency.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 
 /**
  * Holds a set of artifacts resolved from repositories by background threads. When a new set of artifacts is resolved,

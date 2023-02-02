@@ -14,8 +14,8 @@ import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
-import digital.fiasco.runtime.dependency.collections.ArtifactList;
-import digital.fiasco.runtime.dependency.collections.BuilderList;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.lists.BuilderList;
 import digital.fiasco.runtime.repository.Repository;
 
 import java.util.LinkedHashMap;
@@ -30,7 +30,6 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.split;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
-import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
 
@@ -182,10 +181,10 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     public String asString(Format format)
     {
         return switch (format)
-            {
-                case DEBUG -> new ObjectFormatter(this).toString();
-                default -> name();
-            };
+                {
+                    case DEBUG -> new ObjectFormatter(this).toString();
+                    default -> name();
+                };
     }
 
     /**
@@ -220,7 +219,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     @Override
     public BuilderList builderDependencies()
     {
-        return unsupported();
+        return new BuilderList();
     }
 
     /**
@@ -273,20 +272,6 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
             }
         }
         return illegalState("No dependency $ found", name);
-    }
-
-    /**
-     * Returns a copy of this artifact with the given dependencies
-     *
-     * @param dependencies The new dependencies
-     * @return The new artifact
-     */
-    @SafeVarargs
-    @Override
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public final <D extends Artifact<D>> A withDependencies(D... dependencies)
-    {
-        return withDependencies(ArtifactList.artifacts(dependencies));
     }
 
     /**
@@ -393,15 +378,15 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
             {
                 var descriptor = artifact.descriptor();
                 pom.addAll(split(format("""
-                        <dependency>
-                            <groupId>$</groupId>
-                            <artifactId>$</artifactId>
-                            <version>$</version>
-                        </dependency>
-                        """,
-                    descriptor.group(),
-                    descriptor.artifact(),
-                    descriptor.version()), "\n"));
+                                <dependency>
+                                    <groupId>$</groupId>
+                                    <artifactId>$</artifactId>
+                                    <version>$</version>
+                                </dependency>
+                                """,
+                        descriptor.group(),
+                        descriptor.artifact(),
+                        descriptor.version()), "\n"));
             }
 
             pom = pom.indented(4);
@@ -414,23 +399,23 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
         }
 
         return format("""
-                <project
-                  xmlns="http://maven.apache.org/POM/4.0.0"
-                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-                  
-                    <modelVersion>4.0.0</modelVersion>
-                   
-                    <groupId>$</groupId>
-                    <artifactId>$</artifactId>
-                    <version>$</version>
-                $
-                </project>
-                  """,
-            descriptor.group(),
-            descriptor.artifact(),
-            descriptor.version(),
-            pom.join("\n"));
+                        <project
+                          xmlns="http://maven.apache.org/POM/4.0.0"
+                          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                          
+                            <modelVersion>4.0.0</modelVersion>
+                           
+                            <groupId>$</groupId>
+                            <artifactId>$</artifactId>
+                            <version>$</version>
+                        $
+                        </project>
+                          """,
+                descriptor.group(),
+                descriptor.artifact(),
+                descriptor.version(),
+                pom.join("\n"));
     }
 
     @Override
@@ -487,6 +472,20 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     }
 
     /**
+     * Returns a copy of this artifact with the given dependencies
+     *
+     * @param dependencies The new dependencies
+     * @return The new artifact
+     */
+    @SafeVarargs
+    @Override
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public final <D extends Artifact<D>> A withDependencies(D... dependencies)
+    {
+        return withDependencies(ArtifactList.artifacts(dependencies));
+    }
+
+    /**
      * {@inheritDoc}
      */
     @Override
@@ -495,8 +494,8 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     {
         var copy = copy();
         copy.dependencies = this.dependencies
-            .with(dependencies)
-            .deduplicate();
+                .with(dependencies)
+                .deduplicated();
         return copy;
     }
 

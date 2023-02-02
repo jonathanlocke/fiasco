@@ -1,8 +1,9 @@
-package digital.fiasco.runtime.dependency.collections;
+package digital.fiasco.runtime.dependency.collections.lists;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
@@ -13,7 +14,6 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
-import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 
 /**
  * A list of {@link Artifact}s ({@link Library}s or {@link Asset}s).
@@ -21,8 +21,8 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
  * <p><b>Creation</b></p>
  *
  * <ul>
- *     <li>{@link #artifacts(Artifact[])}</li>
- *     <li>{@link #artifacts(Collection)}</li>
+ *     <li>{@link #builders(Builder[])}</li>
+ *     <li>{@link #builders(Collection)}</li>
  * </ul>
  *
  * <p><b>Matching</b></p>
@@ -50,89 +50,78 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
  * <ul>
  *     <li>{@link #asArtifactDescriptors()}</li>
  *     <li>{@link #asStringList()}</li>
- *     <li>{@link #asList()}</li>
- *     <li>{@link #asSet()}</li>
+ *     <li>{@link #asMutableList()}</li>
+ *     <li>{@link #asMutableSet()}</li>
  * </ul>
  *
  * <p><b>Functional</b></p>
  *
  * <ul>
  *     <li>{@link #copy()}</li>
- *     <li>{@link #with(Artifact)}</li>
- *     <li>{@link #with(Artifact, Artifact[])}</li>
- *     <li>{@link #with(Artifact[])}</li>
+ *     <li>{@link #with(Builder)}</li>
+ *     <li>{@link #with(Builder, Builder[])}</li>
+ *     <li>{@link #with(Builder[])}</li>
  *     <li>{@link #without(Matcher)}</li>
  *     <li>{@link #without(Collection)}</li>
- *     <li>{@link #without(Artifact)}</li>
+ *     <li>{@link #without(Builder)}</li>
  * </ul>
  *
  * @author Jonathan Locke
  * @see Artifact
  * @see Library
  * @see Asset
- * @see DependencyList
+ * @see BaseDependencyList
  */
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
-@SuppressWarnings("rawtypes")
-public class ArtifactList extends DependencyList<Artifact, ArtifactList>
+public class BuilderList extends BaseDependencyList<Builder, BuilderList>
 {
     /**
      * Creates a list of artifacts
      *
-     * @param artifacts The artifacts to add
+     * @param builders The builders to add
      * @return The dependency list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static ArtifactList artifacts(Collection<Artifact> artifacts)
+    public static BuilderList builders(Collection<Builder> builders)
     {
-        return new ArtifactList(artifacts);
+        return new BuilderList(builders);
     }
 
     /**
      * Creates a list of dependencies
      *
-     * @param artifacts The dependencies to add
+     * @param builders The dependencies to add
      * @return The dependency list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static ArtifactList artifacts(Artifact... artifacts)
+    public static BuilderList builders(Builder... builders)
     {
-        return new ArtifactList(list(artifacts));
+        return builders(list(builders));
     }
 
-    public ArtifactList()
+    public BuilderList()
     {
     }
 
-    protected ArtifactList(ArtifactList that)
+    protected BuilderList(BuilderList that)
     {
         super(that);
     }
 
-    protected ArtifactList(Collection<Artifact> artifacts)
+    protected BuilderList(Collection<Builder> builders)
     {
-        super(artifacts);
-    }
-
-    public String toJson()
-    {
-        var artifacts = stringList();
-        for (var at : sorted())
-        {
-            artifacts.add(at.toJson());
-        }
-        return artifacts.join("\n");
+        super(builders);
     }
 
     @Override
-    protected ArtifactList newList()
+    protected BuilderList newList()
     {
-        return new ArtifactList();
+        return new BuilderList();
     }
 
     @Override
-    protected ArtifactList newList(ArtifactList that)
+    protected BuilderList newList(BuilderList that)
     {
-        return new ArtifactList(that);
+        return new BuilderList(that);
     }
 }

@@ -10,6 +10,7 @@ import com.telenav.kivakit.core.time.Duration;
 import com.telenav.kivakit.core.value.count.Maximum;
 import com.telenav.kivakit.interfaces.time.WakeState;
 import digital.fiasco.runtime.dependency.Dependency;
+import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
@@ -25,7 +26,7 @@ import static com.telenav.kivakit.core.time.Duration.FOREVER;
 import static com.telenav.kivakit.core.time.Time.now;
 import static com.telenav.kivakit.core.value.count.Maximum.MAXIMUM;
 import static com.telenav.kivakit.core.value.count.Maximum._1;
-import static digital.fiasco.runtime.dependency.collections.DependencyList.dependencies;
+import static digital.fiasco.runtime.dependency.collections.lists.DependencyList.dependencies;
 
 /**
  * A queue that tracks the processing of dependencies by one or more processors.
@@ -39,7 +40,7 @@ import static digital.fiasco.runtime.dependency.collections.DependencyList.depen
  *         "available", and have no unprocessed transitive dependencies). The returned dependencies
  *         are moved from the "available" set to the "taken" set.</li>
  *     <li>When processing of one or more dependencies completes, a processor thread calls
- *         {@link #processed(Dependency)} or {@link #processed(DependencyList)} to move them from the "taken"
+ *         {@link #processed(Dependency)} or {@link #processed(BaseDependencyList)} to move them from the "taken"
  *         set to the "processed" set.</li>
  *     <li>While the above steps run, a thread can wait for all processing to finish by called
  *         {@link #awaitProcessingCompletion(Duration)}</li>
@@ -57,7 +58,7 @@ import static digital.fiasco.runtime.dependency.collections.DependencyList.depen
  *
  * <ul>
  *     <li>{@link #processed(Dependency)}</li>
- *     <li>{@link #processed(DependencyList)}</li>
+ *     <li>{@link #processed(BaseDependencyList)}</li>
  * </ul>
  *
  * <p><b>Waiting for Processing to Complete</b></p>
@@ -100,15 +101,15 @@ public class DependencyQueue implements ConsoleTrait
 {
     /** The dependencies that are available to be processed (when all their transitive dependencies have been processed) */
     @FormatProperty
-    private DependencyList available;
+    private BaseDependencyList available;
 
     /** Any dependencies that are currently being processed */
     @FormatProperty
-    private DependencyList taken;
+    private BaseDependencyList taken;
 
     /** Any dependencies that have completed processing */
     @FormatProperty
-    private DependencyList processed;
+    private BaseDependencyList processed;
 
     /** Read/write lock for accessing available, taken and processed lists */
     private final Lock lock = new Lock();
@@ -122,7 +123,7 @@ public class DependencyQueue implements ConsoleTrait
      * @param initial The dependencies to enqueue, in priority order, where the first elements will be processed frist
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyQueue(DependencyList initial)
+    public DependencyQueue(BaseDependencyList initial)
     {
         ensure(initial.isNonEmpty(), "Cannot create a queue for an empty list");
 
@@ -169,7 +170,7 @@ public class DependencyQueue implements ConsoleTrait
      * Returns the list of dependencies that have been processed.
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyList processed()
+    public BaseDependencyList processed()
     {
         return lock.whileLocked(() -> processed.copy());
     }
@@ -180,7 +181,7 @@ public class DependencyQueue implements ConsoleTrait
      * @param group The dependencies that were processed
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public void processed(DependencyList group)
+    public void processed(BaseDependencyList group)
     {
         lock.whileLocked(() ->
         {
@@ -207,7 +208,7 @@ public class DependencyQueue implements ConsoleTrait
      * Returns a list of all ready dependencies, or an empty list if the queue is empty
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyList takeAll(Class<? extends Dependency> type)
+    public BaseDependencyList takeAll(Class<? extends Dependency> type)
     {
         return take(type, MAXIMUM);
     }
@@ -264,7 +265,7 @@ public class DependencyQueue implements ConsoleTrait
      * Returns a list of dependencies matching the given type that are ready for processing. The list will be empty if
      * the queue is empty.
      */
-    private <D extends Dependency, L extends DependencyList<D, L>> L take(Class<D> type, Maximum maximum)
+    private <D extends Dependency, L extends BaseDependencyList<D, L>> L take(Class<D> type, Maximum maximum)
     {
         return lock.whileLocked(() ->
         {

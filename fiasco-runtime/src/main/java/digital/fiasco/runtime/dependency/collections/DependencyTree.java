@@ -3,12 +3,13 @@ package digital.fiasco.runtime.dependency.collections;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import digital.fiasco.runtime.dependency.Dependency;
+import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
-import static digital.fiasco.runtime.dependency.collections.DependencyList.dependencies;
+import static digital.fiasco.runtime.dependency.collections.lists.DependencyList.dependencies;
 
 /**
  * A tree of {@link Dependency}s with the root passed to the constructor.
@@ -38,7 +39,7 @@ import static digital.fiasco.runtime.dependency.collections.DependencyList.depen
  *
  * @author Jonathan Locke
  * @see Dependency
- * @see DependencyList
+ * @see BaseDependencyList
  * @see DependencyQueue
  */
 @SuppressWarnings({ "unused", "rawtypes", "unchecked" })
@@ -46,7 +47,10 @@ import static digital.fiasco.runtime.dependency.collections.DependencyList.depen
 public class DependencyTree
 {
     /** The dependencies of this graph in depth-first-order */
-    private final DependencyList depthFirst;
+    private final BaseDependencyList depthFirst;
+
+    /** The root dependency for this tree */
+    private final Dependency root;
 
     /**
      * Creates a dependency tree from the given root dependency
@@ -57,14 +61,15 @@ public class DependencyTree
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyTree(Dependency root)
     {
-        depthFirst = depthFirst(root, dependencies()).with(root);
+        this.root = root;
+        this.depthFirst = depthFirst(root, dependencies()).with(root);
     }
 
     /**
      * Returns the dependencies in this tree in depth-first order
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyList asDepthFirstList()
+    public BaseDependencyList asDepthFirstList()
     {
         return depthFirst;
     }
@@ -79,13 +84,23 @@ public class DependencyTree
     }
 
     /**
+     * Returns the root of this tree
+     *
+     * @return The root dependency
+     */
+    public Dependency root()
+    {
+        return root;
+    }
+
+    /**
      * Returns a list of dependencies in this tree in depth-first order
      *
      * @param root The root to explore
      * @param explored The list of dependencies already explored (for cycle detection)
      * @throws RuntimeException Thrown if a cycle is detected in the given root
      */
-    private DependencyList depthFirst(Dependency root, DependencyList explored)
+    private BaseDependencyList depthFirst(Dependency root, BaseDependencyList explored)
     {
         // Go through each child of the root,
         for (var child : root.allDependencies())

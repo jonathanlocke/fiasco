@@ -8,18 +8,18 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
-import digital.fiasco.runtime.dependency.collections.ArtifactList;
-import digital.fiasco.runtime.dependency.collections.AssetList;
-import digital.fiasco.runtime.dependency.collections.BuilderList;
-import digital.fiasco.runtime.dependency.collections.DependencyList;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
-import digital.fiasco.runtime.dependency.collections.LibraryList;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.lists.AssetList;
+import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
+import digital.fiasco.runtime.dependency.collections.lists.BuilderList;
+import digital.fiasco.runtime.dependency.collections.lists.DependencyList;
+import digital.fiasco.runtime.dependency.collections.lists.LibraryList;
 import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
-import static digital.fiasco.runtime.dependency.collections.DependencyList.dependencies;
 
 /**
  * A dependency is either a {@link Builder}, or an {@link Artifact} with an associated {@link #repository()}. An
@@ -44,7 +44,7 @@ import static digital.fiasco.runtime.dependency.collections.DependencyList.depen
  * </ul>
  *
  * @author Jonathan Locke
- * @see DependencyList
+ * @see BaseDependencyList
  * @see DependencyTree
  * @see Builder
  * @see Artifact
@@ -62,12 +62,10 @@ public interface Dependency extends
      *
      * @return The dependencies
      */
-    default DependencyList<?, ?> allDependencies()
+    default DependencyList allDependencies()
     {
-        var all = dependencies();
-        all.addAll(artifactDependencies());
-        all.addAll(builderDependencies());
-        return all;
+        return artifactDependencies().asDependencyList()
+            .with(builderDependencies().asDependencyList());
     }
 
     /**
@@ -146,4 +144,11 @@ public interface Dependency extends
      * @return The repository hosting this dependency, or null if the dependency is a {@link Builder}
      */
     Repository repository();
+
+    /**
+     * Returns the JSON representation for this dependency
+     *
+     * @return JSON text
+     */
+    String toJson();
 }

@@ -1,9 +1,8 @@
-package digital.fiasco.runtime.dependency.collections;
+package digital.fiasco.runtime.dependency.collections.lists;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
-import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
@@ -14,7 +13,6 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
-import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 
 /**
  * A list of {@link Artifact}s ({@link Library}s or {@link Asset}s).
@@ -22,8 +20,8 @@ import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
  * <p><b>Creation</b></p>
  *
  * <ul>
- *     <li>{@link #builders(Builder[])}</li>
- *     <li>{@link #builders(Collection)}</li>
+ *     <li>{@link #artifacts(Artifact[])}</li>
+ *     <li>{@link #artifacts(Collection)}</li>
  * </ul>
  *
  * <p><b>Matching</b></p>
@@ -51,83 +49,79 @@ import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
  * <ul>
  *     <li>{@link #asArtifactDescriptors()}</li>
  *     <li>{@link #asStringList()}</li>
- *     <li>{@link #asList()}</li>
- *     <li>{@link #asSet()}</li>
+ *     <li>{@link #asMutableList()}</li>
+ *     <li>{@link #asMutableSet()}</li>
  * </ul>
  *
  * <p><b>Functional</b></p>
  *
  * <ul>
  *     <li>{@link #copy()}</li>
- *     <li>{@link #with(Builder)}</li>
- *     <li>{@link #with(Builder, Builder[])}</li>
- *     <li>{@link #with(Builder[])}</li>
+ *     <li>{@link #with(Artifact)}</li>
+ *     <li>{@link #with(Artifact, Artifact[])}</li>
+ *     <li>{@link #with(Artifact[])}</li>
  *     <li>{@link #without(Matcher)}</li>
  *     <li>{@link #without(Collection)}</li>
- *     <li>{@link #without(Builder)}</li>
+ *     <li>{@link #without(Artifact)}</li>
  * </ul>
  *
  * @author Jonathan Locke
  * @see Artifact
  * @see Library
  * @see Asset
- * @see DependencyList
+ * @see BaseDependencyList
  */
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
-public class BuilderList extends DependencyList<Builder, BuilderList>
+@SuppressWarnings("rawtypes")
+public class ArtifactList extends BaseDependencyList<Artifact, ArtifactList>
 {
     /**
      * Creates a list of artifacts
      *
-     * @param builders The builders to add
+     * @param artifacts The artifacts to add
      * @return The dependency list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static BuilderList builders(Collection<Builder> builders)
+    public static ArtifactList artifacts(Collection<Artifact> artifacts)
     {
-        return new BuilderList(builders);
+        return new ArtifactList(artifacts);
     }
 
     /**
      * Creates a list of dependencies
      *
-     * @param builders The dependencies to add
+     * @param artifacts The dependencies to add
      * @return The dependency list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static BuilderList builders(Builder... builders)
+    public static ArtifactList artifacts(Artifact... artifacts)
     {
-        return new BuilderList(list(builders));
+        return artifacts(list(artifacts));
     }
 
-    public BuilderList()
+    public ArtifactList()
     {
     }
 
-    protected BuilderList(BuilderList that)
+    protected ArtifactList(ArtifactList that)
     {
         super(that);
     }
 
-    protected BuilderList(Collection<Builder> builders)
+    protected ArtifactList(Collection<Artifact> artifacts)
     {
-        super(builders);
-    }
-
-    public String toJson()
-    {
-        return unsupported();
+        super(artifacts);
     }
 
     @Override
-    protected BuilderList newList()
+    protected ArtifactList newList()
     {
-        return new BuilderList();
+        return new ArtifactList();
     }
 
     @Override
-    protected BuilderList newList(BuilderList that)
+    protected ArtifactList newList(ArtifactList that)
     {
-        return new BuilderList(that);
+        return new ArtifactList(that);
     }
 }

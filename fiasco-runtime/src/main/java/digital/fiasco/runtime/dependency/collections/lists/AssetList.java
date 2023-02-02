@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.dependency.collections;
+package digital.fiasco.runtime.dependency.collections.lists;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
@@ -52,8 +52,8 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
  * <ul>
  *     <li>{@link #asArtifactDescriptors()}</li>
  *     <li>{@link #asStringList()}</li>
- *     <li>{@link #asList()}</li>
- *     <li>{@link #asSet()}</li>
+ *     <li>{@link #asMutableList()}</li>
+ *     <li>{@link #asMutableSet()}</li>
  * </ul>
  *
  * <p><b>Functional</b></p>
@@ -72,10 +72,10 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
  * @see Artifact
  * @see Asset
  * @see Asset
- * @see DependencyList
+ * @see BaseDependencyList
  */
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
-public class AssetList extends DependencyList<Asset, AssetList>
+public class AssetList extends BaseDependencyList<Asset, AssetList>
 {
     /**
      * Creates a list of assets
@@ -98,7 +98,7 @@ public class AssetList extends DependencyList<Asset, AssetList>
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static AssetList assets(Asset... assets)
     {
-        return new AssetList(list(assets));
+        return assets(list(assets));
     }
 
     /**
