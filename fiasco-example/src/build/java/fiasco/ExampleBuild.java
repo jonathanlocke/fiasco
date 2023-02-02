@@ -8,6 +8,7 @@ import digital.fiasco.runtime.build.metadata.Organization;
 
 import static com.telenav.kivakit.resource.Urls.url;
 import static digital.fiasco.libraries.utilities.serialization.Kryo.kryo;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_COMPILE;
 import static digital.fiasco.runtime.build.metadata.BuildMetadata.buildMetadata;
 import static digital.fiasco.runtime.build.metadata.Contributor.contributor;
 import static digital.fiasco.runtime.build.metadata.Copyright.copyright;
@@ -96,7 +97,7 @@ public class ExampleBuild extends BaseBuild implements Libraries
             .withPinnedVersion(apache_ant, "1.0.3")
             .withPinnedVersion(apache_commons_logging, "1.9.0")
             .withPinnedVersion(kryo, "4.3.1")
-            .withActionBeforePhase("compile", it ->
+            .withActionBeforePhase(PHASE_COMPILE, it ->
             {
                 var cleaner = it.newCleaner();
                 cleaner.run();

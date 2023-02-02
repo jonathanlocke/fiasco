@@ -6,9 +6,10 @@ import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.filesystem.Rooted;
 import digital.fiasco.runtime.build.Build;
-import digital.fiasco.runtime.build.execution.BuildExecutionStep;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
+import digital.fiasco.runtime.build.execution.BuildExecutionStep;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
@@ -90,6 +91,16 @@ public interface BuildSettings extends
     BuildExecutionStep,
     Rooted
 {
+    static BuildSettingsObject buildSettings()
+    {
+        return new BuildSettingsObject();
+    }
+
+    static BuildSettingsObject buildSettings(Builder builder)
+    {
+        return new BuildSettingsObject(builder);
+    }
+
     /**
      * Returns the number of threads that should be used to resolve artifacts. This is particularly important for remote
      * repositories.
@@ -99,18 +110,18 @@ public interface BuildSettings extends
     Count artifactResolverThreads();
 
     /**
-     * Returns a copy of the given settings, attached to this object (if it is a mixin)
-     *
-     * @return This object for method chaining
-     */
-    BuildSettings attachMixin(BuildSettings that);
-
-    /**
      * Returns the number of threads to use when building
      *
      * @return The number of threads
      */
     Count builderThreads();
+
+    /**
+     * Returns a copy of this build settings object
+     *
+     * @return The copy
+     */
+    BuildSettings copy();
 
     /**
      * Returns the artifact descriptor build setting

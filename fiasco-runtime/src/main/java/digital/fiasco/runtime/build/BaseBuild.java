@@ -20,13 +20,13 @@ import com.telenav.kivakit.commandline.SwitchParser;
 import com.telenav.kivakit.conversion.core.language.IdentityConverter;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
+import com.telenav.kivakit.core.function.Result;
 import com.telenav.kivakit.core.project.Project;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.serialization.gson.GsonSerializationProject;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.execution.BuildExecutor;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
-import digital.fiasco.runtime.build.settings.BuildSettingsObject;
 import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;
 
 import java.util.Set;
@@ -39,6 +39,7 @@ import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
 import static com.telenav.kivakit.core.value.count.Count._0;
 import static com.telenav.kivakit.core.value.count.Count._16;
 import static com.telenav.kivakit.core.vm.JavaVirtualMachine.javaVirtualMachine;
+import static digital.fiasco.runtime.build.settings.BuildSettings.buildSettings;
 
 /**
  * {@inheritDoc}
@@ -66,13 +67,14 @@ public abstract class BaseBuild extends Application implements Build
         .build();
 
     /** The root builder for this build (once configured) */
-    private Builder rootBuilder;
+    private final Builder rootBuilder;
 
     /**
      * Creates a build
      */
     public BaseBuild()
     {
+        rootBuilder = onConfigureBuild(newBuilder());
     }
 
     /**
@@ -94,7 +96,6 @@ public abstract class BaseBuild extends Application implements Build
     {
         var copy = typeForClass(getClass()).newInstance();
         copy.metadata = this.metadata;
-        copy.attachMixin(this);
         return copy;
     }
 
@@ -112,6 +113,20 @@ public abstract class BaseBuild extends Application implements Build
               describe              describe the build rather than running it
                             
             """ + newBuilder().description();
+    }
+
+    /**
+     * Executes this build using a {@link BuildExecutor}
+     *
+     * @return The builder results (one for each project)
+     */
+    public ObjectList<Result<Builder>> executeBuild()
+    {
+        // Create the root builder,
+        var root = newBuilder().withArtifactDescriptor(metadata.descriptor());
+
+        // configure and run the build,
+        return listenTo(new BuildExecutor(rootBuilder)).build();
     }
 
     @Override
@@ -141,6 +156,18 @@ public abstract class BaseBuild extends Application implements Build
         return rootBuilder;
     }
 
+    @Override
+    public boolean shouldDescribe()
+    {
+        return false;
+    }
+
+    @Override
+    public boolean shouldDescribeAndExecute()
+    {
+        return false;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -154,17 +181,24 @@ public abstract class BaseBuild extends Application implements Build
             .build());
     }
 
+    protected Builder newBuilder()
+    {
+        var builder = new Builder(this);
+        return builder
+            .withSettings(buildSettings(builder)
+                .withBuilderThreads(get(BUILDER_THREADS))
+                .withArtifactResolverThreads(get(ARTIFACT_RESOLVER_THREADS)))
+            .withParsedCommandLine(commandLine());
+    }
+
     /**
      * {@inheritDoc}
      */
     @Override
     protected final void onRun()
     {
-        // Create the root builder,
-        rootBuilder = newBuilder().withArtifactDescriptor(metadata.descriptor());
-
-        // configure and run the build,
-        var results = listenTo(new BuildExecutor(onConfigureBuild(rootBuilder))).build();
+        // Execute the build,
+        var results = executeBuild();
 
         // then show the results.
         var problems = _0;
@@ -173,6 +207,7 @@ public abstract class BaseBuild extends Application implements Build
             at.messages().broadcastTo(this);
             problems = problems.plus(at.messages().problems());
         }
+
         information("Build completed with $ problems", problems);
     }
 
@@ -193,15 +228,5 @@ public abstract class BaseBuild extends Application implements Build
         return super.switchParsers().with(
             BUILDER_THREADS,
             ARTIFACT_RESOLVER_THREADS);
-    }
-
-    private Builder newBuilder()
-    {
-        var builder = new Builder(this);
-        return builder
-            .withSettings(new BuildSettingsObject(builder)
-                .withBuilderThreads(get(BUILDER_THREADS))
-                .withArtifactResolverThreads(get(ARTIFACT_RESOLVER_THREADS)))
-            .withParsedCommandLine(commandLine());
     }
 }

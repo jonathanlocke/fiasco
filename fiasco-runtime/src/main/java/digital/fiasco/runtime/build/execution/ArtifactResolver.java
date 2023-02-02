@@ -15,6 +15,7 @@ import digital.fiasco.runtime.dependency.collections.DependencyTree;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.ExecutorCompletionService;
 
@@ -53,7 +54,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
      * @param root The root of the build tree
      * @param resolved The set of resolved artifacts to update
      */
-    public void resolveArtifacts(Builder root,
+    public void resolveArtifacts(@NotNull Builder root,
                                  ResolvedArtifacts resolved)
     {
         var settings = root.settings();

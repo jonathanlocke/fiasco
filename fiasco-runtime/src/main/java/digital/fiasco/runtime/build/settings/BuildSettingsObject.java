@@ -16,6 +16,7 @@ import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
 import org.jetbrains.annotations.NotNull;
 
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
+import static com.telenav.kivakit.core.value.count.Count._8;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 
 /**
@@ -76,16 +77,16 @@ import static com.telenav.kivakit.filesystem.Folders.currentFolder;
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "UnusedReturnValue", "unused" })
-public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMixin
+public class BuildSettingsObject extends BaseRepeater implements BuildSettings
 {
     /** The builder for these settings */
     private Builder builder;
 
     /** The number of threads to use when building */
-    private Count builderThreads;
+    private Count builderThreads = _8;
 
     /** The number of threads to use when building */
-    private Count artifactResolverThreads;
+    private Count artifactResolverThreads = _8;
 
     /** The set of enabled build options */
     private ObjectSet<BuildOption> options = set();
@@ -105,10 +106,6 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
     /** Set of profiles to enable for this build */
     private ObjectSet<BuildProfile> profiles = set();
 
-    public BuildSettingsObject()
-    {
-    }
-
     public BuildSettingsObject(Builder builder)
     {
         this.builder = builder;
@@ -122,7 +119,7 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
      *
      * @param that The settings to copy
      */
-    public BuildSettingsObject(BuildSettingsObject that)
+    protected BuildSettingsObject(BuildSettingsObject that)
     {
         this.builder = that.builder;
         this.rootFolder = that.rootFolder;
@@ -133,6 +130,10 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
         this.descriptor = that.descriptor;
         this.librarian = that.librarian.copy();
         this.profiles = that.profiles.copy();
+    }
+
+    BuildSettingsObject()
+    {
     }
 
     /**
@@ -158,11 +159,12 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
     }
 
     /**
-     * {@inheritDoc}
+     * Returns a copy of this settings object
      *
-     * @return {@inheritDoc}
+     * @return The copy
      */
-    public BuildSettingsObject copySettings()
+    @Override
+    public BuildSettingsObject copy()
     {
         return new BuildSettingsObject(this);
     }
@@ -223,7 +225,7 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
     @Override
     public Phase phase(String name)
     {
-        return phases.phase(name);
+        return phases().phase(name);
     }
 
     /**
@@ -235,6 +237,10 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
     @NotNull
     public PhaseList phases()
     {
+        if (phases == null)
+        {
+            phases = new StandardPhases(builder);
+        }
         return phases;
     }
 
@@ -269,7 +275,7 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
     @Override
     public BuildSettingsObject withArtifactDescriptor(ArtifactDescriptor descriptor)
     {
-        var copy = copySettings();
+        var copy = copy();
         copy.descriptor = descriptor;
         return copy;
     }
@@ -283,7 +289,7 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
     @Override
     public BuildSettingsObject withArtifactResolverThreads(Count threads)
     {
-        var copy = copySettings();
+        var copy = copy();
         copy.artifactResolverThreads = threads;
         return copy;
     }
@@ -297,7 +303,7 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
     @Override
     public BuildSettingsObject withBuilderThreads(Count threads)
     {
-        var copy = copySettings();
+        var copy = copy();
         copy.builderThreads = threads;
         return copy;
     }
@@ -311,8 +317,8 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
     @Override
     public BuildSettingsObject withDisabled(Phase phase)
     {
-        var copy = copySettings();
-        copy.phases.disable(phase);
+        var copy = copy();
+        copy.phases().disable(phase);
         return copy;
     }
 
@@ -325,7 +331,7 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
     @Override
     public BuildSettingsObject withDisabled(BuildOption option)
     {
-        var copy = copySettings();
+        var copy = copy();
         copy.options.remove(option);
         return copy;
     }
@@ -339,7 +345,7 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
     @Override
     public BuildSettingsObject withDisabled(BuildProfile profile)
     {
-        var copy = copySettings();
+        var copy = copy();
         copy.profiles.remove(profile);
         return copy;
     }
@@ -353,8 +359,8 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
     @Override
     public BuildSettingsObject withEnabled(Phase phase)
     {
-        var copy = copySettings();
-        copy.phases.enable(phase);
+        var copy = copy();
+        copy.phases().enable(phase);
         return copy;
     }
 
@@ -367,7 +373,7 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
     @Override
     public BuildSettingsObject withEnabled(BuildOption option)
     {
-        var copy = copySettings();
+        var copy = copy();
         copy.options.add(option);
         return copy;
     }
@@ -381,7 +387,7 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
     @Override
     public BuildSettingsObject withEnabled(BuildProfile profile)
     {
-        var copy = copySettings();
+        var copy = copy();
         copy.profiles.add(profile);
         return copy;
     }
@@ -395,7 +401,7 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
     @Override
     public BuildSettingsObject withPhases(PhaseList phases)
     {
-        var copy = copySettings();
+        var copy = copy();
         copy.phases = phases.copy();
         return copy;
     }
@@ -409,7 +415,7 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettingsMi
     @Override
     public BuildSettingsObject withRootFolder(Folder rootFolder)
     {
-        var copy = copySettings();
+        var copy = copy();
         copy.rootFolder = rootFolder;
         return copy;
     }

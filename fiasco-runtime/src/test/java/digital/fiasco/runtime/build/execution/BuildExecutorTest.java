@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import java.util.HashSet;
 
+import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_COMPILE;
 
 public class BuildExecutorTest extends FiascoTest
@@ -14,26 +15,36 @@ public class BuildExecutorTest extends FiascoTest
     @Test
     public void test()
     {
+        var compiled = new HashSet<Builder>();
+
         var build = new BaseBuild()
         {
             @Override
             public Builder onConfigureBuild(Builder root)
             {
-                return root.withDependencies(root.deriveBuilder("utilities"));
+                return root
+                    .withActionAfterPhase(PHASE_COMPILE, compiled::add)
+                    .withDependencies(
+                        root.deriveBuilder("utilities")
+                            .withActionAfterPhase(PHASE_COMPILE, compiled::add));
+            }
+
+            @Override
+            protected Builder newBuilder()
+            {
+                return new Builder(this)
+                    .withRootFolder(currentFolder().folder("project"))
+                    .withArtifactDescriptor("library:com.telenav.kivakit:kivakit-core:1.8.5");
             }
         };
 
-        var compiled = new HashSet<Builder>();
+        build.onConfigureBuild(build.newBuilder());
 
-        var root = build.rootBuilder()
-            .withActionAfterPhase(PHASE_COMPILE, compiled::add);
+        var results = new BuildExecutor(build.rootBuilder()).build();
 
-        var utilities = root.builder("utilities")
-            .withActionAfterPhase(PHASE_COMPILE, compiled::add);
+        results.forEach(it -> ensure(it.succeeded()));
 
-        var executor = new BuildExecutor(root);
-        executor.build();
-        ensure(compiled.contains(root));
-        ensure(compiled.contains(utilities));
+        ensure(compiled.contains(build.rootBuilder()));
+        ensure(compiled.contains(build.rootBuilder().builder("utilities")));
     }
 }

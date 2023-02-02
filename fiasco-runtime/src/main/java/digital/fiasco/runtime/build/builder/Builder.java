@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.build.builder;
 
 import com.telenav.kivakit.commandline.CommandLine;
+import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.function.Result;
 import com.telenav.kivakit.core.language.trait.TryCatchTrait;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
@@ -22,7 +23,6 @@ import digital.fiasco.runtime.build.execution.BuildExecutionStep;
 import digital.fiasco.runtime.build.settings.BuildOption;
 import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.build.settings.BuildSettings;
-import digital.fiasco.runtime.build.settings.BuildSettingsMixin;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
@@ -31,6 +31,7 @@ import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
 import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.BuilderList;
 import digital.fiasco.runtime.repository.Repository;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
@@ -41,6 +42,7 @@ import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
 import static com.telenav.kivakit.core.string.Paths.pathTail;
 import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
+import static digital.fiasco.runtime.build.settings.BuildSettings.buildSettings;
 import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.collections.BuilderList.builders;
 
@@ -83,8 +85,8 @@ import static digital.fiasco.runtime.dependency.collections.BuilderList.builders
  *
  * <p>
  * A phase can be retrieved by name with {@link #phase(String)} and an arbitrary {@link Runnable}
- * can be attached to run before, during or after the phase executes with {@link #withActionBeforePhase(String, BuildAction)},
- * {@link #withActionDuringPhase(String, BuildAction)}, and {@link #withActionAfterPhase(String, BuildAction)}. This allows {@link Tool}s to
+ * can be attached to run before, during or after the phase executes with {@link #withActionBeforePhase(Phase, BuildAction)},
+ * {@link #withActionDuringPhase(Phase, BuildAction)}, and {@link #withActionAfterPhase(Phase, BuildAction)}. This allows {@link Tool}s to
  * be used at the right time to achieve different build effects.
  * </p>
  *
@@ -138,12 +140,12 @@ import static digital.fiasco.runtime.dependency.collections.BuilderList.builders
  * <p><b>Build Phases</b></p>
  *
  * <ul>
- *     <li>{@link #withActionAfterPhase(String, BuildAction)}</li>
- *     <li>{@link #withActionBeforePhase(String, BuildAction)}</li>
+ *     <li>{@link #withActionBeforePhase(Phase, BuildAction)}</li>
+ *     <li>{@link #withActionDuringPhase(Phase, BuildAction)}</li>
+ *     <li>{@link #withActionAfterPhase(Phase, BuildAction)}</li>
  *     <li>{@link #withDisabled(Phase)}</li>
  *     <li>{@link #withEnabled(Phase)}</li>
  *     <li>{@link #isEnabled(Phase)}</li>
- *     <li>{@link #withActionDuringPhase(String, BuildAction)}</li>
  *     <li>{@link #phase(String)}</li>
  *     <li>{@link #phases()}</li>
  *     <li>{@link #withPhases(PhaseList)}</li>
@@ -152,9 +154,9 @@ import static digital.fiasco.runtime.dependency.collections.BuilderList.builders
  * <p><b>Build Actions</b></p>
  *
  * <ul>
- *     <li>{@link #withActionBeforePhase(String, BuildAction)}</li>
- *     <li>{@link #withActionDuringPhase(String, BuildAction)}</li>
- *     <li>{@link #withActionAfterPhase(String, BuildAction)}</li>
+ *     <li>{@link #withActionBeforePhase(Phase, BuildAction)}</li>
+ *     <li>{@link #withActionDuringPhase(Phase, BuildAction)}</li>
+ *     <li>{@link #withActionAfterPhase(Phase, BuildAction)}</li>
  * </ul>
  *
  * <p><b>Build Profiles</b></p>
@@ -240,9 +242,9 @@ public class Builder extends BaseRepeater implements
     Described,
     BuildExecutionStep,
     Copyable<Builder>,
-    BuildSettingsMixin,
     BuildStructure,
     BuilderAssociated,
+    BuildSettings,
     BuildEnvironmentTrait,
     ToolFactory,
     TryCatchTrait,
@@ -264,6 +266,9 @@ public class Builder extends BaseRepeater implements
      */
     private BuilderList builderDependencies;
 
+    /** The build settings for this builder */
+    private BuildSettings settings;
+
     /**
      * Creates a builder for the given build
      *
@@ -275,6 +280,7 @@ public class Builder extends BaseRepeater implements
         librarian = newLibrarian();
         artifactDependencies = artifacts();
         builderDependencies = builders();
+        settings = buildSettings(this);
     }
 
     /**
@@ -288,6 +294,7 @@ public class Builder extends BaseRepeater implements
         this.librarian = that.librarian;
         this.artifactDependencies = that.artifactDependencies;
         this.builderDependencies = that.builderDependencies;
+        this.settings = that.settings.copy();
     }
 
     /**
@@ -299,6 +306,12 @@ public class Builder extends BaseRepeater implements
     public ArtifactList artifactDependencies()
     {
         return artifactDependencies;
+    }
+
+    @Override
+    public Count artifactResolverThreads()
+    {
+        return settings().artifactResolverThreads();
     }
 
     /**
@@ -373,6 +386,12 @@ public class Builder extends BaseRepeater implements
         return builderDependencies;
     }
 
+    @Override
+    public Count builderThreads()
+    {
+        return settings().builderThreads();
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -381,9 +400,7 @@ public class Builder extends BaseRepeater implements
     @Override
     public Builder copy()
     {
-        var copy = new Builder(this);
-        copy.attachMixin(settings());
-        return copy;
+        return new Builder(this);
     }
 
     /**
@@ -444,7 +461,25 @@ public class Builder extends BaseRepeater implements
     @Override
     public ArtifactDescriptor descriptor()
     {
-        return BuildSettingsMixin.super.descriptor();
+        return settings.descriptor();
+    }
+
+    @Override
+    public boolean isEnabled(Phase phase)
+    {
+        return settings.isEnabled(phase);
+    }
+
+    @Override
+    public boolean isEnabled(BuildOption option)
+    {
+        return settings.isEnabled(option);
+    }
+
+    @Override
+    public boolean isEnabled(BuildProfile profile)
+    {
+        return settings.isEnabled(profile);
     }
 
     /**
@@ -468,6 +503,24 @@ public class Builder extends BaseRepeater implements
         return descriptor().name();
     }
 
+    @Override
+    public Phase phase(String name)
+    {
+        return settings.phase(name);
+    }
+
+    @Override
+    public @NotNull PhaseList phases()
+    {
+        return settings.phases();
+    }
+
+    @Override
+    public ObjectSet<BuildProfile> profiles()
+    {
+        return settings.profiles();
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -477,6 +530,34 @@ public class Builder extends BaseRepeater implements
     public Repository repository()
     {
         return unsupported();
+    }
+
+    @Override
+    public Folder rootFolder()
+    {
+        return settings().rootFolder();
+    }
+
+    /**
+     * Returns the settings for this builder
+     *
+     * @return The settings
+     */
+    public BuildSettings settings()
+    {
+        return settings;
+    }
+
+    @Override
+    public boolean shouldDescribe()
+    {
+        return settings().shouldDescribe();
+    }
+
+    @Override
+    public boolean shouldDescribeAndExecute()
+    {
+        return settings().shouldDescribeAndExecute();
     }
 
     /**
@@ -889,14 +970,14 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Returns a copy of this builder with the given settings (attached as a {@link BuildSettingsMixin})
+     * Returns a copy of this builder with the given settings
      *
      * @param settings The settings
      * @return The copy
      */
     public Builder withSettings(BuildSettings settings)
     {
-        return mutatedCopy(it -> it.attachMixin(it.settings()));
+        return mutatedCopy(it -> it.settings = settings);
     }
 
     /**

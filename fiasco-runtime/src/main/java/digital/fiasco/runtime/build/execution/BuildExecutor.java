@@ -12,6 +12,7 @@ import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.DependencyList;
 import digital.fiasco.runtime.dependency.collections.DependencyQueue;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Future;
 
@@ -57,7 +58,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
     /** The root of the builder tree */
     private final Builder root;
 
-    public BuildExecutor(Builder root)
+    public BuildExecutor(@NotNull Builder root)
     {
         this.root = root;
     }

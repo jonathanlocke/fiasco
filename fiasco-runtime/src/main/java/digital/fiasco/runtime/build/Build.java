@@ -8,15 +8,14 @@ import digital.fiasco.runtime.build.builder.BuildAction;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
+import digital.fiasco.runtime.build.environment.BuildEnvironmentTrait;
+import digital.fiasco.runtime.build.environment.BuildRepositoriesTrait;
 import digital.fiasco.runtime.build.execution.BuildExecutionStep;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
 import digital.fiasco.runtime.build.settings.BuildOption;
 import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.build.settings.BuildSettings;
-import digital.fiasco.runtime.build.settings.BuildSettingsMixin;
 import digital.fiasco.runtime.build.settings.BuildSettingsObject;
-import digital.fiasco.runtime.build.environment.BuildEnvironmentTrait;
-import digital.fiasco.runtime.build.environment.BuildRepositoriesTrait;
 
 /**
  * Defines a Fiasco build.
@@ -65,8 +64,8 @@ import digital.fiasco.runtime.build.environment.BuildRepositoriesTrait;
  *
  * <p>
  * Phases are enabled and disabled with {@link Builder#withEnabled(Phase)} and {@link Builder#withDisabled(Phase)}. Code can be
- * executed before, during or after a phase runs by calling {@link Builder#withActionBeforePhase(String, BuildAction)},
- * {@link Builder#withActionDuringPhase(String, BuildAction)}, and {@link Builder#withActionAfterPhase(String, BuildAction)}. The
+ * executed before, during or after a phase runs by calling {@link Builder#withActionBeforePhase(Phase, BuildAction)},
+ * {@link Builder#withActionDuringPhase(Phase, BuildAction)}, and {@link Builder#withActionAfterPhase(Phase, BuildAction)}. The
  * {@link BaseBuild} application enables and disables any phase names that were passed from the command line. The phase
  * name itself enables the phase and any dependent phases (for example, "compile" enables the "build-start", "prepare"
  * and "compile" phases). If the phase name is preceded by a dash (for example, -test), the phase is disabled (but not
@@ -168,8 +167,7 @@ public interface Build extends
     BuildExecutionStep,
     Repeater,
     BuildEnvironmentTrait,
-    BuildRepositoriesTrait,
-    BuildSettingsMixin
+    BuildRepositoriesTrait
 {
     /**
      * Returns the metadata for this build
