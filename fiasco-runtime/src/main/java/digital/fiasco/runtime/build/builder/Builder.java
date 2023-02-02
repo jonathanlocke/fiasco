@@ -43,7 +43,8 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.function.Result.result;
 import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
-import static com.telenav.kivakit.core.string.Paths.pathTail;
+import static com.telenav.kivakit.core.string.Formatter.format;
+import static com.telenav.kivakit.core.string.Paths.pathOptionalSuffix;
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
 import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
@@ -417,8 +418,9 @@ public class Builder extends BaseRepeater implements
      */
     public Builder deriveBuilder(String path)
     {
-        return withSettings(withRootFolder(rootFolder().folder(path))
-            .withArtifactName(pathTail(path, '/')));
+        var name = pathOptionalSuffix(path, '/');
+        return withRootFolder(rootFolder().folder(path))
+            .withArtifactName(name);
     }
 
     /**
@@ -574,6 +576,12 @@ public class Builder extends BaseRepeater implements
         var serialized = new StringOutputResource();
         serializer.writeObject(serialized, new SerializableObject<>(this), METADATA_OBJECT_TYPE);
         return serialized.string();
+    }
+
+    @Override
+    public String toString()
+    {
+        return format("Builder ($)", name());
     }
 
     /**

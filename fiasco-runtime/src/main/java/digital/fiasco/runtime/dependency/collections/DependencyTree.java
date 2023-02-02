@@ -4,6 +4,7 @@ import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
+import digital.fiasco.runtime.dependency.collections.lists.DependencyList;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
@@ -42,12 +43,12 @@ import static digital.fiasco.runtime.dependency.collections.lists.DependencyList
  * @see BaseDependencyList
  * @see DependencyQueue
  */
-@SuppressWarnings({ "unused", "rawtypes", "unchecked" })
+@SuppressWarnings({ "unused" })
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public class DependencyTree
 {
     /** The dependencies of this graph in depth-first-order */
-    private final BaseDependencyList depthFirst;
+    private final DependencyList depthFirst;
 
     /** The root dependency for this tree */
     private final Dependency root;
@@ -69,7 +70,7 @@ public class DependencyTree
      * Returns the dependencies in this tree in depth-first order
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public BaseDependencyList asDepthFirstList()
+    public DependencyList asDepthFirstList()
     {
         return depthFirst;
     }
@@ -100,7 +101,7 @@ public class DependencyTree
      * @param explored The list of dependencies already explored (for cycle detection)
      * @throws RuntimeException Thrown if a cycle is detected in the given root
      */
-    private BaseDependencyList depthFirst(Dependency root, BaseDependencyList explored)
+    private DependencyList depthFirst(Dependency root, DependencyList explored)
     {
         // Go through each child of the root,
         for (var child : root.allDependencies())

@@ -12,7 +12,7 @@ public class ResolvedArtifactsTest extends FiascoTest
     @Test
     public void test()
     {
-        var resolved = new ResolvedArtifacts();
+        var resolved = new ResolvedArtifacts(this);
 
         KivaKitThread.run(this, "resolver", () ->
         {

@@ -4,14 +4,15 @@ import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.function.Result;
 import com.telenav.kivakit.core.language.trait.TryTrait;
+import com.telenav.kivakit.core.messaging.Listener;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.settings.BuildSettings;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
-import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
 import digital.fiasco.runtime.dependency.collections.DependencyQueue;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Future;
@@ -58,7 +59,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
     /** The root of the builder tree */
     private final Builder root;
 
-    public BuildExecutor(@NotNull Builder root)
+    public BuildExecutor(Listener listener, @NotNull Builder root)
     {
         this.root = root;
     }
@@ -73,11 +74,13 @@ public class BuildExecutor extends BaseComponent implements TryTrait
         // Start resolving artifacts in the background starting from the root
         // builder's dependencies. Each resolved artifact is added to the
         // resolved set.
-        var resolved = new ResolvedArtifacts();
-        listenTo(new ArtifactResolver()).resolveArtifacts(root, resolved);
+        var resolved = new ResolvedArtifacts(this);
+        trace("Starting artifact resolver");
+        new ArtifactResolver(this).resolveArtifacts(root, resolved);
 
         // Start running builders in parallel. Each builder will wait until its
         // dependencies are in the resolved set before executing.
+        trace("Starting build");
         return build(resolved);
     }
 
@@ -99,15 +102,19 @@ public class BuildExecutor extends BaseComponent implements TryTrait
         {
             // submit the builder to the executor,
             var finalBuilder = builder;
+            trace("$: submitted", finalBuilder);
             var future = (Future<Result<Builder>>) executor.submit(() ->
             {
                 // Wait for artifact dependencies to be resolved,
+                trace("$: waiting for artifacts to be resolved", finalBuilder);
                 resolved.waitForResolutionOf(finalBuilder.artifactDependencies());
 
                 // run the builder,
+                trace("$: building", finalBuilder);
                 finalBuilder.build();
+                trace("$: build completed ", finalBuilder);
 
-                // and then mark it as resolved.
+                // and then mark it as processed.
                 queue.processed(finalBuilder);
             });
 
@@ -116,11 +123,13 @@ public class BuildExecutor extends BaseComponent implements TryTrait
         }
 
         // Wait for all futures to be resolved, and return the results.
+        trace("Waiting for builders to finish");
         var results = new ObjectList<Result<Builder>>();
         for (var at : futures)
         {
             results.add(tryCatch(() -> at.get()));
         }
+        trace("All builders finished");
 
         return results;
     }

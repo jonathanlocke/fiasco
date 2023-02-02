@@ -74,7 +74,7 @@ public class DependencyQueueTest extends FiascoTest
 
         var group1 = queue.takeAll(Library.class);
         ensure(group1.equals(libraries(c, e, f)));
-        queue.processed(group1.asLibraryList());
+        queue.processed(group1);
 
         var group2 = queue.takeAll(Library.class);
         ensure(group2.equals(libraries(b, d)));

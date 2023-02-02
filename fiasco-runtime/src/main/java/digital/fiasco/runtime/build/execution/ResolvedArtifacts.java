@@ -1,5 +1,7 @@
 package digital.fiasco.runtime.build.execution;
 
+import com.telenav.kivakit.component.BaseComponent;
+import com.telenav.kivakit.core.messaging.Listener;
 import com.telenav.kivakit.core.thread.Monitor;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 
@@ -10,13 +12,18 @@ import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
  *
  * @author Jonathan Locke
  */
-public class ResolvedArtifacts
+public class ResolvedArtifacts extends BaseComponent
 {
     /** The set of artifacts that have been resolved */
     private ArtifactList resolved = ArtifactList.artifacts();
 
     /** A monitor that is signaled when artifacts are resolved */
     private final Monitor updated = new Monitor();
+
+    public ResolvedArtifacts(Listener listener)
+    {
+        listener.listenTo(this);
+    }
 
     /**
      * Returns true if all the artifacts in the given list have been resolved
@@ -40,6 +47,7 @@ public class ResolvedArtifacts
         {
             this.resolved = resolved.with(artifacts);
             updated.signal();
+            trace("Resolved: $", artifacts);
         }
     }
 
@@ -54,6 +62,7 @@ public class ResolvedArtifacts
         {
             while (!resolved.containsAll(required))
             {
+                trace("Waiting for resolution: $", required);
                 updated.await();
             }
         }

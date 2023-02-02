@@ -126,7 +126,7 @@ public abstract class BaseBuild extends Application implements Build
         var root = newBuilder().withArtifactDescriptor(metadata.descriptor());
 
         // configure and run the build,
-        return listenTo(new BuildExecutor(rootBuilder)).build();
+        return new BuildExecutor(this, rootBuilder).build();
     }
 
     @Override

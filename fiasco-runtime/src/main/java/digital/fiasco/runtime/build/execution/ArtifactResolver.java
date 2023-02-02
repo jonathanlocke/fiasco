@@ -3,15 +3,16 @@ package digital.fiasco.runtime.build.execution;
 import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.function.Result;
 import com.telenav.kivakit.core.language.trait.TryTrait;
+import com.telenav.kivakit.core.messaging.Listener;
 import com.telenav.kivakit.interfaces.code.Callback;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
 import digital.fiasco.runtime.build.settings.BuildSettingsObject;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.DependencyQueue;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
@@ -47,6 +48,11 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
  */
 public class ArtifactResolver extends BaseComponent implements TryTrait
 {
+    public ArtifactResolver(Listener listener)
+    {
+        listener.listenTo(this);
+    }
+
     /**
      * Resolves the artifact dependencies of a build tree in groups, updating the given {@link ResolvedArtifacts} set
      * for each group that is resolved.
@@ -63,34 +69,40 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
         {
             // Build a dependency queue from the root dependency,
             var queue = new DependencyTree(root).asQueue();
-
-            // create an executor and completion service,
-            var executor = threadPool("FiascoResolverPool", settings.builderThreads());
-            var completion = new ExecutorCompletionService<Void>(executor);
-
-            // and then go through groups of artifacts from the queue that are ready to be resolved,
-            for (var group = queue.takeAll(Artifact.class); group != null; group = queue.takeAll(Artifact.class))
+            if (queue.isWorkAvailable())
             {
-                // and use the completion service to resolve the group.
-                var artifacts = group.asArtifactList();
-                completion.submit(() ->
+                // create an executor and completion service,
+                trace("Starting artifact resolution executor");
+                var executor = threadPool("FiascoResolverPool", settings.builderThreads());
+                var completion = new ExecutorCompletionService<Void>(executor);
+
+                // and then go through groups of artifacts from the queue that are ready to be resolved,
+                for (var group = queue.takeAll(Artifact.class); group != null; group = queue.takeAll(Artifact.class))
                 {
-                    // Use the librarian to resolve the requested artifacts, and call back with the result.
-                    var librarian = root.librarian();
-                    var result = result(librarian, () -> librarian.resolve(artifacts.asArtifactDescriptors()));
-
-                    // and for each group of artifacts that are successfully resolved,
-                    if (result.succeeded())
+                    // and use the completion service to resolve the group.
+                    var artifacts = group.asArtifactList();
+                    trace("Resolving $", artifacts);
+                    completion.submit(() ->
                     {
-                        // mark them in the resolved set.
-                        resolved.resolve(result.get());
-                    }
-                    result.messages().broadcastTo(this);
-                }, null);
-            }
+                        // Use the librarian to resolve the requested artifacts, and call back with the result.
+                        var librarian = root.librarian();
+                        var result = result(librarian, () -> librarian.resolve(artifacts.asArtifactDescriptors()));
 
-            // Wait until all artifacts in the queue are resolved.
-            shutdownAndAwaitTermination(executor);
+                        // and for each group of artifacts that are successfully resolved,
+                        if (result.succeeded())
+                        {
+                            // mark them in the resolved set.
+                            trace("Resolved $", artifacts);
+                            resolved.resolve(result.get());
+                        }
+                        result.messages().broadcastTo(this);
+                    }, null);
+                }
+
+                // Wait until all artifacts in the queue are resolved.
+                trace("Waiting for artifact resolution to complete");
+                shutdownAndAwaitTermination(executor);
+            }
         });
     }
 }
