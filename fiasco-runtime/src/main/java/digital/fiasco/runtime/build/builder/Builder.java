@@ -417,7 +417,8 @@ public class Builder extends BaseRepeater implements
     {
         var name = pathOptionalSuffix(path, '/');
         return withRootFolder(rootFolder().folder(path))
-            .withArtifactName(name);
+            .withArtifactName(name)
+            .withNoDependencies();
     }
 
     /**
@@ -465,6 +466,22 @@ public class Builder extends BaseRepeater implements
     public ArtifactDescriptor descriptor()
     {
         return settings.descriptor();
+    }
+
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object instanceof Builder that)
+        {
+            return name().equals(that.name());
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return name().hashCode();
     }
 
     @Override
@@ -769,7 +786,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withDependencies(Builder... dependencies)
     {
-        return mutatedCopy(it -> it.builderDependencies = builderDependencies.with(dependencies));
+        return mutatedCopy(it -> it.builderDependencies = builderDependencies.with(dependencies).deduplicated());
     }
 
     /**
@@ -780,7 +797,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withDependencies(ArtifactList dependencies)
     {
-        return mutatedCopy(it -> it.artifactDependencies = artifactDependencies.with(dependencies));
+        return mutatedCopy(it -> it.artifactDependencies = artifactDependencies.with(dependencies).deduplicated());
     }
 
     /**
@@ -792,7 +809,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withDependencies(Artifact<?> first, Artifact<?>... rest)
     {
-        return mutatedCopy(it -> it.artifactDependencies = artifactDependencies.with(first, rest));
+        return mutatedCopy(it -> it.artifactDependencies = artifactDependencies.with(first, rest).deduplicated());
     }
 
     /**
@@ -876,6 +893,15 @@ public class Builder extends BaseRepeater implements
     public Builder withLibrarian(Librarian librarian)
     {
         return mutatedCopy(it -> it.librarian = librarian);
+    }
+
+    public Builder withNoDependencies()
+    {
+        return mutatedCopy(it ->
+        {
+            it.builderDependencies = new BuilderList();
+            it.artifactDependencies = new ArtifactList();
+        });
     }
 
     /**

@@ -81,7 +81,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
                 {
                     // and use the completion service to resolve the group.
                     var artifacts = group.asArtifactList();
-                    trace("Resolving $", artifacts);
+                    trace("Resolving [$]", artifacts);
                     completion.submit(() ->
                     {
                         // Use the librarian to resolve the requested artifacts, and call back with the result.
@@ -92,7 +92,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
                         if (result.succeeded())
                         {
                             // mark them in the resolved set.
-                            trace("Resolved $", artifacts);
+                            trace("Resolved [$]", artifacts);
                             resolved.resolve(result.get());
                         }
                         result.messages().broadcastTo(this);

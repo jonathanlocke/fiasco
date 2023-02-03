@@ -2,6 +2,7 @@ package digital.fiasco.runtime.dependency.collections;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
 import digital.fiasco.runtime.dependency.collections.lists.DependencyList;
@@ -63,7 +64,7 @@ public class DependencyTree
     public DependencyTree(Dependency root)
     {
         this.root = root;
-        this.depthFirst = depthFirst(root, dependencies()).with(root);
+        this.depthFirst = depthFirst(root, dependencies());
     }
 
     /**
@@ -97,20 +98,23 @@ public class DependencyTree
     /**
      * Returns a list of dependencies in this tree in depth-first order
      *
-     * @param root The root to explore
+     * @param at The dependency to explore
      * @param explored The list of dependencies already explored (for cycle detection)
      * @throws RuntimeException Thrown if a cycle is detected in the given root
      */
-    private DependencyList depthFirst(Dependency root, DependencyList explored)
+    private DependencyList depthFirst(Dependency at, DependencyList explored)
     {
-        // Go through each child of the root,
-        for (var child : root.allDependencies())
-        {
-            // check for cycles (which should not be possible in our functional api),
-            ensure(!explored.contains(child), "The dependency tree is cyclic:", root);
+        // Check for cycles (which should not be possible in our functional api)
+        ensure(!(at instanceof Builder) || !explored.containsAny(at.builderDependencies().asDependencyList()), "The build dependency tree is cyclic: $ was already explored", at);
 
+        // Add the given dependency as explored.
+        explored = explored.with(at);
+
+        // Go through each child of the root,
+        for (var child : at.allDependencies())
+        {
             // and explore the child (in a depth-first traversal)
-            explored = depthFirst(child, explored).with(child);
+            explored = depthFirst(child, explored);
         }
 
         return explored;

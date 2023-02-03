@@ -45,10 +45,21 @@ public class ResolvedArtifacts extends BaseComponent
     {
         synchronized (updated)
         {
-            this.resolved = resolved.with(artifacts);
-            updated.signal();
-            trace("Resolved: $", artifacts);
+            if (artifacts.isNonEmpty())
+            {
+                this.resolved = resolved.with(artifacts);
+                updated.signal();
+                trace("Resolved: $", artifacts);
+            }
         }
+    }
+
+    /**
+     * Returns the number of resolved artifacts
+     */
+    public int size()
+    {
+        return resolved.size();
     }
 
     /**

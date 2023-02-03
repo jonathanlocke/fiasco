@@ -262,6 +262,17 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     }
 
     /**
+     * Returns true if this dependency list contains any dependency in the given collection
+     *
+     * @param that The collection to check
+     * @return True if there is a dependency in this list that is also in the given list
+     */
+    public boolean containsAny(Collection<D> that)
+    {
+        return dependencies.containsAny(that);
+    }
+
+    /**
      * Returns an immutable copy of this dependency list.
      *
      * @return The copy

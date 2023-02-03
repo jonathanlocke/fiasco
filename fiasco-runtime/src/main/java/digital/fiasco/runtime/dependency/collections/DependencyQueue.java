@@ -128,7 +128,7 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
         ensure(initial.isNonEmpty(), "Cannot create a queue for an empty list");
 
         trace("Created queue with dependencies: $", initial);
-        available = initial;
+        available = initial.deduplicated();
         taken = dependencies();
         processed = dependencies();
     }

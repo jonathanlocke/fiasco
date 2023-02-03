@@ -115,8 +115,8 @@ public class Librarian extends BaseTool<Librarian>
     {
         var artifacts = ArtifactList.artifacts();
 
-        var progress = progressReporter(this, "dependency", descriptors.count());
-        progress.start("Resolving $ artifacts", descriptors.count());
+        var progress = progressReporter(this, "dependencies", descriptors.count());
+        progress.start("Resolving $", descriptors.count());
 
         // Go through each repository,
         for (var repository : repositories())
