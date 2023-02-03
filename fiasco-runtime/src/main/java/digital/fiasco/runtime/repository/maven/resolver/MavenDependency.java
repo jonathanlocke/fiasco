@@ -5,7 +5,7 @@ import digital.fiasco.runtime.repository.maven.MavenRepository;
 import org.jetbrains.annotations.NotNull;
 
 /**
- * The desriptor for a Maven dependency and the repository where it can be found
+ * The descriptor for a Maven dependency and the repository where it can be found
  *
  * @param repository The hosting repository
  * @param descriptor The artifact descriptor

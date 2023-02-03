@@ -3,7 +3,7 @@ package digital.fiasco.libraries.languages;
 import digital.fiasco.libraries.LibraryGroups;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
 
-@SuppressWarnings({ "unused", "SpellCheckingInspection" })
+@SuppressWarnings({ "unused" })
 public interface Groovy extends LibraryGroups
 {
     Library apache_groovy           = apache_groovy_group.library("groovy").asLibrary();

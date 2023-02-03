@@ -29,7 +29,7 @@ public class ResolvedArtifacts extends BaseComponent
      * Returns true if all the artifacts in the given list have been resolved
      *
      * @param artifacts The artifacts
-     * @return True if the artifacts ahve been resolved
+     * @return True if the artifacts have been resolved
      */
     public boolean isResolved(ArtifactList artifacts)
     {

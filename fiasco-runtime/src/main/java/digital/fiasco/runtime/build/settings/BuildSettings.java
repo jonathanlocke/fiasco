@@ -230,7 +230,7 @@ public interface BuildSettings extends
     }
 
     /**
-     * Applies the given tranformation function to the {@link #descriptor()}, returning a copy of this settings object
+     * Applies the given transformation function to the {@link #descriptor()}, returning a copy of this settings object
      * with the transformed descriptor.
      *
      * @param function The function to apply

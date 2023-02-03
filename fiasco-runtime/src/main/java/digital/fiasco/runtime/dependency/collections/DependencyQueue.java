@@ -120,7 +120,7 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
     /**
      * Creates a dependency queue with the given initial elements
      *
-     * @param initial The dependencies to enqueue, in priority order, where the first elements will be processed frist
+     * @param initial The dependencies to enqueue, in priority order, where the first elements will be processed first
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyQueue(DependencyList initial)

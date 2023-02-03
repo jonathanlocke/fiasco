@@ -14,7 +14,7 @@ import static digital.fiasco.runtime.build.metadata.MailingList.MailingListType.
 import static digital.fiasco.runtime.build.metadata.MailingList.MailingListType.COMMITS;
 import static digital.fiasco.runtime.build.metadata.MailingList.MailingListType.DEVELOPER;
 import static digital.fiasco.runtime.build.metadata.MailingList.MailingListType.ISSUES;
-import static digital.fiasco.runtime.build.metadata.MailingList.MailingListType.NOTIFIACTIONS;
+import static digital.fiasco.runtime.build.metadata.MailingList.MailingListType.NOTIFICATIONS;
 import static digital.fiasco.runtime.build.metadata.MailingList.MailingListType.USER;
 
 public record MailingList(@FormatProperty String name,
@@ -60,7 +60,7 @@ public record MailingList(@FormatProperty String name,
 
     public static MailingList notificaitonsMailingList()
     {
-        return mailingList(NOTIFIACTIONS);
+        return mailingList(NOTIFICATIONS);
     }
 
     public static MailingList userMailingList()
@@ -75,7 +75,7 @@ public record MailingList(@FormatProperty String name,
         ISSUES,
         COMMITS,
         ANNOUNCEMENTS,
-        NOTIFIACTIONS,
+        NOTIFICATIONS,
         OTHER
     }
 

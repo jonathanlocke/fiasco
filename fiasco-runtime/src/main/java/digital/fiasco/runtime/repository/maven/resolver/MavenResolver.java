@@ -111,7 +111,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
     }
 
     /**
-     * Resolves the dependencies for the given artifact descripttor
+     * Resolves the dependencies for the given artifact descriptor
      *
      * @param descriptor The descriptor
      * @return The list of resolved dependencies
@@ -150,7 +150,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
     }
 
     /**
-     * Resolves the dependencies for the given artifact descripttor
+     * Resolves the dependencies for the given artifact descriptor
      *
      * @param descriptor The descriptor
      * @return The list of resolved dependencies
@@ -161,7 +161,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
     }
 
     /**
-     * Returns a copy of this resolver with the given Maven local respository
+     * Returns a copy of this resolver with the given Maven local repository
      *
      * @param localRepository The local repository
      * @return The new resolver
@@ -174,7 +174,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
     }
 
     /**
-     * Returns a copy of this resolver with the given Maven local respository
+     * Returns a copy of this resolver with the given Maven local repository
      *
      * @param repository The repository to append
      * @return The new resolver

@@ -34,7 +34,7 @@ public class ResolveArtifactResponse extends BaseMicroservletResponse
 {
     /** The list of artifact content metadata */
     @Expose
-    private List<Artifact> artifacts;
+    private final List<Artifact> artifacts;
 
     public ResolveArtifactResponse(ArtifactList artifacts)
     {

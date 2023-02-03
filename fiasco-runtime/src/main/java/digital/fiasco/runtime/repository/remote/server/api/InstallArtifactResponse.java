@@ -20,7 +20,7 @@ public class InstallArtifactResponse extends BaseMicroservletResponse
 {
     /** The installation result */
     @Expose
-    private InstallationResult result;
+    private final InstallationResult result;
 
     public InstallArtifactResponse(InstallationResult result)
     {

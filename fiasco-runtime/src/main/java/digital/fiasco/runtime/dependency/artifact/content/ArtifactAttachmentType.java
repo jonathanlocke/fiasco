@@ -9,7 +9,7 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 
 /**
  * The type of artifact attachment, and its associated suffix. The suffix is what is added to the base name of an
- * artifact to get the filename for a particular kind of content. For example, an arifact attachment of type
+ * artifact to get the filename for a particular kind of content. For example, an artifact attachment of type
  * {@link #JAVADOC_ATTACHMENT} would yield a filename of "kivakit-core-1.6.2-javadoc.jar".
  *
  * @author jonathanl (shibo)

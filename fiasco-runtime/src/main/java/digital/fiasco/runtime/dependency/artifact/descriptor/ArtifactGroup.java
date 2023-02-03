@@ -12,7 +12,7 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName.artifactName;
 
 /**
- * The group for an artifact, where an artifact desriptor is [type:group:artifact:version].
+ * The group for an artifact, where an artifact descriptor is [type:group:artifact:version].
  *
  * <p><b>Creation</b></p>
  *
