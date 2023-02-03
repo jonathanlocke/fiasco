@@ -43,13 +43,24 @@ import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 public class PhaseList implements Iterable<Phase>
 {
     /** All defined phases, in order of execution */
-    private final ObjectList<Phase> phases = list();
+    private ObjectList<Phase> phases = list();
 
     /** Enable state of each phase */
-    private final ObjectMap<Class<? extends Phase>, Boolean> phaseEnabled = new ObjectMap<>();
+    private ObjectMap<Class<? extends Phase>, Boolean> phaseEnabled = new ObjectMap<>();
 
     /** Maps from the name of a phase to the {@link Phase} object */
-    private final StringMap<Phase> nameToPhase = new StringMap<>();
+    private StringMap<Phase> nameToPhase = new StringMap<>();
+
+    public PhaseList()
+    {
+    }
+
+    public PhaseList(PhaseList that)
+    {
+        this.phases = that.phases.copy();
+        this.phaseEnabled = that.phaseEnabled.copy();
+        this.nameToPhase = that.nameToPhase.copy();
+    }
 
     /**
      * Adds the given phase to this list
@@ -101,12 +112,7 @@ public class PhaseList implements Iterable<Phase>
      */
     public PhaseList copy()
     {
-        var copy = new PhaseList();
-        for (var at : phases)
-        {
-            copy.add(at);
-        }
-        return copy;
+        return new PhaseList(this);
     }
 
     /**

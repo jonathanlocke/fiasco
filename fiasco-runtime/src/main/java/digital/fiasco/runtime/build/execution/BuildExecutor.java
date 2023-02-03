@@ -15,6 +15,7 @@ import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.concurrent.Callable;
 import java.util.concurrent.Future;
 
 import static com.telenav.kivakit.core.thread.Threads.threadPool;
@@ -87,7 +88,6 @@ public class BuildExecutor extends BaseComponent implements TryTrait
     /**
      * Executes all builders from the root in parallel groups.
      */
-    @SuppressWarnings("unchecked")
     private ObjectList<Result<Builder>> build(ResolvedArtifacts resolved)
     {
         // Create a queue of builders from the given root,
@@ -101,22 +101,8 @@ public class BuildExecutor extends BaseComponent implements TryTrait
         for (var builder = queue.takeOne(Builder.class); builder != null; builder = queue.takeOne(Builder.class))
         {
             // submit the builder to the executor,
-            var finalBuilder = builder;
-            trace("$: submitted", finalBuilder);
-            var future = (Future<Result<Builder>>) executor.submit(() ->
-            {
-                // Wait for artifact dependencies to be resolved,
-                trace("$: waiting for artifacts to be resolved", finalBuilder);
-                resolved.waitForResolutionOf(finalBuilder.artifactDependencies());
-
-                // run the builder,
-                trace("$: building", finalBuilder);
-                finalBuilder.build();
-                trace("$: build completed ", finalBuilder);
-
-                // and then mark it as processed.
-                queue.processed(finalBuilder);
-            });
+            var future = (Future<Result<Builder>>) executor.submit(builderTask(resolved, queue, builder));
+            trace("$: submitted", builder);
 
             // and add the future to the list of results to wait for.
             futures.add(future);
@@ -132,5 +118,28 @@ public class BuildExecutor extends BaseComponent implements TryTrait
         trace("All builders finished");
 
         return results;
+    }
+
+    @NotNull
+    private Callable<Result<Builder>> builderTask(ResolvedArtifacts resolved,
+                                                  DependencyQueue queue,
+                                                  Builder builder)
+    {
+        return () ->
+        {
+            // Wait for artifact dependencies to be resolved,
+            trace("$: waiting for artifacts to be resolved", builder);
+            resolved.waitForResolutionOf(builder.artifactDependencies());
+
+            // run the builder,
+            trace("$: building", builder);
+            var result = builder.build();
+            trace("$: build completed ", builder);
+
+            // and then mark it as processed.
+            queue.processed(builder);
+
+            return result;
+        };
     }
 }

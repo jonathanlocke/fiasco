@@ -60,10 +60,13 @@ public class ResolvedArtifacts extends BaseComponent
     {
         synchronized (updated)
         {
-            while (!resolved.containsAll(required))
+            if (required.isNonEmpty())
             {
-                trace("Waiting for resolution: $", required);
-                updated.await();
+                while (!resolved.containsAll(required))
+                {
+                    trace("Waiting for resolution: $", required);
+                    updated.await();
+                }
             }
         }
     }

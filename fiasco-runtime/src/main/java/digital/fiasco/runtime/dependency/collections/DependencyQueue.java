@@ -2,6 +2,7 @@ package digital.fiasco.runtime.dependency.collections;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
+import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.os.ConsoleTrait;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
@@ -96,7 +97,7 @@ import static digital.fiasco.runtime.dependency.collections.lists.DependencyList
  * @author Jonathan locke
  */
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
-public class DependencyQueue implements ConsoleTrait
+public class DependencyQueue extends BaseComponent implements ConsoleTrait
 {
     /** The dependencies that are available to be processed (when all their transitive dependencies have been processed) */
     @FormatProperty
@@ -126,6 +127,7 @@ public class DependencyQueue implements ConsoleTrait
     {
         ensure(initial.isNonEmpty(), "Cannot create a queue for an empty list");
 
+        trace("Created queue with dependencies: $", initial);
         available = initial;
         taken = dependencies();
         processed = dependencies();
@@ -140,6 +142,7 @@ public class DependencyQueue implements ConsoleTrait
     public WakeState awaitProcessingCompletion(Duration maximum)
     {
         var started = now();
+        trace("Waiting for dependency processing to complete");
 
         // Grab the queue lock,
         return lock.whileLocked(() ->
@@ -152,6 +155,7 @@ public class DependencyQueue implements ConsoleTrait
                 wake = remaining.await(processedMore);
             }
 
+            trace("Dependency processing complete");
             return wake;
         });
     }
@@ -187,7 +191,7 @@ public class DependencyQueue implements ConsoleTrait
             // Move the given dependencies from processing to processed,
             this.taken = this.taken.without(group);
             this.processed = this.processed.with(group);
-
+            trace("Processed $", group);
             processedMore.signalAll();
         });
     }
@@ -220,7 +224,8 @@ public class DependencyQueue implements ConsoleTrait
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public <D extends Dependency> D takeOne(Class<D> type)
     {
-        return (D) take(type, _1).first();
+        var taken = take(type, _1);
+        return taken == null ? null : (D) taken.first();
     }
 
     @Override
@@ -262,35 +267,50 @@ public class DependencyQueue implements ConsoleTrait
     }
 
     /**
+     * Returns the list of dependencies that have yet to be fully processed
+     *
+     * @return The dependencies
+     */
+    private DependencyList remaining()
+    {
+        return available.with(taken).without(processed);
+    }
+
+    /**
      * Returns a list of dependencies matching the given type that are ready for processing. The list will be empty if
      * the queue is empty.
      */
     private DependencyList take(Class<?> type, Maximum maximum)
     {
+        trace("Taking ${class} dependency", type);
+
         return lock.whileLocked(() ->
         {
             // While the queue is not empty,
-            while (true)
+            while (remaining().isNonEmpty())
             {
                 // take any available dependencies of the given type,
                 var group = available
                     .matching(at -> isReady(at) && type.isAssignableFrom(at.getClass()))
                     .first(maximum);
 
-                // and if there are none ready,
-                if (group.isEmpty())
+                // and if there are none ready but there are still some remaining,
+                if (group.isEmpty() && remaining().isNonEmpty())
                 {
-                    // wait for some to be available.
+                    // wait for some to be available,
+                    trace("Waiting for dependencies to be processed");
                     FOREVER.await(processedMore);
                 }
                 else
                 {
+                    // otherwise, move the group from the available list to the taken list.
                     available = available.without(group);
                     taken = taken.with(group);
-
+                    trace("Took $", group);
                     return group;
                 }
             }
+            return null;
         });
     }
 }

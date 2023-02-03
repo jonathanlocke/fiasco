@@ -72,7 +72,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
             if (queue.isWorkAvailable())
             {
                 // create an executor and completion service,
-                trace("Starting artifact resolution executor");
+                trace("Starting artifact resolver threads");
                 var executor = threadPool("FiascoResolverPool", settings.builderThreads());
                 var completion = new ExecutorCompletionService<Void>(executor);
 

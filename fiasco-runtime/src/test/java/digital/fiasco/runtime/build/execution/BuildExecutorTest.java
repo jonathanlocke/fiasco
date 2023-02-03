@@ -23,6 +23,7 @@ public class BuildExecutorTest extends FiascoTest
             public Builder onConfigureBuild(Builder root)
             {
                 root = root
+                    .withEnabled(PHASE_COMPILE)
                     .withActionAfterPhase(PHASE_COMPILE, compiled::add);
 
                 root = root.withDependencies(
