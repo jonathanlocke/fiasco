@@ -52,7 +52,6 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
 public class JavaCompiler extends BaseTool<JavaCompiler>
 {
-
     /**
      * Broadcasts compilation errors
      */
@@ -80,13 +79,13 @@ public class JavaCompiler extends BaseTool<JavaCompiler>
     private Version releaseVersion;
 
     /** The source resources to compile */
-    private FileList sources;
+    private FileList sources = new FileList();
 
     /** The class path to give to the compiler */
-    private FolderList classpath;
+    private FolderList classpath = new FolderList();
 
     /** The source path to look for source code */
-    private FolderList sourcepath;
+    private FolderList sourcepath = new FolderList();
 
     /** Folder to write class files to */
     private Folder targetFolder;
@@ -111,6 +110,7 @@ public class JavaCompiler extends BaseTool<JavaCompiler>
     public JavaCompiler(Builder builder)
     {
         super(builder);
+        this.targetFolder = builder.targetFolder();
     }
 
     /**

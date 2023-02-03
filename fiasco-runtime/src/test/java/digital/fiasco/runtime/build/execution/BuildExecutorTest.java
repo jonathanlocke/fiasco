@@ -9,6 +9,7 @@ import java.util.HashSet;
 
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_COMPILE;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
 
 public class BuildExecutorTest extends FiascoTest
 {
@@ -47,6 +48,6 @@ public class BuildExecutorTest extends FiascoTest
         results.forEach(it -> ensure(it.succeeded()));
 
         ensure(compiled.contains(build.rootBuilder()));
-        ensure(compiled.contains(build.rootBuilder().builder("utilities")));
+        ensure(compiled.contains(build.rootBuilder().builder(descriptor(":com.telenav.kivakit:utilities:"))));
     }
 }

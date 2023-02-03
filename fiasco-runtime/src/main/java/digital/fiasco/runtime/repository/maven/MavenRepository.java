@@ -205,7 +205,7 @@ public class MavenRepository extends BaseRepository
     private FileName mavenFileName(Artifact<?> artifact, String suffix)
     {
         var descriptor = artifact.descriptor();
-        return parseFileName(throwingListener(), descriptor.artifact()
+        return parseFileName(throwingListener(), descriptor.artifactName()
             + "-" + descriptor.version() + suffix);
     }
 
@@ -238,7 +238,7 @@ public class MavenRepository extends BaseRepository
         var descriptor = artifact.descriptor();
         var groupPath = descriptor.group().name().replaceAll("\\.", "/");
         return parseResourcePath(throwingListener(), groupPath
-            + "/" + descriptor.artifact()
+            + "/" + descriptor.artifactName()
             + "/" + descriptor.version());
     }
 

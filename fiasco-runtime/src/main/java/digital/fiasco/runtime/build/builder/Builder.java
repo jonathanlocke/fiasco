@@ -48,6 +48,7 @@ import static com.telenav.kivakit.core.string.Paths.pathOptionalSuffix;
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
 import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
+import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
 import static digital.fiasco.runtime.build.settings.BuildSettings.buildSettings;
 import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.collections.lists.BuilderList.builders;
@@ -350,13 +351,9 @@ public class Builder extends BaseRepeater implements
                     phase.internalOnBefore(this);
 
                     // run the phase calling all listeners,
-                    if (shouldDescribe())
+                    if (settings.isEnabled(VERBOSE))
                     {
-                        announce(" \n$", bannerLine(phase.name()));
-                    }
-                    else
-                    {
-                        announce(bannerLine(phase.name()));
+                        announce(bannerLine(phase.name() + " (" + descriptor().groupAndName() + ")"));
                     }
                     phase.internalOnRun(this);
 
@@ -368,11 +365,11 @@ public class Builder extends BaseRepeater implements
         });
     }
 
-    public Builder builder(String name)
+    public Builder builder(ArtifactDescriptor descriptor)
     {
         for (var at : builderDependencies)
         {
-            if (at.name().equals(name))
+            if (descriptor.matches(at.descriptor()))
             {
                 return at;
             }
@@ -581,7 +578,7 @@ public class Builder extends BaseRepeater implements
     @Override
     public String toString()
     {
-        return format("Builder ($)", name());
+        return format("Builder ($)", descriptor().groupAndName());
     }
 
     /**

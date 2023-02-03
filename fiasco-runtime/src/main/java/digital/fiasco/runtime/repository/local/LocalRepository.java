@@ -329,7 +329,7 @@ public class LocalRepository extends BaseRepository
     {
         var artifact = attachment.artifact();
         var descriptor = artifact.descriptor();
-        var file = descriptor.artifact() + "-" + descriptor.version() + attachment.attachmentType().fileSuffix();
+        var file = descriptor.artifactName() + "-" + descriptor.version() + attachment.attachmentType().fileSuffix();
         return repositoryFolder(artifact).file(file);
     }
 
@@ -376,7 +376,7 @@ public class LocalRepository extends BaseRepository
         var descriptor = artifact.descriptor();
         return rootFolder.folder(descriptor.group().name()
             .replaceAll("\\.", "/")
-            + "/" + descriptor.artifact()
+            + "/" + descriptor.artifactName()
             + "/" + descriptor.version()).mkdirs();
     }
 }

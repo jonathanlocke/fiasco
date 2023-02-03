@@ -2,7 +2,6 @@ package digital.fiasco.runtime.dependency.artifact.descriptor;
 
 import com.telenav.kivakit.core.version.Version;
 import digital.fiasco.runtime.FiascoTest;
-import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import org.junit.Test;
 
 import static com.telenav.kivakit.core.messaging.Listener.nullListener;
@@ -31,7 +30,7 @@ public class ArtifactDescriptorTest extends FiascoTest
     {
         var descriptor = descriptor("library:x:y:");
         ensureEqual(descriptor.group(), group("x"));
-        ensureEqual(descriptor.artifact(), artifactName("y"));
+        ensureEqual(descriptor.artifactName(), artifactName("y"));
         ensureEqual(descriptor.version(), null);
         ensureFalse(descriptor.isComplete());
         ensureEqual("library:x:y:", descriptor.name());
@@ -47,7 +46,7 @@ public class ArtifactDescriptorTest extends FiascoTest
     {
         var descriptor = descriptor("library:x::");
         ensureEqual(descriptor.group(), group("x"));
-        ensureEqual(descriptor.artifact(), null);
+        ensureEqual(descriptor.artifactName(), null);
         ensureEqual(descriptor.version(), null);
         ensureFalse(descriptor.isComplete());
         ensureEqual("library:x::", descriptor.name());
@@ -58,7 +57,7 @@ public class ArtifactDescriptorTest extends FiascoTest
     {
         var descriptor = descriptor("library:x:y:1.5");
         ensureEqual(descriptor.group(), group("x"));
-        ensureEqual(descriptor.artifact(), artifactName("y"));
+        ensureEqual(descriptor.artifactName(), artifactName("y"));
         ensureEqual(descriptor.version(), version("1.5"));
         ensure(descriptor.isComplete());
         ensureEqual("library:x:y:1.5", descriptor.name());
@@ -166,7 +165,7 @@ public class ArtifactDescriptorTest extends FiascoTest
     {
         var descriptor = descriptor("library:x::1.5.9");
         ensureEqual(descriptor.group(), group("x"));
-        ensureEqual(descriptor.artifact(), null);
+        ensureEqual(descriptor.artifactName(), null);
         ensureEqual(descriptor.version(), version("1.5.9"));
         ensureFalse(descriptor.isComplete());
         ensureEqual("library:x::1.5.9", descriptor.name());

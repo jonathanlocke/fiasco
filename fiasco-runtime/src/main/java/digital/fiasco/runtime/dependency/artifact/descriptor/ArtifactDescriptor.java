@@ -39,7 +39,7 @@ import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
  * <ul>
  *     <li>{@link #name()} - The full name of this descriptor as <b>[type]:[group]:[artifact]:[version]</b></li>
  *     <li>{@link #group()} - The artifact group, like <i>com.telenav.kivakit</i></li>
- *     <li>{@link #artifact()} - The artifact name, like <i>kivakit-application</i></li>
+ *     <li>{@link #artifactName()} - The artifact name, like <i>kivakit-application</i></li>
  *     <li>{@link #version()} - The artifact version, like <i>1.8.0</i></li>
  * </ul>
  *
@@ -84,7 +84,7 @@ import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
                                  ArtifactGroup group,
-                                 ArtifactName artifact,
+                                 ArtifactName artifactName,
                                  Version version) implements Named
 {
     /**
@@ -93,7 +93,7 @@ public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
     private static final Pattern DESCRIPTOR_PATTERN = Pattern.compile(
         "(?<type>[A-Za-z]+)?"
             + ":(?<group>[A-Za-z0-9._-]+)?"
-            + ":(?<artifact>[A-Za-z0-9._-]+)?"
+            + ":(?<artifactName>[A-Za-z0-9._-]+)?"
             + ":(?<version>[A-Za-z0-9._-]+)?");
 
     private static final StringMap<Class<? extends Artifact<?>>> typeToArtifactClass = new StringMap<>();
@@ -184,14 +184,14 @@ public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
         {
             var type = matcher.group("type");
             var group = matcher.group("group");
-            var artifact = matcher.group("artifact");
+            var artifactName = matcher.group("artifactName");
             var version = matcher.group("version");
 
             return new ArtifactDescriptor(
                 type == null ? null : typeToArtifactClass.get(type),
                 new ArtifactGroup(ensureNotNull(group)),
-                artifact != null
-                    ? ArtifactName.artifactName(artifact)
+                artifactName != null
+                    ? ArtifactName.artifactName(artifactName)
                     : null,
                 version != null
                     ? Version.version(version, LENIENT)
@@ -211,9 +211,14 @@ public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
         return library(this);
     }
 
+    public String groupAndName()
+    {
+        return group() + ":" + artifactName();
+    }
+
     public boolean hasArtifact()
     {
-        return artifact != null;
+        return artifactName != null;
     }
 
     public boolean hasGroup()
@@ -259,13 +264,13 @@ public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
     {
         return (type == null || type.equals(that.type))
             && (group == null || group.equals(that.group))
-            && (artifact == null || artifact.equals(that.artifact))
+            && (artifactName == null || artifactName.equals(that.artifactName))
             && (version == null || version.equals(that.version));
     }
 
     public String mavenName()
     {
-        return group + ":" + artifact + ":" + version;
+        return group + ":" + artifactName + ":" + version;
     }
 
     /**
@@ -281,7 +286,7 @@ public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
             + ":"
             + group
             + ":"
-            + (artifact == null ? "" : artifact)
+            + (artifactName == null ? "" : artifactName)
             + ":"
             + (version == null ? "" : version);
     }
@@ -316,7 +321,7 @@ public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor version(Version version)
     {
-        return new ArtifactDescriptor(type, group, artifact, version);
+        return new ArtifactDescriptor(type, group, artifactName, version);
     }
 
     /**
@@ -352,7 +357,7 @@ public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor withGroup(ArtifactGroup group)
     {
-        return new ArtifactDescriptor(type, group, artifact, version);
+        return new ArtifactDescriptor(type, group, artifactName, version);
     }
 
     /**
@@ -388,7 +393,7 @@ public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor withVersion(Version version)
     {
-        return new ArtifactDescriptor(type, group, artifact, version);
+        return new ArtifactDescriptor(type, group, artifactName, version);
     }
 
     /**
@@ -406,6 +411,6 @@ public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptor withoutVersion()
     {
-        return group.artifact(type, artifact);
+        return group.artifact(type, artifactName);
     }
 }

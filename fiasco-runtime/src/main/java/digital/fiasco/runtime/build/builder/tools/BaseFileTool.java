@@ -8,6 +8,7 @@ import digital.fiasco.runtime.build.builder.Builder;
 import java.util.Collection;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
+import static com.telenav.kivakit.filesystem.FileList.fileList;
 
 /**
  * Base class for tools that work on files
@@ -16,7 +17,7 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
  */
 public abstract class BaseFileTool<T extends BaseFileTool<T>> extends BaseTool<T>
 {
-    /** The files to be processed by this tool */
+    /** The list of files for this tool to process */
     FileList files;
 
     /**
@@ -27,6 +28,7 @@ public abstract class BaseFileTool<T extends BaseFileTool<T>> extends BaseTool<T
     public BaseFileTool(Builder builder)
     {
         super(builder);
+        this.files = fileList();
     }
 
     /**
@@ -37,7 +39,7 @@ public abstract class BaseFileTool<T extends BaseFileTool<T>> extends BaseTool<T
     public BaseFileTool(T that)
     {
         super(that);
-        this.files = that.files().copy();
+        this.files = that.files.copy();
     }
 
     /**
@@ -81,9 +83,7 @@ public abstract class BaseFileTool<T extends BaseFileTool<T>> extends BaseTool<T
      */
     public T withFiles(Collection<File> files)
     {
-        var copy = copy();
-        copy.files = this.files.with(files);
-        return copy;
+        return mutatedCopy(it -> it.files = files().with(files));
     }
 
     /**
@@ -94,8 +94,6 @@ public abstract class BaseFileTool<T extends BaseFileTool<T>> extends BaseTool<T
      */
     public T withoutFiles(Collection<File> files)
     {
-        var copy = copy();
-        copy.files = this.files.without(files);
-        return copy;
+        return mutatedCopy(it -> it.files = files().without(files));
     }
 }

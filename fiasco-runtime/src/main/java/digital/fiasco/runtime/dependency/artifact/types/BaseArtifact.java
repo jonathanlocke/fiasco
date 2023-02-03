@@ -158,7 +158,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactName artifact()
     {
-        return descriptor.artifact();
+        return descriptor.artifactName();
     }
 
     /**
@@ -385,7 +385,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
                                 </dependency>
                                 """,
                         descriptor.group(),
-                        descriptor.artifact(),
+                        descriptor.artifactName(),
                         descriptor.version()), "\n"));
             }
 
@@ -413,7 +413,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
                         </project>
                           """,
                 descriptor.group(),
-                descriptor.artifact(),
+                descriptor.artifactName(),
                 descriptor.version(),
                 pom.join("\n"));
     }
