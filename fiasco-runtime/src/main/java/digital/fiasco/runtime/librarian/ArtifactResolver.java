@@ -26,9 +26,9 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
 /**
  * Resolves artifacts in groups by turning the given root dependency into a {@link DependencyTree}, and then turning
  * that tree into a {@link DependencyQueue}. Groups of dependencies that are ready for resolution are retrieved with
- * {@link DependencyQueue#takeAll(Class)}, and then resolved using the {@link RepositoryLibrarian} found in the
- * {@link BuildSettingsObject}. When a group of dependencies is resolved, the given {@link Callback} is called with the
- * resolution {@link Result}.
+ * {@link DependencyQueue#takeReadyDependencies()}, and then resolved using the {@link RepositoryLibrarian} found in
+ * the {@link BuildSettingsObject}. When a group of dependencies is resolved, the given {@link Callback} is called with
+ * the resolution {@link Result}.
  *
  * <p><b>Performance</b></p>
  *
@@ -49,8 +49,8 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
     /** The build that this resolver is resolving artifacts for */
     private final Build build;
 
-    /** The queue of resolved artifacts */
-    private final ResolvedArtifactQueue resolved;
+    /** The set of resolved artifacts */
+    private final ResolvedArtifactSet resolved;
 
     /**
      * Creates an artifact resolver for the given build
@@ -58,7 +58,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
      * @param build The build
      * @param resolved The resolved artifact set to update as artifacts are resolved
      */
-    public ArtifactResolver(Build build, ResolvedArtifactQueue resolved)
+    public ArtifactResolver(Build build, ResolvedArtifactSet resolved)
     {
         this.build = build;
         this.resolved = resolved;
@@ -67,8 +67,8 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
     }
 
     /**
-     * Resolves the artifact dependencies of a build tree in groups, updating the given {@link ResolvedArtifactQueue}
-     * set for each group that is resolved.
+     * Resolves the artifact dependencies of a build tree in groups, updating the given {@link ResolvedArtifactSet} set
+     * for each group that is resolved.
      */
     public void resolveArtifacts()
     {
@@ -77,7 +77,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
         run(this, "Resolver", () ->
         {
             // Create a dependency queue from the build's dependency tree,
-            var queue = build.dependencyTree().asQueue();
+            var queue = build.dependencyTree().asQueue(Artifact.class);
 
             // create an executor and completion service,
             trace("Starting artifact resolver threads");
@@ -88,11 +88,11 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
             while (queue.isWorkAvailable())
             {
                 // take the next group of artifacts that are ready to be resolved,
-                var artifacts = queue.takeAll(Artifact.class).asArtifactList();
+                var artifacts = queue.takeReadyDependencies().asArtifactList();
 
                 // and use the completion service to resolve the group of artifacts.
                 trace("Submitting resolver task: $", artifacts);
-                completion.submit(resolve(artifacts));
+                completion.submit(resolverTask(artifacts));
             }
 
             // Wait until all artifacts in the queue are resolved.
@@ -106,11 +106,11 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
      *
      * @param artifacts The artifacts to resolve
      */
-    private Callable<Void> resolve(ArtifactList artifacts)
+    private Callable<Void> resolverTask(ArtifactList artifacts)
     {
         return () ->
         {
-            // Use the librarian to resolve the requested artifacts, and call back with the result.
+            // Use the librarian to resolve the requested artifacts,
             var librarian = build.librarian();
             trace("Resolver librarian resolving: $", artifacts);
             var result = result(librarian, () -> librarian.resolve(artifacts.asArtifactDescriptors()));
@@ -118,7 +118,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
             // and for each group of artifacts that are successfully resolved,
             if (result.succeeded())
             {
-                // mark them in the resolved set.
+                // add them to the resolved set.
                 trace("Resolved: $", artifacts);
                 resolved.resolve(result.get());
             }

@@ -21,8 +21,8 @@ import static digital.fiasco.runtime.dependency.collections.lists.DependencyList
  *
  * <p>
  * The {@link #asDepthFirstList()} method returns the dependencies in the tree as a list, in depth-first order. The
- * {@link #asQueue()} method creates a {@link DependencyQueue} from this list. If the dependency tree is cyclic (if it's
- * actually a graph), a {@link RuntimeException} will be thrown.
+ * {@link #asQueue(Class)} method creates a {@link DependencyQueue} from this list. If the dependency tree is cyclic (if
+ * it's actually a graph), a {@link RuntimeException} will be thrown.
  *
  * <p><b>Creation</b></p>
  *
@@ -33,7 +33,7 @@ import static digital.fiasco.runtime.dependency.collections.lists.DependencyList
  * <p><b>Conversion</b></p>
  *
  * <ul>
- *     <li>{@link #asQueue()}</li>
+ *     <li>{@link #asQueue(Class)}</li>
  * </ul>
  *
  * <p><b>Traversal</b></p>
@@ -83,9 +83,9 @@ public class DependencyTree
      * Returns this dependency tree as a {@link DependencyQueue} that can be used for tracking dependency processing
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyQueue asQueue()
+    public DependencyQueue asQueue(Class<? extends Dependency> type)
     {
-        return new DependencyQueue(asDepthFirstList().deduplicated());
+        return new DependencyQueue(asDepthFirstList().deduplicated(), type);
     }
 
     /**

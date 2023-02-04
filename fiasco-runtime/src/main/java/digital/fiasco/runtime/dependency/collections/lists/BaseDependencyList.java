@@ -35,6 +35,7 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static digital.fiasco.runtime.dependency.collections.lists.AssetList.assets;
+import static digital.fiasco.runtime.dependency.collections.lists.DependencyList.dependencies;
 import static digital.fiasco.runtime.dependency.collections.lists.LibraryList.libraries;
 
 /**
@@ -172,7 +173,7 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
      */
     public DependencyList asDependencyList()
     {
-        var dependencies = new DependencyList();
+        var dependencies = dependencies();
         for (var at : this)
         {
             dependencies = dependencies.with(at);
@@ -473,10 +474,17 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
      * @param type The type of dependency to match
      * @return The dependencies
      */
-    @SuppressWarnings("unchecked")
     public DependencyList matching(Class<? extends Dependency> type)
     {
-        return DependencyList.dependencies((ObjectList<Dependency>) dependencies.matching(at -> type.isAssignableFrom(at.getClass())));
+        var matches = dependencies();
+        for (var at : this)
+        {
+            if (type.isAssignableFrom(at.getClass()))
+            {
+                matches = matches.with(at);
+            }
+        }
+        return matches;
     }
 
     /**

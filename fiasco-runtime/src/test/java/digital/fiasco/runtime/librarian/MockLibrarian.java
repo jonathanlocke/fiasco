@@ -9,7 +9,7 @@ import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 
 import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 
-public class DebugLibrarian extends BaseComponent implements Librarian
+public class MockLibrarian extends BaseComponent implements Librarian
 {
     @Override
     public Librarian copy()
@@ -20,13 +20,13 @@ public class DebugLibrarian extends BaseComponent implements Librarian
     @Override
     public String description()
     {
-        return "Debug librarian";
+        return "Mock librarian";
     }
 
     @Override
     public ArtifactList resolve(ObjectList<ArtifactDescriptor> descriptors)
     {
-        trace("Librarian resolving: $", descriptors);
+        trace("Mock librarian resolving: $", descriptors);
         return artifacts(descriptors.map(ArtifactDescriptor::asArtifact));
     }
 

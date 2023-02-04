@@ -35,11 +35,11 @@ public class ArtifactResolverTest extends FiascoTest
                 return new Builder(this)
                     .withRootFolder(currentFolder().folder("project"))
                     .withArtifactDescriptor("library:com.telenav.kivakit:kivakit-xyz:1.8.5")
-                    .withLibrarian(new DebugLibrarian());
+                    .withLibrarian(new MockLibrarian());
             }
         };
 
-        var resolved = new ResolvedArtifactQueue(this);
+        var resolved = new ResolvedArtifactSet(this);
         var resolver = new ArtifactResolver(build, resolved);
         resolver.resolveArtifacts();
 

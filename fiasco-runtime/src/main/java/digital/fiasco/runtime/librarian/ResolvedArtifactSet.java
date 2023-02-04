@@ -7,7 +7,7 @@ import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 
 import java.util.concurrent.locks.Condition;
 
-import static com.telenav.kivakit.core.time.Duration.FOREVER;
+import static com.telenav.kivakit.core.time.Duration.seconds;
 
 /**
  * Holds a set of artifacts resolved from repositories by background threads. When a new set of artifacts is resolved,
@@ -16,7 +16,7 @@ import static com.telenav.kivakit.core.time.Duration.FOREVER;
  *
  * @author Jonathan Locke
  */
-public class ResolvedArtifactQueue extends BaseComponent
+public class ResolvedArtifactSet extends BaseComponent
 {
     /** The set of artifacts that have been resolved */
     private ArtifactList resolved = ArtifactList.artifacts();
@@ -27,7 +27,7 @@ public class ResolvedArtifactQueue extends BaseComponent
     /** Condition to signal/await artifact resolution */
     private final Condition resolvedMore = lock.newCondition();
 
-    public ResolvedArtifactQueue(Listener listener)
+    public ResolvedArtifactSet(Listener listener)
     {
         listener.listenTo(this);
     }
@@ -81,7 +81,7 @@ public class ResolvedArtifactQueue extends BaseComponent
             while (!isResolved(required))
             {
                 trace("Awaiting resolution: $", required.without(resolved));
-                FOREVER.await(resolvedMore);
+                seconds(0.5).await(resolvedMore);
             }
         });
     }

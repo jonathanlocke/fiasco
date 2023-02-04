@@ -21,9 +21,8 @@ import java.util.concurrent.locks.Condition;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
-import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.string.ObjectFormatter.ObjectFormat.MULTILINE;
-import static com.telenav.kivakit.core.time.Duration.FOREVER;
+import static com.telenav.kivakit.core.time.Duration.seconds;
 import static com.telenav.kivakit.core.time.Time.now;
 import static com.telenav.kivakit.core.value.count.Maximum.MAXIMUM;
 import static com.telenav.kivakit.core.value.count.Maximum._1;
@@ -36,7 +35,7 @@ import static digital.fiasco.runtime.dependency.collections.lists.DependencyList
  *
  * <ol>
  *     <li>All dependencies passed to the constructor are added to the "available" set.</li>
- *     <li>The {@link #takeOne(Class)} or {@link #takeAll(Class)} method is called by a processor
+ *     <li>The {@link #takeNextReadyDependency()} or {@link #takeReadyDependencies()} method is called by a processor
  *         thread to retrieve dependencies that are ready for processing (meaning that they are
  *         "available", and have no unprocessed transitive dependencies). The returned dependencies
  *         are moved from the "available" set to the "taken" set.</li>
@@ -51,8 +50,8 @@ import static digital.fiasco.runtime.dependency.collections.lists.DependencyList
  *
  * <ul>
  *     <li>{@link #isWorkAvailable()}</li>
- *     <li>{@link #takeOne(Class)}</li>
- *     <li>{@link #takeAll(Class)}</li>
+ *     <li>{@link #takeNextReadyDependency()}</li>
+ *     <li>{@link #takeReadyDependencies()}</li>
  * </ul>
  *
  * <p><b>Marking Dependencies as Processed</b></p>
@@ -123,14 +122,12 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
      * @param initial The dependencies to enqueue, in priority order, where the first elements will be processed first
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyQueue(DependencyList initial)
+    public DependencyQueue(DependencyList initial, Class<? extends Dependency> type)
     {
-        ensure(initial.isNonEmpty(), "Cannot create a queue for an empty list");
-
-        trace("Created queue with dependencies: $", initial);
-        available = initial.deduplicated();
+        available = initial.deduplicated().matching(type);
         taken = dependencies();
         processed = dependencies();
+        trace("Created queue with dependencies: $", available);
     }
 
     /**
@@ -217,24 +214,24 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
     }
 
     /**
-     * Returns a list of all ready dependencies, or an empty list if the queue is empty
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyList takeAll(Class<? extends Dependency> type)
-    {
-        return take(type, MAXIMUM);
-    }
-
-    /**
      * Returns the next dependency that is ready (meaning that all of its dependencies have already been processed), or
      * null if the queue is empty.
      */
     @SuppressWarnings("unchecked")
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public <D extends Dependency> D takeOne(Class<D> type)
+    public <D extends Dependency> D takeNextReadyDependency()
     {
-        var taken = take(type, _1);
+        var taken = takeReady(_1);
         return taken == null ? null : (D) taken.first();
+    }
+
+    /**
+     * Returns a list of all ready dependencies, or an empty list if the queue is empty
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public DependencyList takeReadyDependencies()
+    {
+        return takeReady(MAXIMUM);
     }
 
     @Override
@@ -284,31 +281,31 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
      * Returns a list of dependencies matching the given type that are ready for processing. The list will be empty if
      * the queue is empty.
      */
-    private DependencyList take(Class<? extends Dependency> type, Maximum maximum)
+    private DependencyList takeReady(Maximum maximum)
     {
         return lock.whileLocked(() ->
         {
-            // While the queue is not empty,
-            while (remaining().isNonEmpty())
+            // While the queue is still processing,
+            while (!isProcessingComplete())
             {
-                // take any available dependencies of the given type,
+                // take any dependencies that are ready to be processed,
                 var group = available
-                    .matching(at -> isReady(at) && type.isAssignableFrom(at.getClass()))
+                    .matching(this::isReady)
                     .first(maximum);
 
-                // and if there are none ready but there are still some remaining (available or taken),
-                if (group.isEmpty() && remaining().matching(type).isNonEmpty())
+                // and if there are none ready but there are still some remaining to be processed (available or taken),
+                if (group.isEmpty() && remaining().isNonEmpty())
                 {
                     // wait for some to be available,
-                    trace("Waiting for ${class} dependencies to be processed", type);
-                    FOREVER.await(processedMore);
+                    trace("Waiting for more dependencies to be processed");
+                    seconds(0.5).await(processedMore);
                 }
                 else
                 {
                     // otherwise, move the group from the available list to the taken list.
                     available = available.without(group);
                     taken = taken.with(group);
-                    trace("Took ${class} dependencies: $\nAvailable dependencies: $", type, group, available);
+                    trace("Took dependencies: $\nAvailable dependencies: $", group, available);
                     return group;
                 }
             }

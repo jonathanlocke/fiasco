@@ -1,12 +1,12 @@
 package digital.fiasco.runtime.dependency.collections;
 
 import com.telenav.kivakit.core.thread.KivaKitThread;
-import com.telenav.kivakit.core.thread.Threads;
 import digital.fiasco.runtime.FiascoTest;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
+import static com.telenav.kivakit.core.thread.Threads.threadPool;
 import static com.telenav.kivakit.core.time.Duration.milliseconds;
 import static com.telenav.kivakit.core.time.Duration.minutes;
 import static com.telenav.kivakit.core.value.count.Count._5;
@@ -37,14 +37,14 @@ public class DependencyQueueTest extends FiascoTest
         {
             var queue = testDependencyQueue();
 
-            var executor = Threads.threadPool("Processor", _5);
+            var executor = threadPool("Processor", _5);
 
             _5.loop(() ->
                 executor.submit(() ->
                 {
                     while (queue.isWorkAvailable())
                     {
-                        var next = queue.takeOne(Library.class);
+                        var next = queue.takeNextReadyDependency();
                         milliseconds(3).sleep();
                         queue.processed(next);
                     }
@@ -72,15 +72,15 @@ public class DependencyQueueTest extends FiascoTest
     {
         var queue = testDependencyQueue();
 
-        var group1 = queue.takeAll(Library.class);
+        var group1 = queue.takeReadyDependencies();
         ensure(group1.equals(libraries(c, e, f)));
         queue.processed(group1);
 
-        var group2 = queue.takeAll(Library.class);
+        var group2 = queue.takeReadyDependencies();
         ensure(group2.equals(libraries(b, d)));
         queue.processed(group2);
 
-        var group3 = queue.takeAll(Library.class);
+        var group3 = queue.takeReadyDependencies();
         ensure(group3.equals(libraries(a)));
         queue.processed(group3);
     }
@@ -96,7 +96,7 @@ public class DependencyQueueTest extends FiascoTest
             {
                 while (queue.isWorkAvailable())
                 {
-                    var next = queue.takeAll(Library.class);
+                    var next = queue.takeReadyDependencies();
                     milliseconds(1).sleep();
                     queue.processed(next);
                 }
@@ -135,7 +135,7 @@ public class DependencyQueueTest extends FiascoTest
             {
                 while (queue.isWorkAvailable())
                 {
-                    var next = queue.takeOne(Library.class);
+                    var next = queue.takeNextReadyDependency();
                     milliseconds(1).sleep();
                     queue.processed(next);
                 }
@@ -182,28 +182,28 @@ public class DependencyQueueTest extends FiascoTest
 
     private DependencyQueue testDependencyQueue()
     {
-        return testDependencies().asQueue();
+        return testDependencies().asQueue(Library.class);
     }
 
     {
         var queue = testDependencyQueue();
 
-        ensureEqual(queue.takeOne(Library.class), c);
+        ensureEqual(queue.takeNextReadyDependency(), c);
         queue.processed(c);
 
-        ensureEqual(queue.takeOne(Library.class), b);
+        ensureEqual(queue.takeNextReadyDependency(), b);
         queue.processed(b);
 
-        ensureEqual(queue.takeOne(Library.class), e);
+        ensureEqual(queue.takeNextReadyDependency(), e);
         queue.processed(e);
 
-        ensureEqual(queue.takeOne(Library.class), f);
+        ensureEqual(queue.takeNextReadyDependency(), f);
         queue.processed(f);
 
-        ensureEqual(queue.takeOne(Library.class), d);
+        ensureEqual(queue.takeNextReadyDependency(), d);
         queue.processed(d);
 
-        ensureEqual(queue.takeOne(Library.class), a);
+        ensureEqual(queue.takeNextReadyDependency(), a);
         queue.processed(a);
     }
 }
