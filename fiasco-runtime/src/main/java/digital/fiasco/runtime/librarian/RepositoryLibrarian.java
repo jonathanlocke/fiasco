@@ -5,7 +5,7 @@
 // terms of the license agreement you entered into with Telenav.                                             /
 //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-package digital.fiasco.runtime.build.builder.tools.librarian;
+package digital.fiasco.runtime.librarian;
 
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
@@ -26,7 +26,6 @@ import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
 import static com.telenav.kivakit.core.string.Formatter.format;
-import static com.telenav.kivakit.core.version.Version.version;
 import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MAVEN_CENTRAL;
 
 /**
@@ -49,7 +48,7 @@ import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MA
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class Librarian extends BaseTool<Librarian>
+public class RepositoryLibrarian extends BaseTool<RepositoryLibrarian> implements Librarian
 {
     /** The repositories that this librarian searches */
     private ObjectList<Repository> repositories = list();
@@ -57,25 +56,25 @@ public class Librarian extends BaseTool<Librarian>
     /** A map from group:artifact-id to version */
     private ObjectMap<ArtifactDescriptor, Version> pinnedVersions = new ObjectMap<>();
 
-    public Librarian(Librarian that)
+    public RepositoryLibrarian(RepositoryLibrarian that)
     {
         super(that);
         this.repositories = that.repositories.copy();
         this.pinnedVersions = that.pinnedVersions.copy();
     }
 
-    public Librarian(Builder builder)
+    public RepositoryLibrarian(Builder builder)
     {
         super(builder);
 
-        withRepository(new LocalRepository("repository"));
-        withRepository(MAVEN_CENTRAL);
+        repositories.add(new LocalRepository("repository"));
+        repositories.add(MAVEN_CENTRAL);
     }
 
     @Override
-    public Librarian copy()
+    public RepositoryLibrarian copy()
     {
-        return new Librarian(this);
+        return new RepositoryLibrarian(this);
     }
 
     /**
@@ -111,6 +110,7 @@ public class Librarian extends BaseTool<Librarian>
      * @param descriptors The descriptor
      * @return The library
      */
+    @Override
     public ArtifactList resolve(ObjectList<ArtifactDescriptor> descriptors)
     {
         var artifacts = ArtifactList.artifacts();
@@ -140,6 +140,7 @@ public class Librarian extends BaseTool<Librarian>
      * @param artifact The artifact
      * @return The artifact and all of its dependencies
      */
+    @Override
     public ArtifactList resolve(Artifact<?> artifact)
     {
         var dependencies = ArtifactList.artifacts();
@@ -193,47 +194,12 @@ public class Librarian extends BaseTool<Librarian>
      * @param descriptor The group and artifact (but no version)
      * @param version The version to enforce for the descriptor
      */
+    @Override
     public Librarian withPinnedVersion(ArtifactDescriptor descriptor, Version version)
     {
         ensure(descriptor.version() == null);
 
         return mutatedCopy(it -> it.pinnedVersions.put(descriptor, version));
-    }
-
-    /**
-     * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
-     * descriptor will be assigned the given version.
-     *
-     * @param artifact The group and artifact name
-     * @param version The version to enforce for the descriptor
-     */
-    public Librarian withPinnedVersion(Artifact<?> artifact, Version version)
-    {
-        return withPinnedVersion(artifact.descriptor(), version);
-    }
-
-    /**
-     * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
-     * descriptor will be assigned the version.
-     *
-     * @param artifact The artifact to pin
-     * @param version The version to enforce for the descriptor
-     */
-    public Librarian withPinnedVersion(Artifact<?> artifact, String version)
-    {
-        return withPinnedVersion(artifact.descriptor(), version(version));
-    }
-
-    /**
-     * Globally pins the given artifact descriptor (without a version), to the specified version. All artifacts with the
-     * descriptor will be assigned the version.
-     *
-     * @param descriptor The group and artifact (but no version)
-     * @param version The version to enforce for the descriptor
-     */
-    public Librarian withPinnedVersion(String descriptor, String version)
-    {
-        return withPinnedVersion(ArtifactDescriptor.descriptor(descriptor), version(version));
     }
 
     /**

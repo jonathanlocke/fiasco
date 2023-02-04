@@ -152,6 +152,7 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
             for (var remaining = maximum; !isProcessingComplete(); remaining = maximum.minus(started.elapsedSince()))
             {
                 // wait for up to the maximum time remaining for more processing to complete,
+                trace("Waiting for processed dependencies");
                 wake = remaining.await(processedMore);
             }
 
@@ -161,21 +162,20 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
     }
 
     /**
+     * Returns true if all dependencies are now in the list returned by {@link #processed()}
+     */
+    public boolean isProcessingComplete()
+    {
+        return remaining().isEmpty();
+    }
+
+    /**
      * Returns true if there is work available to process
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean isWorkAvailable()
     {
         return lock.whileLocked(() -> available.isNonEmpty());
-    }
-
-    /**
-     * Returns the list of dependencies that have been processed.
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyList processed()
-    {
-        return lock.whileLocked(() -> processed.copy());
     }
 
     /**
@@ -208,10 +208,19 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
     }
 
     /**
+     * Returns the list of dependencies that have been processed.
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public DependencyList processed()
+    {
+        return lock.whileLocked(() -> processed.copy());
+    }
+
+    /**
      * Returns a list of all ready dependencies, or an empty list if the queue is empty
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyList takeAll(Class<?> type)
+    public DependencyList takeAll(Class<? extends Dependency> type)
     {
         return take(type, MAXIMUM);
     }
@@ -235,14 +244,6 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
     }
 
     /**
-     * Returns true if all dependencies are now in the list returned by {@link #processed()}
-     */
-    private boolean isProcessingComplete()
-    {
-        return available.isEmpty() && taken.isEmpty();
-    }
-
-    /**
      * Returns true if the given dependency has no dependencies that are not already processed, meaning that the
      * dependency is ready for processing.
      *
@@ -251,19 +252,22 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
      */
     private boolean isReady(Dependency candidate)
     {
-        // If any dependency of the candidate
-        for (var at : candidate.allDependencies())
+        return lock.whileLocked(() ->
         {
-            // is unprocessed,
-            if (!processed.contains(at))
+            // If any dependency of the candidate
+            for (var at : candidate.allDependencies())
             {
-                // then it is not ready,
-                return false;
+                // is unprocessed,
+                if (!processed.contains(at))
+                {
+                    // then it is not ready,
+                    return false;
+                }
             }
-        }
 
-        // otherwise it is.
-        return true;
+            // otherwise it is.
+            return true;
+        });
     }
 
     /**
@@ -273,17 +277,15 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
      */
     private DependencyList remaining()
     {
-        return available.with(taken).without(processed);
+        return available.with(taken);
     }
 
     /**
      * Returns a list of dependencies matching the given type that are ready for processing. The list will be empty if
      * the queue is empty.
      */
-    private DependencyList take(Class<?> type, Maximum maximum)
+    private DependencyList take(Class<? extends Dependency> type, Maximum maximum)
     {
-        trace("Taking ${class} dependency", type);
-
         return lock.whileLocked(() ->
         {
             // While the queue is not empty,
@@ -294,11 +296,11 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
                     .matching(at -> isReady(at) && type.isAssignableFrom(at.getClass()))
                     .first(maximum);
 
-                // and if there are none ready but there are still some remaining,
-                if (group.isEmpty() && remaining().isNonEmpty())
+                // and if there are none ready but there are still some remaining (available or taken),
+                if (group.isEmpty() && remaining().matching(type).isNonEmpty())
                 {
                     // wait for some to be available,
-                    trace("Waiting for dependencies to be processed");
+                    trace("Waiting for ${class} dependencies to be processed", type);
                     FOREVER.await(processedMore);
                 }
                 else
@@ -306,10 +308,11 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
                     // otherwise, move the group from the available list to the taken list.
                     available = available.without(group);
                     taken = taken.with(group);
-                    trace("Took $", group);
+                    trace("Took ${class} dependencies: $\nAvailable dependencies: $", type, group, available);
                     return group;
                 }
             }
+            trace("Dependency queue is empty");
             return null;
         });
     }

@@ -468,6 +468,18 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     }
 
     /**
+     * Returns a list of dependencies of the given class
+     *
+     * @param type The type of dependency to match
+     * @return The dependencies
+     */
+    @SuppressWarnings("unchecked")
+    public DependencyList matching(Class<? extends Dependency> type)
+    {
+        return DependencyList.dependencies((ObjectList<Dependency>) dependencies.matching(at -> type.isAssignableFrom(at.getClass())));
+    }
+
+    /**
      * Returns a new list with only the dependencies in this list that match the given matcher
      *
      * @param matcher The matcher

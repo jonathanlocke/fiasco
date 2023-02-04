@@ -43,11 +43,11 @@ public class BuildExecutorTest extends FiascoTest
             }
         };
 
-        var results = new BuildExecutor(this, build.rootBuilder()).build();
+        var results = new BuildExecutor(build).run();
 
         results.forEach(it -> ensure(it.succeeded()));
 
-        ensure(compiled.contains(build.rootBuilder()));
-        ensure(compiled.contains(build.rootBuilder().builder(descriptor(":com.telenav.kivakit:utilities:"))));
+        ensure(compiled.contains(build.root()));
+        ensure(compiled.contains(build.root().builder(descriptor(":com.telenav.kivakit:utilities:"))));
     }
 }

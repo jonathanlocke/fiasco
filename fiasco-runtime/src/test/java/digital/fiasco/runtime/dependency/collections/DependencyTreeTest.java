@@ -6,7 +6,6 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.collections.lists.DependencyList.dependencies;
 import static digital.fiasco.runtime.dependency.collections.lists.LibraryList.libraries;
 
@@ -46,8 +45,8 @@ public class DependencyTreeTest extends FiascoTest
     public void testDepthFirst()
     {
         var tree = libraryTree();
-        var depthFirst = tree.asDepthFirstList().asArtifactDescriptors();
-        ensureEqual(depthFirst, artifacts(c, b, e, f, d, a).asArtifactDescriptors());
+        var depthFirst = tree.asDepthFirstList();
+        ensureEqual(depthFirst, dependencies(c, b, e, f, d, a));
     }
 
     @NotNull

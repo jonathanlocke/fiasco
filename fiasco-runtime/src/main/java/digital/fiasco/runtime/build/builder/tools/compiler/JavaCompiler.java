@@ -7,6 +7,7 @@ import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.filesystem.FolderList;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.BaseTool;
+import digital.fiasco.runtime.build.builder.tools.Tool;
 import digital.fiasco.runtime.build.builder.tools.compiler.flags.CompilerWarning;
 import digital.fiasco.runtime.build.builder.tools.compiler.flags.DebugInformation;
 
@@ -27,27 +28,46 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
 /**
  * Compiles one or more files containing Java code.
  *
- * <p><b>Properties</b></p>
+ * <p><b>Compiler Settings</b></p>
  *
  * <ul>
- *     <li>{@link #encoding()}</li>
+ *     <li>{@link #checkConsistency()}</li>
+ *     <li>{@link #compilerWarnings()}</li>
+ *     <li>{@link #debugInformation()}</li>
+ *     <li>{@link #withReleaseVersion(Version)}</li>
+ *     <li>{@link #withWarningDisabled(CompilerWarning...)}</li>
+ *     <li>{@link #withWarningEnabled(CompilerWarning...)}</li>
+ * </ul>
+ *
+ * <p><b>Sources</b></p>
+ *
+ * <ul>
+ *     <li>{@link #sourceEncoding()}</li>
  *     <li>{@link #sourceLocale()}</li>
  *     <li>{@link #sourceVersion()}</li>
  *     <li>{@link #sources()}</li>
- *     <li>{@link #targetVersion()}</li>
- * </ul>
- *
- * <p><b>Functional</b></p>
- *
- * <ul>
  *     <li>{@link #withSourceEncoding(Charset)}</li>
  *     <li>{@link #withSourceLocale(Locale)}</li>
  *     <li>{@link #withSourceVersion(Version)}</li>
  *     <li>{@link #withSources(FileList)}</li>
+ * </ul>
+ *
+ * <p><b>Targets</b></p>
+ *
+ * <ul>
+ *     <li>{@link #targetFolder()}</li>
+ *     <li>{@link #targetVersion()}</li>
+ *     <li>{@link #withTargetFolder(Folder)}</li>
  *     <li>{@link #withTargetVersion(Version)}</li>
  * </ul>
  *
  * @author Jonathan Locke
+ * @see Tool
+ * @see BaseTool
+ * @see CompilerWarning
+ * @see Version
+ * @see Folder
+ * @see FileList
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
 public class JavaCompiler extends BaseTool<JavaCompiler>
@@ -144,6 +164,16 @@ public class JavaCompiler extends BaseTool<JavaCompiler>
     }
 
     /**
+     * Returns the set of enabled compiler warnings
+     *
+     * @return The set
+     */
+    public ObjectSet<CompilerWarning> compilerWarnings()
+    {
+        return enabledCompilerWarnings;
+    }
+
+    /**
      * Returns a copy of this compiler tool
      */
     @Override
@@ -178,30 +208,12 @@ public class JavaCompiler extends BaseTool<JavaCompiler>
     }
 
     /**
-     * Returns the set of enabled compiler warnings
-     *
-     * @return The set
-     */
-    public ObjectSet<CompilerWarning> enabledCompilerWarnings()
-    {
-        return enabledCompilerWarnings;
-    }
-
-    /**
-     * Returns the source code encoding
-     */
-    public Charset encoding()
-    {
-        return sourceEncoding;
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public void onRun()
     {
-        compile(sourceMainJavaSources());
+        // compile(sourceMainJavaSources());
     }
 
     /**
@@ -272,28 +284,6 @@ public class JavaCompiler extends BaseTool<JavaCompiler>
     public JavaCompiler withDebugInformation(DebugInformation... information)
     {
         return mutatedCopy(it -> it.debugInformation = set(information));
-    }
-
-    /**
-     * Returns a copy of this compiler tool with the given compiler warnings disabled
-     *
-     * @param warnings The compiler warnings
-     * @return The new copy of this compiler tool
-     */
-    public JavaCompiler withDisabled(CompilerWarning... warnings)
-    {
-        return mutatedCopy(it -> it.enabledCompilerWarnings.without(warnings));
-    }
-
-    /**
-     * Returns a copy of this compiler tool with the given compiler warnings enabled
-     *
-     * @param warnings The compiler warnings
-     * @return The new copy of this compiler tool
-     */
-    public JavaCompiler withEnabled(CompilerWarning... warnings)
-    {
-        return mutatedCopy(it -> it.enabledCompilerWarnings.with(warnings));
     }
 
     /**
@@ -371,6 +361,28 @@ public class JavaCompiler extends BaseTool<JavaCompiler>
     public JavaCompiler withTargetVersion(Version version)
     {
         return mutatedCopy(it -> it.targetVersion = version);
+    }
+
+    /**
+     * Returns a copy of this compiler tool with the given compiler warnings disabled
+     *
+     * @param warnings The compiler warnings
+     * @return The new copy of this compiler tool
+     */
+    public JavaCompiler withWarningDisabled(CompilerWarning... warnings)
+    {
+        return mutatedCopy(it -> it.enabledCompilerWarnings.without(warnings));
+    }
+
+    /**
+     * Returns a copy of this compiler tool with the given compiler warnings enabled
+     *
+     * @param warnings The compiler warnings
+     * @return The new copy of this compiler tool
+     */
+    public JavaCompiler withWarningEnabled(CompilerWarning... warnings)
+    {
+        return mutatedCopy(it -> it.enabledCompilerWarnings.with(warnings));
     }
 
     /**

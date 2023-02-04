@@ -8,6 +8,7 @@ import digital.fiasco.runtime.build.builder.BuildAction;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
+import digital.fiasco.runtime.librarian.Librarian;
 import digital.fiasco.runtime.build.environment.BuildEnvironmentTrait;
 import digital.fiasco.runtime.build.environment.BuildRepositoriesTrait;
 import digital.fiasco.runtime.build.execution.BuildExecutionStep;
@@ -16,6 +17,7 @@ import digital.fiasco.runtime.build.settings.BuildOption;
 import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.build.settings.BuildSettings;
 import digital.fiasco.runtime.build.settings.BuildSettingsObject;
+import digital.fiasco.runtime.dependency.collections.DependencyTree;
 
 /**
  * Defines a Fiasco build.
@@ -170,6 +172,23 @@ public interface Build extends
     BuildRepositoriesTrait
 {
     /**
+     * Returns the dependency tree for this build
+     *
+     * @return The tree of dependencies
+     */
+    DependencyTree dependencyTree();
+
+    /**
+     * Returns the librarian used by the root builder for this build
+     *
+     * @return The librarian
+     */
+    default Librarian librarian()
+    {
+        return root().librarian();
+    }
+
+    /**
      * Returns the metadata for this build
      */
     BuildMetadata metadata();
@@ -182,4 +201,24 @@ public interface Build extends
      * @return A newly configured root builder based on the given root builder
      */
     Builder onConfigureBuild(Builder root);
+
+    /**
+     * Returns the root builder of the dependency tree for this build
+     *
+     * @return The root builder
+     */
+    default Builder root()
+    {
+        return (Builder) dependencyTree().root();
+    }
+
+    /**
+     * Returns the settings for this build
+     *
+     * @return The build settings
+     */
+    default BuildSettings settings()
+    {
+        return root().settings();
+    }
 }

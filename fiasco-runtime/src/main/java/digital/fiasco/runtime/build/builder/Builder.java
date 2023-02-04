@@ -20,7 +20,7 @@ import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.build.builder.tools.Tool;
 import digital.fiasco.runtime.build.builder.tools.ToolFactory;
-import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
+import digital.fiasco.runtime.librarian.Librarian;
 import digital.fiasco.runtime.build.environment.BuildEnvironmentTrait;
 import digital.fiasco.runtime.build.environment.BuildStructure;
 import digital.fiasco.runtime.build.execution.BuildExecutionStep;
@@ -595,7 +595,7 @@ public class Builder extends BaseRepeater implements
     @Override
     public String toString()
     {
-        return format("Builder ($)", descriptor().groupAndName());
+        return format("builder:$:$", descriptor().groupAndName(), descriptor().version());
     }
 
     /**
@@ -895,12 +895,17 @@ public class Builder extends BaseRepeater implements
         return mutatedCopy(it -> it.librarian = librarian);
     }
 
+    /**
+     * Returns a copy of this builder with no dependencies
+     *
+     * @return The copy
+     */
     public Builder withNoDependencies()
     {
         return mutatedCopy(it ->
         {
-            it.builderDependencies = new BuilderList();
-            it.artifactDependencies = new ArtifactList();
+            it.builderDependencies = builders();
+            it.artifactDependencies = artifacts();
         });
     }
 

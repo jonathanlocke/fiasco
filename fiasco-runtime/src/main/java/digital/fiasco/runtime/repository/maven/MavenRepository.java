@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.repository.maven;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
+import com.telenav.kivakit.core.language.trait.TryCatchTrait;
 import com.telenav.kivakit.core.progress.ProgressReporter;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.filesystem.File;
@@ -48,9 +49,9 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.POM_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactContent.content;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.artifact.types.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLATION_FAILED;
 import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLED;
 
@@ -80,7 +81,7 @@ import static digital.fiasco.runtime.repository.Repository.InstallationResult.IN
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "JavadocLinkAsPlainText", "unused" })
-public class MavenRepository extends BaseRepository
+public class MavenRepository extends BaseRepository implements TryCatchTrait
 {
     public static Folder LOCAL_MAVEN_REPOSITORY_FOLDER = fiascoCacheFolder().folder("maven-repository");
 
@@ -185,7 +186,7 @@ public class MavenRepository extends BaseRepository
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors, final ProgressReporter reporter,
+    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors, ProgressReporter reporter,
                                          RepositoryContentReader reader)
     {
         return resolveArtifacts(list(descriptors), artifacts());
@@ -371,7 +372,7 @@ public class MavenRepository extends BaseRepository
 
     private ArtifactContent readAttachment(Artifact<?> artifact, ArtifactAttachmentType type)
     {
-        return mavenReadContent(attachment(type).withArtifact(artifact));
+        return tryCatch(() -> mavenReadContent(attachment(type).withArtifact(artifact)));
     }
 
     private ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors,

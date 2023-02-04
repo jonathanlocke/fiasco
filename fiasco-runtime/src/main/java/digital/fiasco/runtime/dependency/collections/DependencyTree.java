@@ -4,6 +4,9 @@ import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.dependency.Dependency;
+import digital.fiasco.runtime.dependency.artifact.Artifact;
+import digital.fiasco.runtime.dependency.artifact.types.Asset;
+import digital.fiasco.runtime.dependency.artifact.types.Library;
 import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
 import digital.fiasco.runtime.dependency.collections.lists.DependencyList;
 
@@ -82,7 +85,7 @@ public class DependencyTree
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyQueue asQueue()
     {
-        return new DependencyQueue(asDepthFirstList());
+        return new DependencyQueue(asDepthFirstList().deduplicated());
     }
 
     /**
@@ -93,6 +96,35 @@ public class DependencyTree
     public Dependency root()
     {
         return root;
+    }
+
+    /**
+     * Visits the dependencies in depth-first order, calling the given visitor for each dependency
+     *
+     * @param visitor The visitor
+     */
+    public void visit(DependencyTreeVisitor visitor)
+    {
+        for (var at : asDepthFirstList())
+        {
+            if (at instanceof Asset asset)
+            {
+                visitor.onAsset(asset);
+            }
+            if (at instanceof Library library)
+            {
+                visitor.onLibrary(library);
+            }
+            if (at instanceof Artifact<?> artifact)
+            {
+                visitor.onArtifact(artifact);
+            }
+            if (at instanceof Builder builder)
+            {
+                visitor.onBuilder(builder);
+            }
+            visitor.onDependency(at);
+        }
     }
 
     /**

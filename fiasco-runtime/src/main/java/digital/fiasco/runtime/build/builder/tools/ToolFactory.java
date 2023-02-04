@@ -8,7 +8,8 @@ import digital.fiasco.runtime.build.builder.tools.cleaner.Cleaner;
 import digital.fiasco.runtime.build.builder.tools.compiler.JavaCompiler;
 import digital.fiasco.runtime.build.builder.tools.copier.Copier;
 import digital.fiasco.runtime.build.builder.tools.git.Git;
-import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
+import digital.fiasco.runtime.librarian.Librarian;
+import digital.fiasco.runtime.librarian.RepositoryLibrarian;
 import digital.fiasco.runtime.build.builder.tools.shader.Shader;
 import digital.fiasco.runtime.build.builder.tools.stamper.BuildStamper;
 import digital.fiasco.runtime.build.builder.tools.tester.Tester;
@@ -66,11 +67,11 @@ public interface ToolFactory extends
     }
 
     /**
-     * Creates a new {@link Librarian} tool
+     * Creates a new {@link RepositoryLibrarian} tool
      */
     default Librarian newLibrarian()
     {
-        return newTool(Librarian.class);
+        return newTool(RepositoryLibrarian.class);
     }
 
     /**

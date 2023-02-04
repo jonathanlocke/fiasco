@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.dependency.collections;
 
 import com.telenav.kivakit.core.thread.KivaKitThread;
+import com.telenav.kivakit.core.thread.Threads;
 import digital.fiasco.runtime.FiascoTest;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
 import org.jetbrains.annotations.NotNull;
@@ -14,7 +15,6 @@ import static com.telenav.kivakit.core.value.count.Minimum._10;
 import static com.telenav.kivakit.interfaces.time.WakeState.COMPLETED;
 import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
 import static digital.fiasco.runtime.dependency.collections.lists.LibraryList.libraries;
-import static java.util.concurrent.Executors.newFixedThreadPool;
 
 public class DependencyQueueTest extends FiascoTest
 {
@@ -37,7 +37,7 @@ public class DependencyQueueTest extends FiascoTest
         {
             var queue = testDependencyQueue();
 
-            var executor = newFixedThreadPool(5);
+            var executor = Threads.threadPool("Processor", _5);
 
             _5.loop(() ->
                 executor.submit(() ->

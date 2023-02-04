@@ -27,6 +27,7 @@ import com.telenav.kivakit.serialization.gson.GsonSerializationProject;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.execution.BuildExecutor;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
+import digital.fiasco.runtime.dependency.collections.DependencyTree;
 import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;
 
 import java.util.Set;
@@ -66,15 +67,16 @@ public abstract class BaseBuild extends Application implements Build
         .defaultValue(_16)
         .build();
 
-    /** The root builder for this build (once configured) */
-    private final Builder rootBuilder;
+    /** The dependency tree for this build */
+    private final DependencyTree dependencyTree;
 
     /**
      * Creates a build
      */
     public BaseBuild()
     {
-        rootBuilder = onConfigureBuild(newBuilder());
+        var rootBuilder = onConfigureBuild(newBuilder());
+        dependencyTree = new DependencyTree(rootBuilder);
     }
 
     /**
@@ -85,7 +87,7 @@ public abstract class BaseBuild extends Application implements Build
     protected BaseBuild(BaseBuild that)
     {
         this.metadata = that.metadata;
-        this.rootBuilder = that.rootBuilder;
+        this.dependencyTree = that.dependencyTree;
     }
 
     /**
@@ -97,6 +99,17 @@ public abstract class BaseBuild extends Application implements Build
         var copy = typeForClass(getClass()).newInstance();
         copy.metadata = this.metadata;
         return copy;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public DependencyTree dependencyTree()
+    {
+        return dependencyTree;
     }
 
     /**
@@ -126,9 +139,12 @@ public abstract class BaseBuild extends Application implements Build
         var root = newBuilder().withArtifactDescriptor(metadata.descriptor());
 
         // configure and run the build,
-        return new BuildExecutor(this, rootBuilder).build();
+        return new BuildExecutor(this).run();
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public BuildMetadata metadata()
     {
@@ -147,21 +163,21 @@ public abstract class BaseBuild extends Application implements Build
     }
 
     /**
-     * Returns the root builder for this build
+     * {@inheritDoc}
      *
-     * @return The root builder
+     * @return {@inheritDoc}
      */
-    public Builder rootBuilder()
-    {
-        return rootBuilder;
-    }
-
     @Override
     public boolean shouldDescribe()
     {
         return false;
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
     @Override
     public boolean shouldDescribeAndExecute()
     {
@@ -181,6 +197,11 @@ public abstract class BaseBuild extends Application implements Build
             .build());
     }
 
+    /**
+     * Creates a new builder with settings initialized to defaults and configured by the command line for this build
+     *
+     * @return The builder
+     */
     protected Builder newBuilder()
     {
         var builder = new Builder(this);
@@ -211,6 +232,9 @@ public abstract class BaseBuild extends Application implements Build
         information("Build completed with $ problems", problems);
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     protected void onSerializationInitialize()
     {

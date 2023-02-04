@@ -12,7 +12,7 @@ import com.telenav.kivakit.interfaces.object.Copyable;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.BaseBuild;
 import digital.fiasco.runtime.build.builder.BuilderAssociated;
-import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
+import digital.fiasco.runtime.librarian.Librarian;
 import digital.fiasco.runtime.build.environment.BuildEnvironmentTrait;
 import digital.fiasco.runtime.build.environment.BuildStructure;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;

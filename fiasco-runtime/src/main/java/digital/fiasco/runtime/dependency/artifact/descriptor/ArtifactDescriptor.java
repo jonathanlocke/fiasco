@@ -18,6 +18,7 @@ import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
+import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static com.telenav.kivakit.core.version.Version.Strictness.LENIENT;
 import static digital.fiasco.runtime.dependency.artifact.types.Asset.asset;
@@ -199,6 +200,19 @@ public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
         }
         listener.problem("Unable to parse artifact descriptor: $", value);
         return null;
+    }
+
+    public Artifact<?> asArtifact()
+    {
+        if (type() == Asset.class)
+        {
+            return asAsset();
+        }
+        if (type() == Library.class)
+        {
+            return asLibrary();
+        }
+        return illegalState("Descriptor does not describe an artifact");
     }
 
     public Asset asAsset()

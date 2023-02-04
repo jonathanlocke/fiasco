@@ -4,7 +4,7 @@ import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.function.Result;
 import com.telenav.kivakit.core.language.trait.TryTrait;
-import com.telenav.kivakit.core.messaging.Listener;
+import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.settings.BuildSettings;
 import digital.fiasco.runtime.dependency.Dependency;
@@ -13,9 +13,12 @@ import digital.fiasco.runtime.dependency.collections.DependencyQueue;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
+import digital.fiasco.runtime.librarian.ArtifactResolver;
+import digital.fiasco.runtime.librarian.ResolvedArtifactQueue;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Callable;
+import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
 import static com.telenav.kivakit.core.thread.Threads.threadPool;
@@ -36,15 +39,15 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
  *
  * <p>
  * Builds are executed by two thread pools. One thread pool resolves artifacts, and the other runs builders. A
- * {@link ResolvedArtifacts} object serves as a way to communicate between the two thread pools. As artifacts are
+ * {@link ResolvedArtifactQueue} object serves as a way to communicate between the two thread pools. As artifacts are
  * resolved by the {@link ArtifactResolver}, they are marked as resolved with
- * {@link ResolvedArtifacts#resolve(ArtifactList)}. Builders can wait for their artifacts to be resolved by calling
- * {@link ResolvedArtifacts#waitForResolutionOf(ArtifactList)}. In this way, artifact resolution proceeds independently
- * of building, with builders blocking only when it is necessary to wait for artifacts to be resolved.
+ * {@link ResolvedArtifactQueue#resolve(ArtifactList)}. Builders can wait for their artifacts to be resolved by calling
+ * {@link ResolvedArtifactQueue#waitForResolutionOf(ArtifactList)}. In this way, artifact resolution proceeds
+ * independently of building, with builders blocking only when it is necessary to wait for artifacts to be resolved.
  * </p>
  *
  * @author Jonathan Locke
- * @see ResolvedArtifacts
+ * @see ResolvedArtifactQueue
  * @see Result
  * @see Builder
  * @see Dependency
@@ -57,12 +60,19 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
  */
 public class BuildExecutor extends BaseComponent implements TryTrait
 {
-    /** The root of the builder tree */
-    private final Builder root;
+    /** The build to execute */
+    private final Build build;
 
-    public BuildExecutor(Listener listener, @NotNull Builder root)
+    /**
+     * Creates a build executor for the given build
+     *
+     * @param build The build
+     */
+    public BuildExecutor(Build build)
     {
-        this.root = root;
+        this.build = build;
+
+        build.listenTo(this);
     }
 
     /**
@@ -70,14 +80,14 @@ public class BuildExecutor extends BaseComponent implements TryTrait
      *
      * @return The build results
      */
-    public ObjectList<Result<Builder>> build()
+    public ObjectList<Result<Builder>> run()
     {
         // Start resolving artifacts in the background starting from the root
         // builder's dependencies. Each resolved artifact is added to the
         // resolved set.
-        var resolved = new ResolvedArtifacts(this);
+        var resolved = new ResolvedArtifactQueue(this);
         trace("Starting artifact resolver");
-        new ArtifactResolver(this).resolveArtifacts(root, resolved);
+        new ArtifactResolver(build, resolved).resolveArtifacts();
 
         // Start running builders in parallel. Each builder will wait until its
         // dependencies are in the resolved set before executing.
@@ -87,14 +97,17 @@ public class BuildExecutor extends BaseComponent implements TryTrait
 
     /**
      * Executes all builders from the root in parallel groups.
+     *
+     * @param resolved The resolved artifacts set
+     * @return The results for each builder
      */
-    private ObjectList<Result<Builder>> build(ResolvedArtifacts resolved)
+    private ObjectList<Result<Builder>> build(ResolvedArtifactQueue resolved)
     {
         // Create a queue of builders from the given root,
-        var queue = new DependencyTree(root).asQueue();
+        var queue = build.dependencyTree().asQueue();
 
         // create a thread pool,
-        var executor = threadPool("FiascoBuild", root.settings().builderThreads());
+        var executor = threadPool("FiascoBuild", build.settings().builderThreads());
 
         // and while there are builders yet to run,
         var futures = new ObjectList<Future<Result<Builder>>>();
@@ -120,8 +133,16 @@ public class BuildExecutor extends BaseComponent implements TryTrait
         return results;
     }
 
+    /**
+     * Returns a {@link Callable} task for execution by the executor's thread pool
+     *
+     * @param resolved The set of resolved artifacts to wait on, as needed
+     * @param queue The dependency queue for marking when the builder completes
+     * @param builder The builder to execute
+     * @return The {@link Callable} to execute with {@link ExecutorService#submit(Callable)}
+     */
     @NotNull
-    private Callable<Result<Builder>> builderTask(ResolvedArtifacts resolved,
+    private Callable<Result<Builder>> builderTask(ResolvedArtifactQueue resolved,
                                                   DependencyQueue queue,
                                                   Builder builder)
     {

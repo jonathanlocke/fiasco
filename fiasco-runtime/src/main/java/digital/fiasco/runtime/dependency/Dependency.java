@@ -3,7 +3,7 @@ package digital.fiasco.runtime.dependency;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.interfaces.naming.Named;
 import digital.fiasco.runtime.build.builder.Builder;
-import digital.fiasco.runtime.build.builder.tools.librarian.Librarian;
+import digital.fiasco.runtime.librarian.RepositoryLibrarian;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
@@ -50,7 +50,7 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
  * @see Artifact
  * @see Asset
  * @see Library
- * @see Librarian
+ * @see RepositoryLibrarian
  */
 @SuppressWarnings("unused")
 public interface Dependency extends

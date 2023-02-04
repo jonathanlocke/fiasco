@@ -14,13 +14,13 @@ public class MavenRepositoryListener extends AbstractRepositoryListener implemen
     @Override
     public void artifactDeployed(RepositoryEvent event)
     {
-        trace("Deployed " + repositoryAndArtifact(event));
+        traceCall("Deployed " + repositoryAndArtifact(event));
     }
 
     @Override
     public void artifactDeploying(RepositoryEvent event)
     {
-        trace("Deploying " + repositoryAndArtifact(event));
+        traceCall("Deploying " + repositoryAndArtifact(event));
     }
 
     @Override
@@ -38,7 +38,7 @@ public class MavenRepositoryListener extends AbstractRepositoryListener implemen
     @Override
     public void artifactDownloaded(RepositoryEvent event)
     {
-        trace("Downloaded " + repositoryAndArtifact(event));
+        traceCall("Downloaded " + repositoryAndArtifact(event));
     }
 
     @Override
@@ -50,49 +50,49 @@ public class MavenRepositoryListener extends AbstractRepositoryListener implemen
     @Override
     public void artifactInstalled(RepositoryEvent event)
     {
-        trace("Installed " + artifact(event) + " => " + event.getFile());
+        traceCall("Installed " + artifact(event) + " => " + event.getFile());
     }
 
     @Override
     public void artifactInstalling(RepositoryEvent event)
     {
-        trace("Installing " + artifact(event) + " => " + event.getFile());
+        traceCall("Installing " + artifact(event) + " => " + event.getFile());
     }
 
     @Override
     public void artifactResolved(RepositoryEvent event)
     {
-        trace("Resolved " + repositoryAndArtifact(event));
+        traceCall("Resolved " + repositoryAndArtifact(event));
     }
 
     @Override
     public void artifactResolving(RepositoryEvent event)
     {
-        trace("Resolving " + artifact(event));
+        traceCall("Resolving " + artifact(event));
     }
 
     @Override
     public void metadataDeployed(RepositoryEvent event)
     {
-        trace("Deployed " + repositoryAndMetadata(event));
+        traceCall("Deployed " + repositoryAndMetadata(event));
     }
 
     @Override
     public void metadataDeploying(RepositoryEvent event)
     {
-        trace("Deploying " + repositoryAndMetadata(event));
+        traceCall("Deploying " + repositoryAndMetadata(event));
     }
 
     @Override
     public void metadataInstalled(RepositoryEvent event)
     {
-        trace("Installed " + metadata(event) + " => " + event.getFile());
+        traceCall("Installed " + metadata(event) + " => " + event.getFile());
     }
 
     @Override
     public void metadataInstalling(RepositoryEvent event)
     {
-        trace("Installing " + metadata(event) + " => " + event.getFile());
+        traceCall("Installing " + metadata(event) + " => " + event.getFile());
     }
 
     @Override
@@ -104,13 +104,13 @@ public class MavenRepositoryListener extends AbstractRepositoryListener implemen
     @Override
     public void metadataResolved(RepositoryEvent event)
     {
-        trace("Resolved metadata " + repositoryAndMetadata(event));
+        traceCall("Resolved metadata " + repositoryAndMetadata(event));
     }
 
     @Override
     public void metadataResolving(RepositoryEvent event)
     {
-        trace("Resolving metadata " + repositoryAndMetadata(event));
+        traceCall("Resolving metadata " + repositoryAndMetadata(event));
     }
 
     private String artifact(RepositoryEvent event)
@@ -144,5 +144,10 @@ public class MavenRepositoryListener extends AbstractRepositoryListener implemen
     private String repositoryAndMetadata(RepositoryEvent event)
     {
         return metadata(event) + "/" + artifact(event);
+    }
+
+    private void traceCall(String message, Object... arguments)
+    {
+        trace("MavenRepositoryListener: " + message, arguments);
     }
 }

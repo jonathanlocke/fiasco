@@ -1,18 +1,19 @@
-package digital.fiasco.runtime.build.execution;
+package digital.fiasco.runtime.librarian;
 
 import com.telenav.kivakit.core.thread.KivaKitThread;
 import digital.fiasco.runtime.FiascoTest;
+import digital.fiasco.runtime.librarian.ResolvedArtifactQueue;
 import org.junit.Test;
 
 import static com.telenav.kivakit.core.time.Duration.seconds;
 import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 
-public class ResolvedArtifactsTest extends FiascoTest
+public class ResolvedArtifactQueueTest extends FiascoTest
 {
     @Test
     public void test()
     {
-        var resolved = new ResolvedArtifacts(this);
+        var resolved = new ResolvedArtifactQueue(this);
 
         KivaKitThread.run(this, "resolver", () ->
         {

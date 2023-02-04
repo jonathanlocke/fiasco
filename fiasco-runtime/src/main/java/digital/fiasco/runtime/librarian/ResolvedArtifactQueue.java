@@ -1,9 +1,13 @@
-package digital.fiasco.runtime.build.execution;
+package digital.fiasco.runtime.librarian;
 
 import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.messaging.Listener;
-import com.telenav.kivakit.core.thread.Monitor;
+import com.telenav.kivakit.core.thread.locks.Lock;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+
+import java.util.concurrent.locks.Condition;
+
+import static com.telenav.kivakit.core.time.Duration.FOREVER;
 
 /**
  * Holds a set of artifacts resolved from repositories by background threads. When a new set of artifacts is resolved,
@@ -12,15 +16,18 @@ import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
  *
  * @author Jonathan Locke
  */
-public class ResolvedArtifacts extends BaseComponent
+public class ResolvedArtifactQueue extends BaseComponent
 {
     /** The set of artifacts that have been resolved */
     private ArtifactList resolved = ArtifactList.artifacts();
 
-    /** A monitor that is signaled when artifacts are resolved */
-    private final Monitor updated = new Monitor();
+    /** Read/write lock for accessing the resolved list */
+    private final Lock lock = new Lock();
 
-    public ResolvedArtifacts(Listener listener)
+    /** Condition to signal/await artifact resolution */
+    private final Condition resolvedMore = lock.newCondition();
+
+    public ResolvedArtifactQueue(Listener listener)
     {
         listener.listenTo(this);
     }
@@ -33,7 +40,7 @@ public class ResolvedArtifacts extends BaseComponent
      */
     public boolean isResolved(ArtifactList artifacts)
     {
-        return resolved.containsAll(artifacts);
+        return lock.whileLocked(() -> resolved.containsAll(artifacts));
     }
 
     /**
@@ -43,15 +50,15 @@ public class ResolvedArtifacts extends BaseComponent
      */
     public void resolve(ArtifactList artifacts)
     {
-        synchronized (updated)
+        lock.whileLocked(() ->
         {
             if (artifacts.isNonEmpty())
             {
                 this.resolved = resolved.with(artifacts);
-                updated.signal();
-                trace("Resolved: $", artifacts);
+                resolvedMore.signal();
+                trace("Signaled resolution: $", artifacts);
             }
-        }
+        });
     }
 
     /**
@@ -59,7 +66,7 @@ public class ResolvedArtifacts extends BaseComponent
      */
     public int size()
     {
-        return resolved.size();
+        return lock.whileLocked(() -> resolved.size());
     }
 
     /**
@@ -69,16 +76,13 @@ public class ResolvedArtifacts extends BaseComponent
      */
     public void waitForResolutionOf(ArtifactList required)
     {
-        synchronized (updated)
+        lock.whileLocked(() ->
         {
-            if (required.isNonEmpty())
+            while (!isResolved(required))
             {
-                while (!resolved.containsAll(required))
-                {
-                    trace("Waiting for resolution: $", required);
-                    updated.await();
-                }
+                trace("Awaiting resolution: $", required.without(resolved));
+                FOREVER.await(resolvedMore);
             }
-        }
+        });
     }
 }

@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.build.execution;
+package digital.fiasco.runtime.librarian;
 
 import digital.fiasco.runtime.FiascoTest;
 import digital.fiasco.runtime.build.BaseBuild;
@@ -34,13 +34,14 @@ public class ArtifactResolverTest extends FiascoTest
             {
                 return new Builder(this)
                     .withRootFolder(currentFolder().folder("project"))
-                    .withArtifactDescriptor("library:com.telenav.kivakit:kivakit-xyz:1.8.5");
+                    .withArtifactDescriptor("library:com.telenav.kivakit:kivakit-xyz:1.8.5")
+                    .withLibrarian(new DebugLibrarian());
             }
         };
 
-        var resolved = new ResolvedArtifacts(this);
-        var resolver = new ArtifactResolver(this);
-        resolver.resolveArtifacts(build.rootBuilder(), resolved);
+        var resolved = new ResolvedArtifactQueue(this);
+        var resolver = new ArtifactResolver(build, resolved);
+        resolver.resolveArtifacts();
 
         resolved.waitForResolutionOf(kivakitArtifacts());
         ensure(resolved.size() == 4);
