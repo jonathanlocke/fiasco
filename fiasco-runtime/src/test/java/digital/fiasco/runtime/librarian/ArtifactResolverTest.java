@@ -7,6 +7,7 @@ import org.junit.Test;
 
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_COMPILE;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 
 public class ArtifactResolverTest extends FiascoTest
 {
@@ -40,10 +41,11 @@ public class ArtifactResolverTest extends FiascoTest
         };
 
         var resolved = new ResolvedArtifactSet(this);
-        var resolver = new ArtifactResolver(build, resolved);
-        resolver.resolveArtifacts();
+        new ArtifactResolver(build, resolved).resolveArtifacts();
 
         resolved.waitForResolutionOf(kivakitArtifacts());
-        ensure(resolved.size() == 4);
+        ensure(resolved.isResolved(kivakitArtifacts()));
+        ensure(resolved.isResolved(artifacts(kivakitResource())));
+        ensure(resolved.size() == 5);
     }
 }

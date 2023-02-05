@@ -15,9 +15,6 @@ import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
-import java.util.concurrent.Callable;
-import java.util.concurrent.ExecutorCompletionService;
-
 import static com.telenav.kivakit.core.function.Result.result;
 import static com.telenav.kivakit.core.thread.KivaKitThread.run;
 import static com.telenav.kivakit.core.thread.Threads.shutdownAndAwaitTermination;
@@ -26,9 +23,9 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
 /**
  * Resolves artifacts in groups by turning the given root dependency into a {@link DependencyTree}, and then turning
  * that tree into a {@link DependencyQueue}. Groups of dependencies that are ready for resolution are retrieved with
- * {@link DependencyQueue#takeReadyDependencies()}, and then resolved using the {@link RepositoryLibrarian} found in
- * the {@link BuildSettingsObject}. When a group of dependencies is resolved, the given {@link Callback} is called with
- * the resolution {@link Result}.
+ * {@link DependencyQueue#takeAllReadyForProcessing()}, and then resolved using the {@link RepositoryLibrarian} found in the
+ * {@link BuildSettingsObject}. When a group of dependencies is resolved, the given {@link Callback} is called with the
+ * resolution {@link Result}.
  *
  * <p><b>Performance</b></p>
  *
@@ -72,8 +69,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
      */
     public void resolveArtifacts()
     {
-        var settings = build.settings();
-
+        // Resolve artifacts on a background thread
         run(this, "Resolver", () ->
         {
             // Create a dependency queue from the build's dependency tree,
@@ -81,19 +77,11 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
 
             // create an executor and completion service,
             trace("Starting artifact resolver threads");
-            var executor = threadPool("ResolverPool", settings.builderThreads());
-            var completion = new ExecutorCompletionService<Void>(executor);
+            var threads = build.settings().builderThreads();
+            var executor = threadPool("ResolverPool", threads);
 
-            // and while there are dependencies to resolve,
-            while (queue.isWorkAvailable())
-            {
-                // take the next group of artifacts that are ready to be resolved,
-                var artifacts = queue.takeReadyDependencies().asArtifactList();
-
-                // and use the completion service to resolve the group of artifacts.
-                trace("Submitting resolver task: $", artifacts);
-                completion.submit(resolverTask(artifacts));
-            }
+            // and submit a resolve artifacts task for each thread.
+            threads.loop(() -> executor.submit(() -> resolveArtifacts(queue)));
 
             // Wait until all artifacts in the queue are resolved.
             trace("Waiting for artifact resolution to complete");
@@ -102,17 +90,42 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
     }
 
     /**
+     * Resolve artifacts from the given queue until it is empty
+     *
+     * @param queue The queue of artifacts to resolve
+     */
+    private Void resolveArtifacts(DependencyQueue queue)
+    {
+        // While there are dependencies left to resolve,
+        while (queue.canTakeWork())
+        {
+            // resolve the next group of artifacts that are ready to be resolved.
+            trace("Waiting for ready dependencies");
+            var ready = queue.takeAllReadyForProcessing();
+            if (ready.isNonEmpty())
+            {
+                trace("Resolving artifacts: $", ready);
+                resolveArtifacts(ready.asArtifactList());
+                queue.processed(ready);
+            }
+        }
+
+        // Required by ExecutorCompletionService.submit(Callable<Void>).
+        return null;
+    }
+
+    /**
      * Resolves the given list of artifacts using the build's librarian
      *
      * @param artifacts The artifacts to resolve
      */
-    private Callable<Void> resolverTask(ArtifactList artifacts)
+    private void resolveArtifacts(ArtifactList artifacts)
     {
-        return () ->
+        if (artifacts.isNonEmpty())
         {
             // Use the librarian to resolve the requested artifacts,
             var librarian = build.librarian();
-            trace("Resolver librarian resolving: $", artifacts);
+            trace("Librarian resolving: $", artifacts);
             var result = result(librarian, () -> librarian.resolve(artifacts.asArtifactDescriptors()));
 
             // and for each group of artifacts that are successfully resolved,
@@ -126,7 +139,6 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
             {
                 result.messages().broadcastTo(this);
             }
-            return null;
-        };
+        }
     }
 }

@@ -22,7 +22,7 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.string.ObjectFormatter.ObjectFormat.MULTILINE;
-import static com.telenav.kivakit.core.time.Duration.seconds;
+import static com.telenav.kivakit.core.time.Duration.milliseconds;
 import static com.telenav.kivakit.core.time.Time.now;
 import static com.telenav.kivakit.core.value.count.Maximum.MAXIMUM;
 import static com.telenav.kivakit.core.value.count.Maximum._1;
@@ -35,7 +35,7 @@ import static digital.fiasco.runtime.dependency.collections.lists.DependencyList
  *
  * <ol>
  *     <li>All dependencies passed to the constructor are added to the "available" set.</li>
- *     <li>The {@link #takeNextReadyDependency()} or {@link #takeReadyDependencies()} method is called by a processor
+ *     <li>The {@link #takeNextReadyForProcessing()} or {@link #takeAllReadyForProcessing()} method is called by a processor
  *         thread to retrieve dependencies that are ready for processing (meaning that they are
  *         "available", and have no unprocessed transitive dependencies). The returned dependencies
  *         are moved from the "available" set to the "taken" set.</li>
@@ -43,15 +43,15 @@ import static digital.fiasco.runtime.dependency.collections.lists.DependencyList
  *         {@link #processed(Dependency)} or {@link #processed(DependencyList)} to move them from the "taken"
  *         set to the "processed" set.</li>
  *     <li>While the above steps run, a thread can wait for all processing to finish by called
- *         {@link #awaitProcessingCompletion(Duration)}</li>
+ *         {@link #awaitProcessingFinished(Duration)}</li>
  * </ol>
  *
  * <p><b>Taking Dependencies for Processing</b></p>
  *
  * <ul>
- *     <li>{@link #isWorkAvailable()}</li>
- *     <li>{@link #takeNextReadyDependency()}</li>
- *     <li>{@link #takeReadyDependencies()}</li>
+ *     <li>{@link #canTakeWork()}</li>
+ *     <li>{@link #takeNextReadyForProcessing()}</li>
+ *     <li>{@link #takeAllReadyForProcessing()}</li>
  * </ul>
  *
  * <p><b>Marking Dependencies as Processed</b></p>
@@ -64,7 +64,7 @@ import static digital.fiasco.runtime.dependency.collections.lists.DependencyList
  * <p><b>Waiting for Processing to Complete</b></p>
  *
  * <ul>
- *     <li>{@link #awaitProcessingCompletion(Duration)}</li>
+ *     <li>{@link #awaitProcessingFinished(Duration)}</li>
  * </ul>
  *
  * <p><b>Example</b></p>
@@ -136,7 +136,7 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
      * @param maximum The maximum amount of time to wait
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public WakeState awaitProcessingCompletion(Duration maximum)
+    public WakeState awaitProcessingFinished(Duration maximum)
     {
         var started = now();
         trace("Waiting for dependency processing to complete");
@@ -146,7 +146,7 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
         {
             // and while we're not done processing, and we haven't timed out,
             WakeState wake = null;
-            for (var remaining = maximum; !isProcessingComplete(); remaining = maximum.minus(started.elapsedSince()))
+            for (var remaining = maximum; !isProcessingFinished(); remaining = maximum.minus(started.elapsedSince()))
             {
                 // wait for up to the maximum time remaining for more processing to complete,
                 trace("Waiting for processed dependencies");
@@ -159,20 +159,20 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
     }
 
     /**
-     * Returns true if all dependencies are now in the list returned by {@link #processed()}
-     */
-    public boolean isProcessingComplete()
-    {
-        return remaining().isEmpty();
-    }
-
-    /**
      * Returns true if there is work available to process
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public boolean isWorkAvailable()
+    public boolean canTakeWork()
     {
         return lock.whileLocked(() -> available.isNonEmpty());
+    }
+
+    /**
+     * Returns true if all dependencies are now in the list returned by {@link #processed()}
+     */
+    public boolean isProcessingFinished()
+    {
+        return remaining().isEmpty();
     }
 
     /**
@@ -214,24 +214,24 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
     }
 
     /**
+     * Returns a list of all ready dependencies, or an empty list if the queue is empty
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public DependencyList takeAllReadyForProcessing()
+    {
+        return takeAllReadyForProcessing(MAXIMUM);
+    }
+
+    /**
      * Returns the next dependency that is ready (meaning that all of its dependencies have already been processed), or
      * null if the queue is empty.
      */
     @SuppressWarnings("unchecked")
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public <D extends Dependency> D takeNextReadyDependency()
+    public <D extends Dependency> D takeNextReadyForProcessing()
     {
-        var taken = takeReady(_1);
-        return taken == null ? null : (D) taken.first();
-    }
-
-    /**
-     * Returns a list of all ready dependencies, or an empty list if the queue is empty
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyList takeReadyDependencies()
-    {
-        return takeReady(MAXIMUM);
+        var ready = takeAllReadyForProcessing(_1);
+        return ready.isEmpty() ? null : (D) ready.first();
     }
 
     @Override
@@ -281,36 +281,36 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
      * Returns a list of dependencies matching the given type that are ready for processing. The list will be empty if
      * the queue is empty.
      */
-    private DependencyList takeReady(Maximum maximum)
+    private DependencyList takeAllReadyForProcessing(Maximum maximum)
     {
         return lock.whileLocked(() ->
         {
-            // While the queue is still processing,
-            while (!isProcessingComplete())
+            // While the queue has no unprocessed work,
+            while (!isProcessingFinished())
             {
                 // take any dependencies that are ready to be processed,
-                var group = available
+                var ready = available
                     .matching(this::isReady)
                     .first(maximum);
 
-                // and if there are none ready but there are still some remaining to be processed (available or taken),
-                if (group.isEmpty() && remaining().isNonEmpty())
+                // and if there are none ready now, but there are still some remaining to process,
+                if (ready.isEmpty() && remaining().isNonEmpty())
                 {
-                    // wait for some to be available,
-                    trace("Waiting for more dependencies to be processed");
-                    seconds(0.5).await(processedMore);
+                    // we can wait for more dependencies to be processed (which may cause dependencies to become ready),
+                    milliseconds(50).await(processedMore);
                 }
                 else
                 {
-                    // otherwise, move the group from the available list to the taken list.
-                    available = available.without(group);
-                    taken = taken.with(group);
-                    trace("Took dependencies: $\nAvailable dependencies: $", group, available);
-                    return group;
+                    // otherwise, move the group from the available list to the taken list, and return
+                    // the ready dependencies.
+                    available = available.without(ready);
+                    taken = taken.with(ready);
+                    trace("Took dependencies: $\nAvailable dependencies: $", ready, available);
+                    return ready;
                 }
             }
             trace("Dependency queue is empty");
-            return null;
+            return dependencies();
         });
     }
 }
