@@ -23,7 +23,7 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
 /**
  * Resolves artifacts in groups by turning the given root dependency into a {@link DependencyTree}, and then turning
  * that tree into a {@link DependencyQueue}. Groups of dependencies that are ready for resolution are retrieved with
- * {@link DependencyQueue#takeAllReadyForProcessing()}, and then resolved using the {@link RepositoryLibrarian} found in the
+ * {@link DependencyQueue#takeAllReadyDependencies()}, and then resolved using the {@link RepositoryLibrarian} found in the
  * {@link BuildSettingsObject}. When a group of dependencies is resolved, the given {@link Callback} is called with the
  * resolution {@link Result}.
  *
@@ -97,11 +97,11 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
     private Void resolveArtifacts(DependencyQueue queue)
     {
         // While there are dependencies left to resolve,
-        while (queue.canTakeWork())
+        while (queue.canTakeDependencies())
         {
             // resolve the next group of artifacts that are ready to be resolved.
             trace("Waiting for ready dependencies");
-            var ready = queue.takeAllReadyForProcessing();
+            var ready = queue.takeAllReadyDependencies();
             if (ready.isNonEmpty())
             {
                 trace("Resolving artifacts: $", ready);

@@ -28,15 +28,15 @@ public class DependencyTreeTest extends FiascoTest
     {
         var queue = queue();
 
-        var group1 = queue.takeAllReadyForProcessing();
+        var group1 = queue.takeAllReadyDependencies();
         ensure(group1.equals(libraries(c, e, f)));
         queue.processed(group1);
 
-        var group2 = queue.takeAllReadyForProcessing();
+        var group2 = queue.takeAllReadyDependencies();
         ensure(group2.equals(libraries(b, d)));
         queue.processed(group2);
 
-        var group3 = queue.takeAllReadyForProcessing();
+        var group3 = queue.takeAllReadyDependencies();
         ensure(group3.equals(dependencies(a)));
         queue.processed(group3);
     }

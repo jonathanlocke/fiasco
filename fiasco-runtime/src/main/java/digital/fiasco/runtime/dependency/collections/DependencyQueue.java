@@ -35,23 +35,23 @@ import static digital.fiasco.runtime.dependency.collections.lists.DependencyList
  *
  * <ol>
  *     <li>All dependencies passed to the constructor are added to the "available" set.</li>
- *     <li>The {@link #takeNextReadyForProcessing()} or {@link #takeAllReadyForProcessing()} method is called by a processor
+ *     <li>The {@link #takeNextReadyDependency()} or {@link #takeAllReadyDependencies()} method is called by a processor
  *         thread to retrieve dependencies that are ready for processing (meaning that they are
  *         "available", and have no unprocessed transitive dependencies). The returned dependencies
  *         are moved from the "available" set to the "taken" set.</li>
  *     <li>When processing of one or more dependencies completes, a processor thread calls
  *         {@link #processed(Dependency)} or {@link #processed(DependencyList)} to move them from the "taken"
  *         set to the "processed" set.</li>
- *     <li>While the above steps run, a thread can wait for all processing to finish by called
+ *     <li>While the above steps run, a thread can wait for all processing to finish by calling
  *         {@link #awaitProcessingFinished(Duration)}</li>
  * </ol>
  *
  * <p><b>Taking Dependencies for Processing</b></p>
  *
  * <ul>
- *     <li>{@link #canTakeWork()}</li>
- *     <li>{@link #takeNextReadyForProcessing()}</li>
- *     <li>{@link #takeAllReadyForProcessing()}</li>
+ *     <li>{@link #canTakeDependencies()}</li>
+ *     <li>{@link #takeNextReadyDependency()}</li>
+ *     <li>{@link #takeAllReadyDependencies()}</li>
  * </ul>
  *
  * <p><b>Marking Dependencies as Processed</b></p>
@@ -70,19 +70,18 @@ import static digital.fiasco.runtime.dependency.collections.lists.DependencyList
  * <p><b>Example</b></p>
  *
  * <pre>
- * var queue = dependencyTree.asQueue();
+ * var queue = dependencyTree.asQueue(Artifact.class);
  * KivaKitThread.run(this, "processor", () ->
  * {
- *     while (queue.isWorkAvailable())
+ *     while (queue.canTakeWork())
  *     {
- *         var next = queue.takeAll(Library.class);
+ *         var next = queue.takeAllReadyForProcessing();
  *         process(next);
  *         queue.processed(next);
  *     }
  * });
  *
- * queue.awaitProcessingCompletion();
- * </pre>
+ * queue.awaitProcessingFinished(); </pre>
  *
  * <p><b>Performance</b></p>
  *
@@ -117,9 +116,10 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
     private final Condition processedMore = lock.newCondition();
 
     /**
-     * Creates a dependency queue with the given initial elements
+     * Creates a dependency queue with the given initial elements, filtered by the given dependency type
      *
      * @param initial The dependencies to enqueue, in priority order, where the first elements will be processed first
+     * @param type The type of dependency to add to this queue from the initial list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyQueue(DependencyList initial, Class<? extends Dependency> type)
@@ -162,7 +162,7 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
      * Returns true if there is work available to process
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public boolean canTakeWork()
+    public boolean canTakeDependencies()
     {
         return lock.whileLocked(() -> available.isNonEmpty());
     }
@@ -185,10 +185,12 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
     {
         lock.whileLocked(() ->
         {
-            // Move the given dependencies from processing to processed,
+            // Move the given dependencies from 'taken' to 'processed'
             this.taken = this.taken.without(group);
             this.processed = this.processed.with(group);
             trace("Processed $", group);
+
+            // and alert any threads waiting for work in take*ReadyForProcessing().
             processedMore.signalAll();
         });
     }
@@ -217,9 +219,9 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
      * Returns a list of all ready dependencies, or an empty list if the queue is empty
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public DependencyList takeAllReadyForProcessing()
+    public DependencyList takeAllReadyDependencies()
     {
-        return takeAllReadyForProcessing(MAXIMUM);
+        return takeAllReadyWork(MAXIMUM);
     }
 
     /**
@@ -228,9 +230,9 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
      */
     @SuppressWarnings("unchecked")
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public <D extends Dependency> D takeNextReadyForProcessing()
+    public <D extends Dependency> D takeNextReadyDependency()
     {
-        var ready = takeAllReadyForProcessing(_1);
+        var ready = takeAllReadyWork(_1);
         return ready.isEmpty() ? null : (D) ready.first();
     }
 
@@ -270,7 +272,7 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
     /**
      * Returns the list of dependencies that have yet to be fully processed
      *
-     * @return The dependencies
+     * @return The remaining dependencies, either available or taken
      */
     private DependencyList remaining()
     {
@@ -281,7 +283,7 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
      * Returns a list of dependencies matching the given type that are ready for processing. The list will be empty if
      * the queue is empty.
      */
-    private DependencyList takeAllReadyForProcessing(Maximum maximum)
+    private DependencyList takeAllReadyWork(Maximum maximum)
     {
         return lock.whileLocked(() ->
         {

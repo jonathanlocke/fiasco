@@ -111,7 +111,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
 
         // and while there are builders yet to run,
         var futures = new ObjectList<Future<Result<Builder>>>();
-        for (Builder builder = queue.takeNextReadyForProcessing(); builder != null; builder = queue.takeNextReadyForProcessing())
+        for (Builder builder = queue.takeNextReadyDependency(); builder != null; builder = queue.takeNextReadyDependency())
         {
             // submit the builder to the executor,
             var future = (Future<Result<Builder>>) executor.submit(builderTask(resolved, queue, builder));

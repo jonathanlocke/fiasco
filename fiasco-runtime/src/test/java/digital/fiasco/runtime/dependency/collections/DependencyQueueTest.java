@@ -42,9 +42,9 @@ public class DependencyQueueTest extends FiascoTest
             _5.loop(() ->
                 executor.submit(() ->
                 {
-                    while (queue.canTakeWork())
+                    while (queue.canTakeDependencies())
                     {
-                        var next = queue.takeNextReadyForProcessing();
+                        var next = queue.takeNextReadyDependency();
                         milliseconds(3).sleep();
                         queue.processed(next);
                     }
@@ -53,7 +53,7 @@ public class DependencyQueueTest extends FiascoTest
             var wake = queue.awaitProcessingFinished(minutes(1));
 
             ensureEqual(wake, COMPLETED);
-            ensure(!queue.canTakeWork());
+            ensure(!queue.canTakeDependencies());
 
             var processed = queue.processed().asLibraryList();
             ensure(_6.equals(processed.count()));
@@ -72,15 +72,15 @@ public class DependencyQueueTest extends FiascoTest
     {
         var queue = testDependencyQueue();
 
-        var group1 = queue.takeAllReadyForProcessing();
+        var group1 = queue.takeAllReadyDependencies();
         ensure(group1.equals(libraries(c, e, f)));
         queue.processed(group1);
 
-        var group2 = queue.takeAllReadyForProcessing();
+        var group2 = queue.takeAllReadyDependencies();
         ensure(group2.equals(libraries(b, d)));
         queue.processed(group2);
 
-        var group3 = queue.takeAllReadyForProcessing();
+        var group3 = queue.takeAllReadyDependencies();
         ensure(group3.equals(libraries(a)));
         queue.processed(group3);
     }
@@ -94,9 +94,9 @@ public class DependencyQueueTest extends FiascoTest
 
             KivaKitThread.run(this, "processor", () ->
             {
-                while (queue.canTakeWork())
+                while (queue.canTakeDependencies())
                 {
-                    var next = queue.takeAllReadyForProcessing();
+                    var next = queue.takeAllReadyDependencies();
                     milliseconds(1).sleep();
                     queue.processed(next);
                 }
@@ -105,7 +105,7 @@ public class DependencyQueueTest extends FiascoTest
             var wake = queue.awaitProcessingFinished(minutes(1));
 
             ensureEqual(wake, COMPLETED);
-            ensure(!queue.canTakeWork());
+            ensure(!queue.canTakeDependencies());
 
             var processed = queue.processed();
             ensure(_6.equals(processed.count()));
@@ -133,9 +133,9 @@ public class DependencyQueueTest extends FiascoTest
 
             KivaKitThread.run(this, "processor", () ->
             {
-                while (queue.canTakeWork())
+                while (queue.canTakeDependencies())
                 {
-                    var next = queue.takeNextReadyForProcessing();
+                    var next = queue.takeNextReadyDependency();
                     milliseconds(1).sleep();
                     queue.processed(next);
                 }
@@ -144,7 +144,7 @@ public class DependencyQueueTest extends FiascoTest
             var wake = queue.awaitProcessingFinished(minutes(1));
 
             ensureEqual(wake, COMPLETED);
-            ensure(!queue.canTakeWork());
+            ensure(!queue.canTakeDependencies());
 
             var processed = queue.processed();
             ensure(_6.equals(processed.count()));
@@ -188,22 +188,22 @@ public class DependencyQueueTest extends FiascoTest
     {
         var queue = testDependencyQueue();
 
-        ensureEqual(queue.takeNextReadyForProcessing(), c);
+        ensureEqual(queue.takeNextReadyDependency(), c);
         queue.processed(c);
 
-        ensureEqual(queue.takeNextReadyForProcessing(), b);
+        ensureEqual(queue.takeNextReadyDependency(), b);
         queue.processed(b);
 
-        ensureEqual(queue.takeNextReadyForProcessing(), e);
+        ensureEqual(queue.takeNextReadyDependency(), e);
         queue.processed(e);
 
-        ensureEqual(queue.takeNextReadyForProcessing(), f);
+        ensureEqual(queue.takeNextReadyDependency(), f);
         queue.processed(f);
 
-        ensureEqual(queue.takeNextReadyForProcessing(), d);
+        ensureEqual(queue.takeNextReadyDependency(), d);
         queue.processed(d);
 
-        ensureEqual(queue.takeNextReadyForProcessing(), a);
+        ensureEqual(queue.takeNextReadyDependency(), a);
         queue.processed(a);
     }
 }
