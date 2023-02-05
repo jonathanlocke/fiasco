@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.librarian;
+package digital.fiasco.runtime.dependency.artifact.resolver;
 
 import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.function.Result;
@@ -11,6 +11,7 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.collections.DependencyQueue;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.librarian.MultiRepositoryLibrarian;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
@@ -23,7 +24,7 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
 /**
  * Resolves artifacts in groups by turning the given root dependency into a {@link DependencyTree}, and then turning
  * that tree into a {@link DependencyQueue}. Groups of dependencies that are ready for resolution are retrieved with
- * {@link DependencyQueue#takeAllReadyDependencies()}, and then resolved using the {@link RepositoryLibrarian} found in the
+ * {@link DependencyQueue#takeAllReadyDependencies()}, and then resolved using the {@link MultiRepositoryLibrarian} found in the
  * {@link BuildSettingsObject}. When a group of dependencies is resolved, the given {@link Callback} is called with the
  * resolution {@link Result}.
  *
@@ -47,7 +48,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
     private final Build build;
 
     /** The set of resolved artifacts */
-    private final ResolvedArtifactSet resolved;
+    private final ArtifactResolutionTracker resolved;
 
     /**
      * Creates an artifact resolver for the given build
@@ -55,7 +56,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
      * @param build The build
      * @param resolved The resolved artifact set to update as artifacts are resolved
      */
-    public ArtifactResolver(Build build, ResolvedArtifactSet resolved)
+    public ArtifactResolver(Build build, ArtifactResolutionTracker resolved)
     {
         this.build = build;
         this.resolved = resolved;
@@ -64,7 +65,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
     }
 
     /**
-     * Resolves the artifact dependencies of a build tree in groups, updating the given {@link ResolvedArtifactSet} set
+     * Resolves the artifact dependencies of a build tree in groups, updating the given {@link ArtifactResolutionTracker} set
      * for each group that is resolved.
      */
     public void resolveArtifacts()
@@ -133,7 +134,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
             {
                 // add them to the resolved set.
                 trace("Resolved: $", artifacts);
-                resolved.resolve(result.get());
+                resolved.resolved(result.get());
             }
             else
             {

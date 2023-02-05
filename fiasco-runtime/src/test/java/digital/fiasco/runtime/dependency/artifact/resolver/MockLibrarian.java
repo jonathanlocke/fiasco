@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.librarian;
+package digital.fiasco.runtime.dependency.artifact.resolver;
 
 import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.collections.list.ObjectList;
@@ -6,6 +6,7 @@ import com.telenav.kivakit.core.version.Version;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.librarian.Librarian;
 
 import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 

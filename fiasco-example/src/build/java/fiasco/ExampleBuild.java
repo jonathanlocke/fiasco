@@ -23,6 +23,7 @@ import static digital.fiasco.runtime.build.metadata.ProjectResource.projectSourc
 import static digital.fiasco.runtime.build.metadata.ProjectRole.ARCHITECT;
 import static digital.fiasco.runtime.build.metadata.ProjectRole.LEAD_DEVELOPER;
 import static digital.fiasco.runtime.build.metadata.ProjectRole.ORIGINATOR;
+import static digital.fiasco.runtime.build.settings.BuildProfile.profile;
 
 /**
  * Example Fiasco build.
@@ -83,6 +84,8 @@ public class ExampleBuild extends BaseBuild implements Libraries
     @Override
     public Builder onConfigureBuild(Builder root)
     {
+        root = root.withProfile(profile("export"));
+
         var utilities = root
             .deriveBuilder("utilities")
             .withDependencies(hamcrest_library.withVersion("5.0"));

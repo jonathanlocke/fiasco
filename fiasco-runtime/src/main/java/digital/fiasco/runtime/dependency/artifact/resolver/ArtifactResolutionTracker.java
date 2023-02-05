@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.librarian;
+package digital.fiasco.runtime.dependency.artifact.resolver;
 
 import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.messaging.Listener;
@@ -10,13 +10,18 @@ import java.util.concurrent.locks.Condition;
 import static com.telenav.kivakit.core.time.Duration.seconds;
 
 /**
- * Holds a set of artifacts resolved from repositories by background threads. When a new set of artifacts is resolved,
- * they are marked as resolved by calling {@link #resolve(ArtifactList)}. A task that can't proceed until its artifact
- * dependencies are all resolved can wait for that condition by calling {@link #waitForResolutionOf(ArtifactList)}.
+ * Tracks the resolution of artifacts.
+ *
+ * <p>
+ * Tracks the artifacts being resolved by an {@link ArtifactResolver}. When a new group of one or more artifacts is
+ * resolved, they are marked resolved by calling {@link #resolved(ArtifactList)}. A task that can't proceed until its
+ * artifact dependencies have all been resolved can wait for that condition by calling
+ * {@link #waitForResolutionOf(ArtifactList)}.
+ * </p>
  *
  * @author Jonathan Locke
  */
-public class ResolvedArtifactSet extends BaseComponent
+public class ArtifactResolutionTracker extends BaseComponent
 {
     /** The set of artifacts that have been resolved */
     private ArtifactList resolved = ArtifactList.artifacts();
@@ -27,7 +32,7 @@ public class ResolvedArtifactSet extends BaseComponent
     /** Condition to signal/await artifact resolution */
     private final Condition resolvedMore = lock.newCondition();
 
-    public ResolvedArtifactSet(Listener listener)
+    public ArtifactResolutionTracker(Listener listener)
     {
         listener.listenTo(this);
     }
@@ -48,7 +53,7 @@ public class ResolvedArtifactSet extends BaseComponent
      *
      * @param artifacts The artifacts that were resolved
      */
-    public void resolve(ArtifactList artifacts)
+    public void resolved(ArtifactList artifacts)
     {
         lock.whileLocked(() ->
         {

@@ -7,11 +7,11 @@
 
 package digital.fiasco.runtime.librarian;
 
+import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.version.Version;
-import digital.fiasco.runtime.build.builder.Builder;
-import digital.fiasco.runtime.build.builder.tools.BaseTool;
+import com.telenav.kivakit.interfaces.object.Copyable;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
@@ -23,7 +23,6 @@ import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
-import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MAVEN_CENTRAL;
@@ -48,7 +47,9 @@ import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MA
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class RepositoryLibrarian extends BaseTool<RepositoryLibrarian> implements Librarian
+public class MultiRepositoryLibrarian extends BaseComponent implements
+    Librarian,
+    Copyable<MultiRepositoryLibrarian>
 {
     /** The repositories that this librarian searches */
     private ObjectList<Repository> repositories = list();
@@ -56,25 +57,22 @@ public class RepositoryLibrarian extends BaseTool<RepositoryLibrarian> implement
     /** A map from group:artifact-id to version */
     private ObjectMap<ArtifactDescriptor, Version> pinnedVersions = new ObjectMap<>();
 
-    public RepositoryLibrarian(RepositoryLibrarian that)
+    public MultiRepositoryLibrarian(MultiRepositoryLibrarian that)
     {
-        super(that);
         this.repositories = that.repositories.copy();
         this.pinnedVersions = that.pinnedVersions.copy();
     }
 
-    public RepositoryLibrarian(Builder builder)
+    public MultiRepositoryLibrarian()
     {
-        super(builder);
-
         repositories.add(new LocalRepository("repository"));
         repositories.add(MAVEN_CENTRAL);
     }
 
     @Override
-    public RepositoryLibrarian copy()
+    public MultiRepositoryLibrarian copy()
     {
-        return new RepositoryLibrarian(this);
+        return new MultiRepositoryLibrarian(this);
     }
 
     /**
@@ -88,12 +86,6 @@ public class RepositoryLibrarian extends BaseTool<RepositoryLibrarian> implement
               repositories: $
               pinned versions: $
             """, repositories, pinnedVersions);
-    }
-
-    @Override
-    public void onRun()
-    {
-        unsupported("Librarian does not need to be started");
     }
 
     /**

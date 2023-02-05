@@ -10,6 +10,18 @@ import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 
 import static com.telenav.kivakit.core.version.Version.version;
 
+/**
+ * Resolves artifacts.
+ *
+ * <p><b>Artifact Pinning</b></p>
+ *
+ * <p>
+ * Artifacts can be globally 'pinned' to a particular version using
+ * {@link #withPinnedVersion(ArtifactDescriptor, Version)} or one of the convenient overloads of that method.
+ * </p>
+ *
+ * @author Jonathan Locke
+ */
 public interface Librarian extends
     Repeater,
     Described

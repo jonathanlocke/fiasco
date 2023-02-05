@@ -13,8 +13,8 @@ import digital.fiasco.runtime.dependency.collections.DependencyQueue;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
-import digital.fiasco.runtime.librarian.ArtifactResolver;
-import digital.fiasco.runtime.librarian.ResolvedArtifactSet;
+import digital.fiasco.runtime.dependency.artifact.resolver.ArtifactResolver;
+import digital.fiasco.runtime.dependency.artifact.resolver.ArtifactResolutionTracker;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Callable;
@@ -39,15 +39,15 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
  *
  * <p>
  * Builds are executed by two thread pools. One thread pool resolves artifacts, and the other runs builders. A
- * {@link ResolvedArtifactSet} object serves as a way to communicate between the two thread pools. As artifacts are
+ * {@link ArtifactResolutionTracker} object serves as a way to communicate between the two thread pools. As artifacts are
  * resolved by the {@link ArtifactResolver}, they are marked as resolved with
- * {@link ResolvedArtifactSet#resolve(ArtifactList)}. Builders can wait for their artifacts to be resolved by calling
- * {@link ResolvedArtifactSet#waitForResolutionOf(ArtifactList)}. In this way, artifact resolution proceeds
+ * {@link ArtifactResolutionTracker#resolved(ArtifactList)}. Builders can wait for their artifacts to be resolved by calling
+ * {@link ArtifactResolutionTracker#waitForResolutionOf(ArtifactList)}. In this way, artifact resolution proceeds
  * independently of building, with builders blocking only when it is necessary to wait for artifacts to be resolved.
  * </p>
  *
  * @author Jonathan Locke
- * @see ResolvedArtifactSet
+ * @see ArtifactResolutionTracker
  * @see Result
  * @see Builder
  * @see Dependency
@@ -85,7 +85,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
         // Start resolving artifacts in the background starting from the root
         // builder's dependencies. Each resolved artifact is added to the
         // resolved set.
-        var resolved = new ResolvedArtifactSet(this);
+        var resolved = new ArtifactResolutionTracker(this);
         trace("Starting artifact resolver");
         new ArtifactResolver(build, resolved).resolveArtifacts();
 
@@ -101,7 +101,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
      * @param resolved The resolved artifacts set
      * @return The results for each builder
      */
-    private ObjectList<Result<Builder>> build(ResolvedArtifactSet resolved)
+    private ObjectList<Result<Builder>> build(ArtifactResolutionTracker resolved)
     {
         // Create a queue of builders from the given root,
         var queue = build.dependencyTree().asQueue(Builder.class);
@@ -142,7 +142,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
      * @return The {@link Callable} to execute with {@link ExecutorService#submit(Callable)}
      */
     @NotNull
-    private Callable<Result<Builder>> builderTask(ResolvedArtifactSet resolved,
+    private Callable<Result<Builder>> builderTask(ArtifactResolutionTracker resolved,
                                                   DependencyQueue queue,
                                                   Builder builder)
     {

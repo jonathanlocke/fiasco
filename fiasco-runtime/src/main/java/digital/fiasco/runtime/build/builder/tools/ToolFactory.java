@@ -8,8 +8,6 @@ import digital.fiasco.runtime.build.builder.tools.cleaner.Cleaner;
 import digital.fiasco.runtime.build.builder.tools.compiler.JavaCompiler;
 import digital.fiasco.runtime.build.builder.tools.copier.Copier;
 import digital.fiasco.runtime.build.builder.tools.git.Git;
-import digital.fiasco.runtime.librarian.Librarian;
-import digital.fiasco.runtime.librarian.RepositoryLibrarian;
 import digital.fiasco.runtime.build.builder.tools.shader.Shader;
 import digital.fiasco.runtime.build.builder.tools.stamper.BuildStamper;
 import digital.fiasco.runtime.build.builder.tools.tester.Tester;
@@ -64,14 +62,6 @@ public interface ToolFactory extends
     default Git newGit()
     {
         return newTool(Git.class);
-    }
-
-    /**
-     * Creates a new {@link RepositoryLibrarian} tool
-     */
-    default Librarian newLibrarian()
-    {
-        return newTool(RepositoryLibrarian.class);
     }
 
     /**

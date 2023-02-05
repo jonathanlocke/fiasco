@@ -13,4 +13,8 @@ import digital.fiasco.runtime.build.builder.Builder;
  */
 public record BuildProfile(String name)
 {
+    public static BuildProfile profile(String name)
+    {
+        return new BuildProfile(name);
+    }
 }

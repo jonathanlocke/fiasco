@@ -91,12 +91,12 @@ public interface BuildSettings extends
     BuildExecutionStep,
     Rooted
 {
-    static BuildSettingsObject buildSettings()
+    static BuildSettings buildSettings()
     {
         return new BuildSettingsObject();
     }
 
-    static BuildSettingsObject buildSettings(Builder builder)
+    static BuildSettings buildSettings(Builder builder)
     {
         return new BuildSettingsObject(builder);
     }
@@ -386,6 +386,14 @@ public interface BuildSettings extends
      * @return The copy of this settings object
      */
     BuildSettings withPhases(PhaseList phases);
+
+    /**
+     * Returns this settings object with the given profile added
+     *
+     * @param profile The profile to add
+     * @return The copy
+     */
+    BuildSettings withProfile(BuildProfile profile);
 
     /**
      * Returns a copy of this settings object with the given root folder

@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.librarian;
+package digital.fiasco.runtime.dependency.artifact.resolver;
 
 import digital.fiasco.runtime.FiascoTest;
 import digital.fiasco.runtime.build.BaseBuild;
@@ -40,7 +40,7 @@ public class ArtifactResolverTest extends FiascoTest
             }
         };
 
-        var resolved = new ResolvedArtifactSet(this);
+        var resolved = new ArtifactResolutionTracker(this);
         new ArtifactResolver(build, resolved).resolveArtifacts();
 
         resolved.waitForResolutionOf(kivakitArtifacts());

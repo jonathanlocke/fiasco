@@ -20,7 +20,6 @@ import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.build.builder.tools.Tool;
 import digital.fiasco.runtime.build.builder.tools.ToolFactory;
-import digital.fiasco.runtime.librarian.Librarian;
 import digital.fiasco.runtime.build.environment.BuildEnvironmentTrait;
 import digital.fiasco.runtime.build.environment.BuildStructure;
 import digital.fiasco.runtime.build.execution.BuildExecutionStep;
@@ -34,6 +33,8 @@ import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.lists.BuilderList;
+import digital.fiasco.runtime.librarian.Librarian;
+import digital.fiasco.runtime.librarian.MultiRepositoryLibrarian;
 import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
 
@@ -49,6 +50,7 @@ import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
 import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
 import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
+import static digital.fiasco.runtime.build.settings.BuildProfile.profile;
 import static digital.fiasco.runtime.build.settings.BuildSettings.buildSettings;
 import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.collections.lists.BuilderList.builders;
@@ -228,7 +230,6 @@ import static digital.fiasco.runtime.dependency.collections.lists.BuilderList.bu
  *     <li>{@link #newCompiler()}</li>
  *     <li>{@link #newCopier()}</li>
  *     <li>{@link #newGit()}</li>
- *     <li>{@link #newLibrarian()}</li>
  *     <li>{@link #newShader()}</li>
  *     <li>{@link #newStamper()}</li>
  *     <li>{@link #newTester()}</li>
@@ -283,7 +284,7 @@ public class Builder extends BaseRepeater implements
     public Builder(Build build)
     {
         this.build = build;
-        librarian = newLibrarian();
+        librarian = new MultiRepositoryLibrarian();
         artifactDependencies = artifacts();
         builderDependencies = builders();
         settings = buildSettings(this);
@@ -911,7 +912,8 @@ public class Builder extends BaseRepeater implements
 
     /**
      * Makes a copy of this builder, transformed by parsing the given command line, enabling and disabling relevant
-     * phases and build options.
+     * phases, profiles and build options. Giving names to phases or profiles that are not unique is discouraged, but in
+     * that event, options have higher priority than phases, and phases have higher priority than profiles.
      *
      * @param commandLine The command line to process
      * @return A copy of this builder transformed by the given command line
@@ -952,7 +954,7 @@ public class Builder extends BaseRepeater implements
                 }
                 else
                 {
-                    var profile = new BuildProfile(value);
+                    var profile = profile(value);
                     if (enable)
                     {
                         builder = withSettings(it -> it.withEnabled(profile));
@@ -1007,6 +1009,18 @@ public class Builder extends BaseRepeater implements
     public Builder withPinnedVersion(Artifact<?> artifact, Version version)
     {
         return mutatedCopy(it -> it.librarian = librarian.withPinnedVersion(artifact, version));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param profile {@inheritDoc}
+     * @return {@inheritDoc}
+     */
+    @Override
+    public Builder withProfile(BuildProfile profile)
+    {
+        return withSettings(it -> it.withProfile(profile));
     }
 
     /**

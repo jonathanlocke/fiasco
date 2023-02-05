@@ -5,17 +5,19 @@ import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.Folder;
+import com.telenav.kivakit.interfaces.object.Copyable;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
 import digital.fiasco.runtime.build.builder.phases.standard.StandardPhases;
-import digital.fiasco.runtime.librarian.Librarian;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
+import digital.fiasco.runtime.librarian.Librarian;
 import org.jetbrains.annotations.NotNull;
 
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
+import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.value.count.Count._8;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 
@@ -57,6 +59,7 @@ import static com.telenav.kivakit.filesystem.Folders.currentFolder;
  * <ul>
  *     <li>{@link #withEnabled(BuildProfile)}</li>
  *     <li>{@link #isEnabled(BuildProfile)}</li>
+ *     <li></li>
  *     <li>{@link #profiles()}</li>
  * </ul>
  *
@@ -77,7 +80,9 @@ import static com.telenav.kivakit.filesystem.Folders.currentFolder;
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "UnusedReturnValue", "unused" })
-public class BuildSettingsObject extends BaseRepeater implements BuildSettings
+public class BuildSettingsObject extends BaseRepeater implements
+    BuildSettings,
+    Copyable<BuildSettingsObject>
 {
     /** The builder for these settings */
     private Builder builder;
@@ -103,8 +108,11 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettings
     /** The librarian to manage libraries */
     private Librarian librarian;
 
-    /** Set of profiles to enable for this build */
+    /** Set of profiles for this build */
     private ObjectSet<BuildProfile> profiles = set();
+
+    /** Set of profiles to enable for this build */
+    private ObjectSet<BuildProfile> enabledProfiles = set();
 
     public BuildSettingsObject(Builder builder)
     {
@@ -112,6 +120,10 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettings
         this.phases = new StandardPhases(builder);
         this.librarian = builder.librarian();
         this.rootFolder = currentFolder();
+    }
+
+    BuildSettingsObject()
+    {
     }
 
     /**
@@ -130,10 +142,7 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettings
         this.descriptor = that.descriptor;
         this.librarian = that.librarian.copy();
         this.profiles = that.profiles.copy();
-    }
-
-    BuildSettingsObject()
-    {
+        this.enabledProfiles = that.enabledProfiles.copy();
     }
 
     /**
@@ -213,7 +222,9 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettings
     @Override
     public boolean isEnabled(BuildProfile profile)
     {
-        return profiles.contains(profile);
+        ensure(profiles.contains(profile), "Unknown profile $", profile);
+
+        return enabledProfiles.contains(profile);
     }
 
     /**
@@ -345,8 +356,10 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettings
     @Override
     public BuildSettingsObject withDisabled(BuildProfile profile)
     {
+        ensure(profiles.contains(profile), "Unknown profile $", profile);
+
         var copy = copy();
-        copy.profiles.remove(profile);
+        copy.enabledProfiles.remove(profile);
         return copy;
     }
 
@@ -387,8 +400,10 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettings
     @Override
     public BuildSettingsObject withEnabled(BuildProfile profile)
     {
+        ensure(profiles.contains(profile), "Unknown profile $", profile);
+
         var copy = copy();
-        copy.profiles.add(profile);
+        copy.enabledProfiles.add(profile);
         return copy;
     }
 
@@ -404,6 +419,17 @@ public class BuildSettingsObject extends BaseRepeater implements BuildSettings
         var copy = copy();
         copy.phases = phases.copy();
         return copy;
+    }
+
+    /**
+     * Returns this settings object with the given profile added
+     *
+     * @param profile The profile to add
+     * @return The copy
+     */
+    public BuildSettingsObject withProfile(BuildProfile profile)
+    {
+        return mutatedCopy(it -> it.profiles.add(profile));
     }
 
     /**
