@@ -12,10 +12,10 @@ import com.telenav.kivakit.interfaces.object.Copyable;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.BaseBuild;
 import digital.fiasco.runtime.build.builder.BuilderAssociated;
-import digital.fiasco.runtime.librarian.Librarian;
 import digital.fiasco.runtime.build.environment.BuildEnvironmentTrait;
 import digital.fiasco.runtime.build.environment.BuildStructure;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.librarian.Librarian;
 
 /**
  * Interface for executable tools. Tools are runnable message repeaters that are associated with a {@link BaseBuild}
@@ -47,7 +47,7 @@ public interface Tool<T extends Tool<T>> extends
     void checkConsistency();
 
     /**
-     * Returns true if this tool is enabled under any of the profiles it is assigned to
+     * Returns true if this tool is enabled under any of the profiles to which it is assigned
      *
      * @return True if enabled
      */

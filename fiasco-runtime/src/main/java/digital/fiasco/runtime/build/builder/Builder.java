@@ -333,37 +333,13 @@ public class Builder extends BaseRepeater implements
     }
 
     /**
-     * Runs this builder, returning a result. The result contains any captured messages, and a reference to the builder
-     * to signify which builder the result is for.
+     * Returns the build for this builder
      *
-     * @return Returns the build result
+     * @return The build
      */
-    public final Result<Builder> build()
+    public Build build()
     {
-        return result(() ->
-        {
-            // go through each phase in order,
-            for (var phase : settings().phases())
-            {
-                // and if the phase is enabled,
-                if (isEnabled(phase))
-                {
-                    // notify that the phase has started,
-                    phase.internalOnBefore(this);
-
-                    // run the phase calling all listeners,
-                    if (settings.isEnabled(VERBOSE))
-                    {
-                        announce(bannerLine(phase.name() + " (" + descriptor().groupAndName() + ")"));
-                    }
-                    phase.internalOnRun(this);
-
-                    // notify that the phase has ended,
-                    phase.internalOnAfter(this);
-                }
-            }
-            return this;
-        });
+        return build;
     }
 
     public Builder builder(ArtifactDescriptor descriptor)
@@ -557,6 +533,40 @@ public class Builder extends BaseRepeater implements
     public Folder rootFolder()
     {
         return settings().rootFolder();
+    }
+
+    /**
+     * Runs this builder, returning a result. The result contains any captured messages, and a reference to the builder
+     * to signify which builder the result is for.
+     *
+     * @return Returns the build result
+     */
+    public final Result<Builder> run()
+    {
+        return result(() ->
+        {
+            // go through each phase in order,
+            for (var phase : settings().phases())
+            {
+                // and if the phase is enabled,
+                if (isEnabled(phase))
+                {
+                    // notify that the phase has started,
+                    phase.internalOnBefore(this);
+
+                    // run the phase calling all listeners,
+                    if (settings.isEnabled(VERBOSE))
+                    {
+                        announce(bannerLine(phase.name() + " (" + descriptor().groupAndName() + ")"));
+                    }
+                    phase.internalOnRun(this);
+
+                    // notify that the phase has ended,
+                    phase.internalOnAfter(this);
+                }
+            }
+            return this;
+        });
     }
 
     /**

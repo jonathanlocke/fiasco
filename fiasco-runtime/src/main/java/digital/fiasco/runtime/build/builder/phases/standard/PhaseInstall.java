@@ -22,7 +22,7 @@ public class PhaseInstall extends BasePhase
                 PhaseCompile.class,
                 PhaseTest.class,
                 PhaseDocument.class,
-                PhasePackage.class,
+                PhaseAssemble.class,
                 PhaseIntegrationTest.class
             );
     }

@@ -1,13 +1,20 @@
 package digital.fiasco.runtime.build.builder.tools;
 
 import com.telenav.kivakit.component.BaseComponent;
+import com.telenav.kivakit.core.messaging.Listener;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.object.Copyable;
+import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.builder.Builder;
-import digital.fiasco.runtime.librarian.Librarian;
 import digital.fiasco.runtime.build.execution.BuildExecutionStep;
+import digital.fiasco.runtime.build.settings.BuildOption;
 import digital.fiasco.runtime.build.settings.BuildProfile;
+import digital.fiasco.runtime.build.settings.BuildSettings;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.librarian.Librarian;
+
+import static com.telenav.kivakit.core.messaging.Listener.nullListener;
+import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
 
 /**
  * Base class for build {@link Tool}s. Build tools can be enabled or disabled under a given {@link BuildProfile}.
@@ -63,11 +70,29 @@ public abstract class BaseTool<T extends BaseTool<T>> extends BaseComponent impl
         return builder;
     }
 
+    /**
+     * Returns the build using this tool
+     *
+     * @return The build
+     */
+    public Build build()
+    {
+        return builder.build();
+    }
+
+    /**
+     * Returns the builder using this tool
+     *
+     * @return The builder
+     */
     public Builder builder()
     {
         return builder;
     }
 
+    /**
+     * {@inheritDoc}
+     */
     @Override
     public void checkConsistency()
     {
@@ -155,6 +180,11 @@ public abstract class BaseTool<T extends BaseTool<T>> extends BaseComponent impl
         }
     }
 
+    public BuildSettings settings()
+    {
+        return builder.settings();
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -175,5 +205,23 @@ public abstract class BaseTool<T extends BaseTool<T>> extends BaseComponent impl
     public boolean shouldDescribeAndExecute()
     {
         return builder.shouldDescribeAndExecute();
+    }
+
+    /**
+     * Returns a listener based on the settings for the builder using this tool. For example, if
+     * {@link BuildOption#VERBOSE} is not enabled, a null listener would be returned
+     *
+     * @return The listener to transmit to
+     */
+    protected Listener listener()
+    {
+        if (settings().isEnabled(VERBOSE))
+        {
+            return this;
+        }
+        else
+        {
+            return nullListener();
+        }
     }
 }

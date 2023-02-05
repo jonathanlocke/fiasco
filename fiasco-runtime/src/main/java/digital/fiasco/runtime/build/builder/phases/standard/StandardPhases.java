@@ -11,12 +11,12 @@ import static com.telenav.kivakit.interfaces.comparison.Matcher.matchAll;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_CLEAN;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_COMPILE;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_DEPLOY_DOCUMENTATION;
-import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_DEPLOY_PACKAGES;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_DEPLOY;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_DOCUMENT;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_END;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_INSTALL;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_INTEGRATION_TEST;
-import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_PACKAGE;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_ASSEMBLE;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_PREPARE;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_START;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_TEST;
@@ -67,10 +67,10 @@ public class StandardPhases extends PhaseList implements
         add(PHASE_COMPILE.duringPhase(it -> onCompile()));
         add(PHASE_TEST);
         add(PHASE_DOCUMENT);
-        add(PHASE_PACKAGE);
+        add(PHASE_ASSEMBLE);
         add(PHASE_INTEGRATION_TEST);
         add(PHASE_INSTALL);
-        add(PHASE_DEPLOY_PACKAGES);
+        add(PHASE_DEPLOY);
         add(PHASE_DEPLOY_DOCUMENTATION);
         add(PHASE_END);
 

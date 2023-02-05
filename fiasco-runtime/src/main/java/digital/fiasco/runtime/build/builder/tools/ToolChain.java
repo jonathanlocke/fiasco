@@ -4,7 +4,7 @@ import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.object.Copyable;
-import digital.fiasco.runtime.build.builder.tools.jdk.Jdk;
+import digital.fiasco.runtime.build.builder.tools.toolchain.jdk.Jdk;
 
 import static com.telenav.kivakit.core.collections.map.ObjectMap.map;
 import static com.telenav.kivakit.core.version.Version.version;

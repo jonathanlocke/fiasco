@@ -6,11 +6,11 @@ import digital.fiasco.runtime.build.builder.phases.Phase;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 
-public class PhaseIntegrationTest extends BasePhase
+public class PhaseAssemble extends BasePhase
 {
-    public PhaseIntegrationTest()
+    public PhaseAssemble()
     {
-        super("integration-test");
+        super("assemble");
     }
 
     @Override
@@ -21,14 +21,13 @@ public class PhaseIntegrationTest extends BasePhase
                 PhasePrepare.class,
                 PhaseCompile.class,
                 PhaseTest.class,
-                PhaseDocument.class,
-                PhaseAssemble.class
+                PhaseDocument.class
             );
     }
 
     @Override
     public String description()
     {
-        return "runs integration tests";
+        return "creates packaged artifacts";
     }
 }
