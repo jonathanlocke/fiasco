@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.build.builder.tools.compile.java;
 
+import com.telenav.kivakit.core.collections.list.StringList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.FileList;
@@ -10,6 +11,7 @@ import digital.fiasco.runtime.build.builder.tools.BaseTool;
 import digital.fiasco.runtime.build.builder.tools.Tool;
 import digital.fiasco.runtime.build.builder.tools.compile.java.flags.CompilerWarning;
 import digital.fiasco.runtime.build.builder.tools.compile.java.flags.DebugInformation;
+import digital.fiasco.runtime.utility.CommandLineComposer;
 
 import javax.tools.Diagnostic;
 import javax.tools.DiagnosticListener;
@@ -20,18 +22,21 @@ import java.util.Locale;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.string.Formatter.format;
+import static digital.fiasco.runtime.build.builder.tools.compile.java.flags.DebugInformation.ALL;
+import static digital.fiasco.runtime.build.builder.tools.compile.java.flags.DebugInformation.NONE;
 import static java.nio.charset.StandardCharsets.UTF_8;
 import static javax.tools.ToolProvider.getSystemJavaCompiler;
 
 /**
  * Compiles one or more files containing Java code.
  *
- * <p><b>Compiler Settings</b></p>
+ * <p><b>Settings</b></p>
  *
  * <ul>
  *     <li>{@link #checkConsistency()}</li>
  *     <li>{@link #compilerWarnings()}</li>
  *     <li>{@link #debugInformation()}</li>
+ *     <li>{@link #withDebugInformation(DebugInformation...)}</li>
  *     <li>{@link #withReleaseVersion(Version)}</li>
  *     <li>{@link #withWarningDisabled(CompilerWarning...)}</li>
  *     <li>{@link #withWarningEnabled(CompilerWarning...)}</li>
@@ -155,8 +160,8 @@ public class JavaCompiler extends BaseTool<JavaCompiler>
     @Override
     public void checkConsistency()
     {
-        ensure(debugInformation.equals(ObjectSet.set(DebugInformation.NONE))
-                || debugInformation.equals(ObjectSet.set(DebugInformation.ALL))
+        ensure(debugInformation.equals(ObjectSet.set(NONE))
+                || debugInformation.equals(ObjectSet.set(ALL))
                 || !debugInformation.isEmpty(),
             "Debug information can be NONE, ALL or any combination of SOURCE_FILES, LINES, and VARIABLES");
     }
@@ -211,7 +216,7 @@ public class JavaCompiler extends BaseTool<JavaCompiler>
     @Override
     public void onRun()
     {
-        // compile(sourceMainJavaSources());
+        compile(sources);
     }
 
     /**
@@ -390,11 +395,40 @@ public class JavaCompiler extends BaseTool<JavaCompiler>
      */
     private boolean compile(FileList sources)
     {
-        information("Compiling");
+        trace("Compiling $", sources);
 
         var compiler = getSystemJavaCompiler();
         var fileManager = compiler.getStandardFileManager(new ProblemListener(), sourceLocale, sourceEncoding);
         var files = fileManager.getJavaFileObjectsFromFiles(sources.asJavaFiles());
-        return compiler.getTask(null, fileManager, new ProblemListener(), null, null, files).call();
+        var task = compiler.getTask(null, fileManager, new ProblemListener(), options(), null, files);
+        return task.call();
+    }
+
+    private CommandLineComposer debugFlags(CommandLineComposer composer)
+    {
+        if (debugInformation.contains(ALL))
+        {
+            ensure(debugInformation.size() == 1, "ALL cannot be specified with other debug flags");
+            return composer.withBooleanFlag("-g");
+        }
+        if (debugInformation.contains(NONE))
+        {
+            ensure(debugInformation.size() == 1, "NONE cannot be specified with other debug flags");
+            return composer.withBooleanFlag("-g");
+        }
+        return composer.withOneArgumentSwitch("-g", debugInformation.map(DebugInformation::flag), ",", ":");
+    }
+
+    private StringList options()
+    {
+        return debugFlags(new CommandLineComposer())
+            .withTwoArgumentSwitch("-classpath", classpath, ";")
+            .withTwoArgumentSwitch("-d", targetFolder)
+            .withTwoArgumentSwitch("-encoding", sourceEncoding)
+            .withTwoArgumentSwitch("-release", releaseVersion)
+            .withTwoArgumentSwitch("-source", sourceVersion)
+            .withTwoArgumentSwitch("-locale", sourceLocale)
+            .withTwoArgumentSwitch("-target", targetVersion)
+            .asStringList();
     }
 }
