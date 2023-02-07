@@ -36,13 +36,13 @@ import static com.telenav.kivakit.core.ensure.Ensure.fail;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
+import static com.telenav.kivakit.filesystem.Folders.userHome;
 import static com.telenav.kivakit.resource.Extension.ASC;
 import static com.telenav.kivakit.resource.Extension.MD5;
 import static com.telenav.kivakit.resource.Extension.SHA1;
 import static com.telenav.kivakit.resource.FileName.parseFileName;
 import static com.telenav.kivakit.resource.ResourcePath.parseResourcePath;
 import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
-import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
@@ -83,7 +83,7 @@ import static digital.fiasco.runtime.repository.Repository.InstallationResult.IN
 @SuppressWarnings({ "JavadocLinkAsPlainText", "unused" })
 public class MavenRepository extends BaseRepository implements TryCatchTrait
 {
-    public static Folder LOCAL_MAVEN_REPOSITORY_FOLDER = fiascoCacheFolder().folder("maven-repository");
+    public static Folder LOCAL_MAVEN_REPOSITORY_FOLDER = userHome().folder(".m2/repository");
 
     /** Resolves artifacts from maven repositories */
     private final MavenResolver mavenResolver;
@@ -431,10 +431,6 @@ public class MavenRepository extends BaseRepository implements TryCatchTrait
                                 .withDependencies(children)
                                 .withContent(jar));
                         }
-                    }
-                    else
-                    {
-                        illegalState("Cannot resolve JAR attachment for: $", artifact);
                     }
                 }
             }

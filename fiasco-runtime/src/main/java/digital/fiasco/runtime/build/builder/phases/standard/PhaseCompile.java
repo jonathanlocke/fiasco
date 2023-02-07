@@ -22,6 +22,6 @@ public class PhaseCompile extends BasePhase
     @Override
     public String description()
     {
-        return "compiles targets";
+        return "compiles sources";
     }
 }

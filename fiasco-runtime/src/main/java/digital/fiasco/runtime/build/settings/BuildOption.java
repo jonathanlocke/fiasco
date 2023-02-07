@@ -15,7 +15,7 @@ public enum BuildOption
     DESCRIBE("describe the build rather than running it"),
 
     /** Describe operations as well as executing them */
-    VERBOSE("describe the build rather than running it"),
+    VERBOSE("describe the build in detail as it runs"),
 
     /** Build with minimal output */
     QUIET("build with minimal output"),

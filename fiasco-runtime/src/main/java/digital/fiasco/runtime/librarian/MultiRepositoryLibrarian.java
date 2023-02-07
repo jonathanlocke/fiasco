@@ -26,6 +26,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MAVEN_CENTRAL;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 
 /**
  * Manages {@link Artifact}s and their dependencies. Searches the list of repositories added to this librarian with
@@ -105,7 +106,7 @@ public class MultiRepositoryLibrarian extends BaseComponent implements
     @Override
     public ArtifactList resolve(ObjectList<ArtifactDescriptor> descriptors)
     {
-        var artifacts = ArtifactList.artifacts();
+        var artifacts = artifacts();
 
         var progress = progressReporter(this, "dependencies", descriptors.count());
         progress.start("Resolving $", descriptors.count());
@@ -122,6 +123,12 @@ public class MultiRepositoryLibrarian extends BaseComponent implements
         }
         progress.end();
 
+        var resolved = artifacts.asArtifactDescriptors();
+        for (var at : descriptors)
+        {
+            ensure(resolved.contains(at), "Could not resolve artifact: $", at);
+        }
+
         return artifacts;
     }
 
@@ -135,7 +142,7 @@ public class MultiRepositoryLibrarian extends BaseComponent implements
     @Override
     public ArtifactList resolve(Artifact<?> artifact)
     {
-        var dependencies = ArtifactList.artifacts();
+        var dependencies = artifacts();
 
         // Go through the library's dependencies,
         for (var dependency : artifact.artifactDependencies())
