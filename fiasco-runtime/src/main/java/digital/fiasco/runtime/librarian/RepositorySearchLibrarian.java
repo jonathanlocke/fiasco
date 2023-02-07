@@ -25,6 +25,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
 import static com.telenav.kivakit.core.string.Formatter.format;
+import static com.telenav.kivakit.filesystem.Folders.userHome;
 import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MAVEN_CENTRAL;
 import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 
@@ -48,9 +49,9 @@ import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.a
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class MultiRepositoryLibrarian extends BaseComponent implements
+public class RepositorySearchLibrarian extends BaseComponent implements
     Librarian,
-    Copyable<MultiRepositoryLibrarian>
+    Copyable<RepositorySearchLibrarian>
 {
     /** The repositories that this librarian searches */
     private ObjectList<Repository> repositories = list();
@@ -58,22 +59,23 @@ public class MultiRepositoryLibrarian extends BaseComponent implements
     /** A map from group:artifact-id to version */
     private ObjectMap<ArtifactDescriptor, Version> pinnedVersions = new ObjectMap<>();
 
-    public MultiRepositoryLibrarian(MultiRepositoryLibrarian that)
+    public RepositorySearchLibrarian(RepositorySearchLibrarian that)
     {
         this.repositories = that.repositories.copy();
         this.pinnedVersions = that.pinnedVersions.copy();
     }
 
-    public MultiRepositoryLibrarian()
+    public RepositorySearchLibrarian()
     {
         repositories.add(new LocalRepository("repository"));
         repositories.add(MAVEN_CENTRAL);
+        repositories.add(new MavenRepository("local", userHome().folder(".m2/repository")));
     }
 
     @Override
-    public MultiRepositoryLibrarian copy()
+    public RepositorySearchLibrarian copy()
     {
-        return new MultiRepositoryLibrarian(this);
+        return new RepositorySearchLibrarian(this);
     }
 
     /**

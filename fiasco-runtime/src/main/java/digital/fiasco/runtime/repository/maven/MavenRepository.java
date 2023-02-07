@@ -105,7 +105,7 @@ public class MavenRepository extends BaseRepository implements TryCatchTrait
     {
         super(name, uri);
 
-        this.rootFolder = new HttpResourceFolder(uri);
+        this.rootFolder = uri.getScheme().equals("file") ? localRepositoryFolder : new HttpResourceFolder(uri);
         this.localRepositoryFolder = localRepositoryFolder.mkdirs();
         this.localRepository = new LocalRepository(localRepositoryFolder.asJavaFile());
 
@@ -255,18 +255,22 @@ public class MavenRepository extends BaseRepository implements TryCatchTrait
         var resource = mavenResource(rootFolder, attachment, null);
         if (true) //resource.exists())
         {
-            var type = attachment.attachmentType();
-            var asc = mavenResource(rootFolder, attachment.withType(type), ASC).reader().readText();
-            var md5 = mavenResource(rootFolder, attachment.withType(type), MD5).reader().readText();
-            var sha1 = mavenResource(rootFolder, attachment.withType(type), SHA1).reader().readText();
-            var signatures = new ArtifactContentSignatures(asc, md5, sha1);
-
-            return content()
+            var content = content()
                 .withName(resource.fileName().name())
-                .withSignatures(signatures)
                 .withResource(resource)
                 .withLastModified(resource.lastModified())
                 .withSize(resource.sizeInBytes());
+
+            var type = attachment.attachmentType();
+            var asc = tryCatch(() -> mavenResource(rootFolder, attachment.withType(type), ASC).reader().readText());
+            var md5 = tryCatch(() -> mavenResource(rootFolder, attachment.withType(type), MD5).reader().readText());
+            var sha1 = tryCatch(() -> mavenResource(rootFolder, attachment.withType(type), SHA1).reader().readText());
+
+            if (asc != null && md5 != null && sha1 != null)
+            {
+                content = content.withSignatures(new ArtifactContentSignatures(asc, md5, sha1));
+            }
+            return content;
         }
         return illegalState("Content does not exist: $", resource);
     }

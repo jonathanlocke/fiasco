@@ -115,6 +115,9 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
     /** Condition to signal/await that indicates more dependencies have been processed */
     private final Condition processedMore = lock.newCondition();
 
+    /** The type of dependency in this queue */
+    private final Class<? extends Dependency> type;
+
     /**
      * Creates a dependency queue with the given initial elements, filtered by the given dependency type
      *
@@ -124,6 +127,7 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyQueue(DependencyList initial, Class<? extends Dependency> type)
     {
+        this.type = type;
         available = initial.deduplicated().matching(type);
         taken = dependencies();
         processed = dependencies();
@@ -254,7 +258,7 @@ public class DependencyQueue extends BaseComponent implements ConsoleTrait
         return lock.whileLocked(() ->
         {
             // If any dependency of the candidate
-            for (var at : candidate.allDependencies())
+            for (var at : candidate.allDependencies().matching(type))
             {
                 // is unprocessed,
                 if (!processed.contains(at))

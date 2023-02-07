@@ -11,7 +11,7 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.collections.DependencyQueue;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
-import digital.fiasco.runtime.librarian.MultiRepositoryLibrarian;
+import digital.fiasco.runtime.librarian.RepositorySearchLibrarian;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
@@ -24,7 +24,7 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
 /**
  * Resolves artifacts in groups by turning the given root dependency into a {@link DependencyTree}, and then turning
  * that tree into a {@link DependencyQueue}. Groups of dependencies that are ready for resolution are retrieved with
- * {@link DependencyQueue#takeAllReadyDependencies()}, and then resolved using the {@link MultiRepositoryLibrarian} found in the
+ * {@link DependencyQueue#takeAllReadyDependencies()}, and then resolved using the {@link RepositorySearchLibrarian} found in the
  * {@link BuildSettingsObject}. When a group of dependencies is resolved, the given {@link Callback} is called with the
  * resolution {@link Result}.
  *

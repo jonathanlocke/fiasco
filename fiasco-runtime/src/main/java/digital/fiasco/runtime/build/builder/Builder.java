@@ -34,7 +34,7 @@ import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.lists.BuilderList;
 import digital.fiasco.runtime.librarian.Librarian;
-import digital.fiasco.runtime.librarian.MultiRepositoryLibrarian;
+import digital.fiasco.runtime.librarian.RepositorySearchLibrarian;
 import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
 
@@ -282,7 +282,7 @@ public class Builder extends BaseRepeater implements
     public Builder(Build build)
     {
         this.build = build;
-        librarian = new MultiRepositoryLibrarian();
+        librarian = new RepositorySearchLibrarian();
         artifactDependencies = artifacts();
         builderDependencies = builders();
         settings = buildSettings(this);
