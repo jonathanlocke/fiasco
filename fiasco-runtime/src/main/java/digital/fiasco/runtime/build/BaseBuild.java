@@ -259,6 +259,11 @@ public abstract class BaseBuild extends Application implements Build
     @Override
     public DependencyTree dependencyTree()
     {
+        if (dependencyTree == null)
+        {
+            var root = onConfigureBuild(newBuilder());
+            dependencyTree = new DependencyTree(root);
+        }
         return dependencyTree;
     }
 
@@ -350,12 +355,20 @@ public abstract class BaseBuild extends Application implements Build
             .build());
     }
 
-    @Override
-    protected void onInitialize()
+    /**
+     * Creates a new builder with settings initialized to defaults and configured by the command line for this build
+     *
+     * @return The builder
+     */
+    protected Builder newBuilder()
     {
-        super.onInitialize();
-        var root = onConfigureBuild(newBuilder());
-        dependencyTree = new DependencyTree(root);
+        var builder = new Builder(this);
+        return builder
+            .withSettings(buildSettings(builder)
+                .withArtifactDescriptor(metadata().descriptor())
+                .withBuilderThreads(get(BUILDER_THREADS))
+                .withArtifactResolverThreads(get(RESOLVER_THREADS)))
+            .withParsedCommandLine(commandLine());
     }
 
     /**
@@ -401,21 +414,5 @@ public abstract class BaseBuild extends Application implements Build
         return super.switchParsers().with(
             BUILDER_THREADS,
             RESOLVER_THREADS);
-    }
-
-    /**
-     * Creates a new builder with settings initialized to defaults and configured by the command line for this build
-     *
-     * @return The builder
-     */
-    private Builder newBuilder()
-    {
-        var builder = new Builder(this);
-        return builder
-            .withSettings(buildSettings(builder)
-                .withArtifactDescriptor(metadata().descriptor())
-                .withBuilderThreads(get(BUILDER_THREADS))
-                .withArtifactResolverThreads(get(RESOLVER_THREADS)))
-            .withParsedCommandLine(commandLine());
     }
 }

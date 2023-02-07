@@ -24,9 +24,9 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
 /**
  * Resolves artifacts in groups by turning the given root dependency into a {@link DependencyTree}, and then turning
  * that tree into a {@link DependencyQueue}. Groups of dependencies that are ready for resolution are retrieved with
- * {@link DependencyQueue#takeAllReadyDependencies()}, and then resolved using the {@link RepositorySearchLibrarian} found in the
- * {@link BuildSettingsObject}. When a group of dependencies is resolved, the given {@link Callback} is called with the
- * resolution {@link Result}.
+ * {@link DependencyQueue#takeAllReady()}, and then resolved using the {@link RepositorySearchLibrarian}
+ * found in the {@link BuildSettingsObject}. When a group of dependencies is resolved, the given {@link Callback} is
+ * called with the resolution {@link Result}.
  *
  * <p><b>Performance</b></p>
  *
@@ -65,8 +65,8 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
     }
 
     /**
-     * Resolves the artifact dependencies of a build tree in groups, updating the given {@link ArtifactResolutionTracker} set
-     * for each group that is resolved.
+     * Resolves the artifact dependencies of a build tree in groups, updating the given
+     * {@link ArtifactResolutionTracker} set for each group that is resolved.
      */
     public void resolveArtifacts()
     {
@@ -98,16 +98,16 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
     private Void resolveArtifacts(DependencyQueue queue)
     {
         // While there are dependencies left to resolve,
-        while (queue.canTakeDependencies())
+        while (queue.hasAvailable())
         {
             // resolve the next group of artifacts that are ready to be resolved.
             trace("Waiting for ready dependencies");
-            var ready = queue.takeAllReadyDependencies();
+            var ready = queue.takeAllReady();
             if (ready.isNonEmpty())
             {
                 trace("Resolving artifacts: $", ready);
                 resolveArtifacts(ready.asArtifactList());
-                queue.processed(ready);
+                queue.completed(ready);
             }
         }
 

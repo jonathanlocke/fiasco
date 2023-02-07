@@ -70,6 +70,12 @@ public class DependencyTree
         this.depthFirst = depthFirst(root, dependencies());
     }
 
+    public DependencyTree(DependencyTree that)
+    {
+        this.depthFirst = that.depthFirst.copy();
+        this.root = that.root;
+    }
+
     /**
      * Returns the dependencies in this tree in depth-first order
      */

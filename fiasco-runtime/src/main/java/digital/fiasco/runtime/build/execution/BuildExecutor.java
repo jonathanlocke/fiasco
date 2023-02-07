@@ -114,18 +114,21 @@ public class BuildExecutor extends BaseComponent implements TryTrait
      */
     private ObjectList<Result<Builder>> build(ArtifactResolutionTracker resolved)
     {
-        // Create a queue of builders from the given root,
-        var queue = build.dependencyTree().asQueue(Builder.class);
+        // Create a queue of builders from the dependency tree for the build, where builders are
+        // ready for processing once their artifact and builder dependencies have been resolved.
+        var builderQueue = build.dependencyTree().asQueue(Builder.class)
+            .withIsReady((queue, it) -> resolved.isResolved(it.artifactDependencies())
+                && queue.hasCompleted(it.builderDependencies().asDependencyList()));
 
-        // create a thread pool,
+        // Create a thread pool,
         var executor = threadPool("FiascoBuild", build.settings().builderThreads());
 
         // and while there are builders yet to run,
         var futures = new ObjectList<Future<Result<Builder>>>();
-        for (Builder builder = queue.takeNextReadyDependency(); builder != null; builder = queue.takeNextReadyDependency())
+        for (Builder builder = builderQueue.takeNextReady(); builder != null; builder = builderQueue.takeNextReady())
         {
             // submit the builder to the executor,
-            var future = (Future<Result<Builder>>) executor.submit(builderTask(resolved, queue, builder));
+            var future = (Future<Result<Builder>>) executor.submit(builderTask(resolved, builderQueue, builder));
             trace("$: submitted", builder);
 
             // and add the future to the list of results to wait for.
@@ -169,7 +172,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
             trace("$: build completed ", builder);
 
             // and then mark it as processed.
-            queue.processed(builder);
+            queue.completed(builder);
 
             return result;
         };

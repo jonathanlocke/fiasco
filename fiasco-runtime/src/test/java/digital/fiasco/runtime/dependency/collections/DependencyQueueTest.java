@@ -42,20 +42,20 @@ public class DependencyQueueTest extends FiascoTest
             _5.loop(() ->
                 executor.submit(() ->
                 {
-                    while (queue.canTakeDependencies())
+                    while (queue.hasAvailable())
                     {
-                        var next = queue.takeNextReadyDependency();
+                        var next = queue.takeNextReady();
                         milliseconds(3).sleep();
-                        queue.processed(next);
+                        queue.completed(next);
                     }
                 }));
 
-            var wake = queue.awaitProcessingFinished(minutes(1));
+            var wake = queue.awaitCompletion(minutes(1));
 
             ensureEqual(wake, COMPLETED);
-            ensure(!queue.canTakeDependencies());
+            ensure(!queue.hasAvailable());
 
-            var processed = queue.processed().asLibraryList();
+            var processed = queue.completed().asLibraryList();
             ensure(_6.equals(processed.count()));
 
             ensure(processed.contains(a));
@@ -72,17 +72,17 @@ public class DependencyQueueTest extends FiascoTest
     {
         var queue = testDependencyQueue();
 
-        var group1 = queue.takeAllReadyDependencies();
+        var group1 = queue.takeAllReady();
         ensure(group1.equals(libraries(c, e, f)));
-        queue.processed(group1);
+        queue.completed(group1);
 
-        var group2 = queue.takeAllReadyDependencies();
+        var group2 = queue.takeAllReady();
         ensure(group2.equals(libraries(b, d)));
-        queue.processed(group2);
+        queue.completed(group2);
 
-        var group3 = queue.takeAllReadyDependencies();
+        var group3 = queue.takeAllReady();
         ensure(group3.equals(libraries(a)));
-        queue.processed(group3);
+        queue.completed(group3);
     }
 
     @Test
@@ -94,20 +94,20 @@ public class DependencyQueueTest extends FiascoTest
 
             KivaKitThread.run(this, "processor", () ->
             {
-                while (queue.canTakeDependencies())
+                while (queue.hasAvailable())
                 {
-                    var next = queue.takeAllReadyDependencies();
+                    var next = queue.takeAllReady();
                     milliseconds(1).sleep();
-                    queue.processed(next);
+                    queue.completed(next);
                 }
             });
 
-            var wake = queue.awaitProcessingFinished(minutes(1));
+            var wake = queue.awaitCompletion(minutes(1));
 
             ensureEqual(wake, COMPLETED);
-            ensure(!queue.canTakeDependencies());
+            ensure(!queue.hasAvailable());
 
-            var processed = queue.processed();
+            var processed = queue.completed();
             ensure(_6.equals(processed.count()));
 
             // group 1
@@ -133,20 +133,20 @@ public class DependencyQueueTest extends FiascoTest
 
             KivaKitThread.run(this, "processor", () ->
             {
-                while (queue.canTakeDependencies())
+                while (queue.hasAvailable())
                 {
-                    var next = queue.takeNextReadyDependency();
+                    var next = queue.takeNextReady();
                     milliseconds(1).sleep();
-                    queue.processed(next);
+                    queue.completed(next);
                 }
             });
 
-            var wake = queue.awaitProcessingFinished(minutes(1));
+            var wake = queue.awaitCompletion(minutes(1));
 
             ensureEqual(wake, COMPLETED);
-            ensure(!queue.canTakeDependencies());
+            ensure(!queue.hasAvailable());
 
-            var processed = queue.processed();
+            var processed = queue.completed();
             ensure(_6.equals(processed.count()));
 
             ensureEqual(processed.get(0), c);
@@ -188,22 +188,22 @@ public class DependencyQueueTest extends FiascoTest
     {
         var queue = testDependencyQueue();
 
-        ensureEqual(queue.takeNextReadyDependency(), c);
-        queue.processed(c);
+        ensureEqual(queue.takeNextReady(), c);
+        queue.completed(c);
 
-        ensureEqual(queue.takeNextReadyDependency(), b);
-        queue.processed(b);
+        ensureEqual(queue.takeNextReady(), b);
+        queue.completed(b);
 
-        ensureEqual(queue.takeNextReadyDependency(), e);
-        queue.processed(e);
+        ensureEqual(queue.takeNextReady(), e);
+        queue.completed(e);
 
-        ensureEqual(queue.takeNextReadyDependency(), f);
-        queue.processed(f);
+        ensureEqual(queue.takeNextReady(), f);
+        queue.completed(f);
 
-        ensureEqual(queue.takeNextReadyDependency(), d);
-        queue.processed(d);
+        ensureEqual(queue.takeNextReady(), d);
+        queue.completed(d);
 
-        ensureEqual(queue.takeNextReadyDependency(), a);
-        queue.processed(a);
+        ensureEqual(queue.takeNextReady(), a);
+        queue.completed(a);
     }
 }

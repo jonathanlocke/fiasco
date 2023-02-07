@@ -11,6 +11,7 @@ import java.util.HashSet;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_COMPILE;
 import static digital.fiasco.runtime.build.metadata.BuildMetadata.buildMetadata;
+import static digital.fiasco.runtime.build.settings.BuildSettings.buildSettings;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
 
 public class BuildExecutorTest extends FiascoTest
@@ -41,6 +42,15 @@ public class BuildExecutorTest extends FiascoTest
             public BuildMetadata onMetadata()
             {
                 return buildMetadata().withArtifactDescriptor("library:digital.fiasco:fiasco-test:0.9.0");
+            }
+
+            @Override
+            protected Builder newBuilder()
+            {
+                var builder = new Builder(this);
+                return builder
+                    .withSettings(buildSettings(builder)
+                        .withArtifactDescriptor(metadata().descriptor()));
             }
         };
 
