@@ -143,7 +143,9 @@ public class DependencyTree
     private DependencyList depthFirst(Dependency at, DependencyList explored)
     {
         // Check for cycles (which should not be possible in our functional api)
-        ensure(!(at instanceof Builder) || !explored.containsAny(at.builderDependencies().asDependencyList()), "The build dependency tree is cyclic: $ was already explored", at);
+        ensure(!(at instanceof Builder)
+            || !explored.containsAny(at.builderDependencies().asDependencyList()),
+            "The build dependency tree is cyclic: $ was already explored", at);
 
         // Add the given dependency as explored.
         explored = explored.with(at);

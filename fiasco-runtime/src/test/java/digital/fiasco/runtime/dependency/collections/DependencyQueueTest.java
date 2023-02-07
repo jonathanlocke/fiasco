@@ -182,7 +182,8 @@ public class DependencyQueueTest extends FiascoTest
 
     private DependencyQueue testDependencyQueue()
     {
-        return testDependencies().asQueue(Library.class);
+        return testDependencies().asQueue(Library.class)
+            .withIsReady((queue, it) -> queue.hasCompleted(it.artifactDependencies()));
     }
 
     {

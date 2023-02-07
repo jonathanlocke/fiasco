@@ -21,7 +21,6 @@ import java.net.URI;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.os.Console.console;
-import static com.telenav.kivakit.resource.Urls.url;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.parseDescriptor;
 import static digital.fiasco.runtime.repository.maven.MavenRepository.LOCAL_MAVEN_REPOSITORY_FOLDER;
@@ -65,7 +64,10 @@ public class MavenResolver extends BaseComponent implements TryTrait
     private final RepositorySystem system;
 
     /** The list of maven repositories to consult */
-    private final ObjectList<RemoteRepository> repositories;
+    private final ObjectList<RemoteRepository> remoteRepositories;
+
+    /** The list of maven repositories */
+    private ObjectList<MavenRepository> mavenRepositories = list();
 
     /** The local Maven repository, defaults to ~/.fiasco/maven-repository */
     private LocalRepository localRepository;
@@ -79,7 +81,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
      */
     public MavenResolver(Folder localRepositoryFolder)
     {
-        this.repositories = list();
+        this.remoteRepositories = list();
         this.localRepositoryFolder = localRepositoryFolder.mkdirs();
 
         system = Guice
@@ -95,9 +97,10 @@ public class MavenResolver extends BaseComponent implements TryTrait
     protected MavenResolver(MavenResolver that)
     {
         this.system = that.system;
-        this.repositories = that.repositories.copy();
+        this.remoteRepositories = that.remoteRepositories.copy();
         this.localRepository = that.localRepository;
         this.localRepositoryFolder = that.localRepositoryFolder;
+        this.mavenRepositories = that.mavenRepositories.copy();
     }
 
     /**
@@ -124,7 +127,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
 
             var collectRequest = new CollectRequest();
             collectRequest.setRoot(new Dependency(artifact, COMPILE));
-            collectRequest.setRepositories(repositories);
+            collectRequest.setRepositories(remoteRepositories);
 
             var dependencyRequest = new DependencyRequest(collectRequest, classpathFilter(COMPILE));
             var artifactResults = system
@@ -181,13 +184,14 @@ public class MavenResolver extends BaseComponent implements TryTrait
      */
     public MavenResolver withMavenRepository(MavenRepository repository)
     {
-        var copy = copy();
-        var newRepository = newRepository(repository.name(), repository.uri());
-        if (!repositories.contains(newRepository))
+        if (!mavenRepositories.contains(repository))
         {
-            copy.repositories.add(newRepository);
+            var copy = copy();
+            copy.remoteRepositories.add(newRemoteRepository(repository.id(), repository.uri()));
+            copy.mavenRepositories.add(repository);
+            return copy;
         }
-        return copy;
+        return this;
     }
 
     /**
@@ -197,7 +201,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
      * @param uri The repository location
      * @return The new repository
      */
-    private RemoteRepository newRepository(String id, URI uri)
+    private RemoteRepository newRemoteRepository(String id, URI uri)
     {
         return new RemoteRepository.Builder(id, "default", uri.toString()).build();
     }
@@ -212,11 +216,11 @@ public class MavenResolver extends BaseComponent implements TryTrait
     {
         return tryCatch(() ->
         {
-            for (var at : repositories)
+            for (var at : mavenRepositories)
             {
-                if (at.getId().equals(id))
+                if (at.id().equals(id))
                 {
-                    return new MavenRepository(at.getId(), url(at.getUrl()).toURI(), localRepositoryFolder);
+                    return at;
                 }
             }
             return null;

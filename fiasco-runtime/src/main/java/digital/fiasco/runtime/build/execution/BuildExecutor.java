@@ -118,7 +118,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
         // ready for processing once their artifact and builder dependencies have been resolved.
         var builderQueue = build.dependencyTree().asQueue(Builder.class)
             .withIsReady((queue, it) -> resolved.isResolved(it.artifactDependencies())
-                && queue.hasCompleted(it.builderDependencies().asDependencyList()));
+                && queue.hasCompleted(it.builderDependencies()));
 
         // Create a thread pool,
         var executor = threadPool("FiascoBuild", build.settings().builderThreads());

@@ -19,7 +19,7 @@ public class MavenRepositoryTest extends FiascoTest
 
         var repositoryFolder = currentFolder().folder("target/.fiasco/maven-repository");
 
-        var repository = new MavenRepository("test", repositoryFolder);
+        var repository = new MavenRepository("test", "test", repositoryFolder);
         repository.installArtifact(artifact);
 
         var folder = repositoryFolder.folder("com/telenav/kivakit/kivakit-application/1.8.5");
@@ -51,6 +51,6 @@ public class MavenRepositoryTest extends FiascoTest
     @Test
     public void testResolveFailure()
     {
-        ensureThrows(() -> MAVEN_CENTRAL.resolveArtifacts(descriptors("library:com.shibo:unknown:1.0.1")));
+        ensure(MAVEN_CENTRAL.resolveArtifacts(descriptors("library:com.shibo:unknown:1.0.1")).isEmpty());
     }
 }

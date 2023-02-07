@@ -98,13 +98,17 @@ public class MavenRepository extends BaseRepository implements TryCatchTrait
     /** The local Maven repository folder */
     private final Folder localRepositoryFolder;
 
+    /** The Maven repository identifier */
+    private final String id;
+
     /**
      * Creates a maven repository
      */
-    public MavenRepository(String name, URI uri, Folder localRepositoryFolder)
+    public MavenRepository(String name, String id, URI uri, Folder localRepositoryFolder)
     {
         super(name, uri);
 
+        this.id = id;
         this.rootFolder = uri.getScheme().equals("file") ? localRepositoryFolder : new HttpResourceFolder(uri);
         this.localRepositoryFolder = localRepositoryFolder.mkdirs();
         this.localRepository = new LocalRepository(localRepositoryFolder.asJavaFile());
@@ -117,10 +121,11 @@ public class MavenRepository extends BaseRepository implements TryCatchTrait
     /**
      * Creates a maven repository
      */
-    public MavenRepository(String name, Folder localRepositoryFolder)
+    public MavenRepository(String name, String id, Folder localRepositoryFolder)
     {
         super(name, localRepositoryFolder.asUri());
 
+        this.id = id;
         this.rootFolder = localRepositoryFolder.mkdirs();
         this.localRepositoryFolder = localRepositoryFolder.mkdirs();
         this.localRepository = new LocalRepository(localRepositoryFolder.asJavaFile());
@@ -145,6 +150,11 @@ public class MavenRepository extends BaseRepository implements TryCatchTrait
         {
             return unsupported();
         }
+    }
+
+    public String id()
+    {
+        return id;
     }
 
     /**

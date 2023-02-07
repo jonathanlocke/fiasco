@@ -137,8 +137,7 @@ public interface Repository extends
      * Resolves each artifact descriptor to an {@link Artifact} but does not resolve the content
      *
      * @param descriptors The artifact descriptors
-     * @return The resolved artifacts
-     * @throws IllegalArgumentException Thrown if any descriptor cannot be resolved
+     * @return Any artifacts that could be resolved
      */
     default ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors)
     {
@@ -151,8 +150,7 @@ public interface Repository extends
      * @param descriptors The artifact descriptors
      * @param reporter The progress reporter to call as content input is read
      * @param reader Callback for reading trailing data after the initial JSON element
-     * @return The resolved artifacts
-     * @throws IllegalArgumentException Thrown if any descriptor cannot be resolved
+     * @return Any artifacts that could be resolved
      */
     ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors,
                                   ProgressReporter reporter,

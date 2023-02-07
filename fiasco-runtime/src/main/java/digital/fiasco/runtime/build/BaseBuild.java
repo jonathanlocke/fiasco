@@ -53,7 +53,6 @@ import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
 import static com.telenav.kivakit.core.value.count.Count._0;
 import static com.telenav.kivakit.core.value.count.Count._16;
 import static com.telenav.kivakit.core.vm.JavaVirtualMachine.javaVirtualMachine;
-import static digital.fiasco.runtime.build.settings.BuildSettings.buildSettings;
 
 /**
  * Defines a Fiasco build.
@@ -362,12 +361,10 @@ public abstract class BaseBuild extends Application implements Build
      */
     protected Builder newBuilder()
     {
-        var builder = new Builder(this);
-        return builder
-            .withSettings(buildSettings(builder)
-                .withArtifactDescriptor(metadata().descriptor())
-                .withBuilderThreads(get(BUILDER_THREADS))
-                .withArtifactResolverThreads(get(RESOLVER_THREADS)))
+        return new Builder(this)
+            .withArtifactDescriptor(metadata().descriptor())
+            .withBuilderThreads(get(BUILDER_THREADS))
+            .withArtifactResolverThreads(get(RESOLVER_THREADS))
             .withParsedCommandLine(commandLine());
     }
 

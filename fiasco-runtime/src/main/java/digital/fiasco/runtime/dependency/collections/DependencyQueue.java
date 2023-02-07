@@ -12,6 +12,7 @@ import com.telenav.kivakit.core.value.count.Maximum;
 import com.telenav.kivakit.interfaces.object.Copyable;
 import com.telenav.kivakit.interfaces.time.WakeState;
 import digital.fiasco.runtime.dependency.Dependency;
+import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
 import digital.fiasco.runtime.dependency.collections.lists.DependencyList;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
@@ -242,9 +243,9 @@ public class DependencyQueue extends BaseComponent implements
      * @param list The dependencies to check
      * @return True if the dependencies have been processed
      */
-    public boolean hasCompleted(DependencyList list)
+    public boolean hasCompleted(BaseDependencyList<?, ?> list)
     {
-        return completed.containsAll(list);
+        return completed.containsAll(list.asDependencyList());
     }
 
     /**
