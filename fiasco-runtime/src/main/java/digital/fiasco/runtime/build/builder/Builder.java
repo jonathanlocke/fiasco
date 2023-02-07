@@ -48,9 +48,7 @@ import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.core.string.Paths.pathOptionalSuffix;
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
-import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
 import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
-import static digital.fiasco.runtime.build.settings.BuildProfile.profile;
 import static digital.fiasco.runtime.build.settings.BuildSettings.buildSettings;
 import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.collections.lists.BuilderList.builders;
@@ -513,6 +511,12 @@ public class Builder extends BaseRepeater implements
     }
 
     @Override
+    public BuildProfile profile(String name)
+    {
+        return settings.profile(name);
+    }
+
+    @Override
     public ObjectSet<BuildProfile> profiles()
     {
         return settings.profiles();
@@ -935,17 +939,17 @@ public class Builder extends BaseRepeater implements
         {
             var value = argument.value();
             var enable = !value.startsWith("-");
-            var option = tryCatch(() -> BuildOption.valueOf(value));
+            var option = tryCatch(() -> BuildOption.valueOf(value.toUpperCase()));
 
             if (option != null)
             {
                 if (enable)
                 {
-                    builder = withSettings(it -> it.withEnabled(option));
+                    builder = builder.withSettings(it -> it.withEnabled(option));
                 }
                 else
                 {
-                    builder = withSettings(it -> it.withDisabled(option));
+                    builder = builder.withSettings(it -> it.withDisabled(option));
                 }
             }
             else
@@ -955,31 +959,29 @@ public class Builder extends BaseRepeater implements
                 {
                     if (enable)
                     {
-                        builder = withSettings(it -> it.withEnabled(phase));
+                        builder = builder.withSettings(it -> it.withEnabled(phase));
                     }
                     else
                     {
-                        builder = withSettings(it -> it.withDisabled(phase));
+                        builder = builder.withSettings(it -> it.withDisabled(phase));
                     }
                 }
                 else
                 {
                     var profile = profile(value);
-                    if (enable)
+                    if (profile != null)
                     {
-                        builder = withSettings(it -> it.withEnabled(profile));
-                    }
-                    else
-                    {
-                        builder = withSettings(it -> it.withDisabled(profile));
+                        if (enable)
+                        {
+                            builder = builder.withSettings(it -> it.withEnabled(profile));
+                        }
+                        else
+                        {
+                            builder = builder.withSettings(it -> it.withDisabled(profile));
+                        }
                     }
                 }
             }
-        }
-
-        if (settings().isEnabled(HELP))
-        {
-            information(description());
         }
 
         return builder;

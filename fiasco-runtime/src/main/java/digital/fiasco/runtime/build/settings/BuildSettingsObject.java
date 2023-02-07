@@ -256,6 +256,23 @@ public class BuildSettingsObject extends BaseRepeater implements
     }
 
     /**
+     * Returns the profile with the given name
+     *
+     * @param name The profile name
+     * @return The profile
+     */
+    @Override
+    public BuildProfile profile(String name)
+    {
+        var profile = new BuildProfile(name);
+        if (profiles.contains(profile))
+        {
+            return profile;
+        }
+        return null;
+    }
+
+    /**
      * {@inheritDoc}
      *
      * @return {@inheritDoc}
@@ -427,6 +444,7 @@ public class BuildSettingsObject extends BaseRepeater implements
      * @param profile The profile to add
      * @return The copy
      */
+    @Override
     public BuildSettingsObject withProfile(BuildProfile profile)
     {
         return mutatedCopy(it -> it.profiles.add(profile));

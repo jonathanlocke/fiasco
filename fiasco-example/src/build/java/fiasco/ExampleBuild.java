@@ -7,12 +7,11 @@ import digital.fiasco.runtime.build.metadata.BuildMetadata;
 import digital.fiasco.runtime.build.metadata.Organization;
 
 import static com.telenav.kivakit.resource.Urls.url;
-import static digital.fiasco.libraries.utilities.serialization.Kryo.kryo;
-import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_COMPILE;
+import static digital.fiasco.libraries.build.Fiasco.fiasco_runtime;
 import static digital.fiasco.runtime.build.metadata.BuildMetadata.buildMetadata;
 import static digital.fiasco.runtime.build.metadata.Contributor.contributor;
 import static digital.fiasco.runtime.build.metadata.Copyright.copyright;
-import static digital.fiasco.runtime.build.metadata.License.APACHE_LICENSE_2;
+import static digital.fiasco.runtime.build.metadata.License.APACHE_2_LICENSE;
 import static digital.fiasco.runtime.build.metadata.License.MIT_LICENSE;
 import static digital.fiasco.runtime.build.metadata.MailingList.developerMailingList;
 import static digital.fiasco.runtime.build.metadata.MailingList.userMailingList;
@@ -23,7 +22,6 @@ import static digital.fiasco.runtime.build.metadata.ProjectResource.projectSourc
 import static digital.fiasco.runtime.build.metadata.ProjectRole.ARCHITECT;
 import static digital.fiasco.runtime.build.metadata.ProjectRole.LEAD_DEVELOPER;
 import static digital.fiasco.runtime.build.metadata.ProjectRole.ORIGINATOR;
-import static digital.fiasco.runtime.build.settings.BuildProfile.profile;
 
 /**
  * Example Fiasco build.
@@ -41,15 +39,24 @@ public class ExampleBuild extends BaseBuild implements Libraries
      * {@inheritDoc}
      */
     @Override
-    public BuildMetadata metadata()
+    public Builder onConfigureBuild(Builder root)
+    {
+        return root.withDependencies(fiasco_runtime.withVersion("0.9.0"));
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
+    public BuildMetadata onMetadata()
     {
         var fiasco = new Organization("Fiasco")
             .withUrl(url("https://fiasco.digital"));
 
         return buildMetadata()
-            .withArtifactDescriptor("digital.fiasco:fiasco-example:1.0")
+            .withArtifactDescriptor("library:digital.fiasco:fiasco-example:1.0")
             .withDescription("Example use of Fiasco build system")
-            .withLicenses(APACHE_LICENSE_2, MIT_LICENSE)
+            .withLicenses(APACHE_2_LICENSE, MIT_LICENSE)
             .withOrganization(fiasco)
             .withCopyright(copyright()
                 .withFrom(2022)
@@ -69,42 +76,11 @@ public class ExampleBuild extends BaseBuild implements Libraries
                     .withSubscribe("developer-subscribe@fiasco.digital")
                     .withUnsubscribe("developer-unsubscribe@fiasco.digital")
                     .withPost("developer@fiasco.digital"))
-            .withContributor(
-                contributor("Jonathan Locke")
-                    .withNickname("Shibo")
-                    .withOrganization(fiasco)
-                    .withTimeZone("America/Denver")
-                    .withRoles(ORIGINATOR, ARCHITECT, LEAD_DEVELOPER)
-                    .withEmail("jon@thanlocke.com"));
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    @Override
-    public Builder onConfigureBuild(Builder root)
-    {
-        root = root.withProfile(profile("export"));
-
-        var utilities = root
-            .deriveBuilder("utilities")
-            .withDependencies(hamcrest_library.withVersion("5.0"));
-
-        var model = root
-            .deriveBuilder("child2")
-            .withDependencies(hamcrest_library.withVersion("5.0"))
-            .withDependencies(utilities);
-
-        return root
-            .withDependencies(apache_ant, apache_commons_logging, kryo)
-            .withPinnedVersion(apache_ant, "1.0.3")
-            .withPinnedVersion(apache_commons_logging, "1.9.0")
-            .withPinnedVersion(kryo, "4.3.1")
-            .withActionBeforePhase(PHASE_COMPILE, it ->
-            {
-                var cleaner = it.newCleaner();
-                cleaner.run();
-            })
-            .withDependencies(model);
+            .withContributor(contributor("Jonathan Locke")
+                .withNickname("Shibo")
+                .withOrganization(fiasco)
+                .withTimeZone("America/Denver")
+                .withRoles(ORIGINATOR, ARCHITECT, LEAD_DEVELOPER)
+                .withEmail("jon@thanlocke.com"));
     }
 }

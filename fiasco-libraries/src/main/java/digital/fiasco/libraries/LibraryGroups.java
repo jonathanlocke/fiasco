@@ -37,6 +37,7 @@ public interface LibraryGroups
     ArtifactGroup elastic_search_client_group    = group("org.elasticsearch.client");
     ArtifactGroup elastic_search_group           = group("org.elasticsearch");
     ArtifactGroup elastic_search_plugin_group    = group("org.elasticsearch.plugin");
+    ArtifactGroup fiasco_group                   = group("digital.fiasco");
     ArtifactGroup google_guava_group             = group("com.google.guava");
     ArtifactGroup google_inject_group            = group("com.google.inject");
     ArtifactGroup google_inject_extensions_group = group("com.google.inject.extensions");

@@ -9,19 +9,21 @@ import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.settings.BuildSettings;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
+import digital.fiasco.runtime.dependency.artifact.resolver.ArtifactResolutionTracker;
+import digital.fiasco.runtime.dependency.artifact.resolver.ArtifactResolver;
 import digital.fiasco.runtime.dependency.collections.DependencyQueue;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
-import digital.fiasco.runtime.dependency.artifact.resolver.ArtifactResolver;
-import digital.fiasco.runtime.dependency.artifact.resolver.ArtifactResolutionTracker;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.thread.Threads.threadPool;
+import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
 
 /**
  * Runs a parallel build for the build tree with the given root builder. The root builder's settings provide the number
@@ -39,11 +41,12 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
  *
  * <p>
  * Builds are executed by two thread pools. One thread pool resolves artifacts, and the other runs builders. A
- * {@link ArtifactResolutionTracker} object serves as a way to communicate between the two thread pools. As artifacts are
- * resolved by the {@link ArtifactResolver}, they are marked as resolved with
- * {@link ArtifactResolutionTracker#resolved(ArtifactList)}. Builders can wait for their artifacts to be resolved by calling
- * {@link ArtifactResolutionTracker#waitForResolutionOf(ArtifactList)}. In this way, artifact resolution proceeds
- * independently of building, with builders blocking only when it is necessary to wait for artifacts to be resolved.
+ * {@link ArtifactResolutionTracker} object serves as a way to communicate between the two thread pools. As artifacts
+ * are resolved by the {@link ArtifactResolver}, they are marked as resolved with
+ * {@link ArtifactResolutionTracker#resolved(ArtifactList)}. Builders can wait for their artifacts to be resolved by
+ * calling {@link ArtifactResolutionTracker#waitForResolutionOf(ArtifactList)}. In this way, artifact resolution
+ * proceeds independently of building, with builders blocking only when it is necessary to wait for artifacts to be
+ * resolved.
  * </p>
  *
  * @author Jonathan Locke
@@ -82,17 +85,25 @@ public class BuildExecutor extends BaseComponent implements TryTrait
      */
     public ObjectList<Result<Builder>> run()
     {
-        // Start resolving artifacts in the background starting from the root
-        // builder's dependencies. Each resolved artifact is added to the
-        // resolved set.
-        var resolved = new ArtifactResolutionTracker(this);
-        trace("Starting artifact resolver");
-        new ArtifactResolver(build, resolved).resolveArtifacts();
+        if (build.settings().isEnabled(HELP))
+        {
+            information(build.description());
+            return list();
+        }
+        else
+        {
+            // Start resolving artifacts in the background starting from the root
+            // builder's dependencies. Each resolved artifact is added to the
+            // resolved set.
+            var resolved = new ArtifactResolutionTracker(this);
+            trace("Starting artifact resolver");
+            new ArtifactResolver(build, resolved).resolveArtifacts();
 
-        // Start running builders in parallel. Each builder will wait until its
-        // dependencies are in the resolved set before executing.
-        trace("Starting build");
-        return build(resolved);
+            // Start running builders in parallel. Each builder will wait until its
+            // dependencies are in the resolved set before executing.
+            trace("Starting build");
+            return build(resolved);
+        }
     }
 
     /**
@@ -154,7 +165,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
 
             // run the builder,
             trace("$: building", builder);
-            var result = builder.build();
+            var result = builder.run();
             trace("$: build completed ", builder);
 
             // and then mark it as processed.

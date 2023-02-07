@@ -3,6 +3,7 @@ package digital.fiasco.runtime.dependency.artifact.resolver;
 import digital.fiasco.runtime.FiascoTest;
 import digital.fiasco.runtime.build.BaseBuild;
 import digital.fiasco.runtime.build.builder.Builder;
+import digital.fiasco.runtime.build.metadata.BuildMetadata;
 import org.junit.Test;
 
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
@@ -20,7 +21,10 @@ public class ArtifactResolverTest extends FiascoTest
             public Builder onConfigureBuild(Builder root)
             {
                 root = root
+                    .withRootFolder(currentFolder().folder("project"))
+                    .withArtifactDescriptor("library:com.telenav.kivakit:kivakit-xyz:1.8.5")
                     .withEnabled(PHASE_COMPILE)
+                    .withLibrarian(new MockLibrarian())
                     .withDependencies(kivakitArtifacts());
 
                 root = root.withDependencies(
@@ -31,12 +35,9 @@ public class ArtifactResolverTest extends FiascoTest
             }
 
             @Override
-            protected Builder newBuilder()
+            public BuildMetadata onMetadata()
             {
-                return new Builder(this)
-                    .withRootFolder(currentFolder().folder("project"))
-                    .withArtifactDescriptor("library:com.telenav.kivakit:kivakit-xyz:1.8.5")
-                    .withLibrarian(new MockLibrarian());
+                return BuildMetadata.buildMetadata().withArtifactDescriptor("library:digital.fiasco:fiasco-test:0.9.0");
             }
         };
 

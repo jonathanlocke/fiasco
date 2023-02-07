@@ -47,6 +47,8 @@ import static com.telenav.kivakit.commandline.ArgumentParser.argumentParser;
 import static com.telenav.kivakit.commandline.SwitchParsers.countSwitchParser;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
+import static com.telenav.kivakit.core.ensure.Ensure.ensure;
+import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
 import static com.telenav.kivakit.core.value.count.Count._0;
 import static com.telenav.kivakit.core.value.count.Count._16;
@@ -74,7 +76,7 @@ import static digital.fiasco.runtime.build.settings.BuildSettings.buildSettings;
  *
  * <ul>
  *     <li>-builder-threads=[count] - sets the number of threads to use for executing {@link Builder}s</li>
- *     <li>-artifact-resolver-threads=[count] - sets the number of threads to use for resolving artifacts</li>
+ *     <li>-resolver-threads=[count] - sets the number of threads to use for resolving artifacts</li>
  * </ul>
  *
  * <p>
@@ -150,10 +152,11 @@ import static digital.fiasco.runtime.build.settings.BuildSettings.buildSettings;
  *     </tr>
  * </table>
  *
- * <p><b>Building</b></p>
+ * <p><b>Build Configuration</b></p>
  *
  * <ul>
  *     <li>{@link #onConfigureBuild(Builder)}</li>
+ *     <li>{@link #onMetadata()}</li>
  * </ul>
  *
  * <p><b>Build Metadata</b></p>
@@ -162,6 +165,7 @@ import static digital.fiasco.runtime.build.settings.BuildSettings.buildSettings;
  *     <li>{@link #name()}</li>
  *     <li>{@link #description()}</li>
  *     <li>{@link #metadata()}</li>
+ *     <li>{@link #onMetadata()}</li>
  * </ul>
  *
  * <p><b>Build Environment</b></p>
@@ -208,23 +212,21 @@ public abstract class BaseBuild extends Application implements Build
         .defaultValue(javaVirtualMachine().processors())
         .build();
 
-    /** Switch parser for -artifact-resolver-threads=[count] */
-    private final SwitchParser<Count> ARTIFACT_RESOLVER_THREADS = countSwitchParser(this, "artifact-resolver-threads",
+    /** Switch parser for -resolver-threads=[count] */
+    private final SwitchParser<Count> RESOLVER_THREADS = countSwitchParser(this, "resolver-threads",
         "The number of threads to use when resolving artifacts")
         .optional()
         .defaultValue(_16)
         .build();
 
     /** The dependency tree for this build */
-    private final DependencyTree dependencyTree;
+    private DependencyTree dependencyTree;
 
     /**
      * Creates a build
      */
     public BaseBuild()
     {
-        var rootBuilder = onConfigureBuild(newBuilder());
-        dependencyTree = new DependencyTree(rootBuilder);
     }
 
     /**
@@ -266,14 +268,7 @@ public abstract class BaseBuild extends Application implements Build
     @Override
     public String description()
     {
-        return """
-            Commands
-                            
-              command               description
-              -----------           ---------------------------------------------
-              describe              describe the build rather than running it
-                            
-            """ + newBuilder().description();
+        return root().description();
     }
 
     /**
@@ -283,10 +278,6 @@ public abstract class BaseBuild extends Application implements Build
      */
     public ObjectList<Result<Builder>> executeBuild()
     {
-        // Create the root builder,
-        var root = newBuilder().withArtifactDescriptor(metadata.descriptor());
-
-        // configure and run the build,
         return new BuildExecutor(this).run();
     }
 
@@ -294,10 +285,24 @@ public abstract class BaseBuild extends Application implements Build
      * {@inheritDoc}
      */
     @Override
-    public BuildMetadata metadata()
+    public final BuildMetadata metadata()
     {
+        if (metadata == null)
+        {
+            metadata = onMetadata();
+            ensureNotNull(metadata, "Must return build metadata from onMetadata()");
+            ensure(metadata.descriptor().isComplete(), "Must supply an artifact descriptor in the metadata returned by onMetadata()");
+        }
         return metadata;
     }
+
+    /**
+     * Returns metadata for this build
+     *
+     * @return The build metadata
+     */
+    @Override
+    public abstract BuildMetadata onMetadata();
 
     /**
      * {@inheritDoc}
@@ -345,19 +350,12 @@ public abstract class BaseBuild extends Application implements Build
             .build());
     }
 
-    /**
-     * Creates a new builder with settings initialized to defaults and configured by the command line for this build
-     *
-     * @return The builder
-     */
-    protected Builder newBuilder()
+    @Override
+    protected void onInitialize()
     {
-        var builder = new Builder(this);
-        return builder
-            .withSettings(buildSettings(builder)
-                .withBuilderThreads(get(BUILDER_THREADS))
-                .withArtifactResolverThreads(get(ARTIFACT_RESOLVER_THREADS)))
-            .withParsedCommandLine(commandLine());
+        super.onInitialize();
+        var root = onConfigureBuild(newBuilder());
+        dependencyTree = new DependencyTree(root);
     }
 
     /**
@@ -370,14 +368,17 @@ public abstract class BaseBuild extends Application implements Build
         var results = executeBuild();
 
         // then show the results.
-        var problems = _0;
-        for (var at : results)
+        if (results.isNonEmpty())
         {
-            at.messages().broadcastTo(this);
-            problems = problems.plus(at.messages().problems());
-        }
+            var problems = _0;
+            for (var at : results)
+            {
+                at.messages().broadcastTo(this);
+                problems = problems.plus(at.messages().problems());
+            }
 
-        information("Build completed with $ problems", problems);
+            information("Build completed with $ problems", problems);
+        }
     }
 
     /**
@@ -399,6 +400,22 @@ public abstract class BaseBuild extends Application implements Build
     {
         return super.switchParsers().with(
             BUILDER_THREADS,
-            ARTIFACT_RESOLVER_THREADS);
+            RESOLVER_THREADS);
+    }
+
+    /**
+     * Creates a new builder with settings initialized to defaults and configured by the command line for this build
+     *
+     * @return The builder
+     */
+    private Builder newBuilder()
+    {
+        var builder = new Builder(this);
+        return builder
+            .withSettings(buildSettings(builder)
+                .withArtifactDescriptor(metadata().descriptor())
+                .withBuilderThreads(get(BUILDER_THREADS))
+                .withArtifactResolverThreads(get(RESOLVER_THREADS)))
+            .withParsedCommandLine(commandLine());
     }
 }

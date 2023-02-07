@@ -7,6 +7,8 @@ import com.telenav.kivakit.interfaces.naming.Named;
 
 import java.time.ZoneId;
 
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+
 /**
  * Model for a project contributor
  *
@@ -56,7 +58,7 @@ public record Contributor(@FormatProperty String name,
 
     private Contributor(String name)
     {
-        this(name, null, null, null, null, null);
+        this(name, null, null, null, null, list());
     }
 
     @Override

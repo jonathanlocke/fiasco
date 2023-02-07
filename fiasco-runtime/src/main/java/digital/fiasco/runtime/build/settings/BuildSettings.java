@@ -171,6 +171,14 @@ public interface BuildSettings extends
     PhaseList phases();
 
     /**
+     * Returns the profile with the given name
+     *
+     * @param name The profile name
+     * @return The profile
+     */
+    BuildProfile profile(String name);
+
+    /**
      * Returns a copy of the set of enabled profiles for this build
      *
      * @return Set of build profiles

@@ -8,7 +8,6 @@ import digital.fiasco.runtime.build.builder.BuildAction;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
-import digital.fiasco.runtime.librarian.Librarian;
 import digital.fiasco.runtime.build.environment.BuildEnvironmentTrait;
 import digital.fiasco.runtime.build.environment.BuildRepositoriesTrait;
 import digital.fiasco.runtime.build.execution.BuildExecutionStep;
@@ -18,6 +17,7 @@ import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.build.settings.BuildSettings;
 import digital.fiasco.runtime.build.settings.BuildSettingsObject;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
+import digital.fiasco.runtime.librarian.Librarian;
 
 /**
  * Defines a Fiasco build.
@@ -40,7 +40,7 @@ import digital.fiasco.runtime.dependency.collections.DependencyTree;
  *
  * <ul>
  *     <li>-builder-threads=[count] - sets the number of threads to use for executing {@link Builder}s</li>
- *     <li>-artifact-resolver-threads=[count] - sets the number of threads to use for resolving artifacts</li>
+ *     <li>-resolver-threads=[count] - sets the number of threads to use for resolving artifacts</li>
  * </ul>
  *
  * <p>
@@ -116,10 +116,11 @@ import digital.fiasco.runtime.dependency.collections.DependencyTree;
  *     </tr>
  * </table>
  *
- * <p><b>Building</b></p>
+ * <p><b>Build Configuration</b></p>
  *
  * <ul>
  *     <li>{@link #onConfigureBuild(Builder)}</li>
+ *     <li>{@link #onMetadata()}</li>
  * </ul>
  *
  * <p><b>Build Metadata</b></p>
@@ -128,6 +129,7 @@ import digital.fiasco.runtime.dependency.collections.DependencyTree;
  *     <li>{@link #name()}</li>
  *     <li>{@link #description()}</li>
  *     <li>{@link #metadata()}</li>
+ *     <li>{@link #onMetadata()}</li>
  * </ul>
  *
  * <p><b>Build Environment</b></p>
@@ -189,18 +191,25 @@ public interface Build extends
     }
 
     /**
-     * Returns the metadata for this build
+     * Returns the metadata for this build. To supply metadata, override {@link #onMetadata()}
      */
     BuildMetadata metadata();
 
     /**
      * Called to configure the root builder for a build. In the case of multi-project builds, this may involve adding
-     * child builders to the root builder. T
+     * child builders to the root builder using {@link Builder#deriveBuilder(String)}.
      *
      * @param root The root builder for the build, from which child builders can be derived
      * @return A newly configured root builder based on the given root builder
      */
     Builder onConfigureBuild(Builder root);
+
+    /**
+     * Overridden to supply metadata for this build
+     *
+     * @return The build metadata
+     */
+    BuildMetadata onMetadata();
 
     /**
      * Returns the root builder of the dependency tree for this build

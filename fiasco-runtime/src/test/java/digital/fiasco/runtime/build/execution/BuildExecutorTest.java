@@ -3,12 +3,14 @@ package digital.fiasco.runtime.build.execution;
 import digital.fiasco.runtime.FiascoTest;
 import digital.fiasco.runtime.build.BaseBuild;
 import digital.fiasco.runtime.build.builder.Builder;
+import digital.fiasco.runtime.build.metadata.BuildMetadata;
 import org.junit.Test;
 
 import java.util.HashSet;
 
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_COMPILE;
+import static digital.fiasco.runtime.build.metadata.BuildMetadata.buildMetadata;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
 
 public class BuildExecutorTest extends FiascoTest
@@ -25,6 +27,7 @@ public class BuildExecutorTest extends FiascoTest
             {
                 root = root
                     .withEnabled(PHASE_COMPILE)
+                    .withRootFolder(currentFolder().folder("project"))
                     .withActionAfterPhase(PHASE_COMPILE, compiled::add);
 
                 root = root.withDependencies(
@@ -35,11 +38,9 @@ public class BuildExecutorTest extends FiascoTest
             }
 
             @Override
-            protected Builder newBuilder()
+            public BuildMetadata onMetadata()
             {
-                return new Builder(this)
-                    .withRootFolder(currentFolder().folder("project"))
-                    .withArtifactDescriptor("library:com.telenav.kivakit:kivakit-core:1.8.5");
+                return buildMetadata().withArtifactDescriptor("library:digital.fiasco:fiasco-test:0.9.0");
             }
         };
 
