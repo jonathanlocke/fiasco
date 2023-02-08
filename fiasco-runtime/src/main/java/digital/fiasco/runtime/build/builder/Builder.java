@@ -48,7 +48,11 @@ import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.core.string.Paths.pathOptionalSuffix;
 import static com.telenav.kivakit.core.version.Version.version;
+import static com.telenav.kivakit.interfaces.comparison.Matcher.matchAll;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_CLEAN;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_COMPILE;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_PREPARE;
 import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
 import static digital.fiasco.runtime.build.settings.BuildSettings.buildSettings;
 import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
@@ -287,6 +291,10 @@ public class Builder extends BaseRepeater implements
         artifactDependencies = artifacts();
         builderDependencies = builders();
         settings = buildSettings(this);
+
+        phase(PHASE_CLEAN).duringPhase(Builder::onClean);
+        phase(PHASE_COMPILE).duringPhase(Builder::onCompile);
+        phase(PHASE_PREPARE).duringPhase(Builder::onPrepare);
     }
 
     /**
@@ -296,7 +304,7 @@ public class Builder extends BaseRepeater implements
      */
     protected Builder(Builder that)
     {
-        this(that.build);
+        this.build = that.build;
         this.librarian = that.librarian.copy();
         this.artifactDependencies = that.artifactDependencies.copy();
         this.builderDependencies = that.builderDependencies.copy();
@@ -408,7 +416,7 @@ public class Builder extends BaseRepeater implements
 
         for (var option : BuildOption.values())
         {
-            description.add(String.format("  %-22s%s\n", option.name().toLowerCase(), option.help()));
+            description.add(String.format("  %-22s%s", option.name().toLowerCase(), option.help()));
         }
 
         description.add("""
@@ -421,7 +429,7 @@ public class Builder extends BaseRepeater implements
 
         for (var phase : phases())
         {
-            description.add(String.format("  %-22s%s\n", phase.name(), phase.description()));
+            description.add(String.format("  %-22s%s", phase.name(), phase.description()));
         }
 
         return description.titledBox("Fiasco Help");
@@ -493,6 +501,36 @@ public class Builder extends BaseRepeater implements
         return descriptor().name();
     }
 
+    public void onClean()
+    {
+        newCleaner()
+            .withFiles(targetFolder()
+                .nestedFiles(matchAll()))
+            .run();
+    }
+
+    public void onCompile()
+    {
+        newCompiler()
+            .withSources(sourceMainJavaSources())
+            .run();
+
+        // newStamper().run();
+    }
+
+    public void onPrepare()
+    {
+        newCopier()
+            .withTargetFolder(targetClassesFolder())
+            .withFiles(sourceMainResourcesFolder().nestedFiles())
+            .run();
+
+        newCopier()
+            .withTargetFolder(targetTestClassesFolder())
+            .withFiles(sourceTestResourcesFolder().nestedFiles())
+            .run();
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -508,6 +546,12 @@ public class Builder extends BaseRepeater implements
     public Phase phase(String name)
     {
         return settings.phase(name);
+    }
+
+    @Override
+    public Phase phase(Phase phase)
+    {
+        return settings.phase(phase.name());
     }
 
     @Override

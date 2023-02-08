@@ -7,10 +7,11 @@ import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.object.Copyable;
+import com.telenav.kivakit.interfaces.value.Source;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
-import digital.fiasco.runtime.build.builder.phases.standard.StandardPhases;
+import digital.fiasco.runtime.build.builder.phases.standard.DefaultPhases;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
@@ -22,6 +23,7 @@ import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.value.count.Count._8;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
+import static digital.fiasco.runtime.build.settings.BuildProfile.DEFAULT;
 
 /**
  * Settings used by {@link Builder} to modify the way that it builds.
@@ -84,7 +86,8 @@ import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 @SuppressWarnings({ "UnusedReturnValue", "unused" })
 public class BuildSettingsObject extends BaseRepeater implements
     BuildSettings,
-    Copyable<BuildSettingsObject>
+    Copyable<BuildSettingsObject>,
+    Source<Builder>
 {
     /** The builder for these settings */
     private Builder builder;
@@ -111,15 +114,15 @@ public class BuildSettingsObject extends BaseRepeater implements
     private Librarian librarian;
 
     /** Set of profiles for this build */
-    private ObjectSet<BuildProfile> profiles = set();
+    private ObjectSet<BuildProfile> profiles = set(DEFAULT);
 
     /** Set of profiles to enable for this build */
-    private ObjectSet<BuildProfile> enabledProfiles = set();
+    private ObjectSet<BuildProfile> enabledProfiles = set(DEFAULT);
 
     public BuildSettingsObject(Builder builder)
     {
         this.builder = builder;
-        this.phases = new StandardPhases(builder);
+        this.phases = new DefaultPhases();
         this.librarian = builder.librarian();
         this.rootFolder = currentFolder();
     }
@@ -178,6 +181,12 @@ public class BuildSettingsObject extends BaseRepeater implements
     public ArtifactDescriptor descriptor()
     {
         return descriptor;
+    }
+
+    @Override
+    public Builder get()
+    {
+        return builder;
     }
 
     /**
@@ -241,6 +250,12 @@ public class BuildSettingsObject extends BaseRepeater implements
         return phases().phase(name);
     }
 
+    @Override
+    public Phase phase(Phase phase)
+    {
+        return phase(phase.name());
+    }
+
     /**
      * {@inheritDoc}
      *
@@ -250,10 +265,6 @@ public class BuildSettingsObject extends BaseRepeater implements
     @NotNull
     public PhaseList phases()
     {
-        if (phases == null)
-        {
-            phases = new StandardPhases(builder);
-        }
         return phases;
     }
 

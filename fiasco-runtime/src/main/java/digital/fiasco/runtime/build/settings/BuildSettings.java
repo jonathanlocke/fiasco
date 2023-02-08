@@ -163,6 +163,14 @@ public interface BuildSettings extends
     Phase phase(String name);
 
     /**
+     * Returns the phase with the name of the given phase
+     *
+     * @param phase The phase to look up
+     * @return The phase, or null if no phase can be found with the given name
+     */
+    Phase phase(Phase phase);
+
+    /**
      * Returns a list of all defined phases
      *
      * @return List of phases

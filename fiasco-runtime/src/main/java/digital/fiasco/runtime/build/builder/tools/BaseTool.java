@@ -15,6 +15,7 @@ import digital.fiasco.runtime.librarian.Librarian;
 
 import static com.telenav.kivakit.core.messaging.Listener.nullListener;
 import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
+import static digital.fiasco.runtime.build.settings.BuildProfile.DEFAULT;
 
 /**
  * Base class for build {@link Tool}s. Build tools can be enabled or disabled under a given {@link BuildProfile}.
@@ -29,6 +30,9 @@ public abstract class BaseTool<T extends BaseTool<T>> extends BaseComponent impl
 {
     /** The builder associated with this tool */
     private final Builder builder;
+
+    /** The profile under which this tool instance is enabled */
+    private BuildProfile profile = DEFAULT;
 
     /**
      * Creates a tool associated with the given builder
@@ -114,14 +118,7 @@ public abstract class BaseTool<T extends BaseTool<T>> extends BaseComponent impl
     @Override
     public boolean isEnabled()
     {
-        for (var profile : builder.profiles())
-        {
-            if (builder.settings().isEnabled(profile))
-            {
-                return true;
-            }
-        }
-        return false;
+        return builder.isEnabled(profile);
     }
 
     /**
@@ -205,6 +202,17 @@ public abstract class BaseTool<T extends BaseTool<T>> extends BaseComponent impl
     public boolean shouldDescribeAndExecute()
     {
         return builder.shouldDescribeAndExecute();
+    }
+
+    /**
+     * Returns a copy of this tool that only runs under the given profile
+     *
+     * @param profile The profile
+     * @return The copy
+     */
+    public T withProfile(BuildProfile profile)
+    {
+        return mutatedCopy(it -> ((BaseTool<?>) it).profile = profile);
     }
 
     /**

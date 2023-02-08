@@ -427,7 +427,6 @@ public class JavaCompiler extends BaseTool<JavaCompiler>
             .withTwoArgumentSwitch("-encoding", sourceEncoding)
             .withTwoArgumentSwitch("-release", releaseVersion)
             .withTwoArgumentSwitch("-source", sourceVersion)
-            .withTwoArgumentSwitch("-locale", sourceLocale)
             .withTwoArgumentSwitch("-target", targetVersion)
             .asStringList();
     }

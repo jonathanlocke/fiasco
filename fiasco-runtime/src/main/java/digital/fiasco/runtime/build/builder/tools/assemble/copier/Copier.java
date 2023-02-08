@@ -75,30 +75,33 @@ public class Copier extends BaseFileTool<Copier>
     @Override
     public void onRun()
     {
-        var sourceFolder = files().parent();
-        information("Copying files from $ to $", sourceFolder, to.relativeTo(sourceFolder));
-
-        // For each source file in the 'from' folder that matches,
-        var files = files();
-        var progress = progressReporter(listener(), "files");
-        progress.steps(files.count());
-        progress.start("Copying " + files.size() + " files");
-        for (var source : files)
+        if (files().isNonEmpty())
         {
-            // find the path relative to the root,
-            var relative = source.relativeTo(sourceFolder);
+            var sourceFolder = files().parent();
+            information("Copying $ files from $ to $", files().count(), sourceFolder, to.relativeTo(sourceFolder));
 
-            // construct a file with the same path relative to the 'to' folder,
-            var destination = to.file(relative);
+            // For each source file in the 'from' folder that matches,
+            var files = files();
+            var progress = progressReporter(listener(), "files");
+            progress.steps(files.count());
+            progress.start("Copying " + files.size() + " files");
+            for (var source : files)
+            {
+                // find the path relative to the root,
+                var relative = source.relativeTo(sourceFolder);
 
-            // create any parent folders that might be required
-            destination.parent().mkdirs();
+                // construct a file with the same path relative to the 'to' folder,
+                var destination = to.file(relative);
 
-            // and copy the source file to the destination location
-            step(() -> source.safeCopyTo(destination, OVERWRITE, progress), "Copying $ to $", source, destination);
-            progress.next();
+                // create any parent folders that might be required
+                destination.parent().mkdirs();
+
+                // and copy the source file to the destination location
+                step(() -> source.safeCopyTo(destination, OVERWRITE, progress), "Copying $ to $", source, destination);
+                progress.next();
+            }
+            progress.end(files.size() + " files copied");
         }
-        progress.end(files.size() + " files copied");
     }
 
     /**

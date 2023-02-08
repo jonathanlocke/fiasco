@@ -4,6 +4,7 @@ import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.function.Result;
 import com.telenav.kivakit.core.language.trait.TryTrait;
+import com.telenav.kivakit.core.thread.Threads;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.settings.BuildSettings;
@@ -21,6 +22,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
+import static com.telenav.kivakit.core.thread.Threads.shutdownAndAwaitTermination;
 import static com.telenav.kivakit.core.thread.Threads.threadPool;
 
 /**
@@ -133,6 +135,8 @@ public class BuildExecutor extends BaseComponent implements TryTrait
             results.add(tryCatch(() -> at.get()));
         }
         trace("All builders finished");
+
+        shutdownAndAwaitTermination(executor);
 
         return results;
     }

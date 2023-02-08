@@ -273,7 +273,7 @@ public abstract class BaseBuild extends Application implements Build
     @Override
     public String description()
     {
-        return root().description();
+        return metadata().description();
     }
 
     /**
@@ -355,6 +355,12 @@ public abstract class BaseBuild extends Application implements Build
             .build());
     }
 
+    @Override
+    protected boolean ignoreDeploymentSwitch()
+    {
+        return true;
+    }
+
     /**
      * Creates a new builder with settings initialized to defaults and configured by the command line for this build
      *
@@ -377,7 +383,7 @@ public abstract class BaseBuild extends Application implements Build
     {
         if (settings().isEnabled(HELP))
         {
-            information(description());
+            information(root().description());
         }
         else
         {

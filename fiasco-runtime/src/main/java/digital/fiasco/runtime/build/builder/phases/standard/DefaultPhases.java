@@ -1,22 +1,17 @@
 package digital.fiasco.runtime.build.builder.phases.standard;
 
-import com.telenav.kivakit.component.ComponentMixin;
-import com.telenav.kivakit.filesystem.Folder;
-import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.phases.Phase;
 import digital.fiasco.runtime.build.builder.phases.PhaseList;
-import digital.fiasco.runtime.build.builder.tools.ToolFactory;
 
-import static com.telenav.kivakit.interfaces.comparison.Matcher.matchAll;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_ASSEMBLE;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_CLEAN;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_COMPILE;
-import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_DEPLOY_DOCUMENTATION;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_DEPLOY;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_DEPLOY_DOCUMENTATION;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_DOCUMENT;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_END;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_INSTALL;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_INTEGRATION_TEST;
-import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_ASSEMBLE;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_PREPARE;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_START;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_TEST;
@@ -47,24 +42,17 @@ import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_TEST;
  *
  * @author Jonathan Locke
  */
-public class StandardPhases extends PhaseList implements
-    ToolFactory,
-    ComponentMixin
+public class DefaultPhases extends PhaseList
 {
-    /** The builder for this list of phases */
-    private final Builder builder;
-
     /**
-     * Installs the default phases
+     * Creates the default phase list
      */
-    public StandardPhases(Builder builder)
+    public DefaultPhases()
     {
-        this.builder = builder;
-
         add(PHASE_START);
-        add(PHASE_CLEAN.duringPhase(it -> onClean()));
-        add(PHASE_PREPARE.duringPhase(it -> onPrepare()));
-        add(PHASE_COMPILE.duringPhase(it -> onCompile()));
+        add(PHASE_CLEAN);
+        add(PHASE_PREPARE);
+        add(PHASE_COMPILE);
         add(PHASE_TEST);
         add(PHASE_DOCUMENT);
         add(PHASE_ASSEMBLE);
@@ -76,47 +64,5 @@ public class StandardPhases extends PhaseList implements
 
         enable(PHASE_START);
         enable(PHASE_END);
-    }
-
-    @Override
-    public Builder associatedBuilder()
-    {
-        return builder;
-    }
-
-    public void onClean()
-    {
-        newCleaner()
-            .withFiles(targetFolder()
-                .nestedFiles(matchAll()))
-            .run();
-    }
-
-    public void onCompile()
-    {
-        newCompiler()
-            .withSources(sourceMainJavaSources())
-            .run();
-
-        newStamper().run();
-    }
-
-    public void onPrepare()
-    {
-        newCopier()
-            .withTargetFolder(targetClassesFolder())
-            .withFiles(sourceMainResourcesFolder().nestedFiles())
-            .run();
-
-        newCopier()
-            .withTargetFolder(targetTestClassesFolder())
-            .withFiles(sourceTestResourcesFolder().nestedFiles())
-            .run();
-    }
-
-    @Override
-    public Folder rootFolder()
-    {
-        return builder.rootFolder();
     }
 }
