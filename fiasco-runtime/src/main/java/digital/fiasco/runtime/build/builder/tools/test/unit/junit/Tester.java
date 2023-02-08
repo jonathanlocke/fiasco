@@ -15,7 +15,7 @@ import digital.fiasco.runtime.build.builder.tools.BaseTool;
  *
  * @author Jonathan Locke
  */
-public class Tester extends BaseTool<Tester>
+public class Tester extends BaseTool<Tester, Void>
 {
     public Tester(Builder builder)
     {
@@ -40,7 +40,8 @@ public class Tester extends BaseTool<Tester>
     }
 
     @Override
-    public void onRun()
+    public Void onRun()
     {
+        return null;
     }
 }

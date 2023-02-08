@@ -3,7 +3,7 @@ package digital.fiasco.runtime.build.builder.tools.assemble.shader;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.BaseTool;
 
-public class Shader extends BaseTool<Shader>
+public class Shader extends BaseTool<Shader, Void>
 {
     public Shader(Builder builder)
     {
@@ -28,7 +28,8 @@ public class Shader extends BaseTool<Shader>
     }
 
     @Override
-    public void onRun()
+    public Void onRun()
     {
+        return null;
     }
 }

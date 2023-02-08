@@ -23,8 +23,7 @@ import digital.fiasco.runtime.librarian.Librarian;
  *
  * @author Jonathan locke
  */
-public interface Tool<T extends Tool<T>> extends
-    Runnable,
+public interface Tool<T extends Tool<T, O>, O> extends
     Copyable<T>,
     Repeater,
     Described,
@@ -68,10 +67,17 @@ public interface Tool<T extends Tool<T>> extends
     /**
      * Called when this tool runs
      */
-    void onRun();
+    O onRun();
 
     /**
      * Called before this tool runs
      */
     void onRunning();
+
+    /**
+     * Runs this tool and returns its output
+     *
+     * @return The output from the tool, if any
+     */
+    O run();
 }

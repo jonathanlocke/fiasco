@@ -50,7 +50,7 @@ import static com.telenav.kivakit.core.string.Formatter.format;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class Git extends BaseTool<Git>
+public class Git extends BaseTool<Git, String>
 {
     /** The folder where git should be run */
     Folder folder;
@@ -136,11 +136,12 @@ public class Git extends BaseTool<Git>
      * {@inheritDoc}
      */
     @Override
-    public void onRun()
+    public String onRun()
     {
         information(description());
         output = operatingSystem().execute(this,
             folder.asJavaFile(), arguments.asStringArray()).trim();
+        return output;
     }
 
     /**

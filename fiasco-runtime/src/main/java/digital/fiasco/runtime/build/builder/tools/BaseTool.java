@@ -23,10 +23,10 @@ import static digital.fiasco.runtime.build.settings.BuildProfile.DEFAULT;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public abstract class BaseTool<T extends BaseTool<T>> extends BaseComponent implements
+public abstract class BaseTool<T extends BaseTool<T, O>, O> extends BaseComponent implements
     BuildExecutionStep,
     Copyable<T>,
-    Tool<T>
+    Tool<T, O>
 {
     /** The builder associated with this tool */
     private final Builder builder;
@@ -144,7 +144,7 @@ public abstract class BaseTool<T extends BaseTool<T>> extends BaseComponent impl
      * Called when this tool runs
      */
     @Override
-    public abstract void onRun();
+    public abstract O onRun();
 
     /**
      * Called before this tool runs
@@ -167,14 +167,18 @@ public abstract class BaseTool<T extends BaseTool<T>> extends BaseComponent impl
      * {@inheritDoc}
      */
     @Override
-    public final void run()
+    public final O run()
     {
+        O output = null;
+
         if (isEnabled())
         {
             onRunning();
-            onRun();
+            output = onRun();
             onRan();
         }
+
+        return output;
     }
 
     public BuildSettings settings()
@@ -212,7 +216,7 @@ public abstract class BaseTool<T extends BaseTool<T>> extends BaseComponent impl
      */
     public T withProfile(BuildProfile profile)
     {
-        return mutatedCopy(it -> ((BaseTool<?>) it).profile = profile);
+        return mutatedCopy(it -> ((BaseTool<?, ?>) it).profile = profile);
     }
 
     /**

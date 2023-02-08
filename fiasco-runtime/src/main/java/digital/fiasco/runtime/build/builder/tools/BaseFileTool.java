@@ -15,7 +15,7 @@ import static com.telenav.kivakit.filesystem.FileList.fileList;
  *
  * @author Jonathan Locke
  */
-public abstract class BaseFileTool<T extends BaseFileTool<T>> extends BaseTool<T>
+public abstract class BaseFileTool<T extends BaseFileTool<T, O>, O> extends BaseTool<T, O>
 {
     /** The list of files for this tool to process */
     FileList files;

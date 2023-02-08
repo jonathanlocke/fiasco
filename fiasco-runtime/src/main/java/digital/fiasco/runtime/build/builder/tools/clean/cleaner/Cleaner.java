@@ -11,7 +11,7 @@ import static com.telenav.kivakit.core.string.Formatter.format;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class Cleaner extends BaseFileTool<Cleaner>
+public class Cleaner extends BaseFileTool<Cleaner, Void>
 {
     public Cleaner(Builder builder)
     {
@@ -43,7 +43,7 @@ public class Cleaner extends BaseFileTool<Cleaner>
      * {@inheritDoc}
      */
     @Override
-    public void onRun()
+    public Void onRun()
     {
         step("Cleaning $ files", files().count());
 
@@ -56,5 +56,7 @@ public class Cleaner extends BaseFileTool<Cleaner>
                 step(parent::delete, "Deleting $", parent);
             }
         });
+
+        return null;
     }
 }

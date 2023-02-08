@@ -13,7 +13,7 @@ import static com.telenav.kivakit.resource.compression.archive.ZipArchive.zipArc
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class Archiver extends BaseFileTool<Archiver>
+public class Archiver extends BaseFileTool<Archiver, Void>
 {
     /** The archive */
     private File archiveFile;
@@ -63,7 +63,7 @@ public class Archiver extends BaseFileTool<Archiver>
      * {@inheritDoc}
      */
     @Override
-    public void onRun()
+    public Void onRun()
     {
         if (shouldDescribe())
         {
@@ -79,6 +79,8 @@ public class Archiver extends BaseFileTool<Archiver>
                 archive.add(files());
             }
         }
+
+        return null;
     }
 
     /**

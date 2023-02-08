@@ -44,7 +44,7 @@ import static com.telenav.kivakit.core.time.Time.now;
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused", "SpellCheckingInspection" })
-public class BuildStamper extends BaseTool<BuildStamper> implements
+public class BuildStamper extends BaseTool<BuildStamper, Void> implements
     BuildStructure,
     ToolFactory
 {
@@ -90,7 +90,7 @@ public class BuildStamper extends BaseTool<BuildStamper> implements
      * {@inheritDoc}
      */
     @Override
-    public void onRun()
+    public Void onRun()
     {
         information("Stamping build");
 
@@ -106,6 +106,8 @@ public class BuildStamper extends BaseTool<BuildStamper> implements
 
         step(() -> buildProperties.saveText(buildProperties().join("\n")),
             "Writing $", buildProperties);
+
+        return null;
     }
 
     /**
@@ -113,18 +115,9 @@ public class BuildStamper extends BaseTool<BuildStamper> implements
      */
     private StringList buildProperties()
     {
-        var git = newGit().commitHash();
-        git.run();
-
-        var commitHash = git.output() != null
-            ? git.output()
-            : "[unknown]";
-
-        git = newGit().commitTime();
-        git.run();
-
+        var commitHash = newGit().commitHash().run();
         var commitTime = new GitLocalTimeConverter(this)
-            .convert(git.output());
+            .convert(newGit().commitTime().run());
 
         return stringList("build.time = " + now().asString(),
             "build.name = " + BuildName.name(LocalDate.now()),

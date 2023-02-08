@@ -21,7 +21,7 @@ import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
  * @author Jonathan Locke
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class Copier extends BaseFileTool<Copier>
+public class Copier extends BaseFileTool<Copier, Void>
 {
     /** The folder to copy to */
     private Folder to;
@@ -73,7 +73,7 @@ public class Copier extends BaseFileTool<Copier>
      * {@inheritDoc}
      */
     @Override
-    public void onRun()
+    public Void onRun()
     {
         if (files().isNonEmpty())
         {
@@ -102,6 +102,8 @@ public class Copier extends BaseFileTool<Copier>
             }
             progress.end(files.size() + " files copied");
         }
+
+        return null;
     }
 
     /**

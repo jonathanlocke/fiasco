@@ -4,13 +4,13 @@ import com.telenav.kivakit.core.messaging.Repeater;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.BuilderAssociated;
 import digital.fiasco.runtime.build.builder.tools.assemble.archiver.Archiver;
-import digital.fiasco.runtime.build.builder.tools.clean.cleaner.Cleaner;
-import digital.fiasco.runtime.build.builder.tools.compile.java.JavaCompiler;
 import digital.fiasco.runtime.build.builder.tools.assemble.copier.Copier;
-import digital.fiasco.runtime.build.builder.tools.toolchain.git.Git;
 import digital.fiasco.runtime.build.builder.tools.assemble.shader.Shader;
 import digital.fiasco.runtime.build.builder.tools.assemble.stamper.BuildStamper;
+import digital.fiasco.runtime.build.builder.tools.clean.cleaner.Cleaner;
+import digital.fiasco.runtime.build.builder.tools.compile.java.JavaCompiler;
 import digital.fiasco.runtime.build.builder.tools.test.unit.junit.Tester;
+import digital.fiasco.runtime.build.builder.tools.toolchain.git.Git;
 import digital.fiasco.runtime.build.environment.BuildStructure;
 
 import static com.telenav.kivakit.core.language.Classes.newInstance;
@@ -29,7 +29,7 @@ public interface ToolFactory extends
      */
     default Archiver newArchiver()
     {
-        return newTool(Archiver.class);
+        return newTool(Archiver.class, Void.class);
     }
 
     /**
@@ -37,7 +37,7 @@ public interface ToolFactory extends
      */
     default Cleaner newCleaner()
     {
-        return newTool(Cleaner.class);
+        return newTool(Cleaner.class, Void.class);
     }
 
     /**
@@ -45,7 +45,7 @@ public interface ToolFactory extends
      */
     default JavaCompiler newCompiler()
     {
-        return newTool(JavaCompiler.class);
+        return newTool(JavaCompiler.class, Void.class);
     }
 
     /**
@@ -53,7 +53,7 @@ public interface ToolFactory extends
      */
     default Copier newCopier()
     {
-        return newTool(Copier.class);
+        return newTool(Copier.class, Void.class);
     }
 
     /**
@@ -61,7 +61,7 @@ public interface ToolFactory extends
      */
     default Git newGit()
     {
-        return newTool(Git.class);
+        return newTool(Git.class, String.class);
     }
 
     /**
@@ -69,7 +69,7 @@ public interface ToolFactory extends
      */
     default Shader newShader()
     {
-        return newTool(Shader.class);
+        return newTool(Shader.class, Void.class);
     }
 
     /**
@@ -77,7 +77,7 @@ public interface ToolFactory extends
      */
     default BuildStamper newStamper()
     {
-        return newTool(BuildStamper.class);
+        return newTool(BuildStamper.class, Void.class);
     }
 
     /**
@@ -85,10 +85,10 @@ public interface ToolFactory extends
      */
     default Tester newTester()
     {
-        return newTool(Tester.class);
+        return newTool(Tester.class, Void.class);
     }
 
-    default <T extends Tool<T>> T newTool(Class<T> type)
+    default <T extends Tool<T, O>, O> T newTool(Class<T> type, Class<O> output)
     {
         return listenTo(newInstance(type, Builder.class, associatedBuilder()));
     }

@@ -73,7 +73,7 @@ import static javax.tools.ToolProvider.getSystemJavaCompiler;
  * @see FileList
  */
 @SuppressWarnings({ "unused", "UnusedReturnValue" })
-public class JavaCompiler extends BaseTool<JavaCompiler>
+public class JavaCompiler extends BaseTool<JavaCompiler, Void>
 {
     /**
      * Broadcasts compilation errors
@@ -214,9 +214,11 @@ public class JavaCompiler extends BaseTool<JavaCompiler>
      * {@inheritDoc}
      */
     @Override
-    public void onRun()
+    public Void onRun()
     {
         compile(sources);
+
+        return null;
     }
 
     /**

@@ -11,7 +11,7 @@ import static com.telenav.kivakit.core.collections.map.ObjectMap.map;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.string.Formatter.format;
 
-public class Javadoc extends BaseFileTool<Javadoc>
+public class Javadoc extends BaseFileTool<Javadoc, Void>
 {
     /** The Javadoc warnings that are enabled, per access level */
     private ObjectMap<String, JavadocAccessLevel> accessLevels = map();
@@ -66,8 +66,9 @@ public class Javadoc extends BaseFileTool<Javadoc>
     }
 
     @Override
-    public void onRun()
+    public Void onRun()
     {
+        return null;
     }
 
     /**
