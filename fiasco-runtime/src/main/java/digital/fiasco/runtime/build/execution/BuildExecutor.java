@@ -21,9 +21,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Future;
 
-import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.thread.Threads.threadPool;
-import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
 
 /**
  * Runs a parallel build for the build tree with the given root builder. The root builder's settings provide the number
@@ -85,25 +83,17 @@ public class BuildExecutor extends BaseComponent implements TryTrait
      */
     public ObjectList<Result<Builder>> run()
     {
-        if (build.settings().isEnabled(HELP))
-        {
-            information(build.description());
-            return list();
-        }
-        else
-        {
-            // Start resolving artifacts in the background starting from the root
-            // builder's dependencies. Each resolved artifact is added to the
-            // resolved set.
-            var resolved = new ArtifactResolutionTracker(this);
-            trace("Starting artifact resolver");
-            new ArtifactResolver(build, resolved).resolveArtifacts();
+        // Start resolving artifacts in the background starting from the root
+        // builder's dependencies. Each resolved artifact is added to the
+        // resolved set.
+        var resolved = new ArtifactResolutionTracker(this);
+        trace("Starting artifact resolver");
+        new ArtifactResolver(build, resolved).resolveArtifacts();
 
-            // Start running builders in parallel. Each builder will wait until its
-            // dependencies are in the resolved set before executing.
-            trace("Starting build");
-            return build(resolved);
-        }
+        // Start running builders in parallel. Each builder will wait until its
+        // dependencies are in the resolved set before executing.
+        trace("Starting build");
+        return build(resolved);
     }
 
     /**

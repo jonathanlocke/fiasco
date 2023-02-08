@@ -53,6 +53,7 @@ import static com.telenav.kivakit.core.language.reflection.Type.typeForClass;
 import static com.telenav.kivakit.core.value.count.Count._0;
 import static com.telenav.kivakit.core.value.count.Count._16;
 import static com.telenav.kivakit.core.vm.JavaVirtualMachine.javaVirtualMachine;
+import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
 
 /**
  * Defines a Fiasco build.
@@ -374,20 +375,27 @@ public abstract class BaseBuild extends Application implements Build
     @Override
     protected final void onRun()
     {
-        // Execute the build,
-        var results = executeBuild();
-
-        // then show the results.
-        if (results.isNonEmpty())
+        if (settings().isEnabled(HELP))
         {
-            var problems = _0;
-            for (var at : results)
-            {
-                at.messages().broadcastTo(this);
-                problems = problems.plus(at.messages().problems());
-            }
+            information(description());
+        }
+        else
+        {
+            // Execute the build,
+            var results = executeBuild();
 
-            information("Build completed with $ problems", problems);
+            // then show the results.
+            if (results.isNonEmpty())
+            {
+                var problems = _0;
+                for (var at : results)
+                {
+                    at.messages().broadcastTo(this);
+                    problems = problems.plus(at.messages().problems());
+                }
+
+                information("Build completed with $ problems", problems);
+            }
         }
     }
 
