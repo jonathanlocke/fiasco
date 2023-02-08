@@ -515,7 +515,7 @@ public class Builder extends BaseRepeater implements
             .withSources(sourceMainJavaSources())
             .run();
 
-        // newStamper().run();
+        newStamper().run();
     }
 
     public void onPrepare()

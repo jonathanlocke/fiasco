@@ -1,13 +1,13 @@
 package digital.fiasco.runtime.build.builder.tools.assemble.stamper;
 
 import com.telenav.cactus.metadata.BuildName;
-import com.telenav.kivakit.conversion.core.time.kivakit.KivaKitLocalDateConverter;
 import com.telenav.kivakit.core.collections.list.StringList;
 import com.telenav.kivakit.core.string.Formatter;
-import digital.fiasco.runtime.build.environment.BuildStructure;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.builder.tools.BaseTool;
 import digital.fiasco.runtime.build.builder.tools.ToolFactory;
+import digital.fiasco.runtime.build.builder.tools.toolchain.git.GitLocalTimeConverter;
+import digital.fiasco.runtime.build.environment.BuildStructure;
 
 import java.time.LocalDate;
 
@@ -94,7 +94,7 @@ public class BuildStamper extends BaseTool<BuildStamper> implements
     {
         information("Stamping build");
 
-        var name = associatedBuilder().descriptor().name().replaceAll("\\.", "-");
+        var name = associatedBuilder().descriptor().artifactName().name().replaceAll("\\.", "-");
 
         var projectProperties = targetClassesFolder()
             .file(name + "-project.properties");
@@ -113,20 +113,22 @@ public class BuildStamper extends BaseTool<BuildStamper> implements
      */
     private StringList buildProperties()
     {
-        var git = newGit();
+        var git = newGit().commitHash();
+        git.run();
 
-        git.commitHash().run();
         var commitHash = git.output() != null
             ? git.output()
             : "[unknown]";
 
-        git.commitTime().run();
-        var commitTime = new KivaKitLocalDateConverter()
+        git = newGit().commitTime();
+        git.run();
+
+        var commitTime = new GitLocalTimeConverter(this)
             .convert(git.output());
 
         return stringList("build.time = " + now().asString(),
-            "build.number = " + BuildName.name(LocalDate.now()),
-            "build.name = " + BuildName.toBuildNumber(LocalDate.now()),
+            "build.name = " + BuildName.name(LocalDate.now()),
+            "build.number = " + BuildName.toBuildNumber(LocalDate.now()),
             "build.commit.hash = " + commitHash,
             "build.commit.time = " + commitTime);
     }
@@ -138,7 +140,7 @@ public class BuildStamper extends BaseTool<BuildStamper> implements
     {
         var descriptor = associatedBuilder().descriptor();
         return stringList("artifact.group = " + descriptor.group(),
-            "artifact.name = " + descriptor.name(),
+            "artifact.name = " + descriptor.artifactName(),
             "artifact.version = " + descriptor.version(),
             "artifact = " + descriptor);
     }

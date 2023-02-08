@@ -69,7 +69,7 @@ public class Git extends BaseTool<Git>
     public Git(Builder builder)
     {
         super(builder);
-        folder = rootFolder();
+        folder = builder.rootFolder();
     }
 
     /**
@@ -113,6 +113,7 @@ public class Git extends BaseTool<Git>
     /**
      * Returns a copy of this Git tool
      */
+    @Override
     public Git copy()
     {
         return new Git(this);
@@ -139,7 +140,7 @@ public class Git extends BaseTool<Git>
     {
         information(description());
         output = operatingSystem().execute(this,
-            folder.asJavaFile(), arguments.asStringArray());
+            folder.asJavaFile(), arguments.asStringArray()).trim();
     }
 
     /**
