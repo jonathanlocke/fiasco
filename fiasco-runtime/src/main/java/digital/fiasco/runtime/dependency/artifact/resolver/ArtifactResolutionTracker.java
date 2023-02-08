@@ -86,7 +86,7 @@ public class ArtifactResolutionTracker extends BaseComponent
             while (!isResolved(required))
             {
                 trace("Awaiting resolution: $", required.without(resolved));
-                milliseconds(50).await(resolvedMore);
+                milliseconds(250).await(resolvedMore);
             }
         });
     }

@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.build.settings;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.core.value.count.Count;
@@ -16,6 +17,7 @@ import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
 import digital.fiasco.runtime.librarian.Librarian;
 import org.jetbrains.annotations.NotNull;
 
+import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.value.count.Count._8;
@@ -91,10 +93,10 @@ public class BuildSettingsObject extends BaseRepeater implements
     private Count builderThreads = _8;
 
     /** The number of threads to use when building */
-    private Count artifactResolverThreads = _8;
+    private Count resolverThreads = _8;
 
     /** The set of enabled build options */
-    private ObjectSet<BuildOption> options = set();
+    private ObjectSet<BuildOption> enabledOptions = set();
 
     /** The list of build phases to execute */
     private PhaseList phases;
@@ -136,24 +138,13 @@ public class BuildSettingsObject extends BaseRepeater implements
         this.builder = that.builder;
         this.rootFolder = that.rootFolder;
         this.phases = that.phases.copy();
-        this.artifactResolverThreads = that.artifactResolverThreads;
+        this.resolverThreads = that.resolverThreads;
         this.builderThreads = that.builderThreads;
-        this.options = that.options.copy();
+        this.enabledOptions = that.enabledOptions.copy();
         this.descriptor = that.descriptor;
         this.librarian = that.librarian.copy();
         this.profiles = that.profiles.copy();
         this.enabledProfiles = that.enabledProfiles.copy();
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
-    @Override
-    public Count artifactResolverThreads()
-    {
-        return artifactResolverThreads;
     }
 
     /**
@@ -210,7 +201,7 @@ public class BuildSettingsObject extends BaseRepeater implements
     @Override
     public boolean isEnabled(BuildOption option)
     {
-        return options.contains(option);
+        return enabledOptions.contains(option);
     }
 
     /**
@@ -225,6 +216,17 @@ public class BuildSettingsObject extends BaseRepeater implements
         ensure(profiles.contains(profile), "Unknown profile $", profile);
 
         return enabledProfiles.contains(profile);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public ObjectList<BuildOption> options()
+    {
+        return list(BuildOption.values());
     }
 
     /**
@@ -289,6 +291,17 @@ public class BuildSettingsObject extends BaseRepeater implements
      * @return {@inheritDoc}
      */
     @Override
+    public Count resolverThreads()
+    {
+        return resolverThreads;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
     public Folder rootFolder()
     {
         return rootFolder;
@@ -305,20 +318,6 @@ public class BuildSettingsObject extends BaseRepeater implements
     {
         var copy = copy();
         copy.descriptor = descriptor;
-        return copy;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param threads {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public BuildSettingsObject withArtifactResolverThreads(Count threads)
-    {
-        var copy = copy();
-        copy.artifactResolverThreads = threads;
         return copy;
     }
 
@@ -360,7 +359,7 @@ public class BuildSettingsObject extends BaseRepeater implements
     public BuildSettingsObject withDisabled(BuildOption option)
     {
         var copy = copy();
-        copy.options.remove(option);
+        copy.enabledOptions.remove(option);
         return copy;
     }
 
@@ -404,7 +403,7 @@ public class BuildSettingsObject extends BaseRepeater implements
     public BuildSettingsObject withEnabled(BuildOption option)
     {
         var copy = copy();
-        copy.options.add(option);
+        copy.enabledOptions.add(option);
         return copy;
     }
 
@@ -448,6 +447,20 @@ public class BuildSettingsObject extends BaseRepeater implements
     public BuildSettingsObject withProfile(BuildProfile profile)
     {
         return mutatedCopy(it -> it.profiles.add(profile));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param threads {@inheritDoc}
+     * @return {@inheritDoc}
+     */
+    @Override
+    public BuildSettingsObject withResolverThreads(Count threads)
+    {
+        var copy = copy();
+        copy.resolverThreads = threads;
+        return copy;
     }
 
     /**

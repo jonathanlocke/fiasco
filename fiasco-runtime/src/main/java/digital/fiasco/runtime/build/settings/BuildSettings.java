@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.build.settings;
 
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.core.version.Version;
@@ -79,9 +80,9 @@ import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName
  * <p><b>Threading</b></p>
  *
  * <ul>
- *      <li>{@link #artifactResolverThreads()}</li>
+ *      <li>{@link #resolverThreads()}</li>
  *      <li>{@link #builderThreads()}</li>
- *      <li>{@link #withArtifactResolverThreads(Count)}</li>
+ *      <li>{@link #withResolverThreads(Count)}</li>
  *      <li>{@link #withBuilderThreads(Count)}</li>
  * </ul>
  *
@@ -100,14 +101,6 @@ public interface BuildSettings extends
     {
         return new BuildSettingsObject(builder);
     }
-
-    /**
-     * Returns the number of threads that should be used to resolve artifacts. This is particularly important for remote
-     * repositories.
-     *
-     * @return The number of threads
-     */
-    Count artifactResolverThreads();
 
     /**
      * Returns the number of threads to use when building
@@ -155,6 +148,13 @@ public interface BuildSettings extends
     boolean isEnabled(BuildProfile profile);
 
     /**
+     * Returns a list of all build options
+     *
+     * @return The options
+     */
+    ObjectList<BuildOption> options();
+
+    /**
      * Returns the phase with the given name
      *
      * @param name The phase name to look up
@@ -184,6 +184,14 @@ public interface BuildSettings extends
      * @return Set of build profiles
      */
     ObjectSet<BuildProfile> profiles();
+
+    /**
+     * Returns the number of threads that should be used to resolve artifacts. This is particularly important for remote
+     * repositories.
+     *
+     * @return The number of threads
+     */
+    Count resolverThreads();
 
     /**
      * Returns the root folder for this build
@@ -302,14 +310,6 @@ public interface BuildSettings extends
     }
 
     /**
-     * Returns a copy of this settings object with the given thread count
-     *
-     * @param threads The number of threads
-     * @return The copy of this settings object
-     */
-    BuildSettings withArtifactResolverThreads(Count threads);
-
-    /**
      * Returns a copy of this settings object with the given main artifact version
      *
      * @param version The artifact version
@@ -402,6 +402,14 @@ public interface BuildSettings extends
      * @return The copy
      */
     BuildSettings withProfile(BuildProfile profile);
+
+    /**
+     * Returns a copy of this settings object with the given thread count
+     *
+     * @param threads The number of threads
+     * @return The copy of this settings object
+     */
+    BuildSettings withResolverThreads(Count threads);
 
     /**
      * Returns a copy of this settings object with the given root folder

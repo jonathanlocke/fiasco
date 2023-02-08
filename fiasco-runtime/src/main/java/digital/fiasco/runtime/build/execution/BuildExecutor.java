@@ -28,8 +28,8 @@ import static digital.fiasco.runtime.build.settings.BuildOption.HELP;
 /**
  * Runs a parallel build for the build tree with the given root builder. The root builder's settings provide the number
  * of threads to use with {@link BuildSettings#builderThreads()}. Artifacts are resolved in parallel by an
- * {@link ArtifactResolver}, which uses {@link BuildSettings#artifactResolverThreads()} threads. Both the artifact
- * resolver and this build executor are greedy and begin work as soon as it is possible.
+ * {@link ArtifactResolver}, which uses {@link BuildSettings#resolverThreads()} threads. Both the artifact resolver and
+ * this build executor are greedy and begin work as soon as it is possible.
  *
  * <p>
  * A build is defined by a dependency tree of builders and artifacts starting at the root {@link Builder}. Each builder

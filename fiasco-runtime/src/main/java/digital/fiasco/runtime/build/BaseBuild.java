@@ -364,7 +364,7 @@ public abstract class BaseBuild extends Application implements Build
         return new Builder(this)
             .withArtifactDescriptor(metadata().descriptor())
             .withBuilderThreads(get(BUILDER_THREADS))
-            .withArtifactResolverThreads(get(RESOLVER_THREADS))
+            .withResolverThreads(get(RESOLVER_THREADS))
             .withParsedCommandLine(commandLine());
     }
 

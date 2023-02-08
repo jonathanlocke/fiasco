@@ -2,6 +2,7 @@ package digital.fiasco.runtime.build.builder;
 
 import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.commandline.CommandLine;
+import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
 import com.telenav.kivakit.core.function.Result;
 import com.telenav.kivakit.core.language.trait.TryCatchTrait;
@@ -313,12 +314,6 @@ public class Builder extends BaseRepeater implements
         return artifactDependencies;
     }
 
-    @Override
-    public Count artifactResolverThreads()
-    {
-        return settings().artifactResolverThreads();
-    }
-
     /**
      * {@inheritDoc}
      *
@@ -498,6 +493,17 @@ public class Builder extends BaseRepeater implements
         return descriptor().name();
     }
 
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public ObjectList<BuildOption> options()
+    {
+        return settings.options();
+    }
+
     @Override
     public Phase phase(String name)
     {
@@ -531,6 +537,12 @@ public class Builder extends BaseRepeater implements
     public Repository repository()
     {
         return unsupported();
+    }
+
+    @Override
+    public Count resolverThreads()
+    {
+        return settings().resolverThreads();
     }
 
     @Override
@@ -745,18 +757,6 @@ public class Builder extends BaseRepeater implements
     public Builder withArtifactName(String artifactName)
     {
         return withSettings(it -> it.withArtifactName(artifactName));
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @param threads {@inheritDoc}
-     * @return {@inheritDoc}
-     */
-    @Override
-    public Builder withArtifactResolverThreads(Count threads)
-    {
-        return withSettings(it -> it.withArtifactResolverThreads(threads));
     }
 
     /**
@@ -1035,6 +1035,18 @@ public class Builder extends BaseRepeater implements
     public Builder withProfile(BuildProfile profile)
     {
         return withSettings(it -> it.withProfile(profile));
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @param threads {@inheritDoc}
+     * @return {@inheritDoc}
+     */
+    @Override
+    public Builder withResolverThreads(Count threads)
+    {
+        return withSettings(it -> it.withResolverThreads(threads));
     }
 
     /**

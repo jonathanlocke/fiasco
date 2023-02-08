@@ -349,7 +349,7 @@ public class DependencyQueue extends BaseComponent implements
                 if (ready.isEmpty())
                 {
                     // wait for more dependencies to complete processing,
-                    milliseconds(50).await(completedMore);
+                    milliseconds(250).await(completedMore);
                 }
                 else
                 {
