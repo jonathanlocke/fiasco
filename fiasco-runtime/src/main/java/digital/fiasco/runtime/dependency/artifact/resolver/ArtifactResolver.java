@@ -24,9 +24,9 @@ import static com.telenav.kivakit.core.thread.Threads.threadPool;
 /**
  * Resolves artifacts in groups by turning the given root dependency into a {@link DependencyTree}, and then turning
  * that tree into a {@link DependencyQueue}. Groups of dependencies that are ready for resolution are retrieved with
- * {@link DependencyQueue#takeAllReady()}, and then resolved using the {@link RepositorySearchLibrarian}
- * found in the {@link BuildSettingsObject}. When a group of dependencies is resolved, the given {@link Callback} is
- * called with the resolution {@link Result}.
+ * {@link DependencyQueue#takeAllReady()}, and then resolved using the {@link RepositorySearchLibrarian} found in the
+ * {@link BuildSettingsObject}. When a group of dependencies is resolved, the given {@link Callback} is called with the
+ * resolution {@link Result}.
  *
  * <p><b>Performance</b></p>
  *
@@ -74,7 +74,8 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
         run(this, "Resolver", () ->
         {
             // Create a dependency queue from the build's dependency tree,
-            var queue = build.dependencyTree().asQueue(Artifact.class);
+            var artifactQueue = build.dependencyTree().asQueue(Artifact.class)
+                .withIsReady((queue, it) -> resolved.isResolved(it.artifactDependencies()));
 
             // create an executor and completion service,
             trace("Starting artifact resolver threads");
@@ -82,7 +83,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
             var executor = threadPool("ResolverPool", threads);
 
             // and submit a resolve artifacts task for each thread.
-            threads.loop(() -> executor.submit(() -> resolveArtifacts(queue)));
+            threads.loop(() -> executor.submit(() -> resolveArtifacts(artifactQueue)));
 
             // Wait until all artifacts in the queue are resolved.
             trace("Waiting for artifact resolution to complete");

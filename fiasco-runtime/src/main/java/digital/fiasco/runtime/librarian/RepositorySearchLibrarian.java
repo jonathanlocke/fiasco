@@ -68,8 +68,8 @@ public class RepositorySearchLibrarian extends BaseComponent implements
     public RepositorySearchLibrarian()
     {
         repositories.add(new LocalRepository("local-repository"));
-        repositories.add(MAVEN_CENTRAL);
         repositories.add(new MavenRepository("local-maven-repository", "local", userHome().folder(".m2/repository")));
+        repositories.add(MAVEN_CENTRAL);
     }
 
     @Override

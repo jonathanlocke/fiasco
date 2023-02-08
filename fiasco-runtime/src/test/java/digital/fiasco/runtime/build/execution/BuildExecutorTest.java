@@ -50,6 +50,7 @@ public class BuildExecutorTest extends FiascoTest
                 var builder = new Builder(this);
                 return builder
                     .withSettings(buildSettings(builder)
+                        .withEnabled(PHASE_COMPILE)
                         .withArtifactDescriptor(metadata().descriptor()));
             }
         };
@@ -59,6 +60,6 @@ public class BuildExecutorTest extends FiascoTest
         results.forEach(it -> ensure(it.succeeded()));
 
         ensure(compiled.contains(build.root()));
-        ensure(compiled.contains(build.root().builder(descriptor(":com.telenav.kivakit:utilities:"))));
+        ensure(compiled.contains(build.root().builder(descriptor(":digital.fiasco:utilities:"))));
     }
 }

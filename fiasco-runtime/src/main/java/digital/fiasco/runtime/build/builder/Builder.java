@@ -555,6 +555,8 @@ public class Builder extends BaseRepeater implements
                 // and if the phase is enabled,
                 if (isEnabled(phase))
                 {
+                    trace("Phase $", phase);
+
                     // notify that the phase has started,
                     phase.internalOnBefore(this);
 

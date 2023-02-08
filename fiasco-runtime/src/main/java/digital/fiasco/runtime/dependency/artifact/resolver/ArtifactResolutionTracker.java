@@ -7,7 +7,7 @@ import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 
 import java.util.concurrent.locks.Condition;
 
-import static com.telenav.kivakit.core.time.Duration.seconds;
+import static com.telenav.kivakit.core.time.Duration.milliseconds;
 
 /**
  * Tracks the resolution of artifacts.
@@ -86,7 +86,7 @@ public class ArtifactResolutionTracker extends BaseComponent
             while (!isResolved(required))
             {
                 trace("Awaiting resolution: $", required.without(resolved));
-                seconds(0.5).await(resolvedMore);
+                milliseconds(50).await(resolvedMore);
             }
         });
     }

@@ -70,6 +70,16 @@ public abstract class BasePhase implements Phase
      * {@inheritDoc}
      */
     @Override
+    public Phase duringPhase(BuildAction code)
+    {
+        run.add(code);
+        return this;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    @Override
     public boolean equals(Object object)
     {
         if (object instanceof BasePhase that)
@@ -124,13 +134,9 @@ public abstract class BasePhase implements Phase
         return name;
     }
 
-    /**
-     * {@inheritDoc}
-     */
     @Override
-    public Phase duringPhase(BuildAction code)
+    public String toString()
     {
-        run.add(code);
-        return this;
+        return name;
     }
 }

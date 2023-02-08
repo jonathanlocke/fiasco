@@ -25,6 +25,7 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
+import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static com.telenav.kivakit.core.string.ObjectFormatter.ObjectFormat.MULTILINE;
 import static com.telenav.kivakit.core.time.Duration.milliseconds;
 import static com.telenav.kivakit.core.time.Time.now;
@@ -234,6 +235,7 @@ public class DependencyQueue extends BaseComponent implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public boolean hasAvailable()
     {
+        ensureHasIsReadyFunction();
         return lock.whileLocked(() -> available.isNonEmpty());
     }
 
@@ -245,6 +247,7 @@ public class DependencyQueue extends BaseComponent implements
      */
     public boolean hasCompleted(BaseDependencyList<?, ?> list)
     {
+        ensureHasIsReadyFunction();
         return completed.containsAll(list.asDependencyList());
     }
 
@@ -256,6 +259,7 @@ public class DependencyQueue extends BaseComponent implements
      */
     public boolean hasCompleted(Dependency dependency)
     {
+        ensureHasIsReadyFunction();
         return completed.contains(dependency);
     }
 
@@ -264,6 +268,7 @@ public class DependencyQueue extends BaseComponent implements
      */
     public boolean isCompleted()
     {
+        ensureHasIsReadyFunction();
         return remaining().isEmpty();
     }
 
@@ -273,6 +278,7 @@ public class DependencyQueue extends BaseComponent implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public DependencyList takeAllReady()
     {
+        ensureHasIsReadyFunction();
         return takeAll(MAXIMUM);
     }
 
@@ -283,6 +289,7 @@ public class DependencyQueue extends BaseComponent implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public <D extends Dependency> D takeNextReady()
     {
+        ensureHasIsReadyFunction();
         var ready = takeAll(_1);
         return ready.isEmpty() ? null : (D) ready.first();
     }
@@ -302,7 +309,12 @@ public class DependencyQueue extends BaseComponent implements
      */
     public DependencyQueue withIsReady(BiFunction<DependencyQueue, Dependency, Boolean> isReady)
     {
-        return mutatedCopy(it -> it.isReady = isReady);
+        return mutatedCopy(it -> it.isReady = ensureNotNull(isReady));
+    }
+
+    private void ensureHasIsReadyFunction()
+    {
+        ensure(isReady != null, "Must supply isReady function");
     }
 
     /**
@@ -321,7 +333,7 @@ public class DependencyQueue extends BaseComponent implements
      */
     private DependencyList takeAll(Maximum maximum)
     {
-        ensure(isReady != null, "Must supply isReady function");
+        ensureHasIsReadyFunction();
 
         return lock.whileLocked(() ->
         {

@@ -163,13 +163,13 @@ public class BuildExecutor extends BaseComponent implements TryTrait
         return () ->
         {
             // Wait for artifact dependencies to be resolved,
-            trace("$: waiting for artifacts to be resolved", builder);
+            trace("Waiting for artifacts to be resolved: $", builder);
             resolved.waitForResolutionOf(builder.artifactDependencies());
 
             // run the builder,
-            trace("$: building", builder);
+            trace("Building: $", builder);
             var result = builder.run();
-            trace("$: build completed ", builder);
+            trace("Build completed: $", builder);
 
             // and then mark it as processed.
             queue.completed(builder);
