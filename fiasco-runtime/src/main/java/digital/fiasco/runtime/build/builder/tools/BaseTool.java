@@ -23,10 +23,10 @@ import static digital.fiasco.runtime.build.settings.BuildProfile.DEFAULT;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public abstract class BaseTool<T extends BaseTool<T, O>, O> extends BaseComponent implements
+public abstract class BaseTool<TOOL extends BaseTool<TOOL, OUTPUT>, OUTPUT> extends BaseComponent implements
     BuildExecutionStep,
-    Copyable<T>,
-    Tool<T, O>
+    Copyable<TOOL>,
+    Tool<TOOL, OUTPUT>
 {
     /** The builder associated with this tool */
     private final Builder builder;
@@ -49,7 +49,7 @@ public abstract class BaseTool<T extends BaseTool<T, O>, O> extends BaseComponen
      *
      * @param that The tool to copy
      */
-    public BaseTool(T that)
+    public BaseTool(TOOL that)
     {
         this.builder = that.builder();
     }
@@ -108,7 +108,7 @@ public abstract class BaseTool<T extends BaseTool<T, O>, O> extends BaseComponen
      * @return {@inheritDoc}
      */
     @Override
-    public abstract T copy();
+    public abstract TOOL copy();
 
     /**
      * Returns true if this tool is enabled under any of the profiles it is assigned to
@@ -144,7 +144,7 @@ public abstract class BaseTool<T extends BaseTool<T, O>, O> extends BaseComponen
      * Called when this tool runs
      */
     @Override
-    public abstract O onRun();
+    public abstract OUTPUT onRun();
 
     /**
      * Called before this tool runs
@@ -167,9 +167,9 @@ public abstract class BaseTool<T extends BaseTool<T, O>, O> extends BaseComponen
      * {@inheritDoc}
      */
     @Override
-    public final O run()
+    public final OUTPUT run()
     {
-        O output = null;
+        OUTPUT output = null;
 
         if (isEnabled())
         {
@@ -214,7 +214,7 @@ public abstract class BaseTool<T extends BaseTool<T, O>, O> extends BaseComponen
      * @param profile The profile
      * @return The copy
      */
-    public T withProfile(BuildProfile profile)
+    public TOOL withProfile(BuildProfile profile)
     {
         return mutatedCopy(it -> ((BaseTool<?, ?>) it).profile = profile);
     }

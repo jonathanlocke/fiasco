@@ -15,7 +15,7 @@ import static com.telenav.kivakit.filesystem.FileList.fileList;
  *
  * @author Jonathan Locke
  */
-public abstract class BaseFileTool<T extends BaseFileTool<T, O>, O> extends BaseTool<T, O>
+public abstract class BaseFileTool<TOOL extends BaseFileTool<TOOL, OUTPUT>, OUTPUT> extends BaseTool<TOOL, OUTPUT>
 {
     /** The list of files for this tool to process */
     FileList files;
@@ -36,7 +36,7 @@ public abstract class BaseFileTool<T extends BaseFileTool<T, O>, O> extends Base
      *
      * @param that The tool to copy
      */
-    public BaseFileTool(T that)
+    public BaseFileTool(TOOL that)
     {
         super(that);
         this.files = that.files.copy();
@@ -48,7 +48,7 @@ public abstract class BaseFileTool<T extends BaseFileTool<T, O>, O> extends Base
      * @return {@inheritDoc}
      */
     @Override
-    public abstract T copy();
+    public abstract TOOL copy();
 
     /**
      * Returns the files selected for processing by this tool
@@ -81,7 +81,7 @@ public abstract class BaseFileTool<T extends BaseFileTool<T, O>, O> extends Base
      * @param files The files to add
      * @return This for chaining
      */
-    public T withFiles(Collection<File> files)
+    public TOOL withFiles(Collection<File> files)
     {
         return mutatedCopy(it -> it.files = files().with(files));
     }
@@ -92,7 +92,7 @@ public abstract class BaseFileTool<T extends BaseFileTool<T, O>, O> extends Base
      * @param files The files to exclude
      * @return This for chaining
      */
-    public T withoutFiles(Collection<File> files)
+    public TOOL withoutFiles(Collection<File> files)
     {
         return mutatedCopy(it -> it.files = files().without(files));
     }
