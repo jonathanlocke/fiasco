@@ -3,6 +3,7 @@ package digital.fiasco.runtime.dependency.collections.lists;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
+import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
@@ -27,8 +28,6 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  * <p><b>Matching</b></p>
  *
  * <ul>
- *     <li>{@link #asAssetList()}</li>
- *     <li>{@link #asLibraryList()}</li>
  *     <li>{@link #matching(Matcher)}</li>
  * </ul>
  *
@@ -48,6 +47,8 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  *
  * <ul>
  *     <li>{@link #asArtifactDescriptors()}</li>
+ *     <li>{@link #asAssetList()}</li>
+ *     <li>{@link #asLibraryList()}</li>
  *     <li>{@link #asStringList()}</li>
  *     <li>{@link #asMutableList()}</li>
  *     <li>{@link #asMutableSet()}</li>
@@ -57,12 +58,12 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  *
  * <ul>
  *     <li>{@link #copy()}</li>
- *     <li>{@link #with(Artifact)}</li>
- *     <li>{@link #with(Artifact, Artifact[])}</li>
- *     <li>{@link #with(Artifact[])}</li>
- *     <li>{@link #without(Matcher)}</li>
- *     <li>{@link #without(Collection)}</li>
- *     <li>{@link #without(Artifact)}</li>
+ *     <li>{@link BaseDependencyList#with(Dependency)}</li>
+ *     <li>{@link BaseDependencyList#with(Dependency, Dependency[])}</li>
+ *     <li>{@link BaseDependencyList#with(Dependency[])}</li>
+ *     <li>{@link BaseDependencyList#without(Matcher)}</li>
+ *     <li>{@link BaseDependencyList#without(Collection)}</li>
+ *     <li>{@link BaseDependencyList#without(Dependency)}</li>
  * </ul>
  *
  * @author Jonathan Locke
@@ -79,7 +80,7 @@ public class ArtifactList extends BaseDependencyList<Artifact, ArtifactList>
      * Creates a list of artifacts
      *
      * @param artifacts The artifacts to add
-     * @return The dependency list
+     * @return The artifact list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactList artifacts(Collection<Artifact> artifacts)
@@ -91,7 +92,7 @@ public class ArtifactList extends BaseDependencyList<Artifact, ArtifactList>
      * Creates a list of dependencies
      *
      * @param artifacts The dependencies to add
-     * @return The dependency list
+     * @return The artifact list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static ArtifactList artifacts(Artifact... artifacts)

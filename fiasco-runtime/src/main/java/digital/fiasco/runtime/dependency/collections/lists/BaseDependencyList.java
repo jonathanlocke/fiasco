@@ -33,7 +33,6 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_INSUF
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_NOT_NEEDED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
-import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static digital.fiasco.runtime.dependency.collections.lists.AssetList.assets;
 import static digital.fiasco.runtime.dependency.collections.lists.DependencyList.dependencies;
 import static digital.fiasco.runtime.dependency.collections.lists.LibraryList.libraries;
@@ -447,14 +446,14 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     @Override
     public ListIterator<D> listIterator()
     {
-        return unsupported();
+        return dependencies.listIterator();
     }
 
     @NotNull
     @Override
     public ListIterator<D> listIterator(int index)
     {
-        return unsupported();
+        return dependencies.listIterator(index);
     }
 
     /**
@@ -523,15 +522,14 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     @Override
     public Object @NotNull [] toArray()
     {
-        unsupported();
-        return null;
+        return dependencies.toArray();
     }
 
     @NotNull
     @Override
-    public <T> T @NotNull [] toArray(T @NotNull [] ignored)
+    public <T> T @NotNull [] toArray(T @NotNull [] array)
     {
-        return unsupported();
+        return dependencies.toArray(array);
     }
 
     /**

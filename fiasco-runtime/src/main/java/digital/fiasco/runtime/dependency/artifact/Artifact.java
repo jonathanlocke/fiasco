@@ -78,7 +78,7 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
  * <ul>
  *     <li>{@link #descriptor()}</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)}</li>
- *     <li>{@link #withArtifact(String)}</li>
+ *     <li>{@link #withArtifactName(String)}</li>
  *     <li>{@link #withVersion(Version)}</li>
  * </ul>
  *
@@ -110,7 +110,7 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
  *     <li>{@link #withContent(ArtifactContent)}</li>
  *     <li>{@link #withDependencies(ArtifactList)} - Returns this artifact with the given dependencies</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
- *     <li>{@link #withArtifact(String)} - Returns this artifact with the given name</li>
+ *     <li>{@link #withArtifactName(String)} - Returns this artifact with the given name</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #excluding(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
  *     <li>{@link #excluding(String...)} - Returns this artifact without the given dependencies</li>
@@ -162,7 +162,7 @@ public interface Artifact<A extends Artifact<A>> extends
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default A artifact(String artifactName)
     {
-        return withArtifact(artifactName);
+        return withArtifactName(artifactName);
     }
 
     /**
@@ -174,7 +174,7 @@ public interface Artifact<A extends Artifact<A>> extends
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default A artifact(ArtifactName artifact)
     {
-        return withArtifact(artifact);
+        return withArtifactName(artifact);
     }
 
     /**
@@ -324,6 +324,7 @@ public interface Artifact<A extends Artifact<A>> extends
     /**
      * Returns this artifact in JSON form
      */
+    @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default String toJson()
     {
@@ -334,13 +335,25 @@ public interface Artifact<A extends Artifact<A>> extends
     }
 
     /**
+     * Returns a copy of this artifact with the given version
+     *
+     * @param version The new version
+     * @return The new artifact
+     */
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    default A version(String version)
+    {
+        return withVersion(version);
+    }
+
+    /**
      * Returns a copy of this artifact with the given name
      *
      * @param artifactName The new artifact name
      * @return The new artifact
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default A withArtifact(String artifactName)
+    default A withArtifactName(String artifactName)
     {
         return withDescriptor(descriptor().withArtifact(artifactName));
     }
@@ -352,7 +365,7 @@ public interface Artifact<A extends Artifact<A>> extends
      * @return The new artifact
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    default A withArtifact(ArtifactName artifactName)
+    default A withArtifactName(ArtifactName artifactName)
     {
         return withDescriptor(descriptor().withArtifact(artifactName));
     }

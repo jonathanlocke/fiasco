@@ -385,8 +385,8 @@ public class ArtifactTest extends FiascoTest
 
         ensureEqual(library.withDescriptor(descriptor("library:a:b:1")).descriptor(), descriptor("library:a:b:1"));
 
-        ensureEqual(library.withArtifact("x").descriptor(), descriptor("library:com.telenav.kivakit:x:1.8.5"));
-        ensureEqual(library.withArtifact(new ArtifactName("x")).descriptor(), descriptor("library:com.telenav.kivakit:x:1.8.5"));
+        ensureEqual(library.withArtifactName("x").descriptor(), descriptor("library:com.telenav.kivakit:x:1.8.5"));
+        ensureEqual(library.withArtifactName(new ArtifactName("x")).descriptor(), descriptor("library:com.telenav.kivakit:x:1.8.5"));
         ensureEqual(library.artifact("x").descriptor(), descriptor("library:com.telenav.kivakit:x:1.8.5"));
 
         ensureEqual(library.withVersion("1.0").descriptor(), descriptor("library:com.telenav.kivakit:kivakit-application:1.0"));

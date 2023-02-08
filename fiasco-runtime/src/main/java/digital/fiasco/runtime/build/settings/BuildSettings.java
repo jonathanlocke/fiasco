@@ -343,23 +343,23 @@ public interface BuildSettings extends
      * Returns a copy of this settings object with the given thread count
      *
      * @param threads The number of threads
-     * @return The copy of this settings object
+     * @return The copy
      */
     BuildSettings withBuilderThreads(Count threads);
 
     /**
-     * Disables execution of the given phase
+     * Returns a copy of this object with execution of the given phase disabled
      *
      * @param phase The phase
-     * @return This object for method chaining
+     * @return The copy
      */
     BuildSettings withDisabled(Phase phase);
 
     /**
-     * Disables the given build option
+     * Returns a copy of this object with given build option disabled
      *
      * @param option The option
-     * @return This object for method chaining
+     * @return The copy
      */
     BuildSettings withDisabled(BuildOption option);
 
@@ -367,31 +367,31 @@ public interface BuildSettings extends
      * Returns a copy of this settings object with the given profile disabled
      *
      * @param profile The profile to disable
-     * @return The copy of this settings object
+     * @return The copy
      */
     BuildSettings withDisabled(BuildProfile profile);
 
     /**
-     * Enables execution of the given phase
+     * Returns a copy of this object with execution of the given phase enabled
      *
      * @param phase The phase
-     * @return This object for method chaining
+     * @return The copy
      */
     BuildSettings withEnabled(Phase phase);
 
     /**
-     * Enables the given build option
+     * Returns a copy of this object with given build option enabled
      *
      * @param option The option
-     * @return A copy of this object with the given option enabled
+     * @return The copy
      */
     BuildSettings withEnabled(BuildOption option);
 
     /**
      * Returns a copy of this settings object with the given profile enabled
      *
-     * @param profile The profile to enable
-     * @return The copy of this settings object with the given build profile enabled
+     * @param profile The profile to disable
+     * @return The copy
      */
     BuildSettings withEnabled(BuildProfile profile);
 
@@ -399,7 +399,7 @@ public interface BuildSettings extends
      * Returns a copy of this settings object with the given list of phases
      *
      * @param phases The phase list
-     * @return The copy of this settings object
+     * @return The copy
      */
     BuildSettings withPhases(PhaseList phases);
 
@@ -415,7 +415,7 @@ public interface BuildSettings extends
      * Returns a copy of this settings object with the given thread count
      *
      * @param threads The number of threads
-     * @return The copy of this settings object
+     * @return The copy
      */
     BuildSettings withResolverThreads(Count threads);
 
@@ -423,7 +423,7 @@ public interface BuildSettings extends
      * Returns a copy of this settings object with the given root folder
      *
      * @param rootFolder The root folder
-     * @return The copy of this settings object
+     * @return The copy
      */
     BuildSettings withRootFolder(Folder rootFolder);
 }

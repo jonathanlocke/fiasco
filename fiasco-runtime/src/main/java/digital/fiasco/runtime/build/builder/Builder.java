@@ -55,6 +55,7 @@ import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_COMPILE;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_PREPARE;
 import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
 import static digital.fiasco.runtime.build.settings.BuildSettings.buildSettings;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
 import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.collections.lists.BuilderList.builders;
 
@@ -236,7 +237,7 @@ import static digital.fiasco.runtime.dependency.collections.lists.BuilderList.bu
  *     <li>{@link #newShader()}</li>
  *     <li>{@link #newStamper()}</li>
  *     <li>{@link #newTester()}</li>
- *     <li>{@link #newTool(Class)}</li>
+ *     <li>{@link #newTool(Class, Class)}</li>
  * </ul>
  *
  * <p><b>Miscellaneous</b></p>
@@ -864,9 +865,21 @@ public class Builder extends BaseRepeater implements
     /**
      * Returns a copy of this builder with one or more artifact dependencies added
      *
+     * @param artifactDescriptors The artifact descriptors
+     * @return The copy
+     */
+    public Builder withDependencies(String... artifactDescriptors)
+    {
+        return mutatedCopy(it -> it.artifactDependencies = artifactDependencies
+            .with(descriptors(artifactDescriptors).asArtifacts()).deduplicated());
+    }
+
+    /**
+     * Returns a copy of this builder with one or more artifact dependencies added
+     *
      * @param first The first dependency
      * @param rest Any further dependencies
-     * @return The build for method chaining
+     * @return The copy
      */
     public Builder withDependencies(Artifact<?> first, Artifact<?>... rest)
     {

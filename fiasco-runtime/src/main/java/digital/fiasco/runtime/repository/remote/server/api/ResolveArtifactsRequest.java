@@ -1,18 +1,15 @@
 package digital.fiasco.runtime.repository.remote.server.api;
 
 import com.google.gson.annotations.Expose;
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.microservice.microservlet.BaseMicroservletRequest;
 import com.telenav.kivakit.microservice.microservlet.MicroservletResponse;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
-import java.util.ArrayList;
 import java.util.List;
-
-import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 
 /**
  * A request to resolve artifact descriptors.
@@ -42,24 +39,24 @@ public class ResolveArtifactsRequest extends BaseMicroservletRequest
 {
     /** The artifacts to retrieve */
     @Expose
-    private final List<ArtifactDescriptor> descriptors;
+    private final ArtifactDescriptorList descriptors;
 
     public ResolveArtifactsRequest(List<ArtifactDescriptor> descriptors)
     {
-        this.descriptors = new ArrayList<>(descriptors);
+        this.descriptors = ArtifactDescriptorList.descriptors(descriptors);
     }
 
     public ResolveArtifactsRequest()
     {
-        this.descriptors = list();
+        this.descriptors = ArtifactDescriptorList.descriptors();
     }
 
     /**
      * Returns the artifact descriptors for this request
      */
-    public ObjectList<ArtifactDescriptor> descriptors()
+    public ArtifactDescriptorList descriptors()
     {
-        return list(descriptors);
+        return descriptors;
     }
 
     @Override

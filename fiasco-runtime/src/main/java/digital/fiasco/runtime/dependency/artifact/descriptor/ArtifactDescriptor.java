@@ -2,7 +2,6 @@ package digital.fiasco.runtime.dependency.artifact.descriptor;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.StringMap;
 import com.telenav.kivakit.core.messaging.Listener;
 import com.telenav.kivakit.core.version.Version;
@@ -16,7 +15,6 @@ import java.util.regex.Pattern;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
-import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
@@ -129,32 +127,6 @@ public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
     public static ArtifactDescriptor descriptor(String value)
     {
         return parseDescriptor(throwingListener(), value);
-    }
-
-    /**
-     * Returns a list of artifact descriptors for the given strings. The text format for an artifact descriptor is
-     * <b>[type]:[group]:[artifact]:[version]</b>, for example "library:com.telenav.kivakit:kivakit-core:1.8.0".
-     *
-     * <p><b>Wildcard Matches</b></p>
-     *
-     * <p>
-     * When fields of a descriptor are omitted, they can take on any value in calls to
-     * {@link #matches(ArtifactDescriptor)}. For example:
-     *
-     * <ul>
-     *     <li>"library:com.telenav.kivakit:kivakit-core:" matches all versions of the kivakit-core library</li>
-     *     <li>"library:com.telenav.kivakit::" matches all kivakit libraries</li>
-     *     <li>":com.telenav.kivakit::" matches all kivakit artifacts (both assets and libraries)</li>
-     * </ul>
-     *
-     * @param values The descriptor strings
-     * @return The new artifact descriptors
-     * @throws RuntimeException Throws a subclass of {@link RuntimeException} if parsing fails
-     */
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static ObjectList<ArtifactDescriptor> descriptors(String... values)
-    {
-        return stringList(values).map(ArtifactDescriptor::descriptor);
     }
 
     /**

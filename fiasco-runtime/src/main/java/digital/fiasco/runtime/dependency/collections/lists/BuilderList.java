@@ -4,6 +4,7 @@ import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import digital.fiasco.runtime.build.builder.Builder;
+import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
@@ -58,12 +59,12 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  *
  * <ul>
  *     <li>{@link #copy()}</li>
- *     <li>{@link #with(Builder)}</li>
- *     <li>{@link #with(Builder, Builder[])}</li>
- *     <li>{@link #with(Builder[])}</li>
- *     <li>{@link #without(Matcher)}</li>
- *     <li>{@link #without(Collection)}</li>
- *     <li>{@link #without(Builder)}</li>
+ *     <li>{@link BaseDependencyList#with(Dependency)}</li>
+ *     <li>{@link BaseDependencyList#with(Dependency, Dependency[])}</li>
+ *     <li>{@link BaseDependencyList#with(Dependency[])}</li>
+ *     <li>{@link BaseDependencyList#without(Matcher)}</li>
+ *     <li>{@link BaseDependencyList#without(Collection)}</li>
+ *     <li>{@link BaseDependencyList#without(Dependency)}</li>
  * </ul>
  *
  * @author Jonathan Locke

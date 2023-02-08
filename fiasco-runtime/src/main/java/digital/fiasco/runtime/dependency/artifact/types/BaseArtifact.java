@@ -47,7 +47,7 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
  * <ul>
  *     <li>{@link #descriptor()}</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)}</li>
- *     <li>{@link #withArtifact(String)}</li>
+ *     <li>{@link #withArtifactName(String)}</li>
  *     <li>{@link #withVersion(Version)}</li>
  * </ul>
  *
@@ -77,7 +77,7 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
  *     <li>{@link #withContent(ArtifactContent)}</li>
  *     <li>{@link #withDependencies(ArtifactList)} - Returns this artifact with the given dependencies</li>
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
- *     <li>{@link #withArtifact(String)} - Returns this artifact with the given artifact name</li>
+ *     <li>{@link #withArtifactName(String)} - Returns this artifact with the given artifact name</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
  *     <li>{@link #excluding(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
  *     <li>{@link #excluding(String...)} - Returns this artifact without the given dependencies</li>

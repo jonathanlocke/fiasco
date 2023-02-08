@@ -11,7 +11,7 @@ import org.junit.Test;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
-import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptors;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
 
 public class CacheRepositoryTest extends FiascoTest
 {
