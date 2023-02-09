@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.dependency.collections.lists;
+package digital.fiasco.runtime.dependency.collections;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
@@ -15,6 +15,7 @@ import com.telenav.kivakit.interfaces.object.Copyable;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
 import org.jetbrains.annotations.NotNull;
@@ -33,10 +34,10 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_INSUF
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_NOT_NEEDED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
-import static digital.fiasco.runtime.dependency.collections.lists.AssetList.assets;
-import static digital.fiasco.runtime.dependency.collections.lists.DependencyList.dependencies;
-import static digital.fiasco.runtime.dependency.collections.lists.LibraryList.libraries;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
+import static digital.fiasco.runtime.dependency.collections.AssetList.assets;
+import static digital.fiasco.runtime.dependency.collections.DependencyList.dependencies;
+import static digital.fiasco.runtime.dependency.collections.LibraryList.libraries;
 
 /**
  * A read-only list of {@link Dependency} objects.

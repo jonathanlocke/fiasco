@@ -13,8 +13,8 @@ import digital.fiasco.runtime.dependency.artifact.resolver.ArtifactResolutionTra
 import digital.fiasco.runtime.dependency.artifact.resolver.ArtifactResolver;
 import digital.fiasco.runtime.dependency.collections.DependencyQueue;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
-import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.BaseDependencyList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Callable;

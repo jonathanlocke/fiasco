@@ -10,7 +10,7 @@ import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.collections.DependencyQueue;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.librarian.RepositorySearchLibrarian;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;

@@ -17,8 +17,8 @@ import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContentSignatures;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.RepositoryContentReader;
 import digital.fiasco.runtime.repository.maven.resolver.MavenDependency;
@@ -49,8 +49,8 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactContent.content;
 import static digital.fiasco.runtime.dependency.artifact.types.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
+import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
 import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLATION_FAILED;
 import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLED;
 

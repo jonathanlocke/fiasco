@@ -7,14 +7,12 @@ import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
-import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
-import digital.fiasco.runtime.dependency.collections.lists.DependencyList;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
-import static digital.fiasco.runtime.dependency.collections.lists.DependencyList.dependencies;
+import static digital.fiasco.runtime.dependency.collections.DependencyList.dependencies;
 
 /**
  * A tree of {@link Dependency}s with the root passed to the constructor.

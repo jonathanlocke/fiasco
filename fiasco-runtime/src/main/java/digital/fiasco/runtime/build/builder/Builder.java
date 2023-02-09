@@ -32,8 +32,8 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
-import digital.fiasco.runtime.dependency.collections.lists.BuilderList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.BuilderList;
 import digital.fiasco.runtime.librarian.Librarian;
 import digital.fiasco.runtime.librarian.RepositorySearchLibrarian;
 import digital.fiasco.runtime.repository.Repository;
@@ -55,9 +55,9 @@ import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_COMPILE;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_PREPARE;
 import static digital.fiasco.runtime.build.settings.BuildOption.VERBOSE;
 import static digital.fiasco.runtime.build.settings.BuildSettings.buildSettings;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
-import static digital.fiasco.runtime.dependency.collections.lists.BuilderList.builders;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
+import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.collections.BuilderList.builders;
 
 /**
  * <p>

@@ -14,7 +14,7 @@ import digital.fiasco.runtime.build.BaseBuild;
 import digital.fiasco.runtime.build.builder.BuilderAssociated;
 import digital.fiasco.runtime.build.environment.BuildEnvironmentTrait;
 import digital.fiasco.runtime.build.environment.BuildStructure;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.librarian.Librarian;
 
 /**

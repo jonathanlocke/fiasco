@@ -1,13 +1,12 @@
 package digital.fiasco.runtime.librarian;
 
-import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
 
 import static com.telenav.kivakit.core.version.Version.version;
 

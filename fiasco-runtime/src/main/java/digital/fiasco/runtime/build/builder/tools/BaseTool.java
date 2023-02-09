@@ -10,7 +10,7 @@ import digital.fiasco.runtime.build.execution.BuildExecutionStep;
 import digital.fiasco.runtime.build.settings.BuildOption;
 import digital.fiasco.runtime.build.settings.BuildProfile;
 import digital.fiasco.runtime.build.settings.BuildSettings;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.librarian.Librarian;
 
 import static com.telenav.kivakit.core.messaging.Listener.nullListener;

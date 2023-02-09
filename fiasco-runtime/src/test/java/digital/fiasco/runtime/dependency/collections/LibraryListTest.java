@@ -1,11 +1,11 @@
-package digital.fiasco.runtime.dependency.artifact.collections;
+package digital.fiasco.runtime.dependency.collections;
 
 import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;
 
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
-import static digital.fiasco.runtime.dependency.collections.lists.LibraryList.libraries;
+import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.collections.LibraryList.libraries;
 
 public class LibraryListTest extends FiascoTest
 {

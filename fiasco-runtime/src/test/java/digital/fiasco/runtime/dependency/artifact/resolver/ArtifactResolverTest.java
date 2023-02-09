@@ -9,7 +9,7 @@ import org.junit.Test;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_COMPILE;
 import static digital.fiasco.runtime.build.metadata.BuildMetadata.buildMetadata;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
 
 public class ArtifactResolverTest extends FiascoTest
 {

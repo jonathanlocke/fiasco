@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.dependency.collections.lists;
+package digital.fiasco.runtime.dependency.artifact.descriptor;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.core.collections.list.ObjectList;
@@ -9,9 +9,10 @@ import com.telenav.kivakit.interfaces.collection.Sized;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
 import com.telenav.kivakit.interfaces.object.Copyable;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.BaseDependencyList;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collection;
@@ -22,7 +23,7 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
 
 /**
  * A list of {@link ArtifactDescriptor}s.

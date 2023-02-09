@@ -6,8 +6,8 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
-import static digital.fiasco.runtime.dependency.collections.lists.DependencyList.dependencies;
-import static digital.fiasco.runtime.dependency.collections.lists.LibraryList.libraries;
+import static digital.fiasco.runtime.dependency.collections.DependencyList.dependencies;
+import static digital.fiasco.runtime.dependency.collections.LibraryList.libraries;
 
 public class DependencyTreeTest extends FiascoTest
 {

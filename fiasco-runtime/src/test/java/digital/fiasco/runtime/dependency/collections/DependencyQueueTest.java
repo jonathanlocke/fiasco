@@ -14,7 +14,7 @@ import static com.telenav.kivakit.core.value.count.Count._6;
 import static com.telenav.kivakit.core.value.count.Minimum._10;
 import static com.telenav.kivakit.interfaces.time.WakeState.COMPLETED;
 import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
-import static digital.fiasco.runtime.dependency.collections.lists.LibraryList.libraries;
+import static digital.fiasco.runtime.dependency.collections.LibraryList.libraries;
 
 public class DependencyQueueTest extends FiascoTest
 {

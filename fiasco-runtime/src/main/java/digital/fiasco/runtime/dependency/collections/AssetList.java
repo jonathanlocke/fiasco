@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.dependency.collections.lists;
+package digital.fiasco.runtime.dependency.collections;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
@@ -17,14 +17,15 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 
 /**
- * A list of {@link Asset} objects.
+ * A list of {@link Asset}s.
  *
  * <p><b>Creation</b></p>
  *
  * <ul>
- *     <li>{@link #assets(Asset[])}</li>
- *     <li>{@link #assets(Collection)}</li>
  *     <li>{@link #assets(ArtifactDescriptor...)}</li>
+ *     <li>{@link #assets(Asset...)}</li>
+ *     <li>{@link #assets(Collection)}</li>
+ *     <li>{@link #assets(Iterable)}</li>
  *     <li>{@link #assets(String...)}</li>
  * </ul>
  *

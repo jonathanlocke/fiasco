@@ -3,10 +3,10 @@ package digital.fiasco.runtime.repository.remote.server.serialization.converters
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.telenav.kivakit.serialization.gson.serializers.BaseGsonElementSerializer;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
 
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
 
 public class ArtifactDescriptorListConverter extends BaseGsonElementSerializer<ArtifactDescriptorList>
 {

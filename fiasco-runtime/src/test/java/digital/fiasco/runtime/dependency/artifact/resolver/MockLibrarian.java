@@ -4,11 +4,11 @@ import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.version.Version;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.librarian.Librarian;
 
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
 
 public class MockLibrarian extends BaseComponent implements Librarian
 {

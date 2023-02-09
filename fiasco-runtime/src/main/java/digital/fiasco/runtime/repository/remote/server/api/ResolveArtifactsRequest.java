@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.microservice.microservlet.BaseMicroservletRequest;
 import com.telenav.kivakit.microservice.microservlet.MicroservletResponse;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;

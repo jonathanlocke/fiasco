@@ -15,9 +15,9 @@ import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
-import digital.fiasco.runtime.dependency.collections.lists.BuilderList;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.BuilderList;
 import digital.fiasco.runtime.repository.Repository;
 
 import java.util.LinkedHashMap;
@@ -34,8 +34,8 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
+import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
 
 /**
  * Represents an artifact, either an {@link Asset} or a {@link Library}

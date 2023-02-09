@@ -9,7 +9,7 @@ import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
 
 public class LocalRepositoryTest extends FiascoTest
 {

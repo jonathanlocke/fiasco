@@ -9,12 +9,12 @@ import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
 import digital.fiasco.runtime.dependency.collections.DependencyTree;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
-import digital.fiasco.runtime.dependency.collections.lists.AssetList;
-import digital.fiasco.runtime.dependency.collections.lists.BaseDependencyList;
-import digital.fiasco.runtime.dependency.collections.lists.BuilderList;
-import digital.fiasco.runtime.dependency.collections.lists.DependencyList;
-import digital.fiasco.runtime.dependency.collections.lists.LibraryList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.AssetList;
+import digital.fiasco.runtime.dependency.collections.BaseDependencyList;
+import digital.fiasco.runtime.dependency.collections.BuilderList;
+import digital.fiasco.runtime.dependency.collections.DependencyList;
+import digital.fiasco.runtime.dependency.collections.LibraryList;
 import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
 

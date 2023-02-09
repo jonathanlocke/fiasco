@@ -3,7 +3,7 @@ package digital.fiasco.runtime.dependency.artifact.resolver;
 import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.messaging.Listener;
 import com.telenav.kivakit.core.thread.locks.Lock;
-import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
+import digital.fiasco.runtime.dependency.collections.ArtifactList;
 
 import java.util.concurrent.locks.Condition;
 

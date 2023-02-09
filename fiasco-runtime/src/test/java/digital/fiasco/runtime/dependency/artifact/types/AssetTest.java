@@ -8,7 +8,7 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
-import static digital.fiasco.runtime.dependency.collections.lists.AssetList.assets;
+import static digital.fiasco.runtime.dependency.collections.AssetList.assets;
 
 public class AssetTest extends FiascoTest
 {

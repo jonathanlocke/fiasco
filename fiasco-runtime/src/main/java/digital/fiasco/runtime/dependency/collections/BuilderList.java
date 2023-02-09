@@ -1,8 +1,9 @@
-package digital.fiasco.runtime.dependency.collections.lists;
+package digital.fiasco.runtime.dependency.collections;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.interfaces.comparison.Matcher;
+import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
@@ -16,18 +17,20 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 
 /**
- * A list of {@link Artifact}s ({@link Library}s or {@link Asset}s).
+ * A list of {@link Builder}s.
  *
  * <p><b>Creation</b></p>
  *
  * <ul>
- *     <li>{@link #artifacts(Artifact[])}</li>
- *     <li>{@link #artifacts(Collection)}</li>
+ *     <li>{@link #builders(Builder[])}</li>
+ *     <li>{@link #builders(Collection)}</li>
  * </ul>
  *
  * <p><b>Matching</b></p>
  *
  * <ul>
+ *     <li>{@link #asAssetList()}</li>
+ *     <li>{@link #asLibraryList()}</li>
  *     <li>{@link #matching(Matcher)}</li>
  * </ul>
  *
@@ -47,8 +50,6 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  *
  * <ul>
  *     <li>{@link #asDescriptors()}</li>
- *     <li>{@link #asAssetList()}</li>
- *     <li>{@link #asLibraryList()}</li>
  *     <li>{@link #asStringList()}</li>
  *     <li>{@link #asMutableList()}</li>
  *     <li>{@link #asMutableSet()}</li>
@@ -73,56 +74,55 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  * @see BaseDependencyList
  */
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
-@SuppressWarnings("rawtypes")
-public class ArtifactList extends BaseDependencyList<Artifact, ArtifactList>
+public class BuilderList extends BaseDependencyList<Builder, BuilderList>
 {
     /**
      * Creates a list of artifacts
      *
-     * @param artifacts The artifacts to add
-     * @return The artifact list
+     * @param builders The builders to add
+     * @return The dependency list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static ArtifactList artifacts(Collection<Artifact> artifacts)
+    public static BuilderList builders(Collection<Builder> builders)
     {
-        return new ArtifactList(artifacts);
+        return new BuilderList(builders);
     }
 
     /**
      * Creates a list of dependencies
      *
-     * @param artifacts The dependencies to add
-     * @return The artifact list
+     * @param builders The dependencies to add
+     * @return The dependency list
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static ArtifactList artifacts(Artifact... artifacts)
+    public static BuilderList builders(Builder... builders)
     {
-        return artifacts(list(artifacts));
+        return builders(list(builders));
     }
 
-    public ArtifactList()
+    public BuilderList()
     {
     }
 
-    protected ArtifactList(ArtifactList that)
+    protected BuilderList(BuilderList that)
     {
         super(that);
     }
 
-    protected ArtifactList(Collection<Artifact> artifacts)
+    protected BuilderList(Collection<Builder> builders)
     {
-        super(artifacts);
+        super(builders);
     }
 
     @Override
-    protected ArtifactList newList()
+    protected BuilderList newList()
     {
-        return new ArtifactList();
+        return new BuilderList();
     }
 
     @Override
-    protected ArtifactList newList(ArtifactList that)
+    protected BuilderList newList(BuilderList that)
     {
-        return new ArtifactList(that);
+        return new BuilderList(that);
     }
 }

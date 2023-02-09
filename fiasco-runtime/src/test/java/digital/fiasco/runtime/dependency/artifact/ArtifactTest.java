@@ -19,11 +19,11 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
 import static digital.fiasco.runtime.dependency.artifact.types.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
-import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
-import static digital.fiasco.runtime.dependency.collections.lists.AssetList.assets;
-import static digital.fiasco.runtime.dependency.collections.lists.DependencyList.dependencies;
-import static digital.fiasco.runtime.dependency.collections.lists.LibraryList.libraries;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
+import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
+import static digital.fiasco.runtime.dependency.collections.AssetList.assets;
+import static digital.fiasco.runtime.dependency.collections.DependencyList.dependencies;
+import static digital.fiasco.runtime.dependency.collections.LibraryList.libraries;
 
 public class ArtifactTest extends FiascoTest
 {
