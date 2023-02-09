@@ -22,6 +22,7 @@ import java.util.Locale;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.string.Formatter.format;
+import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.build.builder.tools.compile.java.flags.DebugInformation.ALL;
 import static digital.fiasco.runtime.build.builder.tools.compile.java.flags.DebugInformation.NONE;
 import static java.nio.charset.StandardCharsets.UTF_8;
@@ -399,7 +400,8 @@ public class JavaCompiler extends BaseTool<JavaCompiler, Void>
     {
         if (sources.isNonEmpty())
         {
-            trace("Compiling $", sources);
+            information("Compiling $ files in $", sources.count(), sources.parent().relativeTo(currentFolder()));
+            trace("Compiling $", sources.relativeTo(currentFolder()));
 
             var compiler = getSystemJavaCompiler();
             var fileManager = compiler.getStandardFileManager(new ProblemListener(), sourceLocale, sourceEncoding);

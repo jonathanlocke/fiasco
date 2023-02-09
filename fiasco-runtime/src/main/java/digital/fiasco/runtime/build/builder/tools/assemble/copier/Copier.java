@@ -13,6 +13,7 @@ import digital.fiasco.runtime.build.builder.tools.BaseFileTool;
 
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
 import static com.telenav.kivakit.core.string.Formatter.format;
+import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
 
 /**
@@ -78,7 +79,8 @@ public class Copier extends BaseFileTool<Copier, Void>
         if (files().isNonEmpty())
         {
             var sourceFolder = files().parent();
-            information("Copying $ files from $ to $", files().count(), sourceFolder, to.relativeTo(sourceFolder));
+            information("Copying $ files from $ to $", files().count(),
+                sourceFolder.relativeTo(currentFolder()), to.relativeTo(currentFolder()));
 
             // For each source file in the 'from' folder that matches,
             var files = files();

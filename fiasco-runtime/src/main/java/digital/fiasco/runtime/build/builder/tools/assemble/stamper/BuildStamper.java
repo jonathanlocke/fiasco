@@ -8,6 +8,7 @@ import digital.fiasco.runtime.build.builder.tools.BaseTool;
 import digital.fiasco.runtime.build.builder.tools.ToolFactory;
 import digital.fiasco.runtime.build.builder.tools.toolchain.git.GitLocalTimeConverter;
 import digital.fiasco.runtime.build.environment.BuildStructure;
+import org.jetbrains.annotations.NotNull;
 
 import java.time.LocalDate;
 
@@ -92,9 +93,9 @@ public class BuildStamper extends BaseTool<BuildStamper, Void> implements
     @Override
     public Void onRun()
     {
-        information("Stamping build");
-
         var name = associatedBuilder().descriptor().artifactName().name().replaceAll("\\.", "-");
+
+        information("Stamping $ as build #$ ($)", name, buildNumber(), buildName());
 
         var projectProperties = targetClassesFolder()
             .file(name + "-project.properties");
@@ -110,6 +111,17 @@ public class BuildStamper extends BaseTool<BuildStamper, Void> implements
         return null;
     }
 
+    @NotNull
+    private String buildName()
+    {
+        return BuildName.name(LocalDate.now());
+    }
+
+    private int buildNumber()
+    {
+        return BuildName.toBuildNumber(LocalDate.now());
+    }
+
     /**
      * Returns build properties as a {@link StringList}
      */
@@ -120,8 +132,8 @@ public class BuildStamper extends BaseTool<BuildStamper, Void> implements
             .convert(newGit().commitTime().run());
 
         return stringList("build.time = " + now().asString(),
-            "build.name = " + BuildName.name(LocalDate.now()),
-            "build.number = " + BuildName.toBuildNumber(LocalDate.now()),
+            "build.name = " + buildName(),
+            "build.number = " + buildNumber(),
             "build.commit.hash = " + commitHash,
             "build.commit.time = " + commitTime);
     }

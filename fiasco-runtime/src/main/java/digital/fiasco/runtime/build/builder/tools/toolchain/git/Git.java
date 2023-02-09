@@ -138,7 +138,7 @@ public class Git extends BaseTool<Git, String>
     @Override
     public String onRun()
     {
-        information(description());
+        trace(description());
         output = operatingSystem().execute(this,
             folder.asJavaFile(), arguments.asStringArray()).trim();
         return output;
