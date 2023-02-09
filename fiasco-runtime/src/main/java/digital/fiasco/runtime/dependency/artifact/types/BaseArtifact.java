@@ -8,12 +8,14 @@ import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.core.version.Version;
+import com.telenav.kivakit.interfaces.object.Copyable;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.lists.BuilderList;
 import digital.fiasco.runtime.repository.Repository;
@@ -32,6 +34,8 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 
 /**
  * Represents an artifact, either an {@link Asset} or a {@link Library}
@@ -54,11 +58,10 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
  * <p><b>Dependencies</b></p>
  *
  * <ul>
- *     <li>{@link #artifactDependencies()} ()}</li>
+ *     <li>{@link #dependencies()} ()}</li>
  *     <li>{@link #isExcluded(ArtifactDescriptor)}</li>
  *     <li>{@link #withDependencies(ArtifactList)}</li>
- *     <li>{@link #excluding(ArtifactDescriptor...)}</li>
- *     <li>{@link #excluding(String...)}</li>
+ *     <li>{@link #excluding(ArtifactDescriptorList)}</li>
  * </ul>
  *
  * <p><b>Attachments</b></p>
@@ -79,8 +82,7 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
  *     <li>{@link #withDescriptor(ArtifactDescriptor)} - Returns this artifact with the given descriptor</li>
  *     <li>{@link #withArtifactName(String)} - Returns this artifact with the given artifact name</li>
  *     <li>{@link #withVersion(Version)} - Returns this artifact with the given version</li>
- *     <li>{@link #excluding(ArtifactDescriptor...)} - Returns this artifact without the given dependencies</li>
- *     <li>{@link #excluding(String...)} - Returns this artifact without the given dependencies</li>
+ *     <li>{@link #excluding(ArtifactDescriptorList)} - Returns this artifact without the given dependencies</li>
  * </ul>
  *
  *
@@ -101,7 +103,9 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
  */
 @SuppressWarnings("unused")
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
-public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifact<A>
+public abstract class BaseArtifact<A extends BaseArtifact<A>> implements
+    Artifact<A>,
+    Copyable<A>
 {
     /** The repository where this artifact is hosted */
     @Expose
@@ -115,10 +119,10 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
 
     /** List of dependent artifacts */
     @Expose
-    protected ArtifactList dependencies = ArtifactList.artifacts();
+    protected ArtifactList dependencies = artifacts();
 
     /** Dependency exclusions for this artifact */
-    protected transient ObjectList<ArtifactDescriptor> exclusions;
+    protected transient ArtifactDescriptorList exclusions;
 
     /** The content attachments by type */
     @Expose
@@ -162,29 +166,16 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     }
 
     /**
-     * Returns a list of artifacts without any excluded artifacts
-     *
-     * @return The artifacts
-     */
-    @Override
-    @FormatProperty
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public ArtifactList artifactDependencies()
-    {
-        return dependencies.matching(at -> !isExcluded(at));
-    }
-
-    /**
      * {@inheritDoc}
      */
     @Override
     public String asString(Format format)
     {
         return switch (format)
-                {
-                    case DEBUG -> new ObjectFormatter(this).toString();
-                    default -> name();
-                };
+            {
+                case DEBUG -> new ObjectFormatter(this).toString();
+                default -> name();
+            };
     }
 
     /**
@@ -232,6 +223,19 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     public abstract A copy();
 
     /**
+     * Returns a list of artifacts without any excluded artifacts
+     *
+     * @return The artifacts
+     */
+    @Override
+    @FormatProperty
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    public ArtifactList dependencies()
+    {
+        return dependencies.matching(at -> !isExcluded(at));
+    }
+
+    /**
      * Returns the dependency matching the given dependency pattern
      *
      * @param pattern The pattern to match, like ":a:b:" or ":a::"
@@ -241,7 +245,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactList dependenciesMatching(String pattern)
     {
-        var matches = ArtifactList.artifacts();
+        var matches = artifacts();
         var matcher = ArtifactDescriptor.descriptor(pattern);
         for (var at : dependencies)
         {
@@ -296,21 +300,6 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     }
 
     /**
-     * Returns a copy of this artifact that excludes all descriptors matching the given pattern from its dependencies
-     *
-     * @param exclusion The pattern to exclude
-     * @return The new artifact
-     */
-    @Override
-    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public A excluding(ArtifactDescriptor exclusion)
-    {
-        var copy = copy();
-        copy.exclusions().add(exclusion);
-        return copy;
-    }
-
-    /**
      * Returns a copy of this artifact that excludes the given descriptors from its dependencies
      *
      * @param exclusions The descriptors to exclude
@@ -318,11 +307,18 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public A excluding(ObjectList<ArtifactDescriptor> exclusions)
+    public A excluding(ArtifactDescriptorList exclusions)
     {
-        var copy = copy();
-        copy.exclusions.addAll(exclusions);
-        return copy;
+        return mutatedCopy(it -> it.exclusions = it.exclusions.with(exclusions));
+    }
+
+    public ArtifactDescriptorList exclusions()
+    {
+        if (exclusions == null)
+        {
+            exclusions = descriptors();
+        }
+        return exclusions;
     }
 
     @Override
@@ -371,22 +367,22 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     {
         var pom = stringList();
 
-        var artifacts = artifactDependencies();
+        var artifacts = dependencies();
         if (artifacts.isNonEmpty())
         {
             for (var artifact : artifacts)
             {
                 var descriptor = artifact.descriptor();
                 pom.addAll(split(format("""
-                                <dependency>
-                                    <groupId>$</groupId>
-                                    <artifactId>$</artifactId>
-                                    <version>$</version>
-                                </dependency>
-                                """,
-                        descriptor.group(),
-                        descriptor.artifactName(),
-                        descriptor.version()), "\n"));
+                        <dependency>
+                            <groupId>$</groupId>
+                            <artifactId>$</artifactId>
+                            <version>$</version>
+                        </dependency>
+                        """,
+                    descriptor.group(),
+                    descriptor.artifactName(),
+                    descriptor.version()), "\n"));
             }
 
             pom = pom.indented(4);
@@ -399,23 +395,23 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
         }
 
         return format("""
-                        <project
-                          xmlns="http://maven.apache.org/POM/4.0.0"
-                          xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                          xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-                          
-                            <modelVersion>4.0.0</modelVersion>
-                           
-                            <groupId>$</groupId>
-                            <artifactId>$</artifactId>
-                            <version>$</version>
-                        $
-                        </project>
-                          """,
-                descriptor.group(),
-                descriptor.artifactName(),
-                descriptor.version(),
-                pom.join("\n"));
+                <project
+                  xmlns="http://maven.apache.org/POM/4.0.0"
+                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+                  
+                    <modelVersion>4.0.0</modelVersion>
+                   
+                    <groupId>$</groupId>
+                    <artifactId>$</artifactId>
+                    <version>$</version>
+                $
+                </project>
+                  """,
+            descriptor.group(),
+            descriptor.artifactName(),
+            descriptor.version(),
+            pom.join("\n"));
     }
 
     @Override
@@ -482,7 +478,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public final <D extends Artifact<D>> A withDependencies(D... dependencies)
     {
-        return withDependencies(ArtifactList.artifacts(dependencies));
+        return withDependencies(artifacts(dependencies));
     }
 
     /**
@@ -494,8 +490,8 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
     {
         var copy = copy();
         copy.dependencies = this.dependencies
-                .with(dependencies)
-                .deduplicated();
+            .with(dependencies)
+            .deduplicated();
         return copy;
     }
 
@@ -532,15 +528,6 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements Artifac
         var copy = copy();
         ((BaseArtifact<A>) copy).typeToAttachment = new ObjectMap<>();
         return copy;
-    }
-
-    ObjectList<ArtifactDescriptor> exclusions()
-    {
-        if (exclusions == null)
-        {
-            exclusions = list();
-        }
-        return exclusions;
     }
 
     private ObjectMap<ArtifactAttachmentType, ArtifactAttachment> typeToAttachment()

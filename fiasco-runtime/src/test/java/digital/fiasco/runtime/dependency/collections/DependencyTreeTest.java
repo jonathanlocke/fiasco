@@ -68,6 +68,6 @@ public class DependencyTreeTest extends FiascoTest
     private DependencyQueue queue()
     {
         return libraryTree().asQueue(Library.class)
-            .withIsReady((queue, it) -> queue.hasCompleted(it.artifactDependencies().asDependencyList()));
+            .withIsReady((queue, it) -> queue.hasCompleted(it.dependencies().asDependencyList()));
     }
 }

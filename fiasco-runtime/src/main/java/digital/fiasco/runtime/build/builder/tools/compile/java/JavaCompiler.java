@@ -397,13 +397,17 @@ public class JavaCompiler extends BaseTool<JavaCompiler, Void>
      */
     private boolean compile(FileList sources)
     {
-        trace("Compiling $", sources);
+        if (sources.isNonEmpty())
+        {
+            trace("Compiling $", sources);
 
-        var compiler = getSystemJavaCompiler();
-        var fileManager = compiler.getStandardFileManager(new ProblemListener(), sourceLocale, sourceEncoding);
-        var files = fileManager.getJavaFileObjectsFromFiles(sources.asJavaFiles());
-        var task = compiler.getTask(null, fileManager, new ProblemListener(), options(), null, files);
-        return task.call();
+            var compiler = getSystemJavaCompiler();
+            var fileManager = compiler.getStandardFileManager(new ProblemListener(), sourceLocale, sourceEncoding);
+            var files = fileManager.getJavaFileObjectsFromFiles(sources.asJavaFiles());
+            var task = compiler.getTask(null, fileManager, new ProblemListener(), options(), null, files);
+            return task.call();
+        }
+        return true;
     }
 
     private CommandLineComposer debugFlags(CommandLineComposer composer)

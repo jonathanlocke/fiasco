@@ -87,8 +87,8 @@ public class AssetTest extends FiascoTest
     {
         var asset = asset()
             .withDependencies(assets("a:b:1.0").asArtifactList());
-        ensureEqual(asset.artifactDependencies().size(), 1);
-        ensureEqual(asset.artifactDependencies().get(0).descriptor(), descriptor("asset:a:b:1.0"));
+        ensureEqual(asset.dependencies().size(), 1);
+        ensureEqual(asset.dependencies().get(0).descriptor(), descriptor("asset:a:b:1.0"));
     }
 
     @Test

@@ -4,7 +4,6 @@ import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.function.Result;
 import com.telenav.kivakit.core.language.trait.TryTrait;
-import com.telenav.kivakit.core.thread.Threads;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.settings.BuildSettings;
@@ -109,7 +108,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
         // Create a queue of builders from the dependency tree for the build, where builders are
         // ready for processing once their artifact and builder dependencies have been resolved.
         var builderQueue = build.dependencyTree().asQueue(Builder.class)
-            .withIsReady((queue, it) -> resolved.isResolved(it.artifactDependencies())
+            .withIsReady((queue, it) -> resolved.isResolved(it.dependencies())
                 && queue.hasCompleted(it.builderDependencies()));
 
         // Create a thread pool,
@@ -158,7 +157,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
         {
             // Wait for artifact dependencies to be resolved,
             trace("Waiting for artifacts to be resolved: $", builder);
-            resolved.waitForResolutionOf(builder.artifactDependencies());
+            resolved.waitForResolutionOf(builder.dependencies());
 
             // run the builder,
             trace("Building: $", builder);

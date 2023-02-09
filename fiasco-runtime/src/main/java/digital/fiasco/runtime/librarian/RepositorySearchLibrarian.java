@@ -14,6 +14,7 @@ import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.object.Copyable;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.local.LocalRepository;
@@ -27,6 +28,7 @@ import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressRe
 import static com.telenav.kivakit.core.string.Formatter.format;
 import static com.telenav.kivakit.filesystem.Folders.userHome;
 import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MAVEN_CENTRAL;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
 import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 
 /**
@@ -38,9 +40,9 @@ import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.a
  * <p><b>Finding Libraries</b></p>
  *
  * <ul>
- *     <li>{@link #resolve(ObjectList)} - Resolves the specified artifacts</li>
- *     <li>{@link #resolve(Artifact)} - Returns the dependencies for the given library. Dependent libraries
- *                                           are resolved in depth-first order.</li>
+ *     <li>{@link #resolve(ArtifactDescriptorList)} - Resolves the specified artifacts</li>
+ *     <li>{@link #resolve(Artifact)} - Returns the dependencies for the given library.
+ *         Dependent libraries are resolved in depth-first order.</li>
  *     <li>{@link #withRepository(Repository)} - Adds a repository to look in when resolving libraries</li>
  *     <li>{@link #repositories()} - The list of repositories to search</li>
  *     <li>{@link #withPinnedVersion(ArtifactDescriptor, Version)} - Pins the given artifact to the specified version</li>
@@ -106,7 +108,7 @@ public class RepositorySearchLibrarian extends BaseComponent implements
      * @return The library
      */
     @Override
-    public ArtifactList resolve(ObjectList<ArtifactDescriptor> descriptors)
+    public ArtifactList resolve(ArtifactDescriptorList descriptors)
     {
         var artifacts = artifacts();
 
@@ -125,7 +127,7 @@ public class RepositorySearchLibrarian extends BaseComponent implements
         }
         progress.end();
 
-        var resolved = artifacts.asArtifactDescriptors();
+        var resolved = artifacts.asDescriptors();
         for (var at : descriptors)
         {
             ensure(resolved.contains(at), "Could not resolve artifact: $", at);
@@ -147,7 +149,7 @@ public class RepositorySearchLibrarian extends BaseComponent implements
         var dependencies = artifacts();
 
         // Go through the library's dependencies,
-        for (var dependency : artifact.artifactDependencies())
+        for (var dependency : artifact.dependencies())
         {
             // resolve each dependency,
             for (var resolved : resolve(dependency))
@@ -167,7 +169,7 @@ public class RepositorySearchLibrarian extends BaseComponent implements
         {
             // resolve the library's descriptor to an artifact,
             var descriptor = resolveArtifactVersion(artifact.descriptor());
-            var resolved = repository.resolveArtifacts(list(descriptor));
+            var resolved = repository.resolveArtifacts(descriptors(descriptor));
             if (resolved != null)
             {
                 // and if it isn't excluded,

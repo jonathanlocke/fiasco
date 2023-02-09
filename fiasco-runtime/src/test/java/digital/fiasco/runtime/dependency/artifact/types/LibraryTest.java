@@ -90,8 +90,8 @@ public class LibraryTest extends FiascoTest
     {
         var library = library()
             .withDependencies(ArtifactList.artifacts(Library.library("a:b:1.0")));
-        ensureEqual(library.artifactDependencies().size(), 1);
-        ensureEqual(library.artifactDependencies().get(0).descriptor(), descriptor("library:a:b:1.0"));
+        ensureEqual(library.dependencies().size(), 1);
+        ensureEqual(library.dependencies().get(0).descriptor(), descriptor("library:a:b:1.0"));
     }
 
     @Test

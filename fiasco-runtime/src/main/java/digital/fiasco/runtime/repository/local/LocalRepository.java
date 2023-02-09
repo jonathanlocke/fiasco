@@ -12,16 +12,15 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContentSignatures;
-import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
-import digital.fiasco.runtime.repository.RepositoryContentReader;
 import digital.fiasco.runtime.repository.Repository;
+import digital.fiasco.runtime.repository.RepositoryContentReader;
 import digital.fiasco.runtime.repository.local.cache.CacheRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
-import java.util.List;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
@@ -68,7 +67,7 @@ import static digital.fiasco.runtime.repository.Repository.InstallationResult.IN
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link Repository#resolveArtifacts(List, ProgressReporter, RepositoryContentReader)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(ArtifactDescriptorList, ProgressReporter, RepositoryContentReader)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -199,22 +198,20 @@ public class LocalRepository extends BaseRepository
     /**
      * Gets the artifacts for the given artifact descriptors
      *
-     * @param descriptorList The artifact descriptors
+     * @param descriptors The artifact descriptors
      * @return The artifacts
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptorList,
+    public ArtifactList resolveArtifacts(ArtifactDescriptorList descriptors,
                                          ProgressReporter reporter,
                                          RepositoryContentReader reader)
     {
         return lock().read(() ->
         {
-            var descriptors = list(descriptorList);
-
             // Find the artifacts that are in this repository,
             var resolvedArtifacts = resolve(descriptors);
-            var resolvedDescriptors = resolvedArtifacts.asArtifactDescriptors();
+            var resolvedDescriptors = resolvedArtifacts.asDescriptors();
 
             // and those that are not added yet.
             var unresolvedDescriptors = descriptors.without(resolvedDescriptors::contains);

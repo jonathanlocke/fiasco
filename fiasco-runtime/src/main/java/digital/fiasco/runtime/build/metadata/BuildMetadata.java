@@ -32,16 +32,6 @@ public record BuildMetadata(@FormatProperty ArtifactDescriptor descriptor,
         return new BuildMetadata(null, null, list(), list(), list(), list(), list(), list());
     }
 
-    public BuildMetadata withArtifactDescriptor(String descriptor)
-    {
-        return withArtifactDescriptor(ArtifactDescriptor.descriptor(descriptor));
-    }
-
-    public BuildMetadata withArtifactDescriptor(ArtifactDescriptor descriptor)
-    {
-        return new BuildMetadata(descriptor, description, copyrights, licenses, resources, mailingLists, organizations, contributors);
-    }
-
     public BuildMetadata withContributor(Contributor contributor)
     {
         return withContributors(contributor);
@@ -63,6 +53,16 @@ public record BuildMetadata(@FormatProperty ArtifactDescriptor descriptor,
     }
 
     public BuildMetadata withDescription(String description)
+    {
+        return new BuildMetadata(descriptor, description, copyrights, licenses, resources, mailingLists, organizations, contributors);
+    }
+
+    public BuildMetadata withDescriptor(String descriptor)
+    {
+        return withDescriptor(ArtifactDescriptor.descriptor(descriptor));
+    }
+
+    public BuildMetadata withDescriptor(ArtifactDescriptor descriptor)
     {
         return new BuildMetadata(descriptor, description, copyrights, licenses, resources, mailingLists, organizations, contributors);
     }

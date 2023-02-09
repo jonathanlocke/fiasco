@@ -56,7 +56,7 @@ public class ExampleBuild extends BaseBuild implements Libraries
             .withUrl(url("https://fiasco.digital"));
 
         return buildMetadata()
-            .withArtifactDescriptor("library:digital.fiasco:fiasco-example:1.0")
+            .withDescriptor("library:digital.fiasco:fiasco-example:1.0")
             .withDescription("Example use of Fiasco build system")
             .withLicenses(APACHE_2_LICENSE, MIT_LICENSE)
             .withOrganization(fiasco)

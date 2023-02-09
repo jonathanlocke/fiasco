@@ -33,6 +33,7 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_INSUF
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_NOT_NEEDED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
 import static digital.fiasco.runtime.dependency.collections.lists.AssetList.assets;
 import static digital.fiasco.runtime.dependency.collections.lists.DependencyList.dependencies;
 import static digital.fiasco.runtime.dependency.collections.lists.LibraryList.libraries;
@@ -70,7 +71,7 @@ import static digital.fiasco.runtime.dependency.collections.lists.LibraryList.li
  * <p><b>Conversions</b></p>
  *
  * <ul>
- *     <li>{@link #asArtifactDescriptors()}</li>
+ *     <li>{@link #asDescriptors()}</li>
  *     <li>{@link #asArtifactList()}</li>
  *     <li>{@link #asAssetList()}</li>
  *     <li>{@link #asDependencyList()}</li>
@@ -134,9 +135,9 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
      * @return The list of descriptors
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public ObjectList<ArtifactDescriptor> asArtifactDescriptors()
+    public ArtifactDescriptorList asDescriptors()
     {
-        return dependencies.map(Dependency::descriptor);
+        return descriptors(dependencies.map(Dependency::descriptor));
     }
 
     /**
@@ -162,7 +163,7 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public AssetList asAssetList()
     {
-        return assets(matching(at -> at instanceof Asset).asArtifactDescriptors());
+        return assets(matching(at -> at instanceof Asset).asDescriptors());
     }
 
     /**
@@ -186,7 +187,7 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public LibraryList asLibraryList()
     {
-        return libraries(matching(at -> at instanceof Library).asArtifactDescriptors());
+        return libraries(matching(at -> at instanceof Library).asDescriptors());
     }
 
     /**

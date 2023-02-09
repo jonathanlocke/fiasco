@@ -24,7 +24,7 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 /**
  * A dependency is either a {@link Builder}, or an {@link Artifact} with an associated {@link #repository()}. An
  * {@link Artifact} can be either an {@link Asset} or a {@link Library}. Each dependency can have its own list of
- * {@link #artifactDependencies()} and/or {@link #builderDependencies()}, but circular dependencies are not allowed.
+ * {@link #dependencies()} and/or {@link #builderDependencies()}, but circular dependencies are not allowed.
  * Specific kinds of dependencies can be retrieved with {@link #assets()}, {@link #libraries()}.
  *
  * <p><b>Properties</b></p>
@@ -32,7 +32,7 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
  * <ul>
  *     <li>{@link #descriptor()}</li>
  *     <li>{@link #repository()}</li>
- *     <li>{@link #artifactDependencies()}</li>
+ *     <li>{@link #dependencies()}</li>
  *     <li>{@link #builderDependencies()} ()}</li>
  * </ul>
  *
@@ -64,7 +64,7 @@ public interface Dependency extends
      */
     default DependencyList allDependencies()
     {
-        return artifactDependencies().asDependencyList()
+        return dependencies().asDependencyList()
             .with(builderDependencies().asDependencyList());
     }
 
@@ -74,7 +74,7 @@ public interface Dependency extends
      * @return The dependencies
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    ArtifactList artifactDependencies();
+    ArtifactList dependencies();
 
     /**
      * Gets all asset dependencies
@@ -85,7 +85,7 @@ public interface Dependency extends
     default AssetList assets()
     {
         var assets = new AssetList();
-        for (var at : artifactDependencies())
+        for (var at : dependencies())
         {
             if (at instanceof Asset asset)
             {
@@ -127,7 +127,7 @@ public interface Dependency extends
     default LibraryList libraries()
     {
         var libraries = new LibraryList();
-        for (var at : artifactDependencies())
+        for (var at : dependencies())
         {
             if (at instanceof Library asset)
             {

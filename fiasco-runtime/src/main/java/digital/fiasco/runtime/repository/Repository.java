@@ -7,7 +7,7 @@ import com.telenav.kivakit.core.registry.Register;
 import com.telenav.kivakit.interfaces.naming.Named;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
-import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.local.cache.CacheRepository;
@@ -17,7 +17,6 @@ import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
 import java.net.URI;
-import java.util.List;
 
 import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressReporter;
 
@@ -82,7 +81,7 @@ import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressRep
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(List)} - Resolves the given descriptors to a collection of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link #resolveArtifacts(ArtifactDescriptorList)} - Resolves the given descriptors to a collection of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -139,7 +138,7 @@ public interface Repository extends
      * @param descriptors The artifact descriptors
      * @return Any artifacts that could be resolved
      */
-    default ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors)
+    default ArtifactList resolveArtifacts(ArtifactDescriptorList descriptors)
     {
         return resolveArtifacts(descriptors, nullProgressReporter(), Functions::doNothing);
     }
@@ -152,7 +151,7 @@ public interface Repository extends
      * @param reader Callback for reading trailing data after the initial JSON element
      * @return Any artifacts that could be resolved
      */
-    ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors,
+    ArtifactList resolveArtifacts(ArtifactDescriptorList descriptors,
                                   ProgressReporter reporter,
                                   RepositoryContentReader reader);
 

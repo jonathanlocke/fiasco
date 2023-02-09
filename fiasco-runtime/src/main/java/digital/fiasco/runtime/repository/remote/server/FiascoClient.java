@@ -8,15 +8,14 @@ import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
 import com.telenav.kivakit.settings.SettingsTrait;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.repository.Repository.InstallationResult;
 import digital.fiasco.runtime.repository.RepositoryContentReader;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
-import digital.fiasco.runtime.repository.remote.server.api.ResolveArtifactsRequest;
 import digital.fiasco.runtime.repository.remote.server.api.ResolveArtifactResponse;
+import digital.fiasco.runtime.repository.remote.server.api.ResolveArtifactsRequest;
 import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;
-
-import java.util.List;
 
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressReporter;
@@ -68,7 +67,7 @@ public class FiascoClient extends BaseComponent implements SettingsTrait
      * @param descriptors The artifact descriptors
      * @return The list of resolved artifacts
      */
-    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors)
+    public ArtifactList resolveArtifacts(ArtifactDescriptorList descriptors)
     {
         return resolveArtifacts(descriptors, nullProgressReporter(), Functions::doNothing);
     }
@@ -83,7 +82,7 @@ public class FiascoClient extends BaseComponent implements SettingsTrait
      * @param reader The content reader
      * @return The list of resolved artifacts
      */
-    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors,
+    public ArtifactList resolveArtifacts(ArtifactDescriptorList descriptors,
                                          ProgressReporter reporter,
                                          RepositoryContentReader reader)
     {

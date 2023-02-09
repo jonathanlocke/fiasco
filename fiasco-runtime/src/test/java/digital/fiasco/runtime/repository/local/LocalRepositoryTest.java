@@ -8,7 +8,6 @@ import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
 
@@ -44,7 +43,7 @@ public class LocalRepositoryTest extends FiascoTest
         var repository = repository();
         repository.installArtifact(core);
 
-        var resolved = repository.resolveArtifacts(list(core.descriptor()));
+        var resolved = repository.resolveArtifacts(descriptors(core));
         ensure(resolved.size() == 1);
         ensure(resolved.first().equals(core));
     }
@@ -118,12 +117,12 @@ public class LocalRepositoryTest extends FiascoTest
     private void testRepository(Repository repository, Library core, Asset icons, Asset logos)
     {
         {
-            var resolved = repository.resolveArtifacts(list(core.descriptor()));
+            var resolved = repository.resolveArtifacts(descriptors(core));
             ensure(resolved.size() == 1);
             ensure(resolved.first().equals(core));
         }
         {
-            var resolved = repository.resolveArtifacts(list(icons.descriptor()));
+            var resolved = repository.resolveArtifacts(descriptors(icons));
             ensure(resolved.size() == 1);
             ensure(resolved.first().equals(icons));
         }

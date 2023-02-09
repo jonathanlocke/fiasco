@@ -141,7 +141,7 @@ import static digital.fiasco.runtime.dependency.collections.lists.BuilderList.bu
  * <p><b>Build Dependencies</b></p>
  *
  * <ul>
- *     <li>{@link #artifactDependencies()}</li>
+ *     <li>{@link #dependencies()}</li>
  *     <li>{@link #builderDependencies()}</li>
  *     <li>{@link #librarian()}</li>
  *     <li>{@link #withPinnedVersion(Artifact, String)}</li>
@@ -318,17 +318,6 @@ public class Builder extends BaseRepeater implements
      * @return {@inheritDoc}
      */
     @Override
-    public ArtifactList artifactDependencies()
-    {
-        return artifactDependencies;
-    }
-
-    /**
-     * {@inheritDoc}
-     *
-     * @return {@inheritDoc}
-     */
-    @Override
     public Builder associatedBuilder()
     {
         return this;
@@ -382,6 +371,17 @@ public class Builder extends BaseRepeater implements
     public Builder copy()
     {
         return new Builder(this);
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@inheritDoc}
+     */
+    @Override
+    public ArtifactList dependencies()
+    {
+        return artifactDependencies;
     }
 
     /**
@@ -1127,6 +1127,17 @@ public class Builder extends BaseRepeater implements
     public Builder withSettings(BuildSettings settings)
     {
         return mutatedCopy(it -> it.settings = settings);
+    }
+
+    /**
+     * Returns a copy of this builder without any actions defined for the given phase
+     *
+     * @param phase The phase
+     * @return The copy
+     */
+    public Builder withoutActions(Phase phase)
+    {
+        return mutatedCopy(it -> it.phase(phase.name()).clearActions());
     }
 
     /**

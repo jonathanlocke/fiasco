@@ -51,7 +51,7 @@ import static com.telenav.kivakit.core.collections.list.StringList.stringList;
  * <p><b>Conversions</b></p>
  *
  * <ul>
- *     <li>{@link #asArtifactDescriptors()}</li>
+ *     <li>{@link #asDescriptors()}</li>
  *     <li>{@link #asStringList()}</li>
  *     <li>{@link #asMutableList()}</li>
  *     <li>{@link #asMutableSet()}</li>

@@ -17,7 +17,7 @@ import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContentSignatures;
-import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.RepositoryContentReader;
@@ -27,11 +27,9 @@ import org.eclipse.aether.repository.LocalRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
-import java.util.List;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
-import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.fail;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
@@ -51,6 +49,7 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactContent.content;
 import static digital.fiasco.runtime.dependency.artifact.types.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
 import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLATION_FAILED;
 import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLED;
@@ -69,7 +68,7 @@ import static digital.fiasco.runtime.repository.Repository.InstallationResult.IN
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link #resolveArtifacts(List)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link #resolveArtifacts(ArtifactDescriptorList)}  - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -196,10 +195,11 @@ public class MavenRepository extends BaseRepository implements TryCatchTrait
      */
     @Override
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors, ProgressReporter reporter,
+    public ArtifactList resolveArtifacts(ArtifactDescriptorList descriptors,
+                                         ProgressReporter reporter,
                                          RepositoryContentReader reader)
     {
-        return resolveArtifacts(list(descriptors), artifacts());
+        return resolveArtifacts(descriptors, artifacts());
     }
 
     @Override
@@ -389,7 +389,7 @@ public class MavenRepository extends BaseRepository implements TryCatchTrait
         return tryCatch(() -> mavenReadContent(attachment(type).withArtifact(artifact)));
     }
 
-    private ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors,
+    private ArtifactList resolveArtifacts(ArtifactDescriptorList descriptors,
                                           ArtifactList resolvedFinal)
     {
         return lock().read(() ->
@@ -423,7 +423,7 @@ public class MavenRepository extends BaseRepository implements TryCatchTrait
                         var children = artifacts();
                         if (dependencyDescriptors.isNonEmpty())
                         {
-                            children = resolveArtifacts(dependencyDescriptors, resolved)
+                            children = resolveArtifacts(descriptors(dependencyDescriptors), resolved)
                                 .without(resolved);
                             resolved = resolved.with(children);
                         }

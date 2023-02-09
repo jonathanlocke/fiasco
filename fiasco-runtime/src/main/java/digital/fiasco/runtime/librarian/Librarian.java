@@ -6,6 +6,7 @@ import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 
 import static com.telenav.kivakit.core.version.Version.version;
@@ -39,7 +40,7 @@ public interface Librarian extends
      * @param descriptors The descriptors
      * @return The library
      */
-    ArtifactList resolve(ObjectList<ArtifactDescriptor> descriptors);
+    ArtifactList resolve(ArtifactDescriptorList descriptors);
 
     /**
      * Resolves the given artifact, returning a list of the artifact and all of its transitive dependencies

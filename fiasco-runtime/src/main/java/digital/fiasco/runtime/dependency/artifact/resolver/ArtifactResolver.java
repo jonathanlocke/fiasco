@@ -75,7 +75,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
         {
             // Create a dependency queue from the build's dependency tree,
             var artifactQueue = build.dependencyTree().asQueue(Artifact.class)
-                .withIsReady((queue, it) -> resolved.isResolved(it.artifactDependencies()));
+                .withIsReady((queue, it) -> resolved.isResolved(it.dependencies()));
 
             // create an executor and completion service,
             trace("Starting artifact resolver threads");
@@ -128,7 +128,7 @@ public class ArtifactResolver extends BaseComponent implements TryTrait
             // Use the librarian to resolve the requested artifacts,
             var librarian = build.librarian();
             trace("Librarian resolving: $", artifacts);
-            var result = result(librarian, () -> librarian.resolve(artifacts.asArtifactDescriptors()));
+            var result = result(librarian, () -> librarian.resolve(artifacts.asDescriptors()));
 
             // and for each group of artifacts that are successfully resolved,
             if (result.succeeded())

@@ -17,13 +17,13 @@ public class FiascoClientServerTest extends FiascoTest implements SettingsTrait
         startServer();
         seconds(0.5).sleep();
 
-        var resolved = fiascoClient().resolveArtifacts(kivakitAssets().asArtifactDescriptors());
+        var resolved = fiascoClient().resolveArtifacts(kivakitAssets().asDescriptors());
 
         ensureNotNull(resolved);
         ensure(resolved.size() == 2);
-        ensure(resolved.asArtifactDescriptors().contains(kivakitIcons().descriptor()));
-        ensure(resolved.asArtifactDescriptors().contains(kivakitLogos().descriptor()));
-        ensure(!resolved.asArtifactDescriptors().contains(kivakitCore().descriptor()));
+        ensure(resolved.asDescriptors().contains(kivakitIcons().descriptor()));
+        ensure(resolved.asDescriptors().contains(kivakitLogos().descriptor()));
+        ensure(!resolved.asDescriptors().contains(kivakitCore().descriptor()));
     }
 
     private void startServer()

@@ -11,7 +11,7 @@ public class DependencyTest extends FiascoTest
     @Test
     public void testArtifactDependencies()
     {
-        ensureEqual(kivakitApplication().artifactDependencies(), artifacts(kivakitCore(), kivakitResource(), kivakitIcons(), kivakitLogos()));
+        ensureEqual(kivakitApplication().dependencies(), artifacts(kivakitCore(), kivakitResource(), kivakitIcons(), kivakitLogos()));
     }
 
     @Test

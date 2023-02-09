@@ -115,4 +115,11 @@ public interface Phase extends
      * </p>
      */
     void internalOnRun(Builder builder);
+
+    /**
+     * Returns this phase without any actions
+     *
+     * @return This phase for method chaining
+     */
+    Phase clearActions();
 }

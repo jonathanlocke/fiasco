@@ -20,6 +20,7 @@ import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.lists.BuilderList;
 import digital.fiasco.runtime.repository.Repository;
@@ -31,6 +32,8 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 
 /**
  * Defines an artifact, either an {@link Asset} or a {@link Library}. Libraries are artifacts that have a source and
@@ -58,7 +61,7 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
  * <p><b>Dependencies</b></p>
  *
  * <p>
- * An artifact can have zero or more dependencies. The method {@link #artifactDependencies()} ()} returns an
+ * An artifact can have zero or more dependencies. The method {@link #dependencies()} ()} returns an
  * {@link ArtifactList}, while the method {@link #builderDependencies()} returns a {@link BuilderList}. Artifact
  * dependencies can be filtered by excluding certain descriptors with {@link #excluding(String...)}, or
  * {@link #excluding(ArtifactDescriptor...)}.
@@ -85,7 +88,7 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
  * <p><b>Dependencies</b></p>
  *
  * <ul>
- *     <li>{@link #artifactDependencies()}</li>
+ *     <li>{@link #dependencies()}</li>
  *     <li>{@link #builderDependencies()}</li>
  *     <li>{@link #isExcluded(ArtifactDescriptor)}</li>
  *     <li>{@link #withDependencies(ArtifactList)}</li>
@@ -243,7 +246,7 @@ public interface Artifact<A extends Artifact<A>> extends
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default A excluding(ArtifactDescriptor... exclusions)
     {
-        return excluding(list(exclusions));
+        return excluding(descriptors(list(exclusions)));
     }
 
     /**
@@ -255,7 +258,7 @@ public interface Artifact<A extends Artifact<A>> extends
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default A excluding(String... exclusions)
     {
-        return excluding(list(exclusions).map(ArtifactDescriptor::descriptor));
+        return excluding(descriptors(exclusions));
     }
 
     /**
@@ -264,7 +267,7 @@ public interface Artifact<A extends Artifact<A>> extends
      * @param exclusions The descriptors to exclude
      * @return The new artifact
      */
-    A excluding(ObjectList<ArtifactDescriptor> exclusions);
+    A excluding(ArtifactDescriptorList exclusions);
 
     /**
      * Returns a copy of this artifact that excludes the given artifacts from its dependencies
@@ -275,7 +278,18 @@ public interface Artifact<A extends Artifact<A>> extends
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     default A excluding(Artifact<?>... exclusions)
     {
-        return excluding(list(exclusions).map(Artifact::descriptor));
+        return excluding(artifacts(exclusions));
+    }
+
+    /**
+     * Returns a copy of this artifact that excludes the given artifacts from its dependencies
+     *
+     * @param exclusions The artifacts to exclude
+     * @return The new artifact
+     */
+    default A excluding(ArtifactList exclusions)
+    {
+        return excluding(exclusions.asDescriptors());
     }
 
     /**
@@ -284,7 +298,10 @@ public interface Artifact<A extends Artifact<A>> extends
      * @param pattern The pattern to exclude
      * @return The new artifact
      */
-    A excluding(ArtifactDescriptor pattern);
+    default A excluding(ArtifactDescriptor pattern)
+    {
+        return excluding(descriptors(pattern).asArtifacts());
+    }
 
     /**
      * Returns true if this artifact excludes the given artifact

@@ -9,6 +9,7 @@ import com.telenav.kivakit.core.thread.locks.ReadWriteLock;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.local.cache.CacheRepository;
@@ -18,7 +19,6 @@ import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
 import java.net.URI;
-import java.util.List;
 import java.util.Objects;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
@@ -91,7 +91,7 @@ import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.a
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link Repository#resolveArtifacts(List)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(ArtifactDescriptorList)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -213,7 +213,7 @@ public abstract class BaseRepository extends BaseRepeater implements Repository
         return lock;
     }
 
-    protected ArtifactList resolve(List<ArtifactDescriptor> descriptors)
+    protected ArtifactList resolve(ArtifactDescriptorList descriptors)
     {
         return lock().read(() ->
         {

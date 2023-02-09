@@ -4,6 +4,7 @@ import com.telenav.kivakit.core.progress.ProgressReporter;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.lists.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.RepositoryContentReader;
@@ -89,7 +90,7 @@ public class RemoteRepository extends BaseRepository
      * {@inheritDoc}
      */
     @Override
-    public ArtifactList resolveArtifacts(List<ArtifactDescriptor> descriptors,
+    public ArtifactList resolveArtifacts(ArtifactDescriptorList descriptors,
                                          ProgressReporter reporter,
                                          RepositoryContentReader reader)
     {

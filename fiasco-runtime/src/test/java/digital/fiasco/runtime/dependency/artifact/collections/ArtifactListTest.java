@@ -17,7 +17,7 @@ public class ArtifactListTest extends FiascoTest
     @Test
     public void testAsArtifactDescriptors()
     {
-        var descriptors = kivakitArtifacts().asArtifactDescriptors();
+        var descriptors = kivakitArtifacts().asDescriptors();
         ensureEqual(kivakitArtifacts().size(), descriptors.size());
         for (var artifact : kivakitArtifacts())
         {

@@ -9,8 +9,6 @@ import digital.fiasco.runtime.repository.local.LocalRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
-import java.util.List;
-
 /**
  * A request to resolve artifact descriptors.
  *
@@ -41,9 +39,9 @@ public class ResolveArtifactsRequest extends BaseMicroservletRequest
     @Expose
     private final ArtifactDescriptorList descriptors;
 
-    public ResolveArtifactsRequest(List<ArtifactDescriptor> descriptors)
+    public ResolveArtifactsRequest(ArtifactDescriptorList descriptors)
     {
-        this.descriptors = ArtifactDescriptorList.descriptors(descriptors);
+        this.descriptors = descriptors;
     }
 
     public ResolveArtifactsRequest()

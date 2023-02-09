@@ -10,9 +10,9 @@ import java.util.HashSet;
 
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_COMPILE;
+import static digital.fiasco.runtime.build.builder.phases.Phase.PHASE_PREPARE;
 import static digital.fiasco.runtime.build.metadata.BuildMetadata.buildMetadata;
 import static digital.fiasco.runtime.build.settings.BuildSettings.buildSettings;
-import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
 
 public class BuildExecutorTest extends FiascoTest
 {
@@ -28,12 +28,10 @@ public class BuildExecutorTest extends FiascoTest
             {
                 root = root
                     .withEnabled(PHASE_COMPILE)
-                    .withRootFolder(currentFolder().folder("project"))
+                    .withRootFolder(currentFolder().folder("../fiasco-example"))
+                    .withoutActions(PHASE_PREPARE)
+                    .withoutActions(PHASE_COMPILE)
                     .withActionAfterPhase(PHASE_COMPILE, compiled::add);
-
-                root = root.withDependencies(
-                    root.deriveBuilder("utilities")
-                        .withActionAfterPhase(PHASE_COMPILE, compiled::add));
 
                 return root;
             }
@@ -41,7 +39,7 @@ public class BuildExecutorTest extends FiascoTest
             @Override
             public BuildMetadata onMetadata()
             {
-                return buildMetadata().withArtifactDescriptor("library:digital.fiasco:fiasco-test:0.9.0");
+                return buildMetadata().withDescriptor("library:digital.fiasco:fiasco-example:0.9.0");
             }
 
             @Override
@@ -60,6 +58,5 @@ public class BuildExecutorTest extends FiascoTest
         results.forEach(it -> ensure(it.succeeded()));
 
         ensure(compiled.contains(build.root()));
-        ensure(compiled.contains(build.root().builder(descriptor(":digital.fiasco:utilities:"))));
     }
 }

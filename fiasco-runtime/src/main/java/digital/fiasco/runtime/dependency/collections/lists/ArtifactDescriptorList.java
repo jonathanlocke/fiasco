@@ -100,6 +100,39 @@ public class ArtifactDescriptorList implements
         return new ArtifactDescriptorList(descriptors);
     }
 
+    /**
+     * Returns a list of artifact descriptors
+     *
+     * @param descriptor The descriptor
+     * @return The new artifact descriptor list
+     */
+    public static ArtifactDescriptorList descriptors(ArtifactDescriptor descriptor)
+    {
+        return descriptors(list(descriptor));
+    }
+
+    /**
+     * Returns a list of artifact descriptors
+     *
+     * @param artifacts The artifacts
+     * @return The new artifact descriptor list
+     */
+    public static ArtifactDescriptorList descriptors(ArtifactList artifacts)
+    {
+        return new ArtifactDescriptorList(artifacts.asDescriptors());
+    }
+
+    /**
+     * Returns an artifact descriptor list with the given artifact's descriptor
+     *
+     * @param artifact The artifact
+     * @return The new artifact descriptor list
+     */
+    public static ArtifactDescriptorList descriptors(Artifact<?> artifact)
+    {
+        return descriptors(artifact.descriptor());
+    }
+
     /** The artifact descriptors in this list */
     private final ObjectList<ArtifactDescriptor> descriptors;
 
@@ -147,6 +180,16 @@ public class ArtifactDescriptorList implements
         return Count.count(size());
     }
 
+    @Override
+    public boolean equals(Object object)
+    {
+        if (object instanceof ArtifactDescriptorList list)
+        {
+            return this.descriptors.equals(list.descriptors);
+        }
+        return false;
+    }
+
     public ArtifactDescriptor first()
     {
         return descriptors.first();
@@ -156,6 +199,12 @@ public class ArtifactDescriptorList implements
     public ArtifactDescriptor get(int index)
     {
         return descriptors.get(index);
+    }
+
+    @Override
+    public int hashCode()
+    {
+        return descriptors.hashCode();
     }
 
     @Override
@@ -238,6 +287,12 @@ public class ArtifactDescriptorList implements
     public <T> T[] toArray(@NotNull T[] array)
     {
         return descriptors.toArray(array);
+    }
+
+    @Override
+    public String toString()
+    {
+        return descriptors.asStringList().join();
     }
 
     /**

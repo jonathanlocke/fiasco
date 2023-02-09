@@ -62,7 +62,7 @@ public abstract class BaseTool<TOOL extends BaseTool<TOOL, OUTPUT>, OUTPUT> exte
     @Override
     public ArtifactList artifactDependencies()
     {
-        return builder.artifactDependencies();
+        return builder.dependencies();
     }
 
     /**

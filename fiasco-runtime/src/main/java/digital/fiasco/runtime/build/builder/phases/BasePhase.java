@@ -22,7 +22,7 @@ public abstract class BasePhase implements Phase
     private final ObjectList<BuildAction> runBefore = list();
 
     /** The code to run when the phase executes */
-    private final ObjectList<BuildAction> run = list();
+    private final ObjectList<BuildAction> runDuring = list();
 
     /** The code to run after the phase executes */
     private final ObjectList<BuildAction> runAfter = list();
@@ -57,6 +57,15 @@ public abstract class BasePhase implements Phase
         return this;
     }
 
+    @Override
+    public Phase clearActions()
+    {
+        runAfter.clear();
+        runBefore.clear();
+        runDuring.clear();
+        return this;
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -72,7 +81,7 @@ public abstract class BasePhase implements Phase
     @Override
     public Phase duringPhase(BuildAction code)
     {
-        run.add(code);
+        runDuring.add(code);
         return this;
     }
 
@@ -122,7 +131,7 @@ public abstract class BasePhase implements Phase
     @Override
     public final void internalOnRun(Builder builder)
     {
-        run.forEach(it -> it.action(builder));
+        runDuring.forEach(it -> it.action(builder));
     }
 
     /**

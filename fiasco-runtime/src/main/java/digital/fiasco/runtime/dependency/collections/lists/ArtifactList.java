@@ -46,7 +46,7 @@ import static com.telenav.kivakit.core.collections.list.ObjectList.list;
  * <p><b>Conversions</b></p>
  *
  * <ul>
- *     <li>{@link #asArtifactDescriptors()}</li>
+ *     <li>{@link #asDescriptors()}</li>
  *     <li>{@link #asAssetList()}</li>
  *     <li>{@link #asLibraryList()}</li>
  *     <li>{@link #asStringList()}</li>

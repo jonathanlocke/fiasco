@@ -19,6 +19,7 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
 import static digital.fiasco.runtime.dependency.artifact.types.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
+import static digital.fiasco.runtime.dependency.collections.lists.ArtifactDescriptorList.descriptors;
 import static digital.fiasco.runtime.dependency.collections.lists.ArtifactList.artifacts;
 import static digital.fiasco.runtime.dependency.collections.lists.AssetList.assets;
 import static digital.fiasco.runtime.dependency.collections.lists.DependencyList.dependencies;
@@ -31,9 +32,9 @@ public class ArtifactTest extends FiascoTest
     {
         ensureEqual(kivakitCore().artifact().name(), "kivakit-core");
         ensureEqual(kivakitCore().artifact("kivakit-interfaces"),
-                library("com.telenav.kivakit:kivakit-interfaces:1.8.5"));
+            library("com.telenav.kivakit:kivakit-interfaces:1.8.5"));
         ensureEqual(kivakitCore().artifact(new ArtifactName("kivakit-interfaces")),
-                library("com.telenav.kivakit:kivakit-interfaces:1.8.5"));
+            library("com.telenav.kivakit:kivakit-interfaces:1.8.5"));
     }
 
     @Test
@@ -49,8 +50,8 @@ public class ArtifactTest extends FiascoTest
         var library = library("com.telenav.kivakit:kivakit:1.8.0");
 
         library = library.withAttachment(jarAttachment())
-                .withAttachment(javadocAttachment())
-                .withAttachment(sourcesAttachment());
+            .withAttachment(javadocAttachment())
+            .withAttachment(sourcesAttachment());
 
         {
             var attachment = library.attachmentOfType(JAR_ATTACHMENT);
@@ -74,9 +75,9 @@ public class ArtifactTest extends FiascoTest
     {
         {
             var library = kivakitCore()
-                    .withAttachment(jarAttachment())
-                    .withAttachment(javadocAttachment())
-                    .withAttachment(sourcesAttachment());
+                .withAttachment(jarAttachment())
+                .withAttachment(javadocAttachment())
+                .withAttachment(sourcesAttachment());
 
             ensure(library.attachments().contains(jarAttachment()));
             ensure(library.attachments().contains(javadocAttachment()));
@@ -87,7 +88,7 @@ public class ArtifactTest extends FiascoTest
             attachments.put(JAR_ATTACHMENT, jarAttachment());
             attachments.put(SOURCES_ATTACHMENT, sourcesAttachment());
             var library = kivakitApplication()
-                    .withAttachments(attachments);
+                .withAttachments(attachments);
 
             ensure(library.attachments().contains(jarAttachment()));
             ensure(!library.attachments().contains(javadocAttachment()));
@@ -99,7 +100,7 @@ public class ArtifactTest extends FiascoTest
     public void testContent()
     {
         var library = kivakitApplication()
-                .withContent(packageContent());
+            .withContent(packageContent());
 
         ensureEqual(library.content(), packageContent());
     }
@@ -150,7 +151,7 @@ public class ArtifactTest extends FiascoTest
         }
         {
             var images = kivakitImages()
-                    .withDependencies(kivakitIcons(), kivakitLogos());
+                .withDependencies(kivakitIcons(), kivakitLogos());
 
             ensureEqual(images.assets(), assets(kivakitIcons(), kivakitLogos()));
         }
@@ -162,14 +163,14 @@ public class ArtifactTest extends FiascoTest
         var application = kivakitApplication();
 
         ensureEqual(application.dependenciesMatching(":com.telenav.kivakit::"),
-                artifacts(kivakitCore(), kivakitResource(), kivakitIcons(), kivakitLogos()));
+            artifacts(kivakitCore(), kivakitResource(), kivakitIcons(), kivakitLogos()));
     }
 
     @Test
     public void testDependencyNamed()
     {
         var application = kivakitApplication()
-                .withDependencies(kivakitCore(), kivakitResource());
+            .withDependencies(kivakitCore(), kivakitResource());
         ensureNotNull(application.dependencyNamed("library:com.telenav.kivakit:kivakit-resource:1.8.5"));
         ensureThrows(() -> application.dependencyNamed(":com.telenav.kivakit:kivakit-x:1.8.5"));
     }
@@ -178,9 +179,9 @@ public class ArtifactTest extends FiascoTest
     public void testDependsOn()
     {
         var application = kivakitApplication()
-                .withDependencies(kivakitCore(), kivakitResource());
+            .withDependencies(kivakitCore(), kivakitResource());
 
-        ensure(application.artifactDependencies().containsAll(artifacts(kivakitCore(), kivakitResource())));
+        ensure(application.dependencies().containsAll(artifacts(kivakitCore(), kivakitResource())));
     }
 
     @Test
@@ -208,96 +209,96 @@ public class ArtifactTest extends FiascoTest
     public void testExcluding()
     {
         var application = kivakitApplication()
-                .withDependencies(kivakitCore(), kivakitResource());
+            .withDependencies(kivakitCore(), kivakitResource());
 
         ensureEqual(application
-                        .excluding(":com.telenav.kivakit:kivakit-core:")
-                        .excluding(kivakitIcons())
-                        .excluding(kivakitLogos())
-                        .artifactDependencies(),
-                libraries(kivakitResource()));
+                .excluding(":com.telenav.kivakit:kivakit-core:")
+                .excluding(kivakitIcons())
+                .excluding(kivakitLogos())
+                .dependencies(),
+            libraries(kivakitResource()));
 
         ensureEqual(application
-                        .excluding(":com.telenav.kivakit::")
-                        .artifactDependencies(),
-                artifacts());
+                .excluding(":com.telenav.kivakit::")
+                .dependencies(),
+            artifacts());
 
         ensureEqual(application
-                        .excluding(kivakitCore().descriptor())
-                        .artifactDependencies(),
-                artifacts(kivakitResource(),
-                        kivakitLogos(),
-                        kivakitIcons()));
+                .excluding(kivakitCore().descriptor())
+                .dependencies(),
+            artifacts(kivakitResource(),
+                kivakitLogos(),
+                kivakitIcons()));
 
         ensureEqual(application
-                        .excluding(kivakitResource().descriptor())
-                        .artifactDependencies(),
-                artifacts(kivakitCore(),
-                        kivakitLogos(),
-                        kivakitIcons()));
+                .excluding(kivakitResource().descriptor())
+                .dependencies(),
+            artifacts(kivakitCore(),
+                kivakitLogos(),
+                kivakitIcons()));
 
         ensureEqual(application
-                        .excluding(kivakitResource().descriptor(),
-                                kivakitCore().descriptor(),
-                                kivakitIcons().descriptor(),
-                                kivakitLogos().descriptor())
-                        .artifactDependencies(),
-                artifacts());
+                .excluding(kivakitResource().descriptor(),
+                    kivakitCore().descriptor(),
+                    kivakitIcons().descriptor(),
+                    kivakitLogos().descriptor())
+                .dependencies(),
+            artifacts());
 
         ensureEqual(application
-                        .excluding(kivakitCore())
-                        .excluding(kivakitIcons())
-                        .excluding(kivakitLogos())
-                        .artifactDependencies(),
-                artifacts(kivakitResource()));
+                .excluding(kivakitCore())
+                .excluding(kivakitIcons())
+                .excluding(kivakitLogos())
+                .dependencies(),
+            artifacts(kivakitResource()));
 
         ensureEqual(application
-                        .excluding(kivakitResource())
-                        .excluding(kivakitIcons())
-                        .excluding(kivakitLogos())
-                        .artifactDependencies(),
-                artifacts(kivakitCore()));
+                .excluding(kivakitResource())
+                .excluding(kivakitIcons())
+                .excluding(kivakitLogos())
+                .dependencies(),
+            artifacts(kivakitCore()));
 
         ensureEqual(application
-                        .excluding(kivakitResource())
-                        .excluding(kivakitIcons())
-                        .excluding(kivakitLogos())
-                        .excluding(kivakitCore()).artifactDependencies(),
-                artifacts());
+                .excluding(kivakitResource())
+                .excluding(kivakitIcons())
+                .excluding(kivakitLogos())
+                .excluding(kivakitCore()).dependencies(),
+            artifacts());
 
         ensureEqual(application
-                        .excluding(kivakitResource().descriptor(),
-                                kivakitIcons().descriptor(),
-                                kivakitLogos().descriptor())
-                        .artifactDependencies()
-                        .asArtifactDescriptors(),
-                list(kivakitCore().descriptor()));
+                .excluding(kivakitResource().descriptor(),
+                    kivakitIcons().descriptor(),
+                    kivakitLogos().descriptor())
+                .dependencies()
+                .asDescriptors(),
+            descriptors(artifacts(kivakitCore())));
     }
 
     @Test
     public void testIsExcluded()
     {
         var application = kivakitApplication()
-                .withDependencies(kivakitCore(), kivakitResource());
+            .withDependencies(kivakitCore(), kivakitResource());
 
         ensure(application
-                .excluding(":com.telenav.kivakit:kivakit-core:")
-                .isExcluded(kivakitCore()));
+            .excluding(":com.telenav.kivakit:kivakit-core:")
+            .isExcluded(kivakitCore()));
 
         ensure(application
-                .excluding(":com.telenav.kivakit::")
-                .isExcluded(kivakitCore()));
+            .excluding(":com.telenav.kivakit::")
+            .isExcluded(kivakitCore()));
 
         ensure(application
-                .excluding(":com.telenav.kivakit::")
-                .isExcluded(kivakitResource()));
+            .excluding(":com.telenav.kivakit::")
+            .isExcluded(kivakitResource()));
     }
 
     @Test
     public void testJar()
     {
         var library = kivakitCore()
-                .withJar(packageContent());
+            .withJar(packageContent());
 
         ensureEqual(library.jar(), packageContent());
     }
@@ -306,10 +307,10 @@ public class ArtifactTest extends FiascoTest
     public void testJson()
     {
         var application = kivakitApplication()
-                .withDependencies(kivakitCore(), kivakitResource())
-                .withRepository(MAVEN_CENTRAL)
-                .withJar(packageContent())
-                .withJavadoc(packageContent());
+            .withDependencies(kivakitCore(), kivakitResource())
+            .withRepository(MAVEN_CENTRAL)
+            .withJar(packageContent())
+            .withJavadoc(packageContent());
 
         var json = application.toJson();
         var deserialized = artifactFromJson(json);
@@ -320,38 +321,38 @@ public class ArtifactTest extends FiascoTest
     public void testMavenPom()
     {
         var application = kivakitApplication()
-                .excluding(kivakitIcons())
-                .excluding(kivakitLogos());
+            .excluding(kivakitIcons())
+            .excluding(kivakitLogos());
 
         ensureEqual(application.mavenPom().trim(), """
-                <project
-                  xmlns="http://maven.apache.org/POM/4.0.0"
-                  xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-                  xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+            <project
+              xmlns="http://maven.apache.org/POM/4.0.0"
+              xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 
-                    <modelVersion>4.0.0</modelVersion>
+                <modelVersion>4.0.0</modelVersion>
 
-                    <groupId>com.telenav.kivakit</groupId>
-                    <artifactId>kivakit-application</artifactId>
-                    <version>1.8.5</version>
+                <groupId>com.telenav.kivakit</groupId>
+                <artifactId>kivakit-application</artifactId>
+                <version>1.8.5</version>
+               \s
+                <dependencies>
+               \s
+                    <dependency>
+                        <groupId>com.telenav.kivakit</groupId>
+                        <artifactId>kivakit-core</artifactId>
+                        <version>1.8.5</version>
+                    </dependency>
                    \s
-                    <dependencies>
+                    <dependency>
+                        <groupId>com.telenav.kivakit</groupId>
+                        <artifactId>kivakit-resource</artifactId>
+                        <version>1.8.5</version>
+                    </dependency>
                    \s
-                        <dependency>
-                            <groupId>com.telenav.kivakit</groupId>
-                            <artifactId>kivakit-core</artifactId>
-                            <version>1.8.5</version>
-                        </dependency>
-                       \s
-                        <dependency>
-                            <groupId>com.telenav.kivakit</groupId>
-                            <artifactId>kivakit-resource</artifactId>
-                            <version>1.8.5</version>
-                        </dependency>
-                       \s
-                    </dependencies>
-                   \s
-                </project>""".trim());
+                </dependencies>
+               \s
+            </project>""".trim());
     }
 
     @Test
@@ -364,7 +365,7 @@ public class ArtifactTest extends FiascoTest
     public void testRepository()
     {
         var application = kivakitApplication()
-                .withRepository(MAVEN_CENTRAL);
+            .withRepository(MAVEN_CENTRAL);
 
         ensureEqual(application.repository(), MAVEN_CENTRAL);
     }
@@ -373,9 +374,9 @@ public class ArtifactTest extends FiascoTest
     public void testVersion()
     {
         ensureEqual(kivakitCore().withVersion("1.0.0"),
-                library("com.telenav.kivakit:kivakit-core:1.0.0"));
+            library("com.telenav.kivakit:kivakit-core:1.0.0"));
         ensureEqual(kivakitCore().withVersion(version("1.0.0")),
-                library("com.telenav.kivakit:kivakit-core:1.0.0"));
+            library("com.telenav.kivakit:kivakit-core:1.0.0"));
     }
 
     @Test
