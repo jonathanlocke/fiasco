@@ -13,6 +13,7 @@ import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.object.Copyable;
 import com.telenav.kivakit.interfaces.string.Described;
+import com.telenav.kivakit.microservice.internal.yaml.Yaml;
 import com.telenav.kivakit.resource.resources.StringOutputResource;
 import com.telenav.kivakit.resource.serialization.SerializableObject;
 import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
@@ -419,7 +420,7 @@ public class Builder extends BaseRepeater implements
     {
         var description = stringList();
         description.add("""
-            
+                        
             Fiasco is a pure-Java build tool designed to enable complex, flexible builds.
             The phases below can be enabled by passing the phase name as an argument. If
             a phase name starts with a minus sign (-), the phase will be disabled. For
@@ -700,6 +701,12 @@ public class Builder extends BaseRepeater implements
     public String toString()
     {
         return format("builder:$:$", descriptor().groupAndName(), descriptor().version());
+    }
+
+    @Override
+    public Yaml toYaml()
+    {
+        return unsupported();
     }
 
     /**

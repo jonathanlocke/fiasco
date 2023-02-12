@@ -6,13 +6,17 @@ import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.core.time.Time;
 import com.telenav.kivakit.core.value.count.Bytes;
+import com.telenav.kivakit.microservice.internal.yaml.Yaml;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.ResourceIdentifier;
+
+import java.util.Base64;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
+import static com.telenav.kivakit.microservice.internal.yaml.Yaml.yaml;
 
 /**
  * Holds the content for a single artifact attachment, for example the main JAR, Javadoc, or source code.
@@ -51,6 +55,32 @@ public record ArtifactContent
     public String toString()
     {
         return new ObjectFormatter(this).toString();
+    }
+
+    public Yaml toYaml()
+    {
+        var yaml = yaml()
+            .withScalar("name", name())
+            .withScalar("offset", offset())
+            .withScalar("size", size.asBytes())
+            .withScalar("lastModified", lastModified.asLocalTime().toString());
+
+        if (signatures != null)
+        {
+            yaml = yaml.withBlock("signatures", signatures.toYaml());
+        }
+
+        if (data != null)
+        {
+            yaml = yaml.withScalar("data", Base64.getEncoder().encodeToString(data));
+        }
+
+        if (offset() < 0)
+        {
+            yaml = yaml.withScalar("resourceIdentifier", resourceIdentifier.identifier());
+        }
+
+        return yaml;
     }
 
     /**

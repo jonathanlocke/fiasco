@@ -5,6 +5,7 @@ import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
+import com.telenav.kivakit.microservice.internal.yaml.Yaml;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import org.jetbrains.annotations.NotNull;
 
@@ -13,6 +14,7 @@ import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.language.Hash.hashMany;
 import static com.telenav.kivakit.core.language.Objects.areEqualPairs;
+import static com.telenav.kivakit.microservice.internal.yaml.Yaml.yaml;
 
 /**
  * Represents an artifact content attachment
@@ -104,6 +106,11 @@ public record ArtifactAttachment
     public String toString()
     {
         return new ObjectFormatter(this).toString();
+    }
+
+    public Yaml toYaml()
+    {
+        return yaml().withBlock("content", content.toYaml());
     }
 
     /**

@@ -6,6 +6,7 @@ import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.string.AsString;
 import com.telenav.kivakit.core.version.Version;
+import com.telenav.kivakit.microservice.internal.yaml.Yaml;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.StringOutputResource;
 import com.telenav.kivakit.resource.resources.StringResource;
@@ -17,10 +18,10 @@ import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContentSignatures;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
-import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.BuilderList;
 import digital.fiasco.runtime.repository.Repository;
@@ -29,6 +30,7 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
+import static com.telenav.kivakit.microservice.internal.yaml.Yaml.yaml;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
@@ -349,6 +351,37 @@ public interface Artifact<A extends Artifact<A>> extends
         var serialized = new StringOutputResource();
         serializer.writeObject(serialized, new SerializableObject<>(this), METADATA_OBJECT_TYPE);
         return serialized.string();
+    }
+
+    @Override
+    default Yaml toYaml()
+    {
+        var dependencies = yaml();
+        for (var it : dependencies())
+        {
+            dependencies = dependencies.with(it.descriptor().name());
+        }
+
+        var attachments = yaml();
+        for (var it : attachments())
+        {
+            attachments = attachments.withBlock(it.attachmentType().name(), it.toYaml());
+        }
+
+        var yaml = yaml()
+            .withScalar("descriptor", descriptor().name());
+
+        if (!attachments.toString().isBlank())
+        {
+            yaml = yaml.withBlock("attachments", attachments);
+        }
+
+        if (!dependencies.toString().isBlank())
+        {
+            yaml = yaml.withBlock("dependencies", dependencies);
+        }
+
+        return yaml;
     }
 
     /**

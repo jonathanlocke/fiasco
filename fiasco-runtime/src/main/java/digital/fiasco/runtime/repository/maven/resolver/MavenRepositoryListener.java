@@ -62,13 +62,11 @@ public class MavenRepositoryListener extends AbstractRepositoryListener implemen
     @Override
     public void artifactResolved(RepositoryEvent event)
     {
-        traceCall("Resolved " + repositoryAndArtifact(event));
     }
 
     @Override
     public void artifactResolving(RepositoryEvent event)
     {
-        traceCall("Resolving " + artifact(event));
     }
 
     @Override

@@ -120,7 +120,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
         {
             // submit the builder to the executor,
             var future = (Future<Result<Builder>>) executor.submit(builderTask(resolved, builderQueue, builder));
-            trace("$: submitted", builder);
+            trace("Submitted: $", builder);
 
             // and add the future to the list of results to wait for.
             futures.add(future);
@@ -156,7 +156,7 @@ public class BuildExecutor extends BaseComponent implements TryTrait
         return () ->
         {
             // Wait for artifact dependencies to be resolved,
-            trace("Waiting for artifacts to be resolved: $", builder);
+            trace("Waiting for artifacts: $", builder);
             resolved.waitForResolutionOf(builder.dependencies());
 
             // run the builder,

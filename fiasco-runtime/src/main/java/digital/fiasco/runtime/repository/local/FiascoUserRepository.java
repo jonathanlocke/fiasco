@@ -28,6 +28,7 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.ensure.Ensure.ensureNotNull;
 import static com.telenav.kivakit.core.object.Lazy.lazy;
+import static com.telenav.kivakit.core.string.AsciiArt.repeat;
 import static com.telenav.kivakit.filesystem.Folder.folder;
 import static com.telenav.kivakit.resource.WriteMode.APPEND;
 import static com.telenav.kivakit.resource.WriteMode.OVERWRITE;
@@ -87,7 +88,7 @@ import static digital.fiasco.runtime.repository.Repository.InstallationResult.IN
 public class FiascoUserRepository extends BaseRepository
 {
     /** Separator to use between artifact entries in the artifacts.txt file */
-    private final String ARTIFACT_SEPARATOR = "\n========\n";
+    private final String ARTIFACT_SEPARATOR = repeat(40, "-");
 
     /** The root folder of this repository */
     private final Folder rootFolder;
@@ -182,6 +183,7 @@ public class FiascoUserRepository extends BaseRepository
                     // and add the artifact to the map.
                     add(artifact.descriptor(), artifact);
 
+                    trace("Installed $ in $", artifact, name());
                     return INSTALLED;
                 }
                 catch (Exception e)
@@ -292,16 +294,16 @@ public class FiascoUserRepository extends BaseRepository
     protected void saveArtifactMetadata(Artifact<?> artifact)
     {
         // Get JSON for artifact metadata,
-        var text = artifact.toJson().trim();
+        var text = artifact.toYaml().toString();
 
         // add a separator if necessary,
         if (metadataFile.exists())
         {
-            text = ARTIFACT_SEPARATOR + text;
+            text = ARTIFACT_SEPARATOR + "\n" + text.trim();
         }
 
         // then append the JSON to the metadata file.
-        new StringResource(text).copyTo(metadataFile, APPEND);
+        new StringResource(text + "\n").copyTo(metadataFile, APPEND);
     }
 
     /**
