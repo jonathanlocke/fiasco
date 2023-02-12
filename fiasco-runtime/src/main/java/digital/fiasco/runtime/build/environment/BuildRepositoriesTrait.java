@@ -12,6 +12,12 @@ import static digital.fiasco.runtime.repository.maven.MavenRepository.LOCAL_MAVE
 @SuppressWarnings("unused")
 public interface BuildRepositoriesTrait
 {
+    Repository MAVEN_LOCAL = new MavenRepository("maven-local",
+        "maven-local",
+        LOCAL_MAVEN_REPOSITORY_FOLDER.asUri(),
+        LOCAL_MAVEN_REPOSITORY_FOLDER
+    );
+
     Repository MAVEN_CENTRAL = new MavenRepository("maven-central",
         "central",
         uri("https://repo1.maven.org/maven2"),

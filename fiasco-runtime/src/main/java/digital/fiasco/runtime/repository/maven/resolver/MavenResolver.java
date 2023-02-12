@@ -4,10 +4,13 @@ import com.google.inject.Guice;
 import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.language.trait.TryTrait;
+import com.telenav.kivakit.core.thread.ReentrancyTracker;
 import com.telenav.kivakit.filesystem.Folder;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
+import digital.fiasco.runtime.repository.local.cache.FiascoCacheRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
 import org.apache.maven.repository.internal.MavenRepositorySystemUtils;
+import org.eclipse.aether.RepositoryEvent;
 import org.eclipse.aether.RepositorySystem;
 import org.eclipse.aether.RepositorySystemSession;
 import org.eclipse.aether.artifact.DefaultArtifact;
@@ -16,13 +19,17 @@ import org.eclipse.aether.graph.Dependency;
 import org.eclipse.aether.repository.LocalRepository;
 import org.eclipse.aether.repository.RemoteRepository;
 import org.eclipse.aether.resolution.DependencyRequest;
+import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
 
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.os.Console.console;
+import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MAVEN_LOCAL;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.parseDescriptor;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
+import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLATION_FAILED;
 import static digital.fiasco.runtime.repository.maven.MavenRepository.LOCAL_MAVEN_REPOSITORY_FOLDER;
 import static org.eclipse.aether.util.artifact.JavaScopes.COMPILE;
 import static org.eclipse.aether.util.filter.DependencyFilterUtils.classpathFilter;
@@ -74,6 +81,8 @@ public class MavenResolver extends BaseComponent implements TryTrait
 
     /** The local folder containing this maven repository */
     private final Folder localRepositoryFolder;
+
+    private final ReentrancyTracker reentrancy = new ReentrancyTracker();
 
     /**
      * Creates a resolver, using the Guice injector {@link MavenResolverGuiceInjector} to configure the
@@ -228,6 +237,51 @@ public class MavenResolver extends BaseComponent implements TryTrait
     }
 
     /**
+     * A listener which copies artifacts into the {@link FiascoCacheRepository} as they are resolved by maven
+     *
+     * @return The listener
+     */
+    @NotNull
+    private MavenRepositoryListener repositoryListener()
+    {
+        return new MavenRepositoryListener()
+        {
+            @Override
+            public void artifactResolved(RepositoryEvent event)
+            {
+                super.artifactResolved(event);
+
+                if (!reentrancy.hasReentered())
+                {
+                    try
+                    {
+                        reentrancy.enter();
+                        var artifact = event.getArtifact();
+                        var descriptor = descriptor("library"
+                            + ":" + artifact.getGroupId()
+                            + ":" + artifact.getArtifactId()
+                            + ":" + artifact.getVersion());
+
+                        for (var at : MAVEN_LOCAL.resolveArtifacts(descriptors(descriptor)))
+                        {
+                            var cacheRepository = require(FiascoCacheRepository.class);
+                            var result = cacheRepository.installArtifact(at);
+                            if (result == INSTALLATION_FAILED)
+                            {
+                                warning("Unable to install artifact in $: $ $", cacheRepository, result, at);
+                            }
+                        }
+                    }
+                    finally
+                    {
+                        reentrancy.exit();
+                    }
+                }
+            }
+        };
+    }
+
+    /**
      * Creates a thread-local {@link RepositorySystemSession} using the {@link RepositorySystem} created in the
      * constructor. It is necessary to maintain one session per thread because the session object is not thread-safe.
      *
@@ -239,7 +293,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
         var newSession = MavenRepositorySystemUtils.newSession();
         newSession.setLocalRepositoryManager(system.newLocalRepositoryManager(newSession, localRepository));
         newSession.setTransferListener(new MavenArtifactTransferListener());
-        newSession.setRepositoryListener(new MavenRepositoryListener());
+        newSession.setRepositoryListener(repositoryListener());
         return newSession;
     }
 }

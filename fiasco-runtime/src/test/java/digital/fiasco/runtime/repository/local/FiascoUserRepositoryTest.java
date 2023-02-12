@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.local.cache;
+package digital.fiasco.runtime.repository.local;
 
 import com.telenav.kivakit.filesystem.Folder;
 import digital.fiasco.runtime.FiascoTest;
@@ -8,11 +8,10 @@ import digital.fiasco.runtime.repository.Repository;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 
-import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
 
-public class CacheRepositoryTest extends FiascoTest
+public class FiascoUserRepositoryTest extends FiascoTest
 {
     @Test
     public void testCreate()
@@ -20,12 +19,19 @@ public class CacheRepositoryTest extends FiascoTest
         var core = kivakitCore()
             .withContent(packageContent());
 
-        var funky = new CacheRepository("funky", root().mkdirs().clearAll().asUri());
+        var funky = new FiascoUserRepository("funky").clear();
         funky.installArtifact(core);
 
         var resolved = funky.resolveArtifacts(descriptors(":com.telenav.kivakit::"));
         ensure(resolved.size() == 1);
         ensureEqual(resolved.first(), core);
+    }
+
+    @Test
+    public void testEquals()
+    {
+        ensureEqual(repository(), repository());
+        ensureNotEqual(repository(), 5);
     }
 
     @Test
@@ -37,7 +43,7 @@ public class CacheRepositoryTest extends FiascoTest
         var repository = repository();
         repository.installArtifact(core);
 
-        var resolved = repository.resolveArtifacts(descriptors(core.descriptor()));
+        var resolved = repository.resolveArtifacts(descriptors(core));
         ensure(resolved.size() == 1);
         ensure(resolved.first().equals(core));
     }
@@ -69,7 +75,7 @@ public class CacheRepositoryTest extends FiascoTest
         repository.installArtifact(icons);
         repository.installArtifact(logos);
 
-        var reloaded = new CacheRepository("test", root());
+        var reloaded = new FiascoUserRepository("test", root());
         testRepository(reloaded, core, icons, logos);
     }
 
@@ -92,19 +98,6 @@ public class CacheRepositoryTest extends FiascoTest
     }
 
     @Test
-    public void testSaveFailure()
-    {
-        ensureThrows(() ->
-        {
-            var core = kivakitCore()
-                .withContent(badPackageContent());
-
-            var repository = throwingListener().listenTo(repository());
-            repository.installArtifact(core);
-        });
-    }
-
-    @Test
     public void testUri()
     {
         ensureEqual(repository().uri(), root().asUri());
@@ -113,7 +106,7 @@ public class CacheRepositoryTest extends FiascoTest
     @NotNull
     private static Repository repository()
     {
-        return new CacheRepository("test", root().mkdirs().clearAll());
+        return new FiascoUserRepository("test", root().mkdirs().clearAll());
     }
 
     private static Folder root()
@@ -124,12 +117,12 @@ public class CacheRepositoryTest extends FiascoTest
     private void testRepository(Repository repository, Library core, Asset icons, Asset logos)
     {
         {
-            var resolved = repository.resolveArtifacts(descriptors(core.descriptor()));
+            var resolved = repository.resolveArtifacts(descriptors(core));
             ensure(resolved.size() == 1);
             ensure(resolved.first().equals(core));
         }
         {
-            var resolved = repository.resolveArtifacts(descriptors(icons.descriptor()));
+            var resolved = repository.resolveArtifacts(descriptors(icons));
             ensure(resolved.size() == 1);
             ensure(resolved.first().equals(icons));
         }

@@ -22,6 +22,7 @@ import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressReporter;
 import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.network.core.LocalHost.localhost;
+import static digital.fiasco.runtime.repository.RepositoryContentReader.nullContentReader;
 
 /**
  * Client that resolves requests to a {@link RemoteRepository} using the Fiasco repository protocol over HTTPS.
@@ -73,7 +74,7 @@ public class FiascoClient extends BaseComponent implements SettingsTrait
      */
     public ArtifactList resolveArtifacts(ArtifactDescriptorList descriptors)
     {
-        return resolveArtifacts(descriptors, nullProgressReporter(), Functions::doNothing);
+        return resolveArtifacts(descriptors, nullProgressReporter(), nullContentReader());
     }
 
     /**

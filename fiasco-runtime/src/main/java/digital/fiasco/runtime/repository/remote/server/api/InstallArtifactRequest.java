@@ -4,7 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.microservice.microservlet.BaseMicroservletRequest;
 import com.telenav.kivakit.microservice.microservlet.MicroservletResponse;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
-import digital.fiasco.runtime.repository.local.LocalRepository;
+import digital.fiasco.runtime.repository.local.FiascoUserRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
@@ -38,7 +38,7 @@ public class InstallArtifactRequest extends BaseMicroservletRequest
     @Override
     public MicroservletResponse onRespond()
     {
-        return new InstallArtifactResponse(require(LocalRepository.class)
+        return new InstallArtifactResponse(require(FiascoUserRepository.class)
             .installArtifact(artifact));
     }
 

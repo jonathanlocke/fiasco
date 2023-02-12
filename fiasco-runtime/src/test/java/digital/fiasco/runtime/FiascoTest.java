@@ -10,7 +10,7 @@ import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
-import digital.fiasco.runtime.repository.local.LocalRepository;
+import digital.fiasco.runtime.repository.local.FiascoUserRepository;
 import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;
 
 import static com.telenav.kivakit.filesystem.File.file;
@@ -156,9 +156,9 @@ public class FiascoTest extends UnitTest
         return library("com.telenav.kivakit:kivakit-resource:1.8.5");
     }
 
-    protected LocalRepository localRepository()
+    protected FiascoUserRepository localRepository()
     {
-        return new LocalRepository("local", Folders.currentFolder().folder("target/.fiasco/local"));
+        return new FiascoUserRepository("local", Folders.currentFolder().folder("target/.fiasco/local"));
     }
 
     protected ArtifactContent packageContent()

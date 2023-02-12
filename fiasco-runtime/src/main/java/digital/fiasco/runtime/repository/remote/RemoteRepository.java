@@ -8,7 +8,7 @@ import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.RepositoryContentReader;
-import digital.fiasco.runtime.repository.local.cache.CacheRepository;
+import digital.fiasco.runtime.repository.local.cache.FiascoCacheRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
@@ -57,7 +57,7 @@ import static digital.fiasco.runtime.repository.remote.server.FiascoClient.fiasc
  * @author Jonathan Locke
  * @see BaseRepository
  * @see Repository
- * @see CacheRepository
+ * @see FiascoCacheRepository
  * @see FiascoClient
  * @see FiascoServer
  */

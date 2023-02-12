@@ -95,9 +95,15 @@ public record ArtifactContent
     public ArtifactContent withResource(Resource resource)
     {
         var data = resource.reader().readBytes();
-        return new ArtifactContent(name, signatures, resource == null
+        var content = new ArtifactContent(name, signatures, resource == null
             ? null
             : resource.identifier(), offset, lastModified, size, data);
+
+        return content
+            .withSize(resource.sizeInBytes())
+            .withOffset(0)
+            .withName(resource.fileName().name())
+            .withLastModified(resource.lastModified());
     }
 
     /**

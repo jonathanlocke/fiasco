@@ -14,8 +14,8 @@ import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.Repository.InstallationResult;
-import digital.fiasco.runtime.repository.local.LocalRepository;
-import digital.fiasco.runtime.repository.local.cache.CacheRepository;
+import digital.fiasco.runtime.repository.local.FiascoUserRepository;
+import digital.fiasco.runtime.repository.local.cache.FiascoCacheRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.server.serialization.converters.ArtifactDescriptorConverter;
@@ -50,8 +50,8 @@ public class FiascoGsonFactory extends KivaKitCoreGsonFactory
         addGsonTypeAdapterFactory(RuntimeTypeAdapterFactory
             .of(Repository.class, "type")
             .registerSubtype(MavenRepository.class)
-            .registerSubtype(LocalRepository.class)
-            .registerSubtype(CacheRepository.class)
+            .registerSubtype(FiascoUserRepository.class)
+            .registerSubtype(FiascoCacheRepository.class)
             .registerSubtype(RemoteRepository.class));
 
         addGsonTypeAdapterFactory(RuntimeTypeAdapterFactory

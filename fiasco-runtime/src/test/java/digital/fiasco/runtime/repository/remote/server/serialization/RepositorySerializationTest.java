@@ -1,8 +1,8 @@
 package digital.fiasco.runtime.repository.remote.server.serialization;
 
 import digital.fiasco.runtime.FiascoTest;
-import digital.fiasco.runtime.repository.local.LocalRepository;
-import digital.fiasco.runtime.repository.local.cache.CacheRepository;
+import digital.fiasco.runtime.repository.local.FiascoUserRepository;
+import digital.fiasco.runtime.repository.local.cache.FiascoCacheRepository;
 import org.junit.Test;
 
 import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MAVEN_CENTRAL;
@@ -15,7 +15,7 @@ public class RepositorySerializationTest extends FiascoTest
     {
         testSerialization(MAVEN_CENTRAL);
         testSerialization(MAVEN_CENTRAL_STAGING);
-        testSerialization(new CacheRepository("cache"));
-        testSerialization(new LocalRepository("local"));
+        testSerialization(new FiascoCacheRepository("cache"));
+        testSerialization(new FiascoUserRepository("local"));
     }
 }

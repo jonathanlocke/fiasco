@@ -47,9 +47,9 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.POM_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactContent.content;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
 import static digital.fiasco.runtime.dependency.artifact.types.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
-import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
 import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
 import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLATION_FAILED;
 import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLED;
@@ -83,6 +83,14 @@ import static digital.fiasco.runtime.repository.Repository.InstallationResult.IN
 public class MavenRepository extends BaseRepository implements TryCatchTrait
 {
     public static Folder LOCAL_MAVEN_REPOSITORY_FOLDER = userHome().folder(".m2/repository");
+
+    public enum MavenRepositoryType
+    {
+        MAVEN_CENTRAL,
+        MAVEN_LOCAL,
+        MAVEN_CENTRAL_STAGING,
+        MAVEN
+    }
 
     /** Resolves artifacts from maven repositories */
     private final MavenResolver mavenResolver;
@@ -263,7 +271,7 @@ public class MavenRepository extends BaseRepository implements TryCatchTrait
     private ArtifactContent mavenReadContent(ArtifactAttachment attachment)
     {
         var resource = mavenResource(rootFolder, attachment, null);
-        if (true) //resource.exists())
+        if (resource.exists())
         {
             var content = content()
                 .withName(resource.fileName().name())

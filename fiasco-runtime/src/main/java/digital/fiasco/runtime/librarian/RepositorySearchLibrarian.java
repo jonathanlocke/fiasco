@@ -17,7 +17,8 @@ import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.repository.Repository;
-import digital.fiasco.runtime.repository.local.LocalRepository;
+import digital.fiasco.runtime.repository.local.FiascoUserRepository;
+import digital.fiasco.runtime.repository.local.cache.FiascoCacheRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
 
@@ -26,8 +27,8 @@ import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.progress.reporters.BroadcastingProgressReporter.progressReporter;
 import static com.telenav.kivakit.core.string.Formatter.format;
-import static com.telenav.kivakit.filesystem.Folders.userHome;
 import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MAVEN_CENTRAL;
+import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MAVEN_LOCAL;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
 import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
 
@@ -69,8 +70,9 @@ public class RepositorySearchLibrarian extends BaseComponent implements
 
     public RepositorySearchLibrarian()
     {
-        repositories.add(new LocalRepository("local-repository"));
-        repositories.add(new MavenRepository("local-maven-repository", "local", userHome().folder(".m2/repository")));
+        repositories.add(new FiascoUserRepository("user-repository"));
+        repositories.add(new FiascoCacheRepository("cache-repository"));
+        repositories.add(MAVEN_LOCAL);
         repositories.add(MAVEN_CENTRAL);
     }
 

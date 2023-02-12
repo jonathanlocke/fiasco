@@ -1,6 +1,5 @@
 package digital.fiasco.runtime.repository;
 
-import com.telenav.kivakit.core.function.Functions;
 import com.telenav.kivakit.core.messaging.Repeater;
 import com.telenav.kivakit.core.progress.ProgressReporter;
 import com.telenav.kivakit.core.registry.Register;
@@ -9,8 +8,8 @@ import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.ArtifactList;
-import digital.fiasco.runtime.repository.local.LocalRepository;
-import digital.fiasco.runtime.repository.local.cache.CacheRepository;
+import digital.fiasco.runtime.repository.local.FiascoUserRepository;
+import digital.fiasco.runtime.repository.local.cache.FiascoCacheRepository;
 import digital.fiasco.runtime.repository.maven.MavenRepository;
 import digital.fiasco.runtime.repository.remote.RemoteRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
@@ -19,6 +18,7 @@ import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 import java.net.URI;
 
 import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressReporter;
+import static digital.fiasco.runtime.repository.RepositoryContentReader.nullContentReader;
 
 /**
  * Interface to a repository that stores and resolves artifacts and their content attachments.
@@ -26,8 +26,8 @@ import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressRep
  * Interface for repositories of artifacts and their metadata. Implementations include:
  *
  * <ul>
- *     <li>{@link CacheRepository} - High performance artifact store</li>
- *     <li>{@link LocalRepository} - Stores artifacts on the local filesystem</li>
+ *     <li>{@link FiascoCacheRepository} - High performance artifact store</li>
+ *     <li>{@link FiascoUserRepository} - Stores artifacts on the local filesystem</li>
  *     <li>{@link MavenRepository} - A remote or local maven repository</li>
  *     <li>{@link RemoteRepository} - A Fiasco repository at a remote URI</li>
  * </ul>
@@ -35,7 +35,7 @@ import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressRep
  * <p><b>Local Repositories</b></p>
  *
  * <p>
- * {@link LocalRepository} is used to store artifacts and metadata on the local filesystem. Artifact
+ * {@link FiascoUserRepository} is used to store artifacts and metadata on the local filesystem. Artifact
  * metadata is stored in JSON format in an append-only text file called <i>artifacts.txt</i>, which allows
  * it to be searched with grep or viewed in a text editor. The artifact content attachments are stored
  * on the filesystem in a hierarchical format similar to a Maven repository.
@@ -51,14 +51,14 @@ import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressRep
  * <p><b>Cache Repositories</b></p>
  *
  * <p>
- * {@link CacheRepository} is used to store artifacts and their metadata in a single file to allow
- * high-performance, random access. As with a {@link LocalRepository}, metadata is stored in a single append-only
+ * {@link FiascoCacheRepository} is used to store artifacts and their metadata in a single file to allow
+ * high-performance, random access. As with a {@link FiascoUserRepository}, metadata is stored in a single append-only
  * text file, but artifact content attachments are stored end-to-end in a single file, <i>attachments.binary</i>.
  * </p>
  *
  * <p>
- * An instance of {@link CacheRepository} is used as an artifact cache to avoid unnecessary downloads when a user wipes
- * out their {@link LocalRepository}, causing it to repopulate. Instead of repopulating from Maven Central or another
+ * An instance of {@link FiascoCacheRepository} is used as an artifact cache to avoid unnecessary downloads when a user wipes
+ * out their {@link FiascoUserRepository}, causing it to repopulate. Instead of repopulating from Maven Central or another
  * remote repository, the artifacts in this repository can be used since artifacts and their metadata are never altered,
  * only appended to their respective <i>artifacts.txt</i> and <i>artifact-content.binary</i>files. Because remote
  * artifacts are guaranteed by Maven Central (and other remote repositories) to be immutable, it should rarely be
@@ -66,7 +66,7 @@ import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressRep
  * </p>
  *
  * <p>
- * Another instance of {@link CacheRepository} is used by {@link FiascoServer} to respond quickly to requests to
+ * Another instance of {@link FiascoCacheRepository} is used by {@link FiascoServer} to respond quickly to requests to
  * resolve one or more artifact descriptors.
  * </p>
  *
@@ -140,7 +140,7 @@ public interface Repository extends
      */
     default ArtifactList resolveArtifacts(ArtifactDescriptorList descriptors)
     {
-        return resolveArtifacts(descriptors, nullProgressReporter(), Functions::doNothing);
+        return resolveArtifacts(descriptors, nullProgressReporter(), nullContentReader());
     }
 
     /**

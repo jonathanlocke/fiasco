@@ -13,7 +13,7 @@ import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorL
 import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.RepositoryContentReader;
-import digital.fiasco.runtime.repository.local.LocalRepository;
+import digital.fiasco.runtime.repository.local.FiascoUserRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
@@ -31,8 +31,8 @@ import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
  * <p><b>Uses</b></p>
  *
  * <p>
- * An instance of {@link CacheRepository} is used as an artifact cache to avoid unnecessary downloads when a user wipes
- * out their {@link LocalRepository}, causing it to repopulate. Instead of repopulating from Maven Central or another
+ * An instance of {@link FiascoCacheRepository} is used as an artifact cache to avoid unnecessary downloads when a user wipes
+ * out their {@link FiascoUserRepository}, causing it to repopulate. Instead of repopulating from Maven Central or another
  * remote repository, the artifacts in this repository can be used since artifacts and their metadata are never altered,
  * only appended to their respective <i>artifacts.txt</i> and <i>artifact-content.binary</i>files. Because remote
  * artifacts are guaranteed by Maven Central (and other remote repositories) to be immutable, it should rarely be
@@ -47,8 +47,8 @@ import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
  * <p><b>Content Storage</b></p>
  *
  * <p>
- * This class inherits metadata storage from {@link LocalRepository}, but instead of storing content in a folder tree,
- * {@link CacheRepository} stores content end-to-end in a single, randomly-accessed binary file to increase performance.
+ * This class inherits metadata storage from {@link FiascoUserRepository}, but instead of storing content in a folder tree,
+ * {@link FiascoCacheRepository} stores content end-to-end in a single, randomly-accessed binary file to increase performance.
  * The metadata for an artifact includes the offset and size of each content attachment in the binary content file.
  * </p>
  *
@@ -74,7 +74,7 @@ import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
  * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
-public class CacheRepository extends LocalRepository
+public class FiascoCacheRepository extends FiascoUserRepository
 {
     /** The binary file containing artifacts, laid out end-to-end */
     private final File artifactContentFile = repositoryFile("artifact-content.binary");
@@ -85,7 +85,7 @@ public class CacheRepository extends LocalRepository
      * @param name The name of the repository
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public CacheRepository(String name)
+    public FiascoCacheRepository(String name)
     {
         super(name, fiascoCacheFolder().folder(name));
     }
@@ -96,7 +96,7 @@ public class CacheRepository extends LocalRepository
      * @param name The name of the repository
      * @param uri The uri of the folder for this repository
      */
-    public CacheRepository(@NotNull String name, @NotNull URI uri)
+    public FiascoCacheRepository(@NotNull String name, @NotNull URI uri)
     {
         super(name, folder(uri));
     }
@@ -107,7 +107,7 @@ public class CacheRepository extends LocalRepository
      * @param name The name of the repository
      * @param folder The folder for this repository
      */
-    public CacheRepository(@NotNull String name, @NotNull Folder folder)
+    public FiascoCacheRepository(@NotNull String name, @NotNull Folder folder)
     {
         super(name, folder);
     }

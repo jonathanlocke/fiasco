@@ -17,7 +17,7 @@ import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.RepositoryContentReader;
-import digital.fiasco.runtime.repository.local.cache.CacheRepository;
+import digital.fiasco.runtime.repository.local.cache.FiascoCacheRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
@@ -79,14 +79,13 @@ import static digital.fiasco.runtime.repository.Repository.InstallationResult.IN
  * @author Jonathan Locke
  * @see BaseRepository
  * @see Repository
- * @see CacheRepository
+ * @see FiascoCacheRepository
  */
 @SuppressWarnings({ "unused", "SameParameterValue" })
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
 @Register
-public class LocalRepository extends BaseRepository
+public class FiascoUserRepository extends BaseRepository
 {
-
     /** Separator to use between artifact entries in the artifacts.txt file */
     private final String ARTIFACT_SEPARATOR = "\n========\n";
 
@@ -97,7 +96,7 @@ public class LocalRepository extends BaseRepository
     private final File metadataFile;
 
     /** The append-only download cache repository */
-    private final Lazy<CacheRepository> downloads = lazy(() -> new CacheRepository("download-cache-repository"));
+    private final Lazy<FiascoCacheRepository> cacheRepository = lazy(() -> new FiascoCacheRepository("cache-repository"));
 
     /**
      * Creates a local Fiasco repository in the given folder
@@ -106,7 +105,7 @@ public class LocalRepository extends BaseRepository
      * @param uri The uri of the folder for this repository
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public LocalRepository(@NotNull String name, @NotNull URI uri)
+    public FiascoUserRepository(@NotNull String name, @NotNull URI uri)
     {
         super(name, uri);
         this.rootFolder = folder(uri);
@@ -120,7 +119,7 @@ public class LocalRepository extends BaseRepository
      * @param rootFolder The root folder of the repository
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public LocalRepository(@NotNull String name, @NotNull Folder rootFolder)
+    public FiascoUserRepository(@NotNull String name, @NotNull Folder rootFolder)
     {
         this(name, rootFolder.mkdirs().asUri());
     }
@@ -131,7 +130,7 @@ public class LocalRepository extends BaseRepository
      * @param name The name of the repository
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public LocalRepository(@NotNull String name)
+    public FiascoUserRepository(@NotNull String name)
     {
         this(name, fiascoCacheFolder()
             .folder(name)
@@ -140,7 +139,7 @@ public class LocalRepository extends BaseRepository
     }
 
     @Override
-    public LocalRepository clear()
+    public FiascoUserRepository clear()
     {
         super.clear();
         metadataFile.delete();
@@ -217,9 +216,9 @@ public class LocalRepository extends BaseRepository
             var unresolvedDescriptors = descriptors.without(resolvedDescriptors::contains);
 
             // Install and resolve any unresolved artifacts that are in the downloads cache.
-            if (!(this instanceof CacheRepository))
+            if (!(this instanceof FiascoCacheRepository))
             {
-                var downloadedArtifacts = downloads.get().resolveArtifacts(unresolvedDescriptors, reporter, reader);
+                var downloadedArtifacts = cacheRepository.get().resolveArtifacts(unresolvedDescriptors, reporter, reader);
                 downloadedArtifacts.forEach(this::installArtifact);
                 resolvedArtifacts = resolvedArtifacts.with(downloadedArtifacts);
             }
@@ -306,7 +305,7 @@ public class LocalRepository extends BaseRepository
     }
 
     /**
-     * Saves the given attachment into this repository. {@link LocalRepository} stores the attachment in the file
+     * Saves the given attachment into this repository. {@link FiascoUserRepository} stores the attachment in the file
      * returned by {@link #artifactAttachmentFile(ArtifactAttachment)}.
      */
     protected ArtifactAttachment saveAttachment(ArtifactAttachment attachment)
