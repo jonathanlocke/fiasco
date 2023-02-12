@@ -44,7 +44,7 @@ public class MavenRepositoryListener extends AbstractRepositoryListener implemen
     @Override
     public void artifactDownloading(RepositoryEvent event)
     {
-        information("Downloading " + repositoryAndArtifact(event));
+        announce("Downloading " + repositoryAndArtifact(event));
     }
 
     @Override

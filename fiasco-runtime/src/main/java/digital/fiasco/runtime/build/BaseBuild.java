@@ -45,6 +45,7 @@ import java.util.Set;
 
 import static com.telenav.kivakit.commandline.ArgumentParser.argumentParser;
 import static com.telenav.kivakit.commandline.SwitchParsers.countSwitchParser;
+import static com.telenav.kivakit.core.KivaKit.globalLogger;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.collections.set.ObjectSet.set;
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
@@ -375,6 +376,15 @@ public abstract class BaseBuild extends Application implements Build
             .withParsedCommandLine(commandLine());
     }
 
+    @Override
+    protected void onArguments(String[] arguments)
+    {
+        if (list(arguments).contains("quiet"))
+        {
+            globalLogger().addFilter(entry -> entry.message().isFailure());
+        }
+    }
+
     /**
      * {@inheritDoc}
      */
@@ -400,7 +410,7 @@ public abstract class BaseBuild extends Application implements Build
                     problems = problems.plus(at.messages().problems());
                 }
 
-                information("Build completed with $ problems", problems);
+                announce("Build completed with $ problems", problems);
             }
         }
     }

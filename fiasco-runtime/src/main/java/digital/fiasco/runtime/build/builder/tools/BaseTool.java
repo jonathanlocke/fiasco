@@ -42,6 +42,8 @@ public abstract class BaseTool<TOOL extends BaseTool<TOOL, OUTPUT>, OUTPUT> exte
     public BaseTool(Builder builder)
     {
         this.builder = builder;
+
+        builder.listenTo(this);
     }
 
     /**

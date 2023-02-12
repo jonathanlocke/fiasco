@@ -95,7 +95,7 @@ public class BuildStamper extends BaseTool<BuildStamper, Void> implements
     {
         var name = associatedBuilder().descriptor().artifactName().name().replaceAll("\\.", "-");
 
-        information("Stamping $ as build #$ ($)", name, buildNumber(), buildName());
+        announce("Stamping $ as build #$ ($)", name, buildNumber(), buildName());
 
         var projectProperties = targetClassesFolder()
             .file(name + "-project.properties");

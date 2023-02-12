@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.build.settings;
 
+import com.telenav.kivakit.interfaces.string.Described;
 import digital.fiasco.runtime.build.Build;
 import digital.fiasco.runtime.build.builder.Builder;
 
@@ -11,12 +12,12 @@ import digital.fiasco.runtime.build.builder.Builder;
  * @see Build
  * @see Builder
  */
-public record BuildProfile(String name)
+public record BuildProfile(String name, String description) implements Described
 {
-    public static BuildProfile DEFAULT = profile("Standard");
+    public static BuildProfile DEFAULT = profile("default", "the default profile is always enabled");
 
-    public static BuildProfile profile(String name)
+    public static BuildProfile profile(String name, String description)
     {
-        return new BuildProfile(name);
+        return new BuildProfile(name, description);
     }
 }

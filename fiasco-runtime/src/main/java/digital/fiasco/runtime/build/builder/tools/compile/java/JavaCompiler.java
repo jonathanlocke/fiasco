@@ -134,6 +134,7 @@ public class JavaCompiler extends BaseTool<JavaCompiler, Void>
     public JavaCompiler(Builder builder)
     {
         super(builder);
+
         this.targetFolder = builder.targetFolder();
     }
 
@@ -145,6 +146,7 @@ public class JavaCompiler extends BaseTool<JavaCompiler, Void>
     public JavaCompiler(JavaCompiler that)
     {
         super(that.associatedBuilder());
+
         this.classpath = that.classpath.copy();
         this.debugInformation = that.debugInformation;
         this.enabledCompilerWarnings = that.enabledCompilerWarnings.copy();
@@ -400,7 +402,7 @@ public class JavaCompiler extends BaseTool<JavaCompiler, Void>
     {
         if (sources.isNonEmpty())
         {
-            information("Compiling $ files in $", sources.count(), sources.parent().relativeTo(currentFolder()));
+            announce("Compiling $ files in $", sources.count(), sources.parent().relativeTo(currentFolder()));
             trace("Compiling $", sources.relativeTo(currentFolder()));
 
             var compiler = getSystemJavaCompiler();

@@ -79,7 +79,7 @@ public class Copier extends BaseFileTool<Copier, Void>
         if (files().isNonEmpty())
         {
             var sourceFolder = files().parent();
-            information("Copying $ files from $ to $", files().count(),
+            announce("Copying $ files from $ to $", files().count(),
                 sourceFolder.relativeTo(currentFolder()), to.relativeTo(currentFolder()));
 
             // For each source file in the 'from' folder that matches,

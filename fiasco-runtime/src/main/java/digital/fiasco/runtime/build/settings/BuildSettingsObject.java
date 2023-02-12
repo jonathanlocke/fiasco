@@ -277,10 +277,12 @@ public class BuildSettingsObject extends BaseRepeater implements
     @Override
     public BuildProfile profile(String name)
     {
-        var profile = new BuildProfile(name);
-        if (profiles.contains(profile))
+        for (var at : profiles)
         {
-            return profile;
+            if (at.name().equals(name))
+            {
+                return at;
+            }
         }
         return null;
     }

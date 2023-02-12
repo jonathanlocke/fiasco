@@ -11,10 +11,10 @@ import digital.fiasco.runtime.dependency.Dependency;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.resolver.ArtifactResolutionTracker;
 import digital.fiasco.runtime.dependency.artifact.resolver.ArtifactResolver;
-import digital.fiasco.runtime.dependency.collections.DependencyQueue;
-import digital.fiasco.runtime.dependency.collections.DependencyTree;
 import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.BaseDependencyList;
+import digital.fiasco.runtime.dependency.collections.DependencyQueue;
+import digital.fiasco.runtime.dependency.collections.DependencyTree;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.concurrent.Callable;

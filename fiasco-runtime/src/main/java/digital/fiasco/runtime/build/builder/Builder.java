@@ -1,6 +1,7 @@
 package digital.fiasco.runtime.build.builder;
 
 import com.google.gson.annotations.Expose;
+import com.telenav.kivakit.application.Application;
 import com.telenav.kivakit.commandline.CommandLine;
 import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.set.ObjectSet;
@@ -42,6 +43,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.Function;
 
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
+import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.function.Result.result;
 import static com.telenav.kivakit.core.string.AsciiArt.bannerLine;
@@ -287,7 +289,10 @@ public class Builder extends BaseRepeater implements
      */
     public Builder(Build build)
     {
+        build.listenTo(this);
+
         this.build = build;
+
         librarian = new RepositorySearchLibrarian();
         artifactDependencies = artifacts();
         builderDependencies = builders();
@@ -305,6 +310,9 @@ public class Builder extends BaseRepeater implements
      */
     protected Builder(Builder that)
     {
+        ensure(that.hasListeners());
+        copyListenersFrom(that);
+
         this.build = that.build;
         this.librarian = that.librarian.copy();
         this.artifactDependencies = that.artifactDependencies.copy();
@@ -370,6 +378,7 @@ public class Builder extends BaseRepeater implements
     @Override
     public Builder copy()
     {
+        ensure(hasListeners());
         return new Builder(this);
     }
 
@@ -410,6 +419,14 @@ public class Builder extends BaseRepeater implements
     {
         var description = stringList();
         description.add("""
+            
+            Fiasco is a pure-Java build tool designed to enable complex, flexible builds.
+            The phases below can be enabled by passing the phase name as an argument. If
+            a phase name starts with a minus sign (-), the phase will be disabled. For
+            example, the command line "fiasco assemble -test" will run all of the phases
+            required to assemble the project's packages, but will skip any tests.
+            """);
+        description.add("""
             Commands
                             
               command               description
@@ -422,15 +439,26 @@ public class Builder extends BaseRepeater implements
 
         description.add("""
                     
-            Phases (those preceded by a dash will be disabled)
+            Phases
                         
               phase                 description
-              -----------           ---------------------------------------------
-            """);
+              -----------           ---------------------------------------------""");
 
         for (var phase : phases())
         {
             description.add(String.format("  %-22s%s", phase.name(), phase.description()));
+        }
+
+        description.add("""
+                    
+            Profiles
+                        
+              profile               description
+              -----------           ---------------------------------------------""");
+
+        for (var profile : profiles())
+        {
+            description.add(String.format("  %-22s%s", profile.name(), profile.description()));
         }
 
         return description.titledBox("Fiasco Help");
@@ -1038,6 +1066,10 @@ public class Builder extends BaseRepeater implements
                         {
                             builder = builder.withSettings(it -> it.withDisabled(profile));
                         }
+                    }
+                    else
+                    {
+                        ((Application) build).exit("Unrecognized argument: $", argument);
                     }
                 }
             }
