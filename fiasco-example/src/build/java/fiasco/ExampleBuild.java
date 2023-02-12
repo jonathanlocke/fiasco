@@ -6,7 +6,6 @@ import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.build.metadata.BuildMetadata;
 import digital.fiasco.runtime.build.metadata.Organization;
 
-import static com.telenav.kivakit.filesystem.Folders.currentFolder;
 import static com.telenav.kivakit.resource.Urls.url;
 import static digital.fiasco.runtime.build.metadata.BuildMetadata.buildMetadata;
 import static digital.fiasco.runtime.build.metadata.Contributor.contributor;
@@ -41,9 +40,7 @@ public class ExampleBuild extends BaseBuild implements Libraries
     @Override
     public Builder onConfigureBuild(Builder root)
     {
-        return root
-            .withRootFolder(currentFolder().folder("fiasco-example"))
-            .withDependencies("library:digital.fiasco:fiasco-runtime:0.9.0");
+        return root.withDependencies("library:digital.fiasco:fiasco-runtime:0.9.0");
     }
 
     /**

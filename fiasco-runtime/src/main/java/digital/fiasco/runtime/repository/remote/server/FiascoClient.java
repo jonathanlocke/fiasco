@@ -3,6 +3,7 @@ package digital.fiasco.runtime.repository.remote.server;
 import com.telenav.kivakit.component.BaseComponent;
 import com.telenav.kivakit.core.function.Functions;
 import com.telenav.kivakit.core.progress.ProgressReporter;
+import com.telenav.kivakit.core.version.Version;
 import com.telenav.kivakit.microservice.protocols.rest.http.RestClient;
 import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
 import com.telenav.kivakit.settings.SettingsTrait;
@@ -19,8 +20,8 @@ import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonF
 
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
 import static com.telenav.kivakit.core.progress.ProgressReporter.nullProgressReporter;
+import static com.telenav.kivakit.core.version.Version.version;
 import static com.telenav.kivakit.network.core.LocalHost.localhost;
-import static digital.fiasco.runtime.repository.remote.server.FiascoRestService.fiascoApiVersion;
 
 /**
  * Client that resolves requests to a {@link RemoteRepository} using the Fiasco repository protocol over HTTPS.
@@ -44,7 +45,10 @@ public class FiascoClient extends BaseComponent implements SettingsTrait
         return new FiascoClient();
     }
 
-    public FiascoClient()
+    /** The API version of the {@link FiascoServer} that this client connects to */
+    private final Version API_VERSION = version("0.9.0");
+
+    private FiascoClient()
     {
         register(new FiascoGsonFactory());
     }
@@ -90,7 +94,7 @@ public class FiascoClient extends BaseComponent implements SettingsTrait
         var port = localhost().http(requireSettings(FiascoServerSettings.class).port());
 
         // create a client to talk to it via REST,
-        var restClient = listenTo(new RestClient(new GsonObjectSerializer(), port, fiascoApiVersion()));
+        var restClient = listenTo(new RestClient(new GsonObjectSerializer(), port, API_VERSION));
 
         // then issue a ResolveArtifactsRequest and read the response. The reader callback will be called with the
         // input that trails the JSON header, in this case the artifact content).

@@ -6,17 +6,17 @@ import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.repository.BaseRepository;
-import digital.fiasco.runtime.repository.RepositoryContentReader;
 import digital.fiasco.runtime.repository.Repository;
+import digital.fiasco.runtime.repository.RepositoryContentReader;
 import digital.fiasco.runtime.repository.local.cache.CacheRepository;
 import digital.fiasco.runtime.repository.remote.server.FiascoClient;
 import digital.fiasco.runtime.repository.remote.server.FiascoServer;
 
 import java.net.URI;
-import java.util.List;
 
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
+import static digital.fiasco.runtime.repository.remote.server.FiascoClient.fiascoClient;
 
 /**
  * A remote Fiasco repository accessed with a {@link FiascoClient}. Artifacts in this repository are resolved using a
@@ -33,7 +33,13 @@ import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
  * <p><b>Retrieving Artifacts and Content</b></p>
  *
  * <ul>
- *     <li>{@link Repository#resolveArtifacts(List, ProgressReporter, RepositoryContentReader)} - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments</li>
+ *     <li>{@link Repository#resolveArtifacts(ArtifactDescriptorList)}
+ *         - Resolves the given descriptors to a list of {@link Artifact}s
+ *     </li>
+ *     <li>{@link Repository#resolveArtifacts(ArtifactDescriptorList, ProgressReporter, RepositoryContentReader)}
+ *         - Resolves the given descriptors to a list of {@link Artifact}s, complete with {@link ArtifactContent} attachments,
+ *           as read by the given {@link RepositoryContentReader}.
+ *     </li>
  * </ul>
  *
  * <p><b>Installing Artifacts</b></p>
@@ -41,6 +47,12 @@ import static com.telenav.kivakit.core.ensure.Ensure.unsupported;
  * <ul>
  *     <li>{@link Repository#installArtifact(Artifact)} - Installs the given artifact</li>
  * </ul>
+ *
+ * <p><b>Clearing Artifacts</b></p>
+ *
+ * <p>
+ * The {@link #clear()} function is not supported for security reasons
+ * </p>
  *
  * @author Jonathan Locke
  * @see BaseRepository
@@ -76,7 +88,7 @@ public class RemoteRepository extends BaseRepository
     @Override
     public InstallationResult installArtifact(Artifact<?> artifact)
     {
-        return new FiascoClient().installArtifact(artifact);
+        return fiascoClient().installArtifact(artifact);
     }
 
     @Override
@@ -94,7 +106,7 @@ public class RemoteRepository extends BaseRepository
                                          RepositoryContentReader reader)
     {
         // Return resolved artifacts for the given descriptors
-        return new FiascoClient().resolveArtifacts(descriptors, reporter, reader);
+        return fiascoClient().resolveArtifacts(descriptors, reporter, reader);
     }
 
     @Override

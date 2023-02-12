@@ -7,8 +7,6 @@ import digital.fiasco.runtime.repository.remote.server.api.InstallArtifactReques
 import digital.fiasco.runtime.repository.remote.server.api.ResolveArtifactsRequest;
 import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;
 
-import static digital.fiasco.runtime.repository.remote.server.FiascoRestService.fiascoApiVersion;
-
 /**
  * A microservice that responds to JSON-encoded requests:
  *
@@ -35,7 +33,7 @@ public class FiascoServer extends Microservice<Void>
         return new MicroserviceMetadata()
             .withName("Fiasco Server")
             .withDescription("Fiasco Artifact Server")
-            .withVersion(fiascoApiVersion());
+            .withVersion(restService().apiVersion());
     }
 
     @Override

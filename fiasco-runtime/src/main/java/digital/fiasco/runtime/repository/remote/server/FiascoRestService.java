@@ -15,20 +15,21 @@ import static com.telenav.kivakit.network.http.HttpMethod.POST;
  */
 public class FiascoRestService extends RestService
 {
-    public static Version fiascoApiVersion()
-    {
-        return version("0.9.0");
-    }
-
     public FiascoRestService(FiascoServer server)
     {
         super(server);
     }
 
     @Override
+    public Version apiVersion()
+    {
+        return version("0.9.0");
+    }
+
+    @Override
     public void onInitialize()
     {
-        mount(fiascoApiVersion(), "resolve-artifacts", POST, ResolveArtifactsRequest.class);
-        mount(fiascoApiVersion(), "install-artifact", POST, InstallArtifactRequest.class);
+        mount(apiVersion(), "resolve-artifacts", POST, ResolveArtifactsRequest.class);
+        mount(apiVersion(), "install-artifact", POST, InstallArtifactRequest.class);
     }
 }
