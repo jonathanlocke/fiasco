@@ -18,11 +18,11 @@
 
     <groupId>digital.fiasco</groupId>
     <artifactId>fiasco-example</artifactId>
-    <version>0.9.0</version>
+    <version>0.1.0</version>
 
     <properties>
 
-        <fiasco.version>0.9.0</fiasco.version>
+        <fiasco.version>0.1.0</fiasco.version>
 
         <maven.compiler.plugin.version>3.10.1</maven.compiler.plugin.version>
         <maven.resources.plugin.version>3.3.0</maven.resources.plugin.version>

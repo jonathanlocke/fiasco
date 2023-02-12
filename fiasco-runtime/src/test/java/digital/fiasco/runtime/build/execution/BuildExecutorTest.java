@@ -39,7 +39,7 @@ public class BuildExecutorTest extends FiascoTest
             @Override
             public BuildMetadata onMetadata()
             {
-                return buildMetadata().withDescriptor("library:digital.fiasco:fiasco-example:0.9.0");
+                return buildMetadata().withDescriptor("library:digital.fiasco:fiasco-example:0.1.0");
             }
 
             @Override

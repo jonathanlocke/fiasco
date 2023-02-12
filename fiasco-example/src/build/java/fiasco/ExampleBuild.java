@@ -40,7 +40,7 @@ public class ExampleBuild extends BaseBuild implements Libraries
     @Override
     public Builder onConfigureBuild(Builder root)
     {
-        return root.withDependencies("library:digital.fiasco:fiasco-runtime:0.9.0");
+        return root.withDependencies("library:digital.fiasco:fiasco-runtime:0.1.0");
     }
 
     /**

@@ -10,7 +10,7 @@ mvn -quiet clean compile || exit 1
 # Run ExampleBuild using the runtime jar downloaded by Maven
 #
 
-FIASCO_RUNTIME="$HOME"/.m2/repository/digital/fiasco/fiasco-runtime/0.9.0/fiasco-runtime-0.9.0.jar
+FIASCO_RUNTIME="$HOME"/.m2/repository/digital/fiasco/fiasco-runtime/0.1.0/fiasco-runtime-0.1.0.jar
 
 java -classpath ./target/classes:"$FIASCO_RUNTIME" fiasco.FiascoBuild "$@" || exit 1
 

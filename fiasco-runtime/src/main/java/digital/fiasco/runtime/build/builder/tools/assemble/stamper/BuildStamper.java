@@ -38,7 +38,7 @@ import static com.telenav.kivakit.core.time.Time.now;
  *
  * <pre>
  * project-name=fiasco-runtime
- * project-version=0.9.0
+ * project-version=0.1.0
  * project-group-id=digital.fiasco
  * project-artifact-id=fiasco-runtime</pre>
  *

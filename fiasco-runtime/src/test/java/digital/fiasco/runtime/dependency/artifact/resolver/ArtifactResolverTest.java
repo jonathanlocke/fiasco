@@ -38,7 +38,7 @@ public class ArtifactResolverTest extends FiascoTest
             @Override
             public BuildMetadata onMetadata()
             {
-                return buildMetadata().withDescriptor("library:digital.fiasco:fiasco-test:0.9.0");
+                return buildMetadata().withDescriptor("library:digital.fiasco:fiasco-test:0.1.0");
             }
 
             @Override

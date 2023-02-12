@@ -46,7 +46,7 @@ public class FiascoClient extends BaseComponent implements SettingsTrait
     }
 
     /** The API version of the {@link FiascoServer} that this client connects to */
-    private final Version API_VERSION = version("0.9.0");
+    private final Version API_VERSION = version("0.1.0");
 
     private FiascoClient()
     {
