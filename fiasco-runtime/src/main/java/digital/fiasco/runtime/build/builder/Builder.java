@@ -425,6 +425,8 @@ public class Builder extends BaseRepeater implements
             a phase name starts with a minus sign (-), the phase will be disabled. For
             example, the command line "fiasco assemble -test" will run all of the phases
             required to assemble the project's packages, but will skip any tests.
+
+            Fiasco is named after the science fiction novel Fiasko, by Stanislaw Lem.
             """);
         description.add("""
             Commands
