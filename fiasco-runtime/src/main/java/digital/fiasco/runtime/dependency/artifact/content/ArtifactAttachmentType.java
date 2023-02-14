@@ -47,4 +47,9 @@ public enum ArtifactAttachmentType
     {
         return fileSuffix;
     }
+
+    public boolean isJar()
+    {
+        return fileSuffix.endsWith(".jar");
+    }
 }

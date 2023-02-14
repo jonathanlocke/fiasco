@@ -2,7 +2,7 @@ package digital.fiasco.runtime.repository.remote.server;
 
 import com.telenav.kivakit.microservice.Microservice;
 import com.telenav.kivakit.microservice.MicroserviceMetadata;
-import digital.fiasco.runtime.repository.local.FiascoUserRepository;
+import digital.fiasco.runtime.repository.local.user.FiascoUserRepository;
 import digital.fiasco.runtime.repository.remote.server.api.InstallArtifactRequest;
 import digital.fiasco.runtime.repository.remote.server.api.ResolveArtifactsRequest;
 import digital.fiasco.runtime.repository.remote.server.serialization.FiascoGsonFactory;

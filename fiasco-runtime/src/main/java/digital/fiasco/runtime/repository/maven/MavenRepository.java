@@ -47,6 +47,7 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.POM_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactContent.content;
+import static digital.fiasco.runtime.dependency.artifact.content.jar.ArtifactJarContent.jarContent;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
 import static digital.fiasco.runtime.dependency.artifact.types.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
@@ -273,11 +274,9 @@ public class MavenRepository extends BaseRepository implements TryCatchTrait
         var resource = mavenResource(rootFolder, attachment, null);
         if (resource.exists())
         {
-            var content = content()
-                .withName(resource.fileName().name())
-                .withResource(resource)
-                .withLastModified(resource.lastModified())
-                .withSize(resource.sizeInBytes());
+            var content = resource.endsWith(".jar")
+                ? jarContent(resource)
+                : content(resource);
 
             var type = attachment.attachmentType();
             var asc = tryCatch(() -> mavenResource(rootFolder, attachment.withType(type), ASC).reader().readText());
@@ -288,6 +287,7 @@ public class MavenRepository extends BaseRepository implements TryCatchTrait
             {
                 content = content.withSignatures(new ArtifactContentSignatures(asc, md5, sha1));
             }
+
             return content;
         }
         return illegalState("Content does not exist: $", resource);

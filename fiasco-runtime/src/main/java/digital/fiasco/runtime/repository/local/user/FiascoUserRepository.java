@@ -1,4 +1,4 @@
-package digital.fiasco.runtime.repository.local;
+package digital.fiasco.runtime.repository.local.user;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;

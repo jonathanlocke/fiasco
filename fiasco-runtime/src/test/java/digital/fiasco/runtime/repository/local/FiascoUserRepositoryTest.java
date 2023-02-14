@@ -5,6 +5,7 @@ import digital.fiasco.runtime.FiascoTest;
 import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
 import digital.fiasco.runtime.repository.Repository;
+import digital.fiasco.runtime.repository.local.user.FiascoUserRepository;
 import org.jetbrains.annotations.NotNull;
 import org.junit.Test;
 

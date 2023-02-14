@@ -9,11 +9,12 @@ import com.telenav.kivakit.resource.resources.ResourceSection;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
+import digital.fiasco.runtime.dependency.artifact.content.jar.ArtifactJarContent;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.repository.Repository;
 import digital.fiasco.runtime.repository.RepositoryContentReader;
-import digital.fiasco.runtime.repository.local.FiascoUserRepository;
+import digital.fiasco.runtime.repository.local.user.FiascoUserRepository;
 import org.jetbrains.annotations.NotNull;
 
 import java.net.URI;
@@ -31,11 +32,11 @@ import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
  * <p><b>Uses</b></p>
  *
  * <p>
- * An instance of {@link FiascoCacheRepository} is used as an artifact cache to avoid unnecessary downloads when a user wipes
- * out their {@link FiascoUserRepository}, causing it to repopulate. Instead of repopulating from Maven Central or another
- * remote repository, the artifacts in this repository can be used since artifacts and their metadata are never altered,
- * only appended to their respective <i>artifacts.txt</i> and <i>artifact-content.binary</i>files. Because remote
- * artifacts are guaranteed by Maven Central (and other remote repositories) to be immutable, it should rarely be
+ * An instance of {@link FiascoCacheRepository} is used as an artifact cache to avoid unnecessary downloads when a user
+ * wipes out their {@link FiascoUserRepository}, causing it to repopulate. Instead of repopulating from Maven Central or
+ * another remote repository, the artifacts in this repository can be used since artifacts and their metadata are never
+ * altered, only appended to their respective <i>artifacts.txt</i> and <i>artifact-content.binary</i>files. Because
+ * remote artifacts are guaranteed by Maven Central (and other remote repositories) to be immutable, it should rarely be
  * necessary to remove a download cache repository.
  * </p>
  *
@@ -47,9 +48,10 @@ import static digital.fiasco.runtime.FiascoRuntime.fiascoCacheFolder;
  * <p><b>Content Storage</b></p>
  *
  * <p>
- * This class inherits metadata storage from {@link FiascoUserRepository}, but instead of storing content in a folder tree,
- * {@link FiascoCacheRepository} stores content end-to-end in a single, randomly-accessed binary file to increase performance.
- * The metadata for an artifact includes the offset and size of each content attachment in the binary content file.
+ * This class inherits metadata storage from {@link FiascoUserRepository}, but instead of storing content in a folder
+ * tree, {@link FiascoCacheRepository} stores content end-to-end in a single, randomly-accessed binary file to increase
+ * performance. The metadata for an artifact includes the offset and size of each content attachment in the binary
+ * content file.
  * </p>
  *
  * <p><b>Properties</b></p>
@@ -161,12 +163,21 @@ public class FiascoCacheRepository extends FiascoUserRepository
             // Get the start of this content in the attachments file,
             var start = artifactContentFile.sizeInBytes().asLong();
 
-            // get the size of the content and its time of last modification
+            // get the size of the content and its time of last modification,
             var size = content.resource().sizeInBytes();
             var lastModified = content.lastModified();
 
-            // append the content to the attachments file,
-            content.resource().copyTo(artifactContentFile, APPEND);
+            // and if the content is a JAR file,
+            if (content instanceof ArtifactJarContent jarContent)
+            {
+                // explode the JAR entries and append them to the artifact content file,
+                jarContent.appendEntriesTo(artifactContentFile);
+            }
+            else
+            {
+                // otehrwise, append the content as-is to the content file,
+                content.resource().copyTo(artifactContentFile, APPEND);
+            }
 
             // and return the artifact with its new content information.
             return attachment.withContent(content

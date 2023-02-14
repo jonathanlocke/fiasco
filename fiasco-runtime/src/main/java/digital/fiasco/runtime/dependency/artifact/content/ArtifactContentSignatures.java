@@ -5,14 +5,15 @@ import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
-import com.telenav.kivakit.microservice.internal.yaml.Yaml;
+import com.telenav.kivakit.data.formats.yaml.model.YamlBlock;
 
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTATION_NOT_NEEDED;
 import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMENTED;
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_NOT_NEEDED;
-import static com.telenav.kivakit.microservice.internal.yaml.Yaml.yaml;
+import static com.telenav.kivakit.data.formats.yaml.model.YamlBlock.block;
+import static com.telenav.kivakit.data.formats.yaml.model.YamlScalar.scalar;
 
 /**
  * Holds ASC, MD5 and SHA-1 hashes for a stored artifact.
@@ -45,12 +46,12 @@ public record ArtifactContentSignatures
         return new ObjectFormatter(this).toString();
     }
 
-    public Yaml toYaml()
+    public YamlBlock toYaml()
     {
-        return yaml()
-            .withScalar("asc", asc)
-            .withScalar("md5", md5)
-            .withScalar("sha1", sha1);
+        return block("signatures")
+            .with(scalar("asc", asc))
+            .with(scalar("md5", md5))
+            .with(scalar("sha1", sha1));
     }
 
     @MethodQuality(documentation = DOCUMENTATION_NOT_NEEDED, testing = TESTED)

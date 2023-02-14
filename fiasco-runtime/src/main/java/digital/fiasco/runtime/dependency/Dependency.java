@@ -1,8 +1,8 @@
 package digital.fiasco.runtime.dependency;
 
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
+import com.telenav.kivakit.data.formats.yaml.model.YamlNode;
 import com.telenav.kivakit.interfaces.naming.Named;
-import com.telenav.kivakit.microservice.internal.yaml.Yaml;
 import digital.fiasco.runtime.build.builder.Builder;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
@@ -158,5 +158,5 @@ public interface Dependency extends
      *
      * @return The YAML text
      */
-    Yaml toYaml();
+    YamlNode toYaml();
 }

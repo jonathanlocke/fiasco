@@ -10,10 +10,10 @@ import com.telenav.kivakit.core.language.trait.TryCatchTrait;
 import com.telenav.kivakit.core.messaging.repeaters.BaseRepeater;
 import com.telenav.kivakit.core.value.count.Count;
 import com.telenav.kivakit.core.version.Version;
+import com.telenav.kivakit.data.formats.yaml.model.YamlNode;
 import com.telenav.kivakit.filesystem.Folder;
 import com.telenav.kivakit.interfaces.object.Copyable;
 import com.telenav.kivakit.interfaces.string.Described;
-import com.telenav.kivakit.microservice.internal.yaml.Yaml;
 import com.telenav.kivakit.resource.resources.StringOutputResource;
 import com.telenav.kivakit.resource.serialization.SerializableObject;
 import com.telenav.kivakit.serialization.gson.GsonObjectSerializer;
@@ -704,7 +704,7 @@ public class Builder extends BaseRepeater implements
     }
 
     @Override
-    public Yaml toYaml()
+    public YamlNode toYaml()
     {
         return unsupported();
     }

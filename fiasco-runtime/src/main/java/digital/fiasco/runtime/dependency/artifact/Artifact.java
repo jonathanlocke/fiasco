@@ -6,7 +6,7 @@ import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.string.AsString;
 import com.telenav.kivakit.core.version.Version;
-import com.telenav.kivakit.microservice.internal.yaml.Yaml;
+import com.telenav.kivakit.data.formats.yaml.model.YamlNode;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.StringOutputResource;
 import com.telenav.kivakit.resource.resources.StringResource;
@@ -30,7 +30,9 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
-import static com.telenav.kivakit.microservice.internal.yaml.Yaml.yaml;
+import static com.telenav.kivakit.data.formats.yaml.model.YamlArray.array;
+import static com.telenav.kivakit.data.formats.yaml.model.YamlBlock.block;
+import static com.telenav.kivakit.data.formats.yaml.model.YamlScalar.scalar;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
@@ -354,31 +356,32 @@ public interface Artifact<A extends Artifact<A>> extends
     }
 
     @Override
-    default Yaml toYaml()
+    default YamlNode toYaml()
     {
-        var dependencies = yaml();
+        var dependencies = array("dependencies");
         for (var it : dependencies())
         {
-            dependencies = dependencies.with(it.descriptor().name());
+            dependencies = dependencies.with(scalar(it.descriptor().name()));
         }
 
-        var attachments = yaml();
+        var attachments = array("attachments");
         for (var it : attachments())
         {
-            attachments = attachments.withBlock(it.attachmentType().name(), it.toYaml());
+            attachments = attachments.with(block(it.attachmentType().name())
+                .with(it.toYaml()));
         }
 
-        var yaml = yaml()
-            .withScalar("descriptor", descriptor().name());
+        var yaml = block()
+            .with(scalar("descriptor", descriptor().name()));
 
-        if (!attachments.toString().isBlank())
+        if (!attachments.isEmpty())
         {
-            yaml = yaml.withBlock("attachments", attachments);
+            yaml = yaml.with(attachments);
         }
 
-        if (!dependencies.toString().isBlank())
+        if (!dependencies.isEmpty())
         {
-            yaml = yaml.withBlock("dependencies", dependencies);
+            yaml = yaml.with(dependencies);
         }
 
         return yaml;

@@ -1,7 +1,7 @@
 package digital.fiasco.runtime.repository.remote.server.serialization;
 
 import digital.fiasco.runtime.FiascoTest;
-import digital.fiasco.runtime.repository.local.FiascoUserRepository;
+import digital.fiasco.runtime.repository.local.user.FiascoUserRepository;
 import digital.fiasco.runtime.repository.local.cache.FiascoCacheRepository;
 import org.junit.Test;
 
