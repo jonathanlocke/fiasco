@@ -4,6 +4,7 @@ import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
+import com.telenav.kivakit.core.time.LocalTime;
 import com.telenav.kivakit.core.time.Time;
 import com.telenav.kivakit.core.value.count.Bytes;
 import com.telenav.kivakit.data.formats.yaml.model.YamlBlock;
@@ -18,6 +19,8 @@ import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.language.Objects.areEqualPairs;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
+import static com.telenav.kivakit.core.time.Duration.ONE_SECOND;
+import static com.telenav.kivakit.core.time.KivaKitTimeFormats.KIVAKIT_DATE_TIME_SECONDS;
 import static com.telenav.kivakit.core.time.LocalTime.localTime;
 import static com.telenav.kivakit.core.value.count.Bytes.bytes;
 import static com.telenav.kivakit.data.formats.yaml.model.YamlBlock.yamlBlock;
@@ -72,7 +75,7 @@ public class ArtifactContent implements Copyable<ArtifactContent>
 
     @FormatProperty
     @Expose
-    private Time lastModified;
+    private LocalTime lastModified;
 
     @FormatProperty
     @Expose
@@ -82,10 +85,13 @@ public class ArtifactContent implements Copyable<ArtifactContent>
     {
         name = block.scalar("name").string();
         size = bytes(block.scalar("size").number().intValue());
-        lastModified = localTime(block.scalar("lastModified").string());
+        lastModified = localTime(KIVAKIT_DATE_TIME_SECONDS, block.scalar("lastModified").string()).roundDown(ONE_SECOND);
         offset = block.scalar("offset").number().longValue();
         resourceIdentifier = new ResourceIdentifier(block.scalar("resourceIdentifier").string());
-        signatures = ArtifactContentSignatures.signatures(yamlBlock("signatures"));
+        if (block.has("signatures"))
+        {
+            signatures = ArtifactContentSignatures.signatures(block.block("signatures"));
+        }
     }
 
     protected ArtifactContent(ArtifactContent that)
@@ -94,7 +100,7 @@ public class ArtifactContent implements Copyable<ArtifactContent>
         this.signatures = that.signatures;
         this.resourceIdentifier = that.resourceIdentifier;
         this.offset = that.offset;
-        this.lastModified = that.lastModified;
+        this.lastModified = that.lastModified.roundDown(ONE_SECOND);
         this.size = that.size;
     }
 
@@ -111,7 +117,7 @@ public class ArtifactContent implements Copyable<ArtifactContent>
         ArtifactContentSignatures signatures,
         ResourceIdentifier resourceIdentifier,
         long offset,
-        Time lastModified,
+        LocalTime lastModified,
         Bytes size
     )
     {
@@ -119,7 +125,7 @@ public class ArtifactContent implements Copyable<ArtifactContent>
         this.signatures = signatures;
         this.resourceIdentifier = resourceIdentifier;
         this.offset = offset;
-        this.lastModified = lastModified;
+        this.lastModified = lastModified.roundDown(ONE_SECOND);
         this.size = size;
     }
 
@@ -203,16 +209,12 @@ public class ArtifactContent implements Copyable<ArtifactContent>
             .with(yamlScalar("name", name()))
             .with(yamlScalar("offset", offset()))
             .with(yamlScalar("size", size.asBytes()))
-            .with(yamlScalar("lastModified", lastModified.asLocalTime().toString()));
+            .with(yamlScalar("lastModified", lastModified.asLocalTime().roundDown(ONE_SECOND).asDateTimeSecondsString()))
+            .with(yamlScalar("resourceIdentifier", resourceIdentifier.identifier()));
 
         if (signatures != null)
         {
             yaml = yaml.with(signatures.toYaml());
-        }
-
-        if (offset() < 0)
-        {
-            yaml = yaml.with(yamlScalar("resourceIdentifier", resourceIdentifier.identifier()));
         }
 
         return yaml;
@@ -224,9 +226,9 @@ public class ArtifactContent implements Copyable<ArtifactContent>
      * @param lastModified The new last modified time
      * @return The new artifact content
      */
-    public ArtifactContent withLastModified(Time lastModified)
+    public ArtifactContent withLastModified(LocalTime lastModified)
     {
-        return mutated(it -> it.lastModified = lastModified);
+        return mutated(it -> it.lastModified = lastModified.roundDown(ONE_SECOND));
     }
 
     /**
@@ -268,7 +270,7 @@ public class ArtifactContent implements Copyable<ArtifactContent>
             .withSize(resource.sizeInBytes())
             .withOffset(0)
             .withName(resource.fileName().name())
-            .withLastModified(resource.lastModified());
+            .withLastModified(resource.lastModified().asLocalTime());
     }
 
     /**

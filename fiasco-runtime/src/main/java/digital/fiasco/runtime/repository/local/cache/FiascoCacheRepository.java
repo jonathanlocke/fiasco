@@ -182,7 +182,7 @@ public class FiascoCacheRepository extends FiascoUserRepository
             // and return the artifact with its new content information.
             return attachment.withContent(content
                 .withOffset(start)
-                .withLastModified(lastModified)
+                .withLastModified(lastModified.asLocalTime())
                 .withSize(size));
         }
         catch (Exception e)

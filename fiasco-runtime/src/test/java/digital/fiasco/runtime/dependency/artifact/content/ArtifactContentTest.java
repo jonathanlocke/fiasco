@@ -1,5 +1,6 @@
 package digital.fiasco.runtime.dependency.artifact.content;
 
+import com.telenav.kivakit.core.time.LocalTime;
 import com.telenav.kivakit.core.time.Time;
 import digital.fiasco.runtime.FiascoTest;
 import org.junit.Test;
@@ -39,7 +40,7 @@ public class ArtifactContentTest extends FiascoTest
             ensureEqual(content.size(), bytes(6));
         }
         {
-            var now = Time.now();
+            var now = LocalTime.now();
             content = content.withLastModified(now);
             ensureEqual(content.lastModified(), now);
         }

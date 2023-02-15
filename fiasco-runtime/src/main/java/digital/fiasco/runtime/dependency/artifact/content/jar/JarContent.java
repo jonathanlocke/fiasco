@@ -1,7 +1,7 @@
 package digital.fiasco.runtime.dependency.artifact.content.jar;
 
 import com.google.gson.annotations.Expose;
-import com.telenav.kivakit.core.time.Time;
+import com.telenav.kivakit.core.time.LocalTime;
 import com.telenav.kivakit.core.value.count.Bytes;
 import com.telenav.kivakit.data.formats.yaml.model.YamlBlock;
 import com.telenav.kivakit.filesystem.File;
@@ -11,6 +11,7 @@ import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContentSignatures;
 
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
+import static com.telenav.kivakit.core.language.Hash.hashMany;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
 import static com.telenav.kivakit.resource.WriteMode.APPEND;
 import static com.telenav.kivakit.resource.compression.archive.ZipArchive.AccessMode.READ;
@@ -67,7 +68,7 @@ public class JarContent extends ArtifactContent
     protected JarContent(ZipArchive archive)
     {
         super(archive.file().fileName().name(), null, archive.file().identifier(), -1,
-            archive.resource().lastModified(), archive.resource().sizeInBytes());
+            archive.resource().lastModified().asLocalTime(), archive.resource().sizeInBytes());
 
         this.archive = archive;
 
@@ -108,13 +109,17 @@ public class JarContent extends ArtifactContent
     @Override
     public boolean equals(Object object)
     {
-        return super.equals(object);
+        if (object instanceof JarContent that)
+        {
+            return super.equals(that) && this.index.equals(that.index);
+        }
+        return false;
     }
 
     @Override
     public int hashCode()
     {
-        return super.hashCode();
+        return hashMany(super.hashCode(), index.hashCode());
     }
 
     /**
@@ -135,7 +140,7 @@ public class JarContent extends ArtifactContent
     }
 
     @Override
-    public JarContent withLastModified(Time lastModified)
+    public JarContent withLastModified(LocalTime lastModified)
     {
         return (JarContent) super.withLastModified(lastModified);
     }

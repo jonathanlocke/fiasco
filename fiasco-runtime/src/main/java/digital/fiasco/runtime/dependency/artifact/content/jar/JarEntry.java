@@ -3,6 +3,7 @@ package digital.fiasco.runtime.dependency.artifact.content.jar;
 import com.google.gson.annotations.Expose;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
+import com.telenav.kivakit.core.time.LocalTime;
 import com.telenav.kivakit.core.time.Time;
 import com.telenav.kivakit.core.value.count.Bytes;
 import com.telenav.kivakit.data.formats.yaml.model.YamlBlock;
@@ -51,7 +52,7 @@ public class JarEntry implements Copyable<JarEntry>
         return jarEntry()
             .withPath(entry.jarPath().asString())
             .withSize(entry.sizeInBytes())
-            .withLastModified(entry.lastModified());
+            .withLastModified(entry.lastModified().asLocalTime());
     }
 
     public static JarEntry jarEntry(YamlBlock block)
@@ -72,7 +73,7 @@ public class JarEntry implements Copyable<JarEntry>
     /** The time of last modification of the entry */
     @Expose
     @FormatProperty
-    private Time lastModified;
+    private LocalTime lastModified;
 
     /** The offset of this JAR entry */
     @Expose
@@ -166,7 +167,7 @@ public class JarEntry implements Copyable<JarEntry>
             .with(yamlScalar("offset", offset));
     }
 
-    public JarEntry withLastModified(Time time)
+    public JarEntry withLastModified(LocalTime time)
     {
         return mutated(it -> it.lastModified = time);
     }
