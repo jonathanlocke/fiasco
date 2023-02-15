@@ -10,6 +10,7 @@ package digital.fiasco.runtime.dependency.artifact.types;
 import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.registry.RegistryTrait;
+import com.telenav.kivakit.data.formats.yaml.model.YamlBlock;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
 
@@ -47,7 +48,7 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public static Asset asset(String descriptor)
     {
-        return asset(ArtifactDescriptor.descriptor(ensureStartsWith(descriptor, "asset:")));
+        return asset(ArtifactDescriptor.artifactDescriptor(ensureStartsWith(descriptor, "asset:")));
     }
 
     /**
@@ -80,14 +81,19 @@ public class Asset extends BaseArtifact<Asset> implements RegistryTrait
             documentation = DOCUMENTATION_NOT_NEEDED,
             testing = TESTED
         )
-    public Asset(ArtifactDescriptor descriptor)
+    protected Asset(ArtifactDescriptor descriptor)
     {
         super(descriptor);
     }
 
-    public Asset()
+    protected Asset()
     {
         super((ArtifactDescriptor) null);
+    }
+
+    protected Asset(YamlBlock block)
+    {
+        super(block);
     }
 
     @MethodQuality

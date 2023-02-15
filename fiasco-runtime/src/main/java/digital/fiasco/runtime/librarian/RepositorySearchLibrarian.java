@@ -204,7 +204,7 @@ public class RepositorySearchLibrarian extends BaseComponent implements
     {
         ensure(descriptor.version() == null);
 
-        return mutatedCopy(it -> it.pinnedVersions.put(descriptor, version));
+        return mutated(it -> it.pinnedVersions.put(descriptor, version));
     }
 
     /**
@@ -214,7 +214,7 @@ public class RepositorySearchLibrarian extends BaseComponent implements
      */
     public Librarian withRepository(Repository repository)
     {
-        return mutatedCopy(it -> it.repositories.add(repository));
+        return mutated(it -> it.repositories.add(repository));
     }
 
     /**

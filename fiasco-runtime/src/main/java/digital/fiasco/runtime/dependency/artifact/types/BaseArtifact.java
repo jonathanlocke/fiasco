@@ -8,14 +8,15 @@ import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.core.version.Version;
+import com.telenav.kivakit.data.formats.yaml.model.YamlBlock;
 import com.telenav.kivakit.interfaces.object.Copyable;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor;
-import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
+import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName;
 import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.dependency.collections.BuilderList;
 import digital.fiasco.runtime.repository.Repository;
@@ -33,7 +34,9 @@ import static com.telenav.kivakit.core.collections.list.StringList.split;
 import static com.telenav.kivakit.core.collections.list.StringList.stringList;
 import static com.telenav.kivakit.core.ensure.Ensure.illegalState;
 import static com.telenav.kivakit.core.string.Formatter.format;
+import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.artifactDescriptor;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
 import static digital.fiasco.runtime.dependency.collections.ArtifactList.artifacts;
 
@@ -154,6 +157,24 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements
         this.typeToAttachment = that.typeToAttachment().copy();
     }
 
+    protected BaseArtifact(YamlBlock block)
+    {
+        dependencies = artifacts();
+        for (var at : block.array("dependencies").elements())
+        {
+            dependencies = dependencies.with(artifactDescriptor(at.asScalar().name()).asArtifact());
+        }
+
+        typeToAttachment = new ObjectMap<>();
+        for (var at : block.array("attachments").elements())
+        {
+            var attachment = attachment(at.asBlock());
+            typeToAttachment.put(attachment.attachmentType(), attachment);
+        }
+
+        descriptor = artifactDescriptor(block.scalar("descriptor").string());
+    }
+
     /**
      * Returns the artifact name for this artifact
      *
@@ -246,7 +267,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements
     public ArtifactList dependenciesMatching(String pattern)
     {
         var matches = artifacts();
-        var matcher = ArtifactDescriptor.descriptor(pattern);
+        var matcher = artifactDescriptor(pattern);
         for (var at : dependencies)
         {
             if (matcher.matches(at.descriptor()))
@@ -309,7 +330,7 @@ public abstract class BaseArtifact<A extends BaseArtifact<A>> implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public A excluding(ArtifactDescriptorList exclusions)
     {
-        return mutatedCopy(it -> it.exclusions = it.exclusions.with(exclusions));
+        return mutated(it -> it.exclusions = it.exclusions.with(exclusions));
     }
 
     public ArtifactDescriptorList exclusions()

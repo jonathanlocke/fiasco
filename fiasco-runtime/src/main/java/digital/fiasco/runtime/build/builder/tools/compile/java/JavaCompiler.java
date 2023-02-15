@@ -291,7 +291,7 @@ public class JavaCompiler extends BaseTool<JavaCompiler, Void>
      */
     public JavaCompiler withDebugInformation(DebugInformation... information)
     {
-        return mutatedCopy(it -> it.debugInformation = set(information));
+        return mutated(it -> it.debugInformation = set(information));
     }
 
     /**
@@ -302,7 +302,7 @@ public class JavaCompiler extends BaseTool<JavaCompiler, Void>
      */
     public JavaCompiler withReleaseVersion(Version version)
     {
-        return mutatedCopy(it -> it.releaseVersion = version);
+        return mutated(it -> it.releaseVersion = version);
     }
 
     /**
@@ -313,7 +313,7 @@ public class JavaCompiler extends BaseTool<JavaCompiler, Void>
      */
     public JavaCompiler withSourceEncoding(Charset sourceEncoding)
     {
-        return mutatedCopy(it -> it.sourceEncoding = sourceEncoding);
+        return mutated(it -> it.sourceEncoding = sourceEncoding);
     }
 
     /**
@@ -324,7 +324,7 @@ public class JavaCompiler extends BaseTool<JavaCompiler, Void>
      */
     public JavaCompiler withSourceLocale(Locale sourceLocale)
     {
-        return mutatedCopy(it -> it.sourceLocale = sourceLocale);
+        return mutated(it -> it.sourceLocale = sourceLocale);
     }
 
     /**
@@ -335,7 +335,7 @@ public class JavaCompiler extends BaseTool<JavaCompiler, Void>
      */
     public JavaCompiler withSourceVersion(Version version)
     {
-        return mutatedCopy(it -> it.sourceVersion = version);
+        return mutated(it -> it.sourceVersion = version);
     }
 
     /**
@@ -346,7 +346,7 @@ public class JavaCompiler extends BaseTool<JavaCompiler, Void>
      */
     public JavaCompiler withSources(FileList sources)
     {
-        return mutatedCopy(it -> it.sources = sources.copy());
+        return mutated(it -> it.sources = sources.copy());
     }
 
     /**
@@ -357,7 +357,7 @@ public class JavaCompiler extends BaseTool<JavaCompiler, Void>
      */
     public JavaCompiler withTargetFolder(Folder folder)
     {
-        return mutatedCopy(it -> it.targetFolder = folder);
+        return mutated(it -> it.targetFolder = folder);
     }
 
     /**
@@ -368,7 +368,7 @@ public class JavaCompiler extends BaseTool<JavaCompiler, Void>
      */
     public JavaCompiler withTargetVersion(Version version)
     {
-        return mutatedCopy(it -> it.targetVersion = version);
+        return mutated(it -> it.targetVersion = version);
     }
 
     /**
@@ -379,7 +379,7 @@ public class JavaCompiler extends BaseTool<JavaCompiler, Void>
      */
     public JavaCompiler withWarningDisabled(CompilerWarning... warnings)
     {
-        return mutatedCopy(it -> it.enabledCompilerWarnings.without(warnings));
+        return mutated(it -> it.enabledCompilerWarnings.without(warnings));
     }
 
     /**
@@ -390,7 +390,7 @@ public class JavaCompiler extends BaseTool<JavaCompiler, Void>
      */
     public JavaCompiler withWarningEnabled(CompilerWarning... warnings)
     {
-        return mutatedCopy(it -> it.enabledCompilerWarnings.with(warnings));
+        return mutated(it -> it.enabledCompilerWarnings.with(warnings));
     }
 
     /**

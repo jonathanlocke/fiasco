@@ -26,7 +26,7 @@ import java.net.URI;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
 import static com.telenav.kivakit.core.os.Console.console;
 import static digital.fiasco.runtime.build.environment.BuildRepositoriesTrait.MAVEN_LOCAL;
-import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.artifactDescriptor;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.parseDescriptor;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
 import static digital.fiasco.runtime.repository.Repository.InstallationResult.INSTALLATION_FAILED;
@@ -169,7 +169,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
      */
     public ObjectList<MavenDependency> resolveDependencies(String descriptor)
     {
-        return resolveDependencies(descriptor(descriptor));
+        return resolveDependencies(artifactDescriptor(descriptor));
     }
 
     /**
@@ -257,7 +257,7 @@ public class MavenResolver extends BaseComponent implements TryTrait
                     {
                         reentrancy.enter();
                         var artifact = event.getArtifact();
-                        var descriptor = descriptor("library"
+                        var descriptor = artifactDescriptor("library"
                             + ":" + artifact.getGroupId()
                             + ":" + artifact.getArtifactId()
                             + ":" + artifact.getVersion());

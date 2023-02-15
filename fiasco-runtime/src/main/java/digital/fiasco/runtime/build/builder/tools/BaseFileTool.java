@@ -83,7 +83,7 @@ public abstract class BaseFileTool<TOOL extends BaseFileTool<TOOL, OUTPUT>, OUTP
      */
     public TOOL withFiles(Collection<File> files)
     {
-        return mutatedCopy(it -> it.files = files().with(files));
+        return mutated(it -> it.files = files().with(files));
     }
 
     /**
@@ -94,6 +94,6 @@ public abstract class BaseFileTool<TOOL extends BaseFileTool<TOOL, OUTPUT>, OUTP
      */
     public TOOL withoutFiles(Collection<File> files)
     {
-        return mutatedCopy(it -> it.files = files().without(files));
+        return mutated(it -> it.files = files().without(files));
     }
 }

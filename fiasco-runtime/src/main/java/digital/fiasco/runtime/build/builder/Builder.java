@@ -718,7 +718,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withActionAfterPhase(Phase phase, BuildAction code)
     {
-        return mutatedCopy(it -> it.phase(phase.name()).afterPhase(code));
+        return mutated(it -> it.phase(phase.name()).afterPhase(code));
     }
 
     /**
@@ -730,7 +730,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withActionBeforePhase(Phase phase, BuildAction code)
     {
-        return mutatedCopy(it -> it.phase(phase.name()).beforePhase(code));
+        return mutated(it -> it.phase(phase.name()).beforePhase(code));
     }
 
     /**
@@ -742,7 +742,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withActionDuringPhase(Phase phase, BuildAction code)
     {
-        return mutatedCopy(it -> it.phase(phase.name()).duringPhase(code));
+        return mutated(it -> it.phase(phase.name()).duringPhase(code));
     }
 
     /**
@@ -885,7 +885,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withDependencies(Builder... dependencies)
     {
-        return mutatedCopy(it -> it.builderDependencies = builderDependencies.with(dependencies).deduplicated());
+        return mutated(it -> it.builderDependencies = builderDependencies.with(dependencies).deduplicated());
     }
 
     /**
@@ -896,7 +896,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withDependencies(ArtifactList dependencies)
     {
-        return mutatedCopy(it -> it.artifactDependencies = artifactDependencies.with(dependencies).deduplicated());
+        return mutated(it -> it.artifactDependencies = artifactDependencies.with(dependencies).deduplicated());
     }
 
     /**
@@ -907,7 +907,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withDependencies(String... artifactDescriptors)
     {
-        return mutatedCopy(it -> it.artifactDependencies = artifactDependencies
+        return mutated(it -> it.artifactDependencies = artifactDependencies
             .with(descriptors(artifactDescriptors).asArtifacts()).deduplicated());
     }
 
@@ -920,7 +920,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withDependencies(Artifact<?> first, Artifact<?>... rest)
     {
-        return mutatedCopy(it -> it.artifactDependencies = artifactDependencies.with(first, rest).deduplicated());
+        return mutated(it -> it.artifactDependencies = artifactDependencies.with(first, rest).deduplicated());
     }
 
     /**
@@ -1003,7 +1003,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withLibrarian(Librarian librarian)
     {
-        return mutatedCopy(it -> it.librarian = librarian);
+        return mutated(it -> it.librarian = librarian);
     }
 
     /**
@@ -1013,7 +1013,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withNoDependencies()
     {
-        return mutatedCopy(it ->
+        return mutated(it ->
         {
             it.builderDependencies = builders();
             it.artifactDependencies = artifacts();
@@ -1120,7 +1120,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withPinnedVersion(Artifact<?> artifact, Version version)
     {
-        return mutatedCopy(it -> it.librarian = librarian.withPinnedVersion(artifact, version));
+        return mutated(it -> it.librarian = librarian.withPinnedVersion(artifact, version));
     }
 
     /**
@@ -1167,7 +1167,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withSettings(BuildSettings settings)
     {
-        return mutatedCopy(it -> it.settings = settings);
+        return mutated(it -> it.settings = settings);
     }
 
     /**
@@ -1178,7 +1178,7 @@ public class Builder extends BaseRepeater implements
      */
     public Builder withoutActions(Phase phase)
     {
-        return mutatedCopy(it -> it.phase(phase.name()).clearActions());
+        return mutated(it -> it.phase(phase.name()).clearActions());
     }
 
     /**

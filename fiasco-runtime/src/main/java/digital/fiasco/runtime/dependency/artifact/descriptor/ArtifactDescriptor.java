@@ -29,7 +29,7 @@ import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
  * <p><b>Creation</b></p>
  *
  * <ul>
- *     <li>{@link #descriptor(String)} - Returns the given descriptor, or throws an exception</li>
+ *     <li>{@link #artifactDescriptor(String)} - Returns the given descriptor, or throws an exception</li>
  *     <li>{@link #parseDescriptor(Listener, String)} - Parses the given descriptor, broadcasting a problem if parsing fails</li>
  * </ul>
  *
@@ -124,7 +124,7 @@ public record ArtifactDescriptor(Class<? extends Artifact<?>> type,
      * @throws RuntimeException Throws a subclass of {@link RuntimeException} if parsing fails
      */
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
-    public static ArtifactDescriptor descriptor(String value)
+    public static ArtifactDescriptor artifactDescriptor(String value)
     {
         return parseDescriptor(throwingListener(), value);
     }

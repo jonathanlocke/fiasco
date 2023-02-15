@@ -5,7 +5,7 @@ import com.google.gson.JsonElement;
 import com.telenav.kivakit.serialization.gson.serializers.BaseGsonElementSerializer;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
 
-import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.artifactDescriptor;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
 
 public class ArtifactDescriptorListConverter extends BaseGsonElementSerializer<ArtifactDescriptorList>
@@ -33,7 +33,7 @@ public class ArtifactDescriptorListConverter extends BaseGsonElementSerializer<A
         var descriptors = descriptors();
         for (var at : json)
         {
-            descriptors = descriptors.with(descriptor(at.getAsString()));
+            descriptors = descriptors.with(artifactDescriptor(at.getAsString()));
         }
         return descriptors;
     }

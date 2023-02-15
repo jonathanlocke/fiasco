@@ -8,7 +8,7 @@ import org.junit.Test;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.SOURCES_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.artifactDescriptor;
 import static digital.fiasco.runtime.dependency.collections.LibraryList.libraries;
 
 public class LibraryTest extends FiascoTest
@@ -91,14 +91,14 @@ public class LibraryTest extends FiascoTest
         var library = library()
             .withDependencies(ArtifactList.artifacts(Library.library("a:b:1.0")));
         ensureEqual(library.dependencies().size(), 1);
-        ensureEqual(library.dependencies().get(0).descriptor(), descriptor("library:a:b:1.0"));
+        ensureEqual(library.dependencies().get(0).descriptor(), artifactDescriptor("library:a:b:1.0"));
     }
 
     @Test
     public void testDescriptor()
     {
         var library = library();
-        ensureEqual(library.descriptor(), descriptor("library:x:y:1.0"));
+        ensureEqual(library.descriptor(), artifactDescriptor("library:x:y:1.0"));
     }
 
     @Test

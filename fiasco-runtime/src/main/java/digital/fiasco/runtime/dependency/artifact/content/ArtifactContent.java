@@ -7,6 +7,7 @@ import com.telenav.kivakit.core.string.ObjectFormatter;
 import com.telenav.kivakit.core.time.Time;
 import com.telenav.kivakit.core.value.count.Bytes;
 import com.telenav.kivakit.data.formats.yaml.model.YamlBlock;
+import com.telenav.kivakit.interfaces.object.Copyable;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.ResourceIdentifier;
 
@@ -17,15 +18,26 @@ import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.language.Objects.areEqualPairs;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
-import static com.telenav.kivakit.data.formats.yaml.model.YamlBlock.block;
-import static com.telenav.kivakit.data.formats.yaml.model.YamlScalar.scalar;
+import static com.telenav.kivakit.core.time.LocalTime.localTime;
+import static com.telenav.kivakit.core.value.count.Bytes.bytes;
+import static com.telenav.kivakit.data.formats.yaml.model.YamlBlock.yamlBlock;
+import static com.telenav.kivakit.data.formats.yaml.model.YamlScalar.yamlScalar;
 
 /**
  * Holds the content for a single artifact attachment, for example the main JAR, Javadoc, or source code.
+ *
+ * <p><b>YAML</b></p>
+ *
+ * <ul>
+ *     <li>{@link #toYaml()}</li>
+ *     <li>{@link #content(YamlBlock)}</li>
+ * </ul>
+ *
+ * @author Jonathan Locke
  */
 @SuppressWarnings("unused")
 @TypeQuality(documentation = DOCUMENTED, testing = TESTED, stability = STABLE)
-public class ArtifactContent
+public class ArtifactContent implements Copyable<ArtifactContent>
 {
     public static ArtifactContent content()
     {
@@ -37,13 +49,18 @@ public class ArtifactContent
         return content().withResource(resource);
     }
 
-    @FormatProperty
-    @Expose
-    private final String name;
+    public static ArtifactContent content(YamlBlock block)
+    {
+        return new ArtifactContent(block);
+    }
 
     @FormatProperty
     @Expose
-    private final ArtifactContentSignatures signatures;
+    private String name;
+
+    @FormatProperty
+    @Expose
+    private ArtifactContentSignatures signatures;
 
     @FormatProperty
     @Expose
@@ -51,15 +68,35 @@ public class ArtifactContent
 
     @FormatProperty
     @Expose
-    private final long offset;
+    private long offset;
 
     @FormatProperty
     @Expose
-    private final Time lastModified;
+    private Time lastModified;
 
     @FormatProperty
     @Expose
-    private final Bytes size;
+    private Bytes size;
+
+    protected ArtifactContent(YamlBlock block)
+    {
+        name = block.scalar("name").string();
+        size = bytes(block.scalar("size").number().intValue());
+        lastModified = localTime(block.scalar("lastModified").string());
+        offset = block.scalar("offset").number().longValue();
+        resourceIdentifier = new ResourceIdentifier(block.scalar("resourceIdentifier").string());
+        signatures = ArtifactContentSignatures.signatures(yamlBlock("signatures"));
+    }
+
+    protected ArtifactContent(ArtifactContent that)
+    {
+        this.name = that.name;
+        this.signatures = that.signatures;
+        this.resourceIdentifier = that.resourceIdentifier;
+        this.offset = that.offset;
+        this.lastModified = that.lastModified;
+        this.size = that.size;
+    }
 
     /**
      * @param name The name of the artifact resource
@@ -69,7 +106,7 @@ public class ArtifactContent
      * @param lastModified The time of last modification of the resource
      * @param size The size of the content
      */
-    public ArtifactContent(
+    protected ArtifactContent(
         String name,
         ArtifactContentSignatures signatures,
         ResourceIdentifier resourceIdentifier,
@@ -84,6 +121,12 @@ public class ArtifactContent
         this.offset = offset;
         this.lastModified = lastModified;
         this.size = size;
+    }
+
+    @Override
+    public ArtifactContent copy()
+    {
+        return new ArtifactContent(this);
     }
 
     @Override
@@ -156,11 +199,11 @@ public class ArtifactContent
 
     public YamlBlock toYaml()
     {
-        var yaml = block()
-            .with(scalar("name", name()))
-            .with(scalar("offset", offset()))
-            .with(scalar("size", size.asBytes()))
-            .with(scalar("lastModified", lastModified.asLocalTime().toString()));
+        var yaml = yamlBlock()
+            .with(yamlScalar("name", name()))
+            .with(yamlScalar("offset", offset()))
+            .with(yamlScalar("size", size.asBytes()))
+            .with(yamlScalar("lastModified", lastModified.asLocalTime().toString()));
 
         if (signatures != null)
         {
@@ -169,7 +212,7 @@ public class ArtifactContent
 
         if (offset() < 0)
         {
-            yaml = yaml.with(scalar("resourceIdentifier", resourceIdentifier.identifier()));
+            yaml = yaml.with(yamlScalar("resourceIdentifier", resourceIdentifier.identifier()));
         }
 
         return yaml;
@@ -183,7 +226,7 @@ public class ArtifactContent
      */
     public ArtifactContent withLastModified(Time lastModified)
     {
-        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
+        return mutated(it -> it.lastModified = lastModified);
     }
 
     /**
@@ -194,7 +237,7 @@ public class ArtifactContent
      */
     public ArtifactContent withName(String name)
     {
-        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
+        return mutated(it -> it.name = name);
     }
 
     /**
@@ -205,7 +248,7 @@ public class ArtifactContent
      */
     public ArtifactContent withOffset(long offset)
     {
-        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
+        return mutated(it -> it.offset = offset);
     }
 
     /**
@@ -236,7 +279,7 @@ public class ArtifactContent
      */
     public ArtifactContent withSignatures(ArtifactContentSignatures signatures)
     {
-        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
+        return mutated(it -> it.signatures = signatures);
     }
 
     /**
@@ -247,6 +290,6 @@ public class ArtifactContent
      */
     public ArtifactContent withSize(Bytes size)
     {
-        return new ArtifactContent(name, signatures, resourceIdentifier, offset, lastModified, size);
+        return mutated(it -> it.size = size);
     }
 }

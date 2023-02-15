@@ -250,7 +250,7 @@ public interface BuildSettings extends
      */
     default BuildSettings withArtifactDescriptor(String descriptor)
     {
-        return withArtifactDescriptor(ArtifactDescriptor.descriptor(descriptor));
+        return withArtifactDescriptor(ArtifactDescriptor.artifactDescriptor(descriptor));
     }
 
     /**

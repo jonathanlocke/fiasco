@@ -24,6 +24,6 @@ public class ArtifactDescriptorConverter extends BaseGsonElementSerializer<Artif
     protected ArtifactDescriptor toValue(JsonElement object)
     {
         var json = (JsonObject) object;
-        return ArtifactDescriptor.descriptor(json.get("name").getAsString());
+        return ArtifactDescriptor.artifactDescriptor(json.get("name").getAsString());
     }
 }

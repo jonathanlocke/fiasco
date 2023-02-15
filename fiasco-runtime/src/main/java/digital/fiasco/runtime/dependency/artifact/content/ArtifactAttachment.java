@@ -5,6 +5,7 @@ import com.telenav.kivakit.annotations.code.quality.MethodQuality;
 import com.telenav.kivakit.annotations.code.quality.TypeQuality;
 import com.telenav.kivakit.core.string.FormatProperty;
 import com.telenav.kivakit.core.string.ObjectFormatter;
+import com.telenav.kivakit.data.formats.yaml.model.YamlBlock;
 import com.telenav.kivakit.data.formats.yaml.model.YamlNode;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import org.jetbrains.annotations.NotNull;
@@ -72,6 +73,16 @@ public record ArtifactAttachment
     public static ArtifactAttachment attachment(ArtifactAttachmentType type)
     {
         return attachment(type, null);
+    }
+
+    public static ArtifactAttachment attachment(YamlBlock block)
+    {
+        return new ArtifactAttachment(block);
+    }
+
+    protected ArtifactAttachment(YamlBlock block)
+    {
+        this(Artifact.artifactFromYaml(block), null, null);
     }
 
     /**

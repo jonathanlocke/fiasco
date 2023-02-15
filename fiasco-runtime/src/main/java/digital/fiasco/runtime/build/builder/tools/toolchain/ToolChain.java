@@ -42,6 +42,6 @@ public class ToolChain extends BaseComponent implements Copyable<ToolChain>
 
     public ToolChain with(Jdk jdk)
     {
-        return mutatedCopy(it -> it.jdks.put(jdk.version(), jdk));
+        return mutated(it -> it.jdks.put(jdk.version(), jdk));
     }
 }

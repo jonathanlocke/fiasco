@@ -497,7 +497,7 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L matching(Matcher<D> matcher)
     {
-        return mutatedCopy(it -> it.dependencies = dependencies.matching(matcher));
+        return mutated(it -> it.dependencies = dependencies.matching(matcher));
     }
 
     /**
@@ -566,7 +566,7 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L with(D first, D... rest)
     {
-        return mutatedCopy(it ->
+        return mutated(it ->
         {
             it.dependencies.add(first);
             it.dependencies.addAll(rest);
@@ -582,7 +582,7 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L with(D inclusion)
     {
-        return mutatedCopy(it -> it.dependencies.add(inclusion));
+        return mutated(it -> it.dependencies.add(inclusion));
     }
 
     /**
@@ -594,7 +594,7 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L with(D[] inclusions)
     {
-        return mutatedCopy(it -> it.dependencies.addAll(inclusions));
+        return mutated(it -> it.dependencies.addAll(inclusions));
     }
 
     /**
@@ -606,7 +606,7 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L with(L inclusions)
     {
-        return mutatedCopy(it -> it.dependencies.addAll(inclusions));
+        return mutated(it -> it.dependencies.addAll(inclusions));
     }
 
     /**
@@ -618,7 +618,7 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L with(Collection<D> inclusions)
     {
-        return mutatedCopy(it -> it.dependencies.addAll(inclusions));
+        return mutated(it -> it.dependencies.addAll(inclusions));
     }
 
     /**
@@ -630,7 +630,7 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L without(Collection<D> exclusions)
     {
-        return mutatedCopy(it -> it.dependencies.removeAll(exclusions));
+        return mutated(it -> it.dependencies.removeAll(exclusions));
     }
 
     /**
@@ -642,7 +642,7 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L without(D exclusion)
     {
-        return mutatedCopy(it -> it.dependencies.remove(exclusion));
+        return mutated(it -> it.dependencies.remove(exclusion));
     }
 
     /**
@@ -654,7 +654,7 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L without(L exclusions)
     {
-        return mutatedCopy(it -> it.dependencies.removeAll(exclusions));
+        return mutated(it -> it.dependencies.removeAll(exclusions));
     }
 
     /**
@@ -666,7 +666,7 @@ public abstract class BaseDependencyList<D extends Dependency, L extends BaseDep
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public L without(Matcher<D> exclusionPattern)
     {
-        return mutatedCopy(it -> it.dependencies.removeIf(exclusionPattern::matches));
+        return mutated(it -> it.dependencies.removeIf(exclusionPattern::matches));
     }
 
     protected abstract L newList(L that);

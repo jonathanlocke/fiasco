@@ -16,7 +16,7 @@ import static digital.fiasco.runtime.dependency.artifact.Artifact.artifactFromJs
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAVADOC_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.SOURCES_ATTACHMENT;
-import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.artifactDescriptor;
 import static digital.fiasco.runtime.dependency.artifact.types.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.types.Library.library;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
@@ -187,7 +187,7 @@ public class ArtifactTest extends FiascoTest
     @Test
     public void testDescriptor()
     {
-        ensureEqual(kivakitApplication().descriptor(), descriptor("library:com.telenav.kivakit:kivakit-application:1.8.5"));
+        ensureEqual(kivakitApplication().descriptor(), artifactDescriptor("library:com.telenav.kivakit:kivakit-application:1.8.5"));
     }
 
     @Test
@@ -384,14 +384,14 @@ public class ArtifactTest extends FiascoTest
     {
         var library = kivakitApplication();
 
-        ensureEqual(library.withDescriptor(descriptor("library:a:b:1")).descriptor(), descriptor("library:a:b:1"));
+        ensureEqual(library.withDescriptor(artifactDescriptor("library:a:b:1")).descriptor(), artifactDescriptor("library:a:b:1"));
 
-        ensureEqual(library.withArtifactName("x").descriptor(), descriptor("library:com.telenav.kivakit:x:1.8.5"));
-        ensureEqual(library.withArtifactName(new ArtifactName("x")).descriptor(), descriptor("library:com.telenav.kivakit:x:1.8.5"));
-        ensureEqual(library.artifact("x").descriptor(), descriptor("library:com.telenav.kivakit:x:1.8.5"));
+        ensureEqual(library.withArtifactName("x").descriptor(), artifactDescriptor("library:com.telenav.kivakit:x:1.8.5"));
+        ensureEqual(library.withArtifactName(new ArtifactName("x")).descriptor(), artifactDescriptor("library:com.telenav.kivakit:x:1.8.5"));
+        ensureEqual(library.artifact("x").descriptor(), artifactDescriptor("library:com.telenav.kivakit:x:1.8.5"));
 
-        ensureEqual(library.withVersion("1.0").descriptor(), descriptor("library:com.telenav.kivakit:kivakit-application:1.0"));
-        ensureEqual(library.withVersion("1.0").descriptor(), descriptor("library:com.telenav.kivakit:kivakit-application:1.0"));
+        ensureEqual(library.withVersion("1.0").descriptor(), artifactDescriptor("library:com.telenav.kivakit:kivakit-application:1.0"));
+        ensureEqual(library.withVersion("1.0").descriptor(), artifactDescriptor("library:com.telenav.kivakit:kivakit-application:1.0"));
 
         ensureEqual(library.withRepository(MAVEN_CENTRAL).repository(), MAVEN_CENTRAL);
 

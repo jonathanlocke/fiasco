@@ -307,7 +307,7 @@ public class DependencyQueue extends BaseComponent implements
      */
     public DependencyQueue withIsReady(BiFunction<DependencyQueue, Dependency, Boolean> isReady)
     {
-        return mutatedCopy(it -> it.isReady = ensureNotNull(isReady));
+        return mutated(it -> it.isReady = ensureNotNull(isReady));
     }
 
     private void ensureHasIsReadyFunction()

@@ -47,7 +47,7 @@ import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachm
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.POM_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.SOURCES_ATTACHMENT;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactContent.content;
-import static digital.fiasco.runtime.dependency.artifact.content.jar.ArtifactJarContent.jarContent;
+import static digital.fiasco.runtime.dependency.artifact.content.jar.JarContent.jarContent;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList.descriptors;
 import static digital.fiasco.runtime.dependency.artifact.types.Asset.asset;
 import static digital.fiasco.runtime.dependency.artifact.types.Library.library;

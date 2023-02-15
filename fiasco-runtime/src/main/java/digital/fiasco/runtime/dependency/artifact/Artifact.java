@@ -6,6 +6,7 @@ import com.telenav.kivakit.core.collections.list.ObjectList;
 import com.telenav.kivakit.core.collections.map.ObjectMap;
 import com.telenav.kivakit.core.string.AsString;
 import com.telenav.kivakit.core.version.Version;
+import com.telenav.kivakit.data.formats.yaml.model.YamlBlock;
 import com.telenav.kivakit.data.formats.yaml.model.YamlNode;
 import com.telenav.kivakit.resource.Resource;
 import com.telenav.kivakit.resource.resources.StringOutputResource;
@@ -30,9 +31,9 @@ import static com.telenav.kivakit.annotations.code.quality.Documentation.DOCUMEN
 import static com.telenav.kivakit.annotations.code.quality.Stability.STABLE;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.core.collections.list.ObjectList.list;
-import static com.telenav.kivakit.data.formats.yaml.model.YamlArray.array;
-import static com.telenav.kivakit.data.formats.yaml.model.YamlBlock.block;
-import static com.telenav.kivakit.data.formats.yaml.model.YamlScalar.scalar;
+import static com.telenav.kivakit.data.formats.yaml.model.YamlArray.yamlArray;
+import static com.telenav.kivakit.data.formats.yaml.model.YamlBlock.yamlBlock;
+import static com.telenav.kivakit.data.formats.yaml.model.YamlScalar.yamlScalar;
 import static com.telenav.kivakit.resource.serialization.ObjectMetadata.METADATA_OBJECT_TYPE;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment.attachment;
 import static digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachmentType.JAR_ATTACHMENT;
@@ -158,6 +159,20 @@ public interface Artifact<A extends Artifact<A>> extends
         var serialized = new StringResource(json);
         var serializer = new GsonObjectSerializer();
         return (A) serializer.readObject(serialized, METADATA_OBJECT_TYPE).object();
+    }
+
+    /**
+     * Returns an artifact for a given YAML string
+     *
+     * @param yaml The YAML
+     * @return The artifact
+     */
+    @SuppressWarnings("unchecked")
+    @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
+    static <A extends Artifact<A>> A artifactFromYaml(YamlBlock yaml)
+    {
+        var descriptor = ArtifactDescriptor.artifactDescriptor(yaml.scalar("descriptor").string());
+        return (A) descriptor.asArtifact();
     }
 
     /**
@@ -358,33 +373,36 @@ public interface Artifact<A extends Artifact<A>> extends
     @Override
     default YamlNode toYaml()
     {
-        var dependencies = array("dependencies");
+        var dependencies = yamlArray("dependencies");
         for (var it : dependencies())
         {
-            dependencies = dependencies.with(scalar(it.descriptor().name()));
+            dependencies = dependencies.with(yamlScalar(it.descriptor().name()));
         }
 
-        var attachments = array("attachments");
+        var attachments = yamlArray("attachments");
         for (var it : attachments())
         {
-            attachments = attachments.with(block(it.attachmentType().name())
+            attachments = attachments.with(yamlBlock(it.attachmentType().name())
                 .with(it.toYaml()));
         }
 
-        var yaml = block()
-            .with(scalar("descriptor", descriptor().name()));
-
-        if (!attachments.isEmpty())
         {
-            yaml = yaml.with(attachments);
-        }
+            var yaml = yamlBlock()
+                .with(yamlScalar("descriptor", descriptor().name()))
+                .with(yamlScalar(repository().name()));
 
-        if (!dependencies.isEmpty())
-        {
-            yaml = yaml.with(dependencies);
-        }
+            if (!attachments.isEmpty())
+            {
+                yaml = yaml.with(attachments);
+            }
 
-        return yaml;
+            if (!dependencies.isEmpty())
+            {
+                yaml = yaml.with(dependencies);
+            }
+
+            return yaml;
+        }
     }
 
     /**

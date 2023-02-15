@@ -89,6 +89,6 @@ public class Jdk implements Copyable<Jdk>
 
     public Jdk withHomeFolder(Folder home)
     {
-        return mutatedCopy(it -> it.home = home);
+        return mutated(it -> it.home = home);
     }
 }

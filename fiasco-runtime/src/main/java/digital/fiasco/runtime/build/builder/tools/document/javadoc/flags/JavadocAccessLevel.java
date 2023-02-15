@@ -67,11 +67,11 @@ public class JavadocAccessLevel implements Copyable<JavadocAccessLevel>
 
     public JavadocAccessLevel withWarnings(JavadocWarning... warnings)
     {
-        return mutatedCopy(it -> it.enabledWarnings = enabledWarnings.with(warnings));
+        return mutated(it -> it.enabledWarnings = enabledWarnings.with(warnings));
     }
 
     public JavadocAccessLevel withoutWarnings(JavadocWarning... warnings)
     {
-        return mutatedCopy(it -> it.enabledWarnings = enabledWarnings.without(warnings));
+        return mutated(it -> it.enabledWarnings = enabledWarnings.without(warnings));
     }
 }

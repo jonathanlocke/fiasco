@@ -87,7 +87,7 @@ public class ArtifactDescriptorList implements
      */
     public static ArtifactDescriptorList descriptors(String... descriptors)
     {
-        return descriptors(stringList(descriptors).map(ArtifactDescriptor::descriptor));
+        return descriptors(stringList(descriptors).map(ArtifactDescriptor::artifactDescriptor));
     }
 
     /**
@@ -306,7 +306,7 @@ public class ArtifactDescriptorList implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptorList with(ArtifactDescriptor first, ArtifactDescriptor... rest)
     {
-        return mutatedCopy(it ->
+        return mutated(it ->
         {
             it.descriptors.add(first);
             it.descriptors.addAll(rest);
@@ -322,7 +322,7 @@ public class ArtifactDescriptorList implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptorList with(ArtifactDescriptor inclusion)
     {
-        return mutatedCopy(it -> it.descriptors.add(inclusion));
+        return mutated(it -> it.descriptors.add(inclusion));
     }
 
     /**
@@ -334,7 +334,7 @@ public class ArtifactDescriptorList implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptorList with(ArtifactDescriptor[] inclusions)
     {
-        return mutatedCopy(it -> it.descriptors.addAll(inclusions));
+        return mutated(it -> it.descriptors.addAll(inclusions));
     }
 
     /**
@@ -346,7 +346,7 @@ public class ArtifactDescriptorList implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptorList with(ArtifactDescriptorList inclusions)
     {
-        return mutatedCopy(it -> it.descriptors.addAll(inclusions));
+        return mutated(it -> it.descriptors.addAll(inclusions));
     }
 
     /**
@@ -358,7 +358,7 @@ public class ArtifactDescriptorList implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptorList with(Collection<ArtifactDescriptor> inclusions)
     {
-        return mutatedCopy(it -> it.descriptors.addAll(inclusions));
+        return mutated(it -> it.descriptors.addAll(inclusions));
     }
 
     /**
@@ -370,7 +370,7 @@ public class ArtifactDescriptorList implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptorList without(Collection<ArtifactDescriptor> exclusions)
     {
-        return mutatedCopy(it -> it.descriptors.removeAll(exclusions));
+        return mutated(it -> it.descriptors.removeAll(exclusions));
     }
 
     /**
@@ -382,7 +382,7 @@ public class ArtifactDescriptorList implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptorList without(ArtifactDescriptor exclusion)
     {
-        return mutatedCopy(it -> it.descriptors.remove(exclusion));
+        return mutated(it -> it.descriptors.remove(exclusion));
     }
 
     /**
@@ -394,7 +394,7 @@ public class ArtifactDescriptorList implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptorList without(ArtifactDescriptorList exclusions)
     {
-        return mutatedCopy(it -> it.descriptors.removeAll(exclusions));
+        return mutated(it -> it.descriptors.removeAll(exclusions));
     }
 
     /**
@@ -406,6 +406,6 @@ public class ArtifactDescriptorList implements
     @MethodQuality(documentation = DOCUMENTED, testing = TESTED)
     public ArtifactDescriptorList without(Matcher<ArtifactDescriptor> exclusionPattern)
     {
-        return mutatedCopy(it -> it.descriptors.removeIf(exclusionPattern::matches));
+        return mutated(it -> it.descriptors.removeIf(exclusionPattern::matches));
     }
 }

@@ -218,7 +218,7 @@ public abstract class BaseTool<TOOL extends BaseTool<TOOL, OUTPUT>, OUTPUT> exte
      */
     public TOOL withProfile(BuildProfile profile)
     {
-        return mutatedCopy(it -> ((BaseTool<?, ?>) it).profile = profile);
+        return mutated(it -> ((BaseTool<?, ?>) it).profile = profile);
     }
 
     /**

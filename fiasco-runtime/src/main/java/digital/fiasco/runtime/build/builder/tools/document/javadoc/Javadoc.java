@@ -79,7 +79,7 @@ public class Javadoc extends BaseFileTool<Javadoc, Void>
      */
     public Javadoc withDisabled(JavadocAccessLevel level, JavadocWarning... warnings)
     {
-        return mutatedCopy(it -> it.accessLevels.get(level.accessLevelName()).withoutWarnings(warnings));
+        return mutated(it -> it.accessLevels.get(level.accessLevelName()).withoutWarnings(warnings));
     }
 
     /**
@@ -90,6 +90,6 @@ public class Javadoc extends BaseFileTool<Javadoc, Void>
      */
     public Javadoc withEnabled(JavadocAccessLevel level, JavadocWarning... warnings)
     {
-        return mutatedCopy(it -> it.accessLevels.get(level.accessLevelName()).withWarnings(warnings));
+        return mutated(it -> it.accessLevels.get(level.accessLevelName()).withWarnings(warnings));
     }
 }

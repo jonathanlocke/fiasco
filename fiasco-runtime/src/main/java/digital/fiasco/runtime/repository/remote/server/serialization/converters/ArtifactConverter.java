@@ -13,7 +13,7 @@ import static com.telenav.kivakit.annotations.code.quality.Testing.TESTED;
 import static com.telenav.kivakit.annotations.code.quality.Testing.TESTING_INSUFFICIENT;
 import static com.telenav.kivakit.core.language.Classes.newInstance;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
-import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.artifactDescriptor;
 
 /**
  * Converts artifact notation to and from objects, where artifact notation is like "(library|asset)/[descriptor]", for
@@ -58,7 +58,7 @@ public class ArtifactConverter<T extends Artifact> extends BaseStringConverter<T
     @MethodQuality(documentation = DOCUMENTED, testing = TESTING_INSUFFICIENT)
     protected T onToValue(String text)
     {
-        var descriptor = descriptor(text);
+        var descriptor = artifactDescriptor(text);
         return (T) newInstance(descriptor.type(), ArtifactDescriptor.class, descriptor);
     }
 }

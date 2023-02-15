@@ -1,17 +1,17 @@
 package digital.fiasco.runtime.dependency.artifact.content.jar;
 
 import com.google.gson.annotations.Expose;
+import com.telenav.kivakit.core.time.Time;
+import com.telenav.kivakit.core.value.count.Bytes;
 import com.telenav.kivakit.data.formats.yaml.model.YamlBlock;
 import com.telenav.kivakit.filesystem.File;
 import com.telenav.kivakit.resource.Resource;
-import com.telenav.kivakit.resource.ResourceIdentifier;
 import com.telenav.kivakit.resource.compression.archive.ZipArchive;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContentSignatures;
 
 import static com.telenav.kivakit.core.ensure.Ensure.ensure;
 import static com.telenav.kivakit.core.messaging.Listener.throwingListener;
-import static com.telenav.kivakit.data.formats.yaml.model.YamlBlock.block;
 import static com.telenav.kivakit.resource.WriteMode.APPEND;
 import static com.telenav.kivakit.resource.compression.archive.ZipArchive.AccessMode.READ;
 import static com.telenav.kivakit.resource.compression.archive.ZipArchive.zipArchive;
@@ -20,14 +20,27 @@ import static digital.fiasco.runtime.dependency.artifact.content.jar.JarIndex.ja
 
 /**
  * JAR artifact content exploded into a {@link JarIndex} of {@link JarEntry}s.
+ *
+ * <p><b>YAML</b></p>
+ *
+ * <ul>
+ *     <li>{@link #toYaml()}</li>
+ *     <li>{@link #jarContent(YamlBlock)}</li>
+ * </ul>
+ *
+ * @author Jonathan Locke
  */
-public class ArtifactJarContent extends ArtifactContent
+public class JarContent extends ArtifactContent
 {
-    public static ArtifactJarContent jarContent(Resource resource)
+    public static JarContent jarContent(Resource resource)
     {
         ensure(resource instanceof File);
-        return new ArtifactJarContent(null, null, null, -1,
-            zipArchive(throwingListener(), (File) resource, READ));
+        return new JarContent(zipArchive(throwingListener(), (File) resource, READ));
+    }
+
+    public static JarContent jarContent(YamlBlock block)
+    {
+        return new JarContent(block);
     }
 
     /** The JAR index */
@@ -36,33 +49,44 @@ public class ArtifactJarContent extends ArtifactContent
 
     /** The JAR zip archive */
     @Expose
-    private final ZipArchive archive;
+    private ZipArchive archive;
+
+    protected JarContent(JarContent that)
+    {
+        super(that);
+        this.index = that.index;
+        this.archive = that.archive;
+    }
 
     /**
      * Holds the content for a single JAR artifact. The JAR is exploded into an index which references the series of
-     * decompressed files in the JAR.
+     * decompressed files from the JAR.
      *
-     * @param name The name of the artifact resource
-     * @param signatures The signatures for this content
-     * @param resourceIdentifier The resource containing the content
-     * @param offset The offset of this content in a cache file (if any)
      * @param archive The JAR archive
      */
-    public ArtifactJarContent(String name,
-                              ArtifactContentSignatures signatures,
-                              ResourceIdentifier resourceIdentifier,
-                              long offset,
-                              ZipArchive archive)
+    protected JarContent(ZipArchive archive)
     {
-        super(name, signatures, resourceIdentifier, offset, archive.resource().lastModified(), archive.resource().sizeInBytes());
+        super(archive.file().fileName().name(), null, archive.file().identifier(), -1,
+            archive.resource().lastModified(), archive.resource().sizeInBytes());
 
         this.archive = archive;
 
         this.index = jarIndex();
-        for (var entry : archive)
+        var offset = 0L;
+        for (var at : archive)
         {
-            index = index.withEntry(jarEntry(entry));
+            var entry = jarEntry(at)
+                .withOffset(offset);
+            index = index.withEntry(entry);
+            offset += entry.size().asBytes();
         }
+    }
+
+    protected JarContent(YamlBlock block)
+    {
+        super(block);
+
+        index = jarIndex(block.array("index"));
     }
 
     /**
@@ -73,6 +97,12 @@ public class ArtifactJarContent extends ArtifactContent
     public void appendEntriesTo(File file)
     {
         archive.forEach(it -> it.safeCopyTo(file, APPEND));
+    }
+
+    @Override
+    public JarContent copy()
+    {
+        return new JarContent(this);
     }
 
     @Override
@@ -101,7 +131,42 @@ public class ArtifactJarContent extends ArtifactContent
     public YamlBlock toYaml()
     {
         return super.toYaml()
-            .with(block("index")
-                .with(index.toYaml()));
+            .with(index.toYaml());
+    }
+
+    @Override
+    public JarContent withLastModified(Time lastModified)
+    {
+        return (JarContent) super.withLastModified(lastModified);
+    }
+
+    @Override
+    public JarContent withName(String name)
+    {
+        return (JarContent) super.withName(name);
+    }
+
+    @Override
+    public JarContent withOffset(long offset)
+    {
+        return (JarContent) super.withOffset(offset);
+    }
+
+    @Override
+    public JarContent withResource(Resource resource)
+    {
+        return (JarContent) super.withResource(resource);
+    }
+
+    @Override
+    public JarContent withSignatures(ArtifactContentSignatures signatures)
+    {
+        return (JarContent) super.withSignatures(signatures);
+    }
+
+    @Override
+    public JarContent withSize(Bytes size)
+    {
+        return (JarContent) super.withSize(size);
     }
 }

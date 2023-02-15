@@ -75,6 +75,6 @@ public interface Librarian extends
 
     default Librarian withPinnedVersion(String descriptor, String version)
     {
-        return withPinnedVersion(ArtifactDescriptor.descriptor(descriptor), version(version));
+        return withPinnedVersion(ArtifactDescriptor.artifactDescriptor(descriptor), version(version));
     }
 }

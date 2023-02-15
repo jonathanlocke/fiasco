@@ -9,7 +9,7 @@ import com.telenav.kivakit.resource.resources.ResourceSection;
 import digital.fiasco.runtime.dependency.artifact.Artifact;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactAttachment;
 import digital.fiasco.runtime.dependency.artifact.content.ArtifactContent;
-import digital.fiasco.runtime.dependency.artifact.content.jar.ArtifactJarContent;
+import digital.fiasco.runtime.dependency.artifact.content.jar.JarContent;
 import digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptorList;
 import digital.fiasco.runtime.dependency.collections.ArtifactList;
 import digital.fiasco.runtime.repository.Repository;
@@ -168,7 +168,7 @@ public class FiascoCacheRepository extends FiascoUserRepository
             var lastModified = content.lastModified();
 
             // and if the content is a JAR file,
-            if (content instanceof ArtifactJarContent jarContent)
+            if (content instanceof JarContent jarContent)
             {
                 // explode the JAR entries and append them to the artifact content file,
                 jarContent.appendEntriesTo(artifactContentFile);

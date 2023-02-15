@@ -459,7 +459,7 @@ public class BuildSettingsObject extends BaseRepeater implements
     @Override
     public BuildSettingsObject withProfile(BuildProfile profile)
     {
-        return mutatedCopy(it -> it.profiles.add(profile));
+        return mutated(it -> it.profiles.add(profile));
     }
 
     /**

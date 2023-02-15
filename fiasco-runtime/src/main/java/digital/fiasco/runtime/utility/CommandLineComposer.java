@@ -42,7 +42,7 @@ public class CommandLineComposer implements Copyable<CommandLineComposer>
         var strings = toStringList(object);
         if (strings != null)
         {
-            return mutatedCopy(it -> it.arguments.add(strings.join(separator)));
+            return mutated(it -> it.arguments.add(strings.join(separator)));
         }
         return this;
     }
@@ -72,7 +72,7 @@ public class CommandLineComposer implements Copyable<CommandLineComposer>
         var strings = toStringList(object);
         if (strings != null)
         {
-            return mutatedCopy(it -> it.arguments.add(name + equals + strings.join(separator)));
+            return mutated(it -> it.arguments.add(name + equals + strings.join(separator)));
         }
         return this;
     }
@@ -87,7 +87,7 @@ public class CommandLineComposer implements Copyable<CommandLineComposer>
         var strings = toStringList(object);
         if (strings != null)
         {
-            return mutatedCopy(it ->
+            return mutated(it ->
             {
                 it.arguments.add(name);
                 it.arguments.add(strings.join(separator));

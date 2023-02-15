@@ -5,7 +5,7 @@ import digital.fiasco.runtime.dependency.artifact.types.Asset;
 import digital.fiasco.runtime.dependency.artifact.types.Library;
 import org.junit.Test;
 
-import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.descriptor;
+import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactDescriptor.artifactDescriptor;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactGroup.group;
 import static digital.fiasco.runtime.dependency.artifact.descriptor.ArtifactName.artifactName;
 import static digital.fiasco.runtime.dependency.artifact.types.Asset.asset;
@@ -16,17 +16,17 @@ public class ArtifactGroupTest extends FiascoTest
     @Test
     public void testArtifact()
     {
-        ensureEqual(group("x").library("y").asLibrary(), descriptor("library:x:y:").asLibrary());
-        ensureEqual(group("x").library("y").version("1.9").asLibrary(), descriptor("library:x:y:1.9").asLibrary());
-        ensureEqual(group("x").library(artifactName("y")).asLibrary(), descriptor("library:x:y:").asLibrary());
-        ensureEqual(group("x").library(artifactName("y")).version("1.9").asLibrary(), descriptor("library:x:y:1.9").asLibrary());
+        ensureEqual(group("x").library("y").asLibrary(), artifactDescriptor("library:x:y:").asLibrary());
+        ensureEqual(group("x").library("y").version("1.9").asLibrary(), artifactDescriptor("library:x:y:1.9").asLibrary());
+        ensureEqual(group("x").library(artifactName("y")).asLibrary(), artifactDescriptor("library:x:y:").asLibrary());
+        ensureEqual(group("x").library(artifactName("y")).version("1.9").asLibrary(), artifactDescriptor("library:x:y:1.9").asLibrary());
     }
 
     @Test
     public void testAsset()
     {
         var asset = asset(group("x").asset("y"));
-        ensureEqual(asset.descriptor(), descriptor("library:x:y:"));
+        ensureEqual(asset.descriptor(), artifactDescriptor("library:x:y:"));
         ensure(asset instanceof Asset);
     }
 
@@ -34,7 +34,7 @@ public class ArtifactGroupTest extends FiascoTest
     public void testLibrary()
     {
         var library = library(group("x").library("y").asLibrary());
-        ensureEqual(library.descriptor(), descriptor("library:x:y:"));
+        ensureEqual(library.descriptor(), artifactDescriptor("library:x:y:"));
         ensure(library instanceof Library);
     }
 

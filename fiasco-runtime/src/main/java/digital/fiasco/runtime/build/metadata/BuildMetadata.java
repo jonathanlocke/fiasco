@@ -59,7 +59,7 @@ public record BuildMetadata(@FormatProperty ArtifactDescriptor descriptor,
 
     public BuildMetadata withDescriptor(String descriptor)
     {
-        return withDescriptor(ArtifactDescriptor.descriptor(descriptor));
+        return withDescriptor(ArtifactDescriptor.artifactDescriptor(descriptor));
     }
 
     public BuildMetadata withDescriptor(ArtifactDescriptor descriptor)
